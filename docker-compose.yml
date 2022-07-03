@@ -1,0 +1,11 @@
+version: "3"
+services:
+  web:
+    build:
+      context: ./
+    container_name: app-store-front
+    image: app-store-front:v1
+    expose:
+      - 3000
+    ports:
+      - "3000:3000"
