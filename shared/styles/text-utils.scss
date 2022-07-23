@@ -1,0 +1,23 @@
+
+@each $index, $font-size in $font-sizes {
+  .font-size-#{$index} {
+    font-size: $font-size;
+  }
+}
+
+// generate a border-color, text, and background classes according to earch color in $fontWeights
+@for $i from 1 through 7 {
+  .font-weight-#{$i} {
+    font-weight: $i * 100;
+  }
+}
+
+.header-label {
+  font-size: $font-size-6;
+  font-weight: bold;
+}
+
+.header-title {
+  font-size: $font-size-7;
+  font-weight: 500;
+}

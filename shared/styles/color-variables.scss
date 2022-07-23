@@ -1,0 +1,46 @@
+// BLUE
+$color-blue-1: #0766c1;
+$color-blue-2: #1577d4;
+$color-blue-3: #3494ee;
+$color-blue-4: #67b5ff;
+
+// Red
+$color-red-1: #dc372b;
+$color-red-2: #f85b50;
+
+// GRAY
+$color-gray-1: #6a6a6a;
+$color-gray-2: #9c9c9c;
+$color-gray-3: #c9c9c9;
+
+// BLACK
+$color-black-1: #353f45;
+
+// WHITE
+$color-white-1: #fff;
+$color-white-2: #C7D0E0;
+
+$colors: (
+  "blue": (
+    1: $color-blue-1,
+    2: $color-blue-2,
+    3: $color-blue-3,
+    4: $color-blue-4,
+  ),
+  "red": (
+    1: $color-red-1,
+    2: $color-red-2,
+  ),
+  "gray": (
+    1: $color-gray-1,
+    2: $color-gray-2,
+    3: $color-gray-3,
+  ),
+  "black": (
+    1: $color-black-1,
+  ),
+  "white": (
+    1: $color-white-1,
+    2: $color-white-2,
+  ),
+);

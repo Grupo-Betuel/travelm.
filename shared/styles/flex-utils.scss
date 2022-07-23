@@ -1,0 +1,36 @@
+$flexAlignments: (
+  "between": space-between,
+  "center": center,
+  "start": start,
+  "end": end,
+);
+
+.d-flex {
+  display: flex;
+}
+
+@each $name, $alignment in $flexAlignments {
+  @each $name2, $alignment2 in $flexAlignments {
+    .flex-#{$name}-#{$name2} {
+      display: flex;
+      justify-content: $alignment;
+      align-items: $alignment2;
+    }
+
+    .flex-#{$name2}-#{$name} {
+      display: flex;
+      justify-content: $alignment2;
+      align-items: $alignment;
+    }
+  }
+  .flex-align-#{$name} {
+    display: flex;
+    align-items: $alignment;
+  }
+
+  .flex-justify-#{$name} {
+    display: flex;
+    align-items: $alignment;
+  }
+
+}

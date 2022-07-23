@@ -1,4 +1,4 @@
-import { Navbar } from "@shared/layout/components/Navbar";
+import { Navbar } from "@shared/layout/components/Navbar/Navbar";
 import { Sidebar } from "@shared/layout/components/Sidebar";
 import { Layout } from "antd";
 import { AppFooter } from "@shared/layout/components/Footer";
@@ -13,10 +13,10 @@ const AppLayout = ({ children }: IAppLayoutProps) => {
       <Layout>
         <Navbar />
         <Layout>
-          <Sidebar />
+          {/*<Sidebar />*/}
           <Content>{children}</Content>
         </Layout>
-        <AppFooter />
+        {/*<AppFooter />*/}
       </Layout>
     </>
   );

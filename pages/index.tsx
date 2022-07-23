@@ -1,11 +1,8 @@
 import type { NextPage } from "next";
+import { Home } from "@screens/Home";
 
-const Home: NextPage = () => {
-  return (
-    <div>
-      <h1>Hello Padilla-Core.</h1>
-    </div>
-  );
+const Index: NextPage = () => {
+  return <Home />;
 };
 
-export default Home;
+export default Index;

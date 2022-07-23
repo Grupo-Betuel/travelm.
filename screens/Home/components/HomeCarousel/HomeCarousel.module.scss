@@ -1,0 +1,27 @@
+@import "shared/styles/text-variables";
+
+.HomeCarouselWrapper {
+  position: relative;
+
+  .Arrow {
+    position: absolute;
+    font-size: $font-size-10;
+    font-weight: bold;
+    cursor: pointer;
+    color: white;
+    top: 25%;
+    margin-top: -14px;
+    z-index: 9;
+  }
+
+  .HomeCarouselLeftArrow {
+    @extend .Arrow;
+    left: 30px;
+  }
+
+  .HomeCarouselRightArrow {
+    @extend .Arrow;
+    right: 30px;
+
+  }
+}

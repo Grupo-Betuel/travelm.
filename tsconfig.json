@@ -17,10 +17,13 @@
     "baseUrl": "./",
     "paths": {
       "@components/*": ["./shared/components/*"],
+      "@interfaces/*": ["./shared/interfaces/*"],
+      "@models/*": ["./shared/models/*"],
       "@shared/*": ["./shared/*"],
       "@styles/*": ["./shared/styles/*"],
       "@services/*": ["./shared/services/*"],
-      "@assets/*": ["./shared/assets/*"]
+      "@assets/*": ["./shared/assets/*"],
+      "@screens/*": ["./screens/*"]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],

@@ -1,0 +1,45 @@
+@import "shared/styles/spacing-variables";
+@import "shared/styles/text-variables";
+@import "shared/styles/color-variables";
+
+.ScrollViewWrapper {
+  position: relative;
+  padding: $space-large;
+
+  .ScrollView {
+    overflow-x: scroll;
+    width: 100%;
+    display: flex;
+    gap: $space-medium;
+    align-items: center;
+    justify-content: center;
+    box-shadow: -5px 0px 0px #000 inset;
+
+    .ScrollViewItem {
+      min-width: 200px;
+    }
+  }
+
+  .Arrow {
+    position: absolute;
+    font-size: $font-size-10;
+    font-weight: bold;
+    cursor: pointer;
+    color: $color-blue-1;
+    top: 50%;
+    margin-top: -14px;
+    z-index: 9;
+    background-color: white;
+  }
+
+  .ScrollViewLeftArrow {
+    @extend .Arrow;
+    left: 0rem;
+  }
+
+  .ScrollViewRightArrow {
+    @extend .Arrow;
+    right: 0rem;
+
+  }
+}

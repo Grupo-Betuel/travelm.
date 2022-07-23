@@ -1,0 +1,22 @@
+@import "text-variables";
+
+.cursor-pointer {
+  cursor: pointer;
+}
+
+.w-100 {
+  width: 100%;
+}
+
+.subtitle {
+  font-size: $font-size-8;
+  font-weight: 700;
+}
+
+.border-radius {
+  border-radius: 0.625rem;
+}
+
+.box-shadow {
+  box-shadow: 0.3125rem 0.3125rem 0.625rem rgb(0 0 0 / 30%);
+}

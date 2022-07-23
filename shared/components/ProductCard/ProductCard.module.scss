@@ -1,0 +1,23 @@
+@import "shared/styles/common-utils";
+
+.ProductCard {
+  @extend .box-shadow;
+  @extend .border-radius;
+  display: flex;
+  flex-direction: column;
+  padding: 0.75rem;
+  background-color: white;
+  cursor: pointer;
+  .ProductTitle {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+  }
+
+  .ProductPrice {
+    font-weight: bold;
+    font-size: $font-size-8;
+  }
+}

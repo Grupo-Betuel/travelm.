@@ -1,0 +1,17 @@
+@each $colorType, $variants in $colors {
+  @each $variant, $color in $variants {
+    $colorVariant: '-' + $variant;
+    @if($variant == 1) {
+      $colorVariant: '';
+    }
+
+    .hover-#{$colorType}#{$colorVariant} {
+      border-radius: 0.625rem;
+      cursor: pointer;
+      padding: 0.3125rem;
+      &:hover {
+        border: 0.1875rem solid $color;
+      }
+    }
+  }
+}
