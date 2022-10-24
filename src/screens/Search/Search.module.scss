@@ -1,0 +1,10 @@
+@import "src/shared/styles/spacing-variables";
+@import "src/shared/styles/color-variables";
+
+.SearchWrapper {
+  display: flex;
+  .SearchContent {
+    padding: 60px 30px;
+    width: 100%;
+  }
+}

@@ -1,0 +1,19 @@
+@import "src/shared/styles/color-variables";
+@import "src/shared/styles/spacing-variables";
+
+.VerticalPreviewCardWrapper {
+  background-color: white;
+  padding: $space-medium;
+  box-shadow: 0.3125rem 0.3125rem 0.625rem rgba(0,0,0, .3);
+  border-radius: 0.625rem;
+  color: $color-black-1;
+  .VerticalPreviewCardGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    width: 100%;
+    gap: $space-medium;
+    align-items: center;
+    justify-items: stretch;
+    height: 18.75rem;
+  }
+}

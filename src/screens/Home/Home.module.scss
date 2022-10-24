@@ -1,0 +1,38 @@
+@import "src/shared/styles/spacing-variables";
+@import "src/shared/styles/color-variables";
+
+.HomeWrapper {
+  .HomeContent {
+    padding: $space-large;
+    display: flex;
+    flex-direction: column;
+    gap: $space-large;
+    .HomeTopCardsGrid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(18.75rem, 1fr));
+      justify-items: start;
+      gap: $space-large;
+      position: relative;
+      margin-top: -250px;
+    }
+  }
+
+  .HomeSection {
+    padding: $space-large;
+    background-color: white;
+    box-shadow: 0.3125rem 0.3125rem 0.625rem rgba(0,0,0, .3);
+    border-radius: 0.625rem;
+  }
+}
+
+.products {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 30px;
+  div {
+    cursor: pointer;
+  }
+  img {
+    max-width: 200px;
+  }
+}

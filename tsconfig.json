@@ -16,14 +16,14 @@
     "incremental": true,
     "baseUrl": "./",
     "paths": {
-      "@components/*": ["./shared/components/*"],
-      "@interfaces/*": ["./shared/interfaces/*"],
-      "@models/*": ["./shared/models/*"],
-      "@shared/*": ["./shared/*"],
-      "@styles/*": ["./shared/styles/*"],
-      "@services/*": ["./shared/services/*"],
-      "@assets/*": ["./shared/assets/*"],
-      "@screens/*": ["./screens/*"]
+      "@components/*": ["./src/shared/components/*"],
+      "@interfaces/*": ["./src/shared/interfaces/*"],
+      "@models/*": ["./src/shared/models/*"],
+      "@shared/*": ["./src/shared/*"],
+      "@styles/*": ["./src/shared/styles/*"],
+      "@services/*": ["./src/shared/services/*"],
+      "@assets/*": ["./src/shared/assets/*"],
+      "@screens/*": ["./src/screens/*"]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
