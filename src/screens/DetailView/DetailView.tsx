@@ -20,9 +20,12 @@ import { handleEntityHook } from '@shared/hooks/handleEntityHook'
 import { Resizable } from 're-resizable'
 import { sidebarWidth } from '../../utils/layout.utils'
 import { StickyFooter } from '@shared/layout/components/StickyFooter/StickyFooter'
+import { useContextualRouting } from 'next-use-contextual-routing'
 
 export interface IDetailViewProps {
-  previewItem?: PostEntity
+  previewPost?: PostEntity
+  selectedPost?: PostEntity
+  returnHref?: string
 }
 
 const IconText = ({ icon, text }: { icon: React.FC; text: string }) => (
@@ -42,15 +45,22 @@ const data = Array.from({ length: 23 }).map((_, i) => ({
     'Me Encanto la tabla de surf que compre, de muy buena calidad, excelente servicios',
 }))
 
-export const DetailView = ({ previewItem }: IDetailViewProps) => {
+export const DetailView = ({
+  previewPost,
+  selectedPost,
+  returnHref,
+}: IDetailViewProps) => {
   const router = useRouter()
-  const [post, setPost] = useState<PostEntity>({ ...previewItem } as PostEntity)
+  const [post, setPost] = useState<PostEntity>({
+    ...previewPost,
+    ...selectedPost,
+  } as PostEntity)
   const carouselRef = useRef<any>()
   const { get, item } = handleEntityHook<PostEntity>('posts')
-
+  const { makeContextualHref } = useContextualRouting()
   useEffect(() => {
-    setPost({ ...item, ...previewItem } as PostEntity)
-  }, [previewItem, item])
+    setPost({ ...item, ...previewPost, ...selectedPost } as PostEntity)
+  }, [previewPost, item, selectedPost])
 
   useEffect(() => {
     const slug = router.query.slug as string
@@ -59,7 +69,17 @@ export const DetailView = ({ previewItem }: IDetailViewProps) => {
     }
   }, [router.query])
 
-  const back = () => router.back()
+  const back = () => {
+    console.log('returnHref', returnHref)
+    if (returnHref) {
+      router.push(makeContextualHref({ return: true, slug: '' }), returnHref, {
+        shallow: true,
+      })
+    } else {
+      router.back()
+    }
+  }
+
   const navigate = (to: 'prev' | 'next') => () =>
     carouselRef.current && carouselRef.current[to]()
   const hasImages = post.images && !!post.images.length
@@ -67,12 +87,8 @@ export const DetailView = ({ previewItem }: IDetailViewProps) => {
 
   return (
     <div className={`grid-container ${styles.DetailViewWrapper}`}>
-      <div
-        className={`grid-column-${previewItem ? '1' : '1'} ${
-          styles.GalleryWrapper
-        }`}
-      >
-        {!previewItem && (
+      <div className={`grid-column-1 ${styles.GalleryWrapper}`}>
+        {!previewPost && (
           <div className={styles.DetailViewBackButton}>
             <ArrowLeftOutlined onClick={back} />
           </div>

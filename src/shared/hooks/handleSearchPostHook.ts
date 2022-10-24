@@ -68,8 +68,8 @@ export const handleSearchPostHook = (): IHandleSearchPostHookData => {
     //   console.log('query =>', router.query, queryRef.current)
     //   queryRef.current = router.query
     //   console.log('changed')
-
-    if (isNotEmptyObject(router.query)) {
+    console.log("query =>", router.query)
+    if (isNotEmptyObject(router.query) && !router.query.slug && !router.query.return) {
       getPosts()
       // console.log('changed')
       // queryRef.current = router.query

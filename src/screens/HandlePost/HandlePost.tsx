@@ -280,7 +280,7 @@ export const HandlePost = () => {
         </StickyFooter>
       </Sidebar>
       <div className={styles.handlePostPreview}>
-        <DetailView previewItem={postItem} />
+        <DetailView previewPost={postItem} />
       </div>
     </LayoutContent>
   )
