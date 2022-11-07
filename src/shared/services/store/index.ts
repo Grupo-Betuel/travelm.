@@ -11,8 +11,8 @@ import { ProductEntity } from "@models/ProductEntity";
 import {
   appEntitiesWithService,
   AppEntitiesStoreType,
-} from "@services/store/appEntitiesWithService.ts";
-import { EntityNamesType } from "@services/store/appEntitiesWithService";
+} from "@services/appEntitiesWithService";
+import { EntityNamesType } from "@services/appEntitiesWithService";
 
 /// APP STORE
 export interface IAppStore extends AppEntitiesStoreType {
@@ -31,8 +31,8 @@ export const appStore = (set: SetState<IAppStore>) => {
     },
   } as IAppStore;
 
-  Object.keys(appEntitiesWithService).forEach(
-    (k: EntityNamesType | any) =>
+  (Object.keys(appEntitiesWithService) as EntityNamesType[]).forEach(
+    (k: EntityNamesType) =>
       ((appStoreInit as any)[k] = createEntityStore<ProductEntity>(
         [appEntitiesWithService[k].entity],
         appEntitiesWithService[k].service

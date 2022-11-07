@@ -5,24 +5,28 @@ import { BaseEntity } from "@models/BaseEntity";
 import { BaseService } from "@services/BaseService";
 import { ProductService } from "@services/productService";
 
-export type EntityNamesType = "product";
+export type EntityNamesType = "posts" | "users";
 
 export type EntityPerServiceType = {
   [N in EntityNamesType]: {
-    entity: BaseEntity;
+    entity: BaseEntity | any;
     service: BaseService<any>;
   };
 };
 
 export const appEntitiesWithService: EntityPerServiceType = {
-  product: {
+  posts: {
     entity: new ProductEntity(),
-    service: new ProductService(),
+    service: new ProductService("posts"),
+  },
+  users: {
+    entity: new ProductEntity(),
+    service: new ProductService("users"),
   },
 };
 
 export type AppEntitiesStoreType = {
-  [N in keyof typeof appEntitiesWithService]: UseBoundStore<
-    StoreApi<IEntityStore<typeof appEntitiesWithService[N]>>
+  [N in EntityNamesType]: UseBoundStore<
+    StoreApi<IEntityStore<typeof appEntitiesWithService[N]["entity"]>>
   >;
 };

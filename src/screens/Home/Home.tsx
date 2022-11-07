@@ -2,17 +2,16 @@ import { VerticalPreviewCard } from "@components/VerticalPreviewCard";
 import styles from "./Home.module.scss";
 import logo from "@assets/images/logo.png";
 import { HomeCarousel } from "./components/HomeCarousel";
-import { AppCarousel } from "@components/Carousel";
 import { ScrollView } from "@components/ScrollView/ScrollView";
-import { IAppStore, useStore } from "@services/store";
+import { useStore } from "@services/store";
 import { ProductEntity } from "@models/ProductEntity";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export const Home = () => {
   const count = useStore((state) => state.count);
   const name = useStore((state) => state.name);
   const handleCount = useStore((state) => state.handleCount);
-  const productEntity = useStore((state) => state.product((statep) => statep));
+  const productEntity = useStore((state) => state.posts((statep) => statep));
 
   const [product, setProduct] = useState<ProductEntity>(new ProductEntity());
   const products = [
@@ -55,7 +54,9 @@ export const Home = () => {
   const removeProduct = (id: number) => () => {
     productEntity.remove(id);
   };
-
+  useEffect(() => {
+    productEntity.get({});
+  }, []);
   return (
     <div className={styles.HomeWrapper}>
       {productEntity.loading ? (

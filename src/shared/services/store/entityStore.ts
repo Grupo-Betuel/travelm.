@@ -1,13 +1,14 @@
 import { SetState, StoreApi, UseBoundStore } from "zustand";
 import create from "zustand";
 import { BaseService } from "@services/BaseService";
+import { useQuery } from "@tanstack/react-query";
 export interface IEntityStore<T> {
   data: T[];
   item: T;
   add: (value: T) => Promise<void>;
   update: (id: number, value: Partial<T>) => Promise<void>;
   remove: (id: number) => Promise<void>;
-  get: (property: { [N in keyof T]: any }) => Promise<void>;
+  get: (property: { [N in keyof T]: any }) => void;
   loading?: boolean;
 }
 
@@ -47,19 +48,20 @@ export function createEntityStore<T extends { id: number }>(
         loading: false,
       }));
     },
-    get: async (properties: { [N in keyof T]: any }) => {
+    get: (properties: { [N in keyof T]: any }, cacheLiveTime?: number) => {
       set((state) => ({ ...state, loading: true }));
-      await service.get(properties);
-      set((state: any) => ({
-        ...state,
-        data: state.data.filter(
-          (item: T) =>
-            !!Object.keys(properties).find(
-              (prop) => (item as any)[prop] === (properties as any)[prop]
-            )
-        ),
-        loading: false,
-      }));
+      service.get((data: T[]) => {
+        set((state: any) => ({
+          ...state,
+          data: data.filter(
+            (item: T) =>
+              !!Object.keys(properties).find(
+                (prop) => (item as any)[prop] === (properties as any)[prop]
+              )
+          ),
+          loading: false,
+        }));
+      }, cacheLiveTime);
     },
   }));
 }
