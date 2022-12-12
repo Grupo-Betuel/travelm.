@@ -1,0 +1,53 @@
+$filterItemPadding: 15px 30px;
+
+.SideBarWrapper {
+  background-color: #fff;
+  min-width: 15.625rem !important;
+
+  .FilterWrapper {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: $filterItemPadding;
+
+    &.Column {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .FilterLabel {
+      font-weight: bold;
+    }
+  }
+
+  .FilterTitle {
+    font-size: 36px;
+    font-weight: bold;
+    padding: $filterItemPadding;
+  }
+
+  .FilterList {
+    .FilterListItem {
+      padding: $filterItemPadding;
+      transition: all 0.3s ease;
+      background-color: #fff;
+      cursor: pointer;
+      position: relative;
+
+      &:hover {
+        filter: brightness(70%);
+      }
+
+      &::after {
+        content: "";
+        position: absolute;
+        bottom: 0px;
+        left: 5%;
+        display: block;
+        width: 90%;
+        border-bottom: 1px solid #eee;
+        matgin: 0 20px;
+      }
+    }
+  }
+}

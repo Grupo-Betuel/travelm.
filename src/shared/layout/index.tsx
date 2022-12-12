@@ -13,7 +13,7 @@ const AppLayout = ({ children }: IAppLayoutProps) => {
       <Layout>
         <Navbar />
         <Layout>
-          {/*<Sidebar />*/}
+          {/*<FiltersSidebar />*/}
           <Content>{children}</Content>
         </Layout>
         {/*<AppFooter />*/}
