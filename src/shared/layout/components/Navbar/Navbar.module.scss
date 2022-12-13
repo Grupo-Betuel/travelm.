@@ -1,35 +1,43 @@
-@import "src/shared/styles/spacing-variables";
-@import "src/shared/styles/color-variables";
+@use "src/shared/styles/color-variables" as colors;
+@use "../../../styles/sizing-variables" as s;
+@import "../../../styles/box-shadow-utils";
 
 .navbar {
+  @extend .small-bxs;
+  padding: 0;
   width: 100%;
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(12.5rem, 1fr));
   align-items: center;
   justify-items: stretch;
-  height: auto;
-  background-color: white;
+  height: auto !important;
+  background: colors.$color-green-4 !important;
+  z-index: 1;
 
   .navbarLogoContainer {
     max-width: 3.125rem;
+    img {
+      filter: brightness(0) invert(1);
+    }
   }
 
   .navbarBrowserWrapper {
     grid-column: span 2;
   }
   .navbarOptionsList {
-    gap: $space-small;
+    gap: s.$size-small;
     width: 100%;
     grid-column: span 3;
     li {
       cursor: pointer;
+      color: white;
     }
   }
   .navbarFavoritesWrapper {
     display: flex;
     height: 2.5rem;
     grid-column: 1 / -1;
-    color: $color-black-1;
+    color: white;
   }
 }
 

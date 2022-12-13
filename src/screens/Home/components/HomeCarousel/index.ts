@@ -1,1 +1,1 @@
-export { HomeCarousel } from "./HomeCarousel";
+export { LandingCarousel } from "./LandingCarousel";

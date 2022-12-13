@@ -6,13 +6,13 @@ const contentStyle: React.CSSProperties = {
   height: "500px",
   lineHeight: "160px",
   textAlign: "center",
-  background: "linear-gradient(180deg, #7a7a7a 70%, transparent)",
+  background: "linear-gradient(180deg, green 70%, transparent)",
 };
 export interface IAppMainPromotionCarouselProps extends CarouselProps {
   showArrow?: boolean;
 }
 
-export const HomeCarousel = (props: IAppMainPromotionCarouselProps) => {
+export const LandingCarousel = (props: IAppMainPromotionCarouselProps) => {
   const { showArrow } = { showArrow: true, ...props };
 
   const carousel = useRef<any>();

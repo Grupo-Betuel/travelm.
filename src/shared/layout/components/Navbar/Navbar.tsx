@@ -3,6 +3,7 @@ import logo from "@assets/images/logo.png";
 import Image from "next/image";
 import styles from "./Navbar.module.scss";
 import { Button, Drawer, Input, Select } from "antd";
+
 const { Option } = Select;
 import { useState } from "react";
 import { CategoriesDrawer } from "@shared/layout/components/CategoriesDrawer/CategoriesDrawer";
@@ -24,24 +25,27 @@ export const Navbar = () => {
   return (
     <>
       <Header className={`${styles.navbar}`}>
-        <div className={`${styles.navbarLogoContainer} flex-start-center`}>
-          <Image src={logo} alt="Store Logo" />
+        <div className="grid-container grid-column-full px-xx-l">
+          <div className={`${styles.navbarLogoContainer} flex-start-center`}>
+            <Image src={logo} alt="Store Logo" />
+          </div>
+          <div className={`${styles.navbarBrowserWrapper} flex-center-center`}>
+            <Input.Search
+              size="large"
+              allowClear
+              addonBefore={selectBefore}
+              placeholder="Search"
+            />
+          </div>
+          <ul className={`${styles.navbarOptionsList} flex-end-center`}>
+            <li>item 1</li>
+            <li>item 2</li>
+            <li>item 3</li>
+            <li>item 4</li>
+            <li>item 5</li>
+          </ul>
         </div>
-        <div className={`${styles.navbarBrowserWrapper} flex-center-center`}>
-          <Input.Search
-            allowClear
-            addonBefore={selectBefore}
-            placeholder="Search"
-          />
-        </div>
-        <ul className={`${styles.navbarOptionsList} flex-end-center`}>
-          <li>item 1</li>
-          <li>item 2</li>
-          <li>item 3</li>
-          <li>item 4</li>
-          <li>item 5</li>
-        </ul>
-        <div className={styles.navbarFavoritesWrapper}>
+        <div className={`${styles.navbarFavoritesWrapper} px-xx-l`}>
           <ul className="flex-between-center w-100">
             <li>
               <div

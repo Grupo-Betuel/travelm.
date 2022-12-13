@@ -1,7 +1,7 @@
 import { VerticalPreviewCard } from "@components/VerticalPreviewCard";
 import styles from "./Home.module.scss";
 import logo from "@assets/images/logo.png";
-import { HomeCarousel } from "./components/HomeCarousel";
+import { LandingCarousel } from "./components/HomeCarousel";
 import { ScrollView } from "@components/ScrollView/ScrollView";
 import { useStore } from "@services/store";
 import { ProductEntity } from "@models/ProductEntity";
@@ -17,26 +17,26 @@ export const Home = () => {
   const products = [
     {
       title: "First Item",
-      image: logo,
+      image: logo
     },
     {
       title: "First Item",
-      image: logo,
+      image: logo
     },
     {
       title: "First Item",
-      image: logo,
+      image: logo
     },
     {
       title: "First Item",
-      image: logo,
-    },
+      image: logo
+    }
   ];
 
   const onchange = ({ target: { value, name } }: any) =>
     setProduct({
       ...product,
-      [name]: value,
+      [name]: value
     });
 
   const onSelectProduct = (item: ProductEntity) => () =>
@@ -113,7 +113,9 @@ export const Home = () => {
       {/*    </div>*/}
       {/*  ))}*/}
       {/*</div>*/}
-      <HomeCarousel />
+      <div className={styles.LandingCarouselWrapper}>
+        <LandingCarousel />
+      </div>
       <div className={styles.HomeContent}>
         <div className={styles.HomeTopCardsGrid}>
           <VerticalPreviewCard products={products} />
@@ -121,15 +123,8 @@ export const Home = () => {
           <VerticalPreviewCard products={products.slice(0, 1)} />
           <VerticalPreviewCard products={products} />
         </div>
-
-        <div className={styles.HomeSection}>
-          <span className="subtitle">Inspirados por Tu Compra</span>
-          <ScrollView />
-        </div>
-        <div className={styles.HomeSection}>
-          <span className="subtitle">Inspirados por Tu Compra</span>
-          <ScrollView />
-        </div>
+        <ScrollView />
+        <ScrollView />
       </div>
     </div>
   );

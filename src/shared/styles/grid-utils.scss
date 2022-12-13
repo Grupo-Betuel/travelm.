@@ -1,36 +1,40 @@
 $gridSizes: (1, 2, 3, 4, 5, 6);
 
+.d-grid {
+  display: grid;
+}
+
 .grid-container {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(12.5rem, 1fr));
   //grid-template-rows: repeat(auto-fit, minmax(10rem, 1fr));
   gap: 1.875rem;
+}
 
-  @each $size in $gridSizes {
-    .grid-column-#{$size} {
-      grid-column: span $size;
-    }
-
-    .grid-row-#{$size} {
-      grid-row: span $size;
-    }
-
-    grid-gap-#{$size} {
-      gap: $size * 10px;
-    }
-
-    grid-gap-#{$size}5 {
-      gap: $size * 10px + 5px;
-    }
+@each $size in $gridSizes {
+  .grid-column-#{$size} {
+    grid-column: span $size;
   }
 
-  .grid-column-full {
-    grid-column: 1 / -1;
+  .grid-row-#{$size} {
+    grid-row: span $size;
   }
 
-  .grid-column-full {
-    grid-row: 1 / -1;
+  grid-gap-#{$size} {
+    gap: $size * 10px;
   }
+
+  grid-gap-#{$size}5 {
+    gap: $size * 10px + 5px;
+  }
+}
+
+.grid-column-full {
+  grid-column: 1 / -1;
+}
+
+.grid-row-full {
+  grid-row: 1 / -1;
 }
 
 $gridModes: (

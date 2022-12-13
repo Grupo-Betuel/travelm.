@@ -13,7 +13,7 @@ export const ScrollView = () => {
         left: back
           ? scrollView.scrollLeft - progress
           : scrollView.scrollLeft + progress,
-        behavior: "smooth",
+        behavior: "smooth"
       });
     }
   };
@@ -22,22 +22,26 @@ export const ScrollView = () => {
   const scrollViewRef = useRef({} as any);
 
   return (
-    <div className={styles.ScrollViewWrapper}>
-      <i
-        className={`bi bi-chevron-left ${styles.ScrollViewLeftArrow}`}
-        onClick={preview(true)}
-      />
-      <div className={styles.ScrollView} ref={scrollViewRef}>
-        {products.map((item) => (
-          <div className={styles.ScrollViewItem}>
-            <Image src={logo} />
-          </div>
-        ))}
+    <div className={styles.ScrollViewContainer}>
+      <span className="subtitle">Inspirados por Tu Compra</span>
+      <div className={styles.ScrollViewWrapper}>
+        <i
+          className={`bi bi-chevron-left ${styles.ScrollViewLeftArrow}`}
+          onClick={preview(true)}
+        />
+        <div className={styles.ScrollView} ref={scrollViewRef}>
+          {products.map((item) => (
+            <div className={styles.ScrollViewItem}>
+              <Image src={logo} />
+            </div>
+          ))}
+        </div>
+        <i
+          className={`bi bi-chevron-right ${styles.ScrollViewRightArrow}`}
+          onClick={preview(false)}
+        />
       </div>
-      <i
-        className={`bi bi-chevron-right ${styles.ScrollViewRightArrow}`}
-        onClick={preview(false)}
-      />
     </div>
+
   );
 };

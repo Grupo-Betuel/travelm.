@@ -1,24 +1,25 @@
-@import "src/shared/styles/spacing-variables";
+@import "../../shared/styles/sizing-variables";
 @import "src/shared/styles/color-variables";
 
 .HomeWrapper {
+
   .HomeContent {
-    padding: $space-large;
+    padding: $size-large;
     display: flex;
     flex-direction: column;
-    gap: $space-large;
+    gap: $size-large;
     .HomeTopCardsGrid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(18.75rem, 1fr));
       justify-items: start;
-      gap: $space-large;
+      gap: $size-large;
       position: relative;
       margin-top: -250px;
     }
   }
 
   .HomeSection {
-    padding: $space-large;
+    padding: $size-large;
     background-color: white;
     box-shadow: 0.3125rem 0.3125rem 0.625rem rgba(0,0,0, .3);
     border-radius: 0.625rem;

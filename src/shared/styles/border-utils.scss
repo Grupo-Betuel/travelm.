@@ -1,0 +1,31 @@
+@use "sizing-variables" as s;
+
+.folded {
+  border-radius: s.$size-xx-small;
+}
+
+.fold-top {
+  border-top-left-radius: s.$size-xx-small;
+  border-top-right-radius: s.$size-xx-small;
+}
+.fold-top-left {
+  border-top-left-radius: s.$size-xx-small;
+}
+
+.fold-top-right {
+  border-top-right-radius: s.$size-xx-small;
+}
+
+.fold-bottom {
+  border-bottom-left-radius: s.$size-xx-small;
+  border-bottom-right-radius: s.$size-xx-small;
+}
+
+.fold-bottom-left {
+  border-bottom-left-radius: s.$size-xx-small;
+}
+
+.fold-bottom-right {
+  border-bottom-right-radius: s.$size-xx-small;
+}
+

@@ -1,45 +1,53 @@
-@import "src/shared/styles/spacing-variables";
-@import "src/shared/styles/text-variables";
-@import "src/shared/styles/color-variables";
+@use "../../styles/sizing-variables" as s;
+@use "src/shared/styles/text-variables" as text;
+@use "src/shared/styles/color-variables" as colors;
+@import "src/shared/styles/box-shadow-utils";
+@import "src/shared/styles/border-utils";
 
-.ScrollViewWrapper {
-  position: relative;
-  padding: $space-large;
+.ScrollViewContainer {
+  @extend .small-bxs;
+  @extend .folded;
+  padding: s.$size-large;
+  background-color: white;
 
-  .ScrollView {
-    overflow-x: scroll;
-    width: 100%;
-    display: flex;
-    gap: $space-medium;
-    align-items: center;
-    justify-content: center;
-    box-shadow: -5px 0px 0px #000 inset;
+  .ScrollViewWrapper {
+    position: relative;
+    padding: s.$size-large;
 
-    .ScrollViewItem {
-      min-width: 200px;
+    .ScrollView {
+      overflow-x: scroll;
+      width: 100%;
+      display: flex;
+      gap: s.$size-medium;
+      align-items: center;
+      justify-content: center;
+
+      .ScrollViewItem {
+        min-width: 200px;
+      }
     }
-  }
 
-  .Arrow {
-    position: absolute;
-    font-size: $font-size-10;
-    font-weight: bold;
-    cursor: pointer;
-    color: $color-blue-1;
-    top: 50%;
-    margin-top: -14px;
-    z-index: 9;
-    background-color: white;
-  }
+    .Arrow {
+      position: absolute;
+      font-size: text.$font-size-10;
+      font-weight: bold;
+      cursor: pointer;
+      color: colors.$color-blue-1;
+      top: 50%;
+      margin-top: -14px;
+      z-index: 9;
+      background-color: white;
+    }
 
-  .ScrollViewLeftArrow {
-    @extend .Arrow;
-    left: 0rem;
-  }
+    .ScrollViewLeftArrow {
+      @extend .Arrow;
+      left: 0rem;
+    }
 
-  .ScrollViewRightArrow {
-    @extend .Arrow;
-    right: 0rem;
+    .ScrollViewRightArrow {
+      @extend .Arrow;
+      right: 0rem;
 
+    }
   }
 }

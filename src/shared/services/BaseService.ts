@@ -1,7 +1,5 @@
 import { EntityNamesType } from "@services/appEntitiesWithService";
 import axios from "axios";
-import { SetState } from "zustand";
-import { IEntityStore } from "@services/store/entityStore";
 
 export class BaseService<T> {
   host = "http://localhost:5000";
