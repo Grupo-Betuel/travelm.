@@ -1,3 +1,5 @@
+@use "sizing-variables" as size;
+
 $flexAlignments: (
   "between": space-between,
   "center": center,
@@ -7,6 +9,17 @@ $flexAlignments: (
 
 .d-flex {
   display: flex;
+}
+
+.d-flex-column {
+  display: flex;
+  flex-direction: column;
+}
+
+@each $name, $value in size.$sizes {
+  .gap-#{$name} {
+    gap: $value;
+  }
 }
 
 @each $name, $alignment in $flexAlignments {
@@ -22,6 +35,20 @@ $flexAlignments: (
       justify-content: $alignment2;
       align-items: $alignment;
     }
+
+    .flex-column-#{$name}-#{$name2} {
+      display: flex;
+      justify-content: $alignment;
+      align-items: $alignment2;
+      flex-direction: column;
+    }
+
+    .flex-column-#{$name2}-#{$name} {
+      display: flex;
+      justify-content: $alignment2;
+      align-items: $alignment;
+      flex-direction: column;
+    }
   }
   .flex-align-#{$name} {
     display: flex;
@@ -31,6 +58,18 @@ $flexAlignments: (
   .flex-justify-#{$name} {
     display: flex;
     align-items: $alignment;
+  }
+
+  .flex-column-align-#{$name} {
+    display: flex;
+    align-items: $alignment;
+    flex-direction: column;
+  }
+
+  .flex-column-justify-#{$name} {
+    display: flex;
+    align-items: $alignment;
+    flex-direction: column;
   }
 
 }

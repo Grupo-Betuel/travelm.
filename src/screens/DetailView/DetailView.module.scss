@@ -1,0 +1,49 @@
+@use "../../shared/styles/sizing-variables" as size;
+@use "src/shared/styles/color-variables" as colors;
+
+.DetailViewWrapper {
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  width: 100%;
+  height: 100%;
+  align-items: stretch;
+  justify-content: center;
+  align-content: stretch;
+
+  .GalleryWrapper {
+    height: 100% !important;
+    position: relative;
+
+    div {
+      height: 100%;
+    }
+
+    .DetailViewBackButton {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      z-index: 99;
+      cursor: pointer;
+      color: colors.$color-gray-3;
+      font-size: size.$size-large;
+      background-color: rgba(0,0,0, .6);
+      width: 40px;
+      height: 40px;
+      border-radius: 40px;
+      display: flex;
+      align-items:center;
+      justify-content: center;
+    }
+  }
+
+  .DetailViewContent {
+    display: flex;
+    flex-direction: column;
+    gap: size.$size-small;
+    padding-top: size.$size-small;
+
+
+    .DetailViewContentHeader {
+    }
+
+  }
+}

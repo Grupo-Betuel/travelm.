@@ -2,6 +2,7 @@ import styles from "./Search.module.scss";
 import { ProductCard } from "@components/ProductCard";
 import { Sidebar } from "@shared/layout/components/Sidebar";
 import { FiltersSidebar } from "@components/FiltersSidebar";
+import Link from "next/link";
 
 export const Search = () => {
   const products = Array.from(new Array(20));
@@ -10,7 +11,7 @@ export const Search = () => {
       <FiltersSidebar />
       <div className={`${styles.SearchContent} grid-gap-15 grid-column-fill-2`}>
         {products.map((item, i) => (
-          <ProductCard key={i} />
+            <ProductCard key={i} />
         ))}
       </div>
     </div>

@@ -1,3 +1,4 @@
+@use "sizing-variables" as size;
 $gridSizes: (1, 2, 3, 4, 5, 6);
 
 .d-grid {
@@ -7,8 +8,7 @@ $gridSizes: (1, 2, 3, 4, 5, 6);
 .grid-container {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(12.5rem, 1fr));
-  //grid-template-rows: repeat(auto-fit, minmax(10rem, 1fr));
-  gap: 1.875rem;
+  gap: size.$size-medium;
 }
 
 @each $size in $gridSizes {

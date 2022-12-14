@@ -1,4 +1,5 @@
-@import "text-variables";
+@use "text-variables" as texts;
+@use "color-variables" as colors;
 
 .cursor-pointer {
   cursor: pointer;
@@ -9,10 +10,22 @@
 }
 
 .subtitle {
-  font-size: $font-size-8;
-  font-weight: 700;
+  display: block;
+  font-size: texts.$font-size-8;
+  //font-weight: 700;
 }
 
-.border-radius {
-  border-radius: 0.625rem;
+.title {
+  display: block;
+  font-size: texts.$font-size-11;
+  font-weight: bold;
+}
+
+.label {
+  color: colors.$color-gray-1;
+  font-size: texts.$font-size-1;
+}
+
+.text-bold {
+  font-weight: bold;
 }

@@ -2,7 +2,7 @@
 @import "src/shared/styles/color-variables";
 
 .HomeWrapper {
-
+  max-width: 1500px;
   .HomeContent {
     padding: $size-large;
     display: flex;

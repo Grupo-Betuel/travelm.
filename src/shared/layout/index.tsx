@@ -1,8 +1,7 @@
 import { Navbar } from "@shared/layout/components/Navbar/Navbar";
-import { Sidebar } from "@shared/layout/components/Sidebar";
 import { Layout } from "antd";
-import { AppFooter } from "@shared/layout/components/Footer";
 import { Content } from "antd/lib/layout/layout";
+import styles from "./layout.module.scss";
 
 export interface IAppLayoutProps {
   children: any;
@@ -10,11 +9,11 @@ export interface IAppLayoutProps {
 const AppLayout = ({ children }: IAppLayoutProps) => {
   return (
     <>
-      <Layout>
+      <Layout className={styles.layout}>
         <Navbar />
-        <Layout>
+        <Layout  className={styles.layout}>
           {/*<FiltersSidebar />*/}
-          <Content>{children}</Content>
+          <Content className={styles.content}>{children}</Content>
         </Layout>
         {/*<AppFooter />*/}
       </Layout>

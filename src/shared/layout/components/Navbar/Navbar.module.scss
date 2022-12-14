@@ -4,7 +4,7 @@
 
 .navbar {
   @extend .small-bxs;
-  padding: 0;
+  padding: 0 !important;
   width: 100%;
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(12.5rem, 1fr));
@@ -25,7 +25,7 @@
     grid-column: span 2;
   }
   .navbarOptionsList {
-    gap: s.$size-small;
+    gap: s.$size-xx-large;
     width: 100%;
     grid-column: span 3;
     li {
@@ -38,6 +38,13 @@
     height: 2.5rem;
     grid-column: 1 / -1;
     color: white;
+    background: colors.$color-green-3;
+  }
+
+  .userDropdown {
+    display: flex;
+    max-width: 20px;
+    margin-left: s.$size-xx-medium;
   }
 }
 
