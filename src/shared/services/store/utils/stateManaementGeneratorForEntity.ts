@@ -1,7 +1,7 @@
 import { Dispatch } from "redux";
 import { createSlice, PayloadAction, combineReducers } from "@reduxjs/toolkit";
 import { CreateSliceOptions } from "@reduxjs/toolkit/src/createSlice";
-import { asLiterals } from "../../../../utils/types";
+import { asLiterals } from "../../../../utils/types.util";
 import { apiCall } from "@services/apiCall";
 import {
   RESTApiType,
