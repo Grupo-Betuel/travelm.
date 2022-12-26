@@ -1,0 +1,62 @@
+@use "sizing-variables" as s;
+
+@each $name, $value in s.$sizes {
+  .p-#{$name} {
+    padding: $value;
+  }
+  .ps-#{$name} {
+    padding-left: $value;
+  }
+
+  .pe-#{$name} {
+    padding-right: $value;
+  }
+
+  .pt-#{$name} {
+    padding-top: $value;
+  }
+
+  .pb-#{$name} {
+    padding-bottom: $value;
+  }
+
+  .px-#{$name} {
+    padding-left: $value;
+    padding-right: $value;
+  }
+
+  .py-#{$name} {
+    padding-top: $value;
+    padding-bottom: $value;
+  }
+
+  .m-#{$name} {
+    margin: $value;
+  }
+  .ms-#{$name} {
+    margin-left: $value;
+  }
+
+  .me-#{$name} {
+    margin-right: $value;
+  }
+
+  .mt-#{$name} {
+    margin-top: $value;
+  }
+
+  .mb-#{$name} {
+    margin-bottom: $value;
+  }
+
+  .mx-#{$name} {
+    margin-left: $value;
+    margin-right: $value;
+  }
+
+  .my-#{$name} {
+    margin-top: $value;
+    margin-bottom: $value;
+  }
+
+}
