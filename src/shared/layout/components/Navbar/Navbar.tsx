@@ -1,15 +1,16 @@
-import { Header } from "antd/lib/layout/layout";
-import logo from "@assets/images/logo.png";
-import person from "@assets/images/person.png";
-import Image from "next/image";
-import styles from "./Navbar.module.scss";
-import { Dropdown, Input, MenuProps, Select } from "antd";
-
-const { Option } = Select;
-import { useState } from "react";
-import { CategoriesDrawer } from "@shared/layout/components/CategoriesDrawer/CategoriesDrawer";
-import Link from "next/link";
-import { useRouter } from "next/router";
+import { Header } from 'antd/lib/layout/layout'
+import logo from '@assets/images/logo.png'
+import person from '@assets/images/person.png'
+import Image from 'next/image'
+import styles from './Navbar.module.scss'
+import { Dropdown, Input, MenuProps, Modal, Select } from 'antd'
+const { Option } = Select
+import { useState } from 'react'
+import { CategoriesDrawer } from '@shared/layout/components/CategoriesDrawer/CategoriesDrawer'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
+import { useContextualRouting } from 'next-use-contextual-routing'
+import { Auth } from '@screens/Auth/Auth'
 
 const selectBefore = (
   <Select defaultValue="Todas" className="select-before">
@@ -17,28 +18,36 @@ const selectBefore = (
     <Option value="Categoria 1">Categoria 1</Option>
     <Option value="Categoria 2">Categoria 2</Option>
   </Select>
-);
-
-const userDropdownItems: MenuProps["items"] = [
-  {
-    key: "acount",
-    label: "account"
-  },
-  {
-    key: "log-out",
-    label: "log out"
-  }
-];
+)
 
 export const Navbar = () => {
-  const [showAllCategories, setShowAllCategories] = useState<boolean>(false);
+  const router = useRouter()
+  const authIsEnable = router.query.auth
+  const [showAllCategories, setShowAllCategories] = useState<boolean>(false)
+  const { makeContextualHref, returnHref } = useContextualRouting()
+  const handleCloseAuthModal = () => router.push(returnHref)
+
+  const userDropdownItems: MenuProps['items'] = [
+    {
+      key: 'acount',
+      label: 'account',
+    },
+    {
+      key: 'log-out',
+      label: (
+        <Link href={makeContextualHref({ auth: true })} as="/auth" shallow>
+          <a>Authenticate</a>
+        </Link>
+      ),
+    },
+  ]
+
   const toggleAllCategoriesDrawer = () => {
-    setShowAllCategories(!showAllCategories);
-  };
-  const router = useRouter();
+    setShowAllCategories(!showAllCategories)
+  }
 
   const onSearch = () => {
-    router.push('/search');
+    router.push('/search')
   }
 
   return (
@@ -85,9 +94,7 @@ export const Navbar = () => {
             <li>item 2</li>
             <li>item 3</li>
             <li>item 4</li>
-            <li>
-              item 5
-            </li>
+            <li>item 5</li>
           </ul>
         </div>
       </Header>
@@ -96,6 +103,14 @@ export const Navbar = () => {
         visible={showAllCategories}
         onClose={toggleAllCategoriesDrawer}
       />
+      <Modal
+        title="Basic Modal"
+        open={!!authIsEnable}
+        onOk={handleCloseAuthModal}
+        onCancel={handleCloseAuthModal}
+      >
+        <Auth />
+      </Modal>
     </>
-  );
-};
+  )
+}

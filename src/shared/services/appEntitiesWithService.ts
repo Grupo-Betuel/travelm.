@@ -1,32 +1,32 @@
-import { StoreApi, UseBoundStore } from "zustand";
-import { IEntityStore } from "@services/store/entityStore";
-import { ProductEntity } from "@models/ProductEntity";
-import { BaseEntity } from "@models/BaseEntity";
-import { BaseService } from "@services/BaseService";
-import { ProductService } from "@services/productService";
+import { StoreApi, UseBoundStore } from 'zustand'
+import { IEntityStore } from '@services/store/entityStore'
+import { ProductEntity } from '@models/ProductEntity'
+import { BaseEntity } from '@models/BaseEntity'
+import { BaseService } from '@services/BaseService'
+import { ProductService } from '@services/productService'
 
-export type EntityNamesType = "posts" | "users";
+export type EntityNamesType = 'posts' | 'users'
 
 export type EntityPerServiceType = {
   [N in EntityNamesType]: {
-    entity: BaseEntity | any;
-    service: BaseService<any>;
-  };
-};
+    entity: BaseEntity | any
+    service: BaseService<any>
+  }
+}
 
 export const appEntitiesWithService: EntityPerServiceType = {
   posts: {
     entity: new ProductEntity(),
-    service: new ProductService("posts"),
+    service: new ProductService('posts'),
   },
   users: {
     entity: new ProductEntity(),
-    service: new ProductService("users"),
+    service: new ProductService('users'),
   },
-};
+}
 
 export type AppEntitiesStoreType = {
   [N in EntityNamesType]: UseBoundStore<
-    StoreApi<IEntityStore<typeof appEntitiesWithService[N]["entity"]>>
-  >;
-};
+    StoreApi<IEntityStore<typeof appEntitiesWithService[N]['entity']>>
+  >
+}

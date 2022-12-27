@@ -2261,6 +2261,13 @@ natural-compare@^1.4.0:
   resolved "https://registry.yarnpkg.com/natural-compare/-/natural-compare-1.4.0.tgz#4abebfeed7541f2c27acfb29bdbbd15c8d5ba4f7"
   integrity sha512-OWND8ei3VtNC9h7V60qff3SVobHr996CTwgxubgyQYEpg290h9J0buyECNNJexkFm5sOajh5G116RYA1c8ZMSw==
 
+next-use-contextual-routing@^2.3.0:
+  version "2.3.0"
+  resolved "https://registry.yarnpkg.com/next-use-contextual-routing/-/next-use-contextual-routing-2.3.0.tgz#0d626b4b18ab45fa4483b955753cd36741be9176"
+  integrity sha512-JTZ+cUjHfelG58wSOBhmEhwpcNJhSSpQHt9FodV0pOH8NsqF3uL5YSBohXUtN4q3VZriudzIbTGHe2WbJHoesg==
+  dependencies:
+    qs-stringify "^1.2.1"
+
 next@12:
   version "12.3.1"
   resolved "https://registry.yarnpkg.com/next/-/next-12.3.1.tgz#127b825ad2207faf869b33393ec8c75fe61e50f1"
@@ -2548,6 +2555,11 @@ punycode@^2.1.0:
   version "2.1.1"
   resolved "https://registry.yarnpkg.com/punycode/-/punycode-2.1.1.tgz#b58b010ac40c22c5657616c8d2c2c02c7bf479ec"
   integrity sha512-XRsRjdf+j5ml+y/6GKHPZbrF/8p2Yga0JPtdqTIY2Xe5ohJPD9saDJJLPvp9+NSBprVvevdXZybnj2cv8OEd0A==
+
+qs-stringify@^1.2.1:
+  version "1.2.1"
+  resolved "https://registry.yarnpkg.com/qs-stringify/-/qs-stringify-1.2.1.tgz#9b39ef6b816bd83309628fc9dad435fc0eccc28b"
+  integrity sha512-2N5xGLGZUxpgAYq1fD1LmBSCbxQVsXYt5JU0nU3FuPWO8PlCnKNFQwXkZgyB6mrTdg7IbexX4wxIR403dJw9pw==
 
 queue-microtask@^1.2.2:
   version "1.2.3"
