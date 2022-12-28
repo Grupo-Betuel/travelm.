@@ -1,62 +1,61 @@
-import { VerticalPreviewCard } from "@components/VerticalPreviewCard";
-import styles from "./Home.module.scss";
-import logo from "@assets/images/logo.png";
-import { LandingCarousel } from "./components/HomeCarousel";
-import { ScrollView } from "@components/ScrollView/ScrollView";
-import { useStore } from "@services/store";
-import { ProductEntity } from "@models/ProductEntity";
-import { useEffect, useState } from "react";
+import { VerticalPreviewCard } from '@components/VerticalPreviewCard'
+import styles from './Home.module.scss'
+import logo from '@assets/images/logo.png'
+import { LandingCarousel } from './components/HomeCarousel'
+import { ScrollView } from '@components/ScrollView/ScrollView'
+import { useAppStore } from '@services/store'
+import { ProductEntity } from '@models/ProductEntity'
+import { useEffect, useState } from 'react'
 
 export const Home = () => {
-  const count = useStore((state) => state.count);
-  const name = useStore((state) => state.name);
-  const handleCount = useStore((state) => state.handleCount);
-  const productEntity = useStore((state) => state.posts((statep) => statep));
+  const count = useAppStore((state) => state.count)
+  const name = useAppStore((state) => state.name)
+  const handleCount = useAppStore((state) => state.handleCount)
+  const productEntity = useAppStore((state) => state.posts((statep) => statep))
 
-  const [product, setProduct] = useState<ProductEntity>(new ProductEntity());
+  const [product, setProduct] = useState<ProductEntity>(new ProductEntity())
   const products = [
     {
-      title: "First Item",
-      image: logo
+      title: 'First Item',
+      image: logo,
     },
     {
-      title: "First Item",
-      image: logo
+      title: 'First Item',
+      image: logo,
     },
     {
-      title: "First Item",
-      image: logo
+      title: 'First Item',
+      image: logo,
     },
     {
-      title: "First Item",
-      image: logo
-    }
-  ];
+      title: 'First Item',
+      image: logo,
+    },
+  ]
 
   const onchange = ({ target: { value, name } }: any) =>
     setProduct({
       ...product,
-      [name]: value
-    });
+      [name]: value,
+    })
 
-  const onSelectProduct = (item: ProductEntity) => () =>
-    setProduct({ ...item });
+  const onSelectProduct = (item: ProductEntity) => () => setProduct({ ...item })
 
   const createProduct = () => {
     if (!product.id) {
-      productEntity.add(product);
+      productEntity.add(product)
     } else {
-      productEntity.update(product.id, product);
+      productEntity.update(product.id, product)
     }
-    setProduct({} as ProductEntity);
-  };
+    setProduct({} as ProductEntity)
+  }
 
   const removeProduct = (id: number) => () => {
-    productEntity.remove(id);
-  };
+    productEntity.remove(id)
+  }
   useEffect(() => {
-    productEntity.get({});
-  }, []);
+    productEntity.get({})
+  }, [])
   return (
     <div className={styles.HomeWrapper}>
       {/*{productEntity.loading ? (*/}
@@ -127,5 +126,5 @@ export const Home = () => {
         <ScrollView />
       </div>
     </div>
-  );
-};
+  )
+}

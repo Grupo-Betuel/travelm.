@@ -4,20 +4,20 @@ import create, {
   SetState,
   StoreApi,
   UseBoundStore,
-} from "zustand";
-import { persist } from "zustand/middleware";
-import { createEntityStore, IEntityStore } from "@services/store/entityStore";
-import { ProductEntity } from "@models/ProductEntity";
+} from 'zustand'
+import { persist } from 'zustand/middleware'
+import { createEntityStore, IEntityStore } from '@services/store/entityStore'
+import { ProductEntity } from '@models/ProductEntity'
 import {
   appEntitiesWithService,
   AppEntitiesStoreType,
-} from "@services/appEntitiesWithService";
-import { EntityNamesType } from "@services/appEntitiesWithService";
+} from '@services/appEntitiesWithService'
+import { EntityNamesType } from '@services/appEntitiesWithService'
 
 /// APP STORE
 export interface IAppStore extends AppEntitiesStoreType {
-  count: number;
-  handleCount: (isSubs?: boolean) => () => void;
+  count: number
+  handleCount: (isSubs?: boolean) => () => void
 }
 
 export const appStore = (set: SetState<IAppStore>) => {
@@ -27,34 +27,36 @@ export const appStore = (set: SetState<IAppStore>) => {
       set((state) => ({
         ...state,
         count: isSubstract ? state.count - 1 : state.count + 1,
-      }));
+      }))
     },
-  } as IAppStore;
+  } as IAppStore
 
-  (Object.keys(appEntitiesWithService) as EntityNamesType[]).forEach(
+  ;(Object.keys(appEntitiesWithService) as EntityNamesType[]).forEach(
     (k: EntityNamesType) =>
       ((appStoreInit as any)[k] = createEntityStore<ProductEntity>(
         [appEntitiesWithService[k].entity],
         appEntitiesWithService[k].service
       ))
-  );
+  )
 
-  return appStoreInit;
-};
+  return appStoreInit
+}
 
 /// PERSIST DATA
 export interface IPersistStore {
-  name: string;
+  name: string
 }
 
 const persistStore = persist<IPersistStore>(
   (set) => ({
-    name: "Williams",
+    name: 'Williams',
   }),
-  { name: "persist/commission" }
-);
+  { name: 'persist/commission' }
+)
 
-export const useStore = create<IAppStore & IPersistStore>((set, get, api) => ({
-  ...persistStore(set, get, api),
-  ...appStore(set),
-}));
+export const useAppStore = create<IAppStore & IPersistStore>(
+  (set, get, api) => ({
+    ...persistStore(set, get, api),
+    ...appStore(set),
+  })
+)

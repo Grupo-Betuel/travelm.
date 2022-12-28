@@ -17,11 +17,11 @@ export type EntityPerServiceType = {
 export const appEntitiesWithService: EntityPerServiceType = {
   posts: {
     entity: new ProductEntity(),
-    service: new ProductService('posts'),
+    service: new ProductService(),
   },
   users: {
     entity: new ProductEntity(),
-    service: new ProductService('users'),
+    service: new ProductService(),
   },
 }
 
