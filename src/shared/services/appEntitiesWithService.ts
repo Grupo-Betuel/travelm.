@@ -4,8 +4,12 @@ import { ProductEntity } from '@models/ProductEntity'
 import { BaseEntity } from '@models/BaseEntity'
 import { BaseService } from '@services/BaseService'
 import { ProductService } from '@services/productService'
+import { UserEntity } from '@models/UserEntity'
+import { UserService } from '@services/userService'
+import { AuthUserEntity } from '@models/auth.model'
+import { AuthService } from '@services/authService'
 
-export type EntityNamesType = 'posts' | 'users'
+export type EntityNamesType = 'posts' | 'users' | 'auth/login'
 
 export type EntityPerServiceType = {
   [N in EntityNamesType]: {
@@ -20,8 +24,12 @@ export const appEntitiesWithService: EntityPerServiceType = {
     service: new ProductService(),
   },
   users: {
-    entity: new ProductEntity(),
-    service: new ProductService(),
+    entity: new UserEntity(),
+    service: new UserService(),
+  },
+  'auth/login': {
+    entity: new AuthUserEntity(),
+    service: new AuthService(),
   },
 }
 

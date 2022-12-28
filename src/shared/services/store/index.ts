@@ -1,10 +1,4 @@
-import create, {
-  GetState,
-  Mutate,
-  SetState,
-  StoreApi,
-  UseBoundStore,
-} from 'zustand'
+import create, { SetState } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { createEntityStore, IEntityStore } from '@services/store/entityStore'
 import { ProductEntity } from '@models/ProductEntity'
@@ -13,6 +7,7 @@ import {
   AppEntitiesStoreType,
 } from '@services/appEntitiesWithService'
 import { EntityNamesType } from '@services/appEntitiesWithService'
+import { BaseEntity } from '@models/BaseEntity'
 
 /// APP STORE
 export interface IAppStore extends AppEntitiesStoreType {
@@ -33,7 +28,7 @@ export const appStore = (set: SetState<IAppStore>) => {
 
   ;(Object.keys(appEntitiesWithService) as EntityNamesType[]).forEach(
     (k: EntityNamesType) =>
-      ((appStoreInit as any)[k] = createEntityStore<ProductEntity>(
+      ((appStoreInit as any)[k] = createEntityStore<BaseEntity>(
         [appEntitiesWithService[k].entity],
         appEntitiesWithService[k].service
       ))

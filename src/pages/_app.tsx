@@ -7,7 +7,7 @@ import { ConfigProvider } from 'antd'
 import { defaultValidateMessages as validateMessages } from '../config/form-validation.config'
 import { defaultTheme } from '../config/theme.config'
 import { useEffect, useState } from 'react'
-import { getLoggedUser } from '../utils/auth.utils'
+import { getAuthData } from '../utils/auth.utils'
 import { UserEntity } from '@models/UserEntity'
 
 const queryClient = new QueryClient()
@@ -20,7 +20,7 @@ function MyApp({ Component, pageProps }: AppProps<IAppProps>) {
   const [user, setUser] = useState<UserEntity | unknown>(null)
 
   useEffect(() => {
-    setUser(getLoggedUser())
+    setUser(getAuthData())
   }, [pageProps])
 
   if (pageProps.protected && !user) {

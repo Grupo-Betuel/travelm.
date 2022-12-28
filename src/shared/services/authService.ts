@@ -1,8 +1,8 @@
 import { BaseService } from '@services/BaseService'
-import { AuthUser } from '@interfaces/auth.interface'
+import { AuthUserEntity } from '@models/auth.model'
 
-export class AuthService extends BaseService<AuthUser> {
+export class AuthService extends BaseService<AuthUserEntity> {
   constructor() {
-    super('users')
+    super('auth/login')
   }
 }
