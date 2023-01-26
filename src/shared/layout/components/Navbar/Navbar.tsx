@@ -5,7 +5,7 @@ import Image from 'next/image'
 import styles from './Navbar.module.scss'
 import { Button, Dropdown, Input, MenuProps, Modal, Select } from 'antd'
 const { Option } = Select
-import { ChangeEvent, useState } from 'react'
+import { ChangeEvent, useRef, useState } from 'react'
 import { CategoriesDrawer } from '@shared/layout/components/CategoriesDrawer/CategoriesDrawer'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -46,14 +46,13 @@ export const Navbar = () => {
   const router = useRouter()
   const authIsEnable = router.query.auth
   const { makeContextualHref, returnHref } = useContextualRouting()
-  const handleCloseAuthModal = () => router.push(returnHref)
+  const handleReturnToHref = () => router.push(returnHref)
   const authUser = getAuthData('user') as UserEntity
   const { data: categories } = getEntityDataHook<CategoryEntity>(
     'categories',
     true
   )
   const enableContextSearch = !returnHref.includes('search')
-  console.log('cate', categories)
 
   const authenticate = () => {
     router.push(makeContextualHref({ auth: true }), 'auth', { shallow: true })
@@ -78,6 +77,21 @@ export const Navbar = () => {
     setShowAllCategories(!showAllCategories)
   }
 
+  const handleSearchRouting = (
+    path: string,
+    queryParams: any,
+    isContext?: boolean
+  ) => {
+    if (isContext) {
+      router.push(makeContextualHref(queryParams), path)
+    } else {
+      router.push({
+        pathname: path,
+        query: queryParams,
+      })
+    }
+  }
+
   const onSearch =
     (contextSearch: boolean = false) =>
     (data: ChangeEvent<HTMLInputElement> | string) => {
@@ -86,8 +100,10 @@ export const Navbar = () => {
       const value: string = (data as ChangeEvent<HTMLInputElement>).target
         ? (data as ChangeEvent<HTMLInputElement>).target.value
         : (data as string)
-
       setSearchValue(value)
+      emptySearch(!!value)
+
+      if (!value) return
 
       if (contextSearch) {
         const queryParams: any = {
@@ -95,21 +111,20 @@ export const Navbar = () => {
           categorySlug,
           extraPath: ['autocomplete-by-title'].join('/'),
         }
-        setShowContextSearchModal(!!value)
         const queryString = new URLSearchParams(queryParams).toString()
         console.log(queryString)
-        router.push(
-          makeContextualHref(queryParams),
-          `/search/${path}/?${queryString}`
-        )
+        const contextPath = `/search/${path}/?${queryString}`
+        handleSearchRouting(contextPath, queryParams, contextSearch)
       } else {
-        router.push({
-          pathname: `/search/${path}/`,
-          query: { value, categorySlug },
-        })
+        handleSearchRouting(`/search/${path}/`, { value, categorySlug })
         setShowContextSearchModal(false)
       }
     }
+
+  const emptySearch = (isShown: boolean = false) => {
+    !isShown && handleReturnToHref()
+    setShowContextSearchModal(isShown)
+  }
 
   const onSelectCategory = (slug: string) => setCategorySlug(slug)
 
@@ -190,8 +205,8 @@ export const Navbar = () => {
       <Modal
         title="Basic Modal"
         open={!!authIsEnable}
-        onOk={handleCloseAuthModal}
-        onCancel={handleCloseAuthModal}
+        onOk={handleReturnToHref}
+        onCancel={handleReturnToHref}
       >
         <Auth isModal />
       </Modal>

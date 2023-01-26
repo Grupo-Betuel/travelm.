@@ -1,21 +1,19 @@
+@use 'src/shared/styles/layout-variables' as layout;
 @import 'src/shared/styles/box-shadow-utils';
 
-$sidebarWidth: 360px;
-
 .Sidebar {
-  width: $sidebarWidth !important;
-  min-width: $sidebarWidth !important;
+  width: layout.$sidebarWidth !important;
+  min-width: layout.$sidebarWidth !important;
   max-width: unset !important;
   position: relative;
   flex: unset !important;
 
-
   .SidebarWrapper {
     @extend .small-bxs;
-    width: $sidebarWidth !important;
+    width: layout.$sidebarWidth !important;
     background-color: white;
-    position: fixed;
-    height: 80vh;
+    position: sticky;
+    height: 100%;
     left: 0;
     overflow: hidden;
 

@@ -1,10 +1,10 @@
-import { useContext, useEffect } from 'react'
+import { useContext, useEffect, useRef } from 'react'
 import { appLoadingContext } from '../../pages/_app'
 import { useAppStore } from '@services/store'
 import { EntityNamesType } from '@services/appEntitiesWithService'
 import { IServiceMethodProperties } from '@services/BaseService'
 import { IPaginatedResponse } from '@interfaces/pagination.interface'
-import _ from 'lodash'
+import { debounce } from 'lodash'
 
 export interface IGetEntityDataHookReturn<T> {
   loading?: boolean
@@ -20,10 +20,11 @@ export function getEntityDataHook<T>(
 ): IGetEntityDataHookReturn<T> {
   const entity = useAppStore((state) => state[entityName]((statep) => statep))
   const { setAppLoading } = useContext(appLoadingContext)
-  const getData = _.debounce((props: IServiceMethodProperties<T> = {}) => {
-    console.log('getting data!')
-    entity.get({ ...properties, ...props })
-  }, 600)
+  const getData = useRef(
+    debounce((props: IServiceMethodProperties<T> = {}) => {
+      entity.get({ ...properties, ...props })
+    }, 600)
+  ).current
 
   useEffect(() => {
     loadDataAutomatically && getData()
