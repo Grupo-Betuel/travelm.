@@ -1,6 +1,6 @@
 import { Button, Checkbox, Form, Input, Select } from 'antd'
 import { useAppStore } from '@services/store'
-import { UserEntity } from '@models/UserEntity'
+import { UserEntity } from '@shared/entities/UserEntity'
 import { MaskedInput } from 'antd-mask-input'
 import { useRouter } from 'next/router'
 import { IAuthProps } from '@screens/Auth/Auth'

@@ -1,4 +1,4 @@
-import { BaseEntity } from '@models/BaseEntity'
+import { BaseEntity } from './/BaseEntity'
 
 export class UserEntity extends BaseEntity {
   name: string = ''

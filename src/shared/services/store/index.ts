@@ -1,7 +1,7 @@
 import create, { SetState } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { createEntityStore, IEntityStore } from '@services/store/entityStore'
-import { PostEntity } from '@models/PostEntity'
+import { PostEntity } from '@shared/entities/PostEntity'
 import { mountStoreDevtool } from 'simple-zustand-devtools'
 
 import {
@@ -9,7 +9,7 @@ import {
   AppEntitiesStoreType,
 } from '@services/appEntitiesWithService'
 import { EntityNamesType } from '@services/appEntitiesWithService'
-import { BaseEntity } from '@models/BaseEntity'
+import { BaseEntity } from '@shared/entities/BaseEntity'
 
 /// APP STORE
 export interface IAppStore extends AppEntitiesStoreType {

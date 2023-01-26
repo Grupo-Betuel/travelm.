@@ -1,4 +1,4 @@
 import { useAppStore } from '@services/store'
-import { AuthUserEntity } from '@models/auth.model'
+import { AuthUserEntity } from '@shared/entities/AuthEntity'
 
 export const authHook = () => {}

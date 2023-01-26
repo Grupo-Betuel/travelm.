@@ -1,5 +1,5 @@
 import { isExpired } from 'react-jwt'
-import { UserEntity } from '@models/UserEntity'
+import { UserEntity } from '@shared/entities/UserEntity'
 import { BaseService } from '@services/BaseService'
 import { IAuthResponse } from '@interfaces/auth.interface'
 

@@ -4,7 +4,7 @@ import logo from '@assets/images/logo.png'
 import { LandingCarousel } from './components/HomeCarousel'
 import { ScrollView } from '@components/ScrollView/ScrollView'
 import { useAppStore } from '@services/store'
-import { PostEntity } from '@models/PostEntity'
+import { PostEntity } from '@shared/entities/PostEntity'
 import { useEffect, useState } from 'react'
 
 export const Home = () => {
@@ -45,28 +45,6 @@ export const Home = () => {
 
   const createProduct = () => {
     if (!product.id) {
-      //   "description is required"
-      //   4
-      // :
-      //   "description must be a string"
-      //   5
-      // :
-      //   "statusId is required"
-      //   6
-      // :
-      //   "subCategoryId is required"
-      //   7
-      // :
-      //   "typeCurrencyId is required"
-      //   8
-      // :
-      //   "images must contain at least 1 elements"
-      //   9
-      // :
-      //   "images must be an array"
-      //   10
-      // :
-      //   "images is required"
       productEntity.add(
         {
           ...product,
@@ -97,60 +75,62 @@ export const Home = () => {
   }, [])
   return (
     <div className={styles.HomeWrapper}>
-      {productEntity.loading ? (
-        <p>Loading...</p>
-      ) : (
-        <h1>
-          Count {count} - {name}
-        </h1>
-      )}
-      <br />
-      <br />
-      <input
-        type="text"
-        name="title"
-        onChange={onchange}
-        value={product.title}
-        placeholder="title"
-      />{' '}
-      <br /> <br />
-      <input
-        type="text"
-        name="description"
-        onChange={onchange}
-        value={product.description}
-        placeholder="description"
-      />{' '}
-      <br /> <br />
-      <input
-        type="text"
-        name="image"
-        onChange={onchange}
-        value={product.image}
-        placeholder="image"
-      />{' '}
-      <br /> <br />
-      <button onClick={createProduct}>
-        {product.id ? 'Update' : 'Create'} product
-      </button>{' '}
-      <br /> <br />
-      <button onClick={handleCount()}>Increase</button>
-      <br /> <br />
-      <button onClick={handleCount(true)}>Decrease</button>
-      <br />
-      <br />
-      <div className={styles.products}>
-        {productData.map((item, i) => (
-          <div key={i} onClick={onSelectProduct(item)}>
-            <img src={item.image} alt="" />
-            <h5>{item.title}</h5>
-            <p>{item.description}</p>
-            <a href="#" onClick={removeProduct(item.id)}>
-              Eliminar
-            </a>
-          </div>
-        ))}
-      </div>
+      {/*<div className="prods">*/}
+      {/*  {productEntity.loading ? (*/}
+      {/*    <p>Loading...</p>*/}
+      {/*  ) : (*/}
+      {/*    <h1>*/}
+      {/*      Count {count} - {name}*/}
+      {/*    </h1>*/}
+      {/*  )}*/}
+      {/*  <br />*/}
+      {/*  <br />*/}
+      {/*  <input*/}
+      {/*    type="text"*/}
+      {/*    name="title"*/}
+      {/*    onChange={onchange}*/}
+      {/*    value={product.title}*/}
+      {/*    placeholder="title"*/}
+      {/*  />{' '}*/}
+      {/*  <br /> <br />*/}
+      {/*  <input*/}
+      {/*    type="text"*/}
+      {/*    name="description"*/}
+      {/*    onChange={onchange}*/}
+      {/*    value={product.description}*/}
+      {/*    placeholder="description"*/}
+      {/*  />{' '}*/}
+      {/*  <br /> <br />*/}
+      {/*  <input*/}
+      {/*    type="text"*/}
+      {/*    name="image"*/}
+      {/*    onChange={onchange}*/}
+      {/*    value={product.image}*/}
+      {/*    placeholder="image"*/}
+      {/*  />{' '}*/}
+      {/*  <br /> <br />*/}
+      {/*  <button onClick={createProduct}>*/}
+      {/*    {product.id ? 'Update' : 'Create'} product*/}
+      {/*  </button>{' '}*/}
+      {/*  <br /> <br />*/}
+      {/*  <button onClick={handleCount()}>Increase</button>*/}
+      {/*  <br /> <br />*/}
+      {/*  <button onClick={handleCount(true)}>Decrease</button>*/}
+      {/*  <br />*/}
+      {/*  <br />*/}
+      {/*  <div className={styles.products}>*/}
+      {/*    {productData.map((item, i) => (*/}
+      {/*      <div key={i} onClick={onSelectProduct(item)}>*/}
+      {/*        <img src={item.image} alt="" />*/}
+      {/*        <h5>{item.title}</h5>*/}
+      {/*        <p>{item.description}</p>*/}
+      {/*        <a href="#" onClick={removeProduct(item.id)}>*/}
+      {/*          Eliminar*/}
+      {/*        </a>*/}
+      {/*      </div>*/}
+      {/*    ))}*/}
+      {/*  </div>*/}
+      {/*</div>*/}
       <div className={styles.LandingCarouselWrapper}>
         <LandingCarousel />
       </div>

@@ -1,4 +1,4 @@
-import { UserEntity } from '@models/UserEntity'
+import { UserEntity } from '@shared/entities/UserEntity'
 
 export interface IAuthResponse {
   user: UserEntity

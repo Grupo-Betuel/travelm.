@@ -5,15 +5,14 @@ import { EntityNamesType } from '@services/appEntitiesWithService'
 import { IServiceMethodProperties } from '@services/BaseService'
 import { IPaginatedResponse } from '@interfaces/pagination.interface'
 import { debounce } from 'lodash'
+import { IEntityStore } from '@services/store/entityStore'
 
-export interface IGetEntityDataHookReturn<T> {
-  loading?: boolean
+export interface IGetEntityDataHookReturn<T> extends IEntityStore<T> {
   data: T[]
-  getData: (props?: IServiceMethodProperties<T>) => void
   pagination?: Omit<IPaginatedResponse<T>, 'content'>
 }
 
-export function getEntityDataHook<T>(
+export function handleEntityHook<T>(
   entityName: EntityNamesType,
   loadDataAutomatically?: boolean,
   properties?: IServiceMethodProperties<T>
@@ -42,9 +41,9 @@ export function getEntityDataHook<T>(
     : undefined
 
   return {
-    loading: entity.loading,
+    ...entity,
     data: [...(data || [])],
     pagination,
-    getData,
+    get: getData,
   }
 }

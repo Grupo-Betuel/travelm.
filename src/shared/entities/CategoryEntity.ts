@@ -1,5 +1,5 @@
-import { BaseEntity } from '@models/BaseEntity'
-import { SubCategoryEntity } from '@models/SubCategoryEntity'
+import { BaseEntity } from './/BaseEntity'
+import { SubCategoryEntity } from './/SubCategoryEntity'
 
 export class CategoryEntity extends BaseEntity {
   name = ''

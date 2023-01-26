@@ -1,5 +1,5 @@
 import { BaseService } from '@services/BaseService'
-import { AuthUserEntity } from '@models/auth.model'
+import { AuthUserEntity } from '@shared/entities/AuthEntity'
 
 export class AuthService extends BaseService<AuthUserEntity> {
   constructor() {

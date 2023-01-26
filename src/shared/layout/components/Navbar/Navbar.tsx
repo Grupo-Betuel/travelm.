@@ -11,10 +11,10 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useContextualRouting } from 'next-use-contextual-routing'
 import { Auth } from '@screens/Auth/Auth'
-import { CategoryEntity } from '@models/CategoryEntity'
-import { getEntityDataHook } from '@shared/hooks/getEntityDataHook'
+import { CategoryEntity } from '@shared/entities/CategoryEntity'
+import { handleEntityHook } from '@shared/hooks/handleEntityHook'
 import { getAuthData, appLogOut } from '../../../../utils/auth.utils'
-import { UserEntity } from '@models/UserEntity'
+import { UserEntity } from '@shared/entities/UserEntity'
 import { MainContentModal } from '@components/MainContentModal/MainContentModal'
 import { Search } from '@screens/Search'
 
@@ -48,7 +48,7 @@ export const Navbar = () => {
   const { makeContextualHref, returnHref } = useContextualRouting()
   const handleReturnToHref = () => router.push(returnHref)
   const authUser = getAuthData('user') as UserEntity
-  const { data: categories } = getEntityDataHook<CategoryEntity>(
+  const { data: categories } = handleEntityHook<CategoryEntity>(
     'categories',
     true
   )

@@ -1,5 +1,5 @@
 import { BaseService } from '@services/BaseService'
-import { CategoryEntity } from '@models/CategoryEntity'
+import { CategoryEntity } from '@shared/entities/CategoryEntity'
 
 export class CategoryService extends BaseService<CategoryEntity> {
   constructor() {

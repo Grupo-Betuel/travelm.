@@ -1,5 +1,5 @@
-import { getEntityDataHook } from '@shared/hooks/getEntityDataHook'
-import { PostEntity } from '@models/PostEntity'
+import { handleEntityHook } from '@shared/hooks/handleEntityHook'
+import { PostEntity } from '@shared/entities/PostEntity'
 import { useRouter } from 'next/router'
 import { isNotEmptyObject } from '../../utils/matching.util'
 import { useEffect } from 'react'
@@ -9,7 +9,7 @@ export interface IHandleSearchPostHookData {
 
 export const handleSearchPostHook = (): IHandleSearchPostHookData => {
   const router = useRouter()
-  const { data, getData } = getEntityDataHook<PostEntity>('posts', false)
+  const { data, get } = handleEntityHook<PostEntity>('posts', false)
 
   useEffect(() => {
     console.log('query!!', router.query)
@@ -24,7 +24,7 @@ export const handleSearchPostHook = (): IHandleSearchPostHookData => {
     delete queryParams.searchPath
     delete queryParams.extraPath
     if (isNotEmptyObject(router.query)) {
-      getData({ path: searchPath || extraPath, queryParams })
+      get({ path: searchPath || extraPath, queryParams })
     }
   }
 

@@ -3,7 +3,7 @@ import placeholder from '@assets/images/logo.png'
 import { Rate } from 'antd'
 import styles from './ProductCard.module.scss'
 import Link from 'next/link'
-import { PostEntity } from '@models/PostEntity'
+import { PostEntity } from '@shared/entities/PostEntity'
 
 export interface IProductProps {
   product: PostEntity

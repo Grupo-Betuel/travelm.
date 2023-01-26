@@ -6,7 +6,7 @@ import { defaultValidateMessages as validateMessages } from '../config/form-vali
 import { defaultTheme } from '../config/theme.config'
 import { createContext, useEffect, useState } from 'react'
 import { getAuthData } from '../utils/auth.utils'
-import { UserEntity } from '@models/UserEntity'
+import { UserEntity } from '@shared/entities/UserEntity'
 import 'react-toastify/dist/ReactToastify.css'
 import { ToastContainer } from 'react-toastify'
 import { useAppStore } from '@services/store'
