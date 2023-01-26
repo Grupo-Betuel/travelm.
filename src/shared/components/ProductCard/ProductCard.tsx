@@ -9,10 +9,14 @@ export interface IProductProps {
   product: PostEntity
 }
 export const ProductCard = ({ product }: IProductProps) => {
+  const img = product && product.images ? product.images[0] : ''
+  console.log('img', img)
+  console.log('product =>', product)
   return (
     <Link href="/detail">
+      ™
       <div className={styles.ProductCard}>
-        <Image src={placeholder} />
+        <img src={img} />
         <span className={styles.ProductTitle}>{product.title}</span>
         <Rate allowHalf defaultValue={4.5} disabled />
         <span className={styles.ProductPrice}>RD$ 4,500</span>

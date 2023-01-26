@@ -29,7 +29,6 @@ export const getAuthData = (
       return ''
     }
 
-    console.log(authData, 'key', authServiceMock.localStorageKey.add)
     return type === 'all' ? authData : authData[type]
   } catch (err: any) {
     console.log('errrrorrr', err.message)

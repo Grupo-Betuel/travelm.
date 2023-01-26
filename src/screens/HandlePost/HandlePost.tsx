@@ -2,7 +2,16 @@ import { Sidebar } from '@shared/layout/components/Sidebar/Sidebar'
 import { DetailView } from '@screens/DetailView'
 import { LayoutContent } from '@shared/layout/components/Content/LayoutContent'
 import styles from './HandlePost.module.scss'
-import { Button, Checkbox, Form, Input, Select, Switch, Upload } from 'antd'
+import {
+  Button,
+  Checkbox,
+  Form,
+  Input,
+  InputNumber,
+  Select,
+  Switch,
+  Upload,
+} from 'antd'
 import { PostEntity } from '@shared/entities/PostEntity'
 import { InboxOutlined } from '@ant-design/icons'
 import { handleEntityHook } from '@shared/hooks/handleEntityHook'
@@ -103,7 +112,19 @@ export const HandlePost = () => {
   }
 
   const submit = (values: any) => {
-    console.log(values)
+    console.log('form value', values)
+    console.log(
+      'added',
+      add(
+        {
+          ...values,
+          subCategoryId: 'id',
+          typeCurrencyId: 1,
+          images: values.images.map((item: any) => item.thumbUrl),
+        },
+        { path: 'create' }
+      )
+    )
   }
 
   return (
@@ -144,10 +165,9 @@ export const HandlePost = () => {
           <Form.Item
             label="Precio"
             name="price"
-            type="number"
-            rules={[{ required: true }]}
+            rules={[{ type: 'number', required: true }]}
           >
-            <Input size="large" />
+            <InputNumber size="large" className="w-100" />
           </Form.Item>
           <Form.Item
             label="Categoria"
