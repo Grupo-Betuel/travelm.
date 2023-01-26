@@ -9,21 +9,27 @@ export const resetAuthData = () => {
   localStorage.removeItem(authServiceMock.localStorageKey.add)
 }
 
+export const appLogOut = () => {
+  resetAuthData()
+  location.reload()
+}
+
+// @ts-ignore
 export const getAuthData = (
   type: keyof IAuthResponse | 'all' = 'access_token'
-): UserEntity | unknown => {
+): IAuthResponse | string | UserEntity => {
   try {
-    console.log('check logged')
-
-    const authString = localStorage.getItem(authServiceMock.localStorageKey.add)
+    const authString =
+      localStorage && localStorage.getItem(authServiceMock.localStorageKey.add)
     const authData = JSON.parse(authString || '{}') as IAuthResponse
     const tokenIsExpired = isExpired(authData.access_token)
 
     if (!authString || tokenIsExpired) {
       resetAuthData()
-      return null
+      return ''
     }
 
+    console.log(authData, 'key', authServiceMock.localStorageKey.add)
     return type === 'all' ? authData : authData[type]
   } catch (err: any) {
     console.log('errrrorrr', err.message)

@@ -1,36 +1,52 @@
 import { SetState, StoreApi, UseBoundStore } from 'zustand'
 import create from 'zustand'
-import { BaseService } from '@services/BaseService'
+import { BaseService, IServiceMethodProperties } from '@services/BaseService'
 import { BaseEntity } from '@models/BaseEntity'
+import { IPaginatedResponse } from '@interfaces/pagination.interface'
+import { toast } from 'react-toastify'
+
 export interface IEntityStore<T> {
-  data: T[]
+  data: T[] | IPaginatedResponse<T>
   item: T
   add: (
     value: T,
+    properties?: IServiceMethodProperties<T>,
     enableCache?: boolean,
     cacheLifeTime?: number
-  ) => Promise<void>
+  ) => Promise<boolean | void>
   update: (
     value: { _id: string } & Partial<T>,
     enableCache?: boolean,
     cacheLifeTime?: number
-  ) => Promise<void>
-  remove: (id: string) => Promise<void>
+  ) => Promise<boolean | void>
+  remove: (id: string) => Promise<boolean | void>
   get: (
-    property: { [N in keyof T]: any },
+    properties?: IServiceMethodProperties<T>,
     enableCache?: boolean,
     cacheLifeTime?: number
   ) => void
   loading?: boolean
+  error?: string
 }
 
-export const stopLoadingRollback = (set: SetState<IEntityStore<any>>) => () => {
-  set((state: any) => ({
-    ...state,
-    loading: false,
-  }))
-}
-export function updateState<T extends BaseEntity>(
+export const stateHandlerError =
+  (set: SetState<IEntityStore<any>>) => (error: string) => {
+    console.error('application error', error)
+    if (process.env.NODE_ENV === 'development') {
+      toast(`Forbidden: ${error.toString()}`, {
+        autoClose: false,
+        type: 'error',
+      })
+    }
+
+    set((state: any) => ({
+      ...state,
+      error,
+      loading: false,
+    }))
+  }
+
+export function stateHandlerSuccess<T extends BaseEntity>(
   key: keyof IEntityStore<T>,
   data: T | T[],
   set: SetState<IEntityStore<any>>
@@ -41,6 +57,7 @@ export function updateState<T extends BaseEntity>(
         ...state,
         data: [...state.data, { ...data }],
         loading: false,
+        error: undefined,
       }))
       break
     case 'update':
@@ -50,6 +67,7 @@ export function updateState<T extends BaseEntity>(
           item._id === (data as T)._id ? { ...item, ...data } : item
         ),
         loading: false,
+        error: undefined,
       }))
       break
     case 'get':
@@ -63,13 +81,16 @@ export function updateState<T extends BaseEntity>(
         // ),
         data,
         loading: false,
+        error: undefined,
       }))
+
       break
     case 'remove':
       set((state: any) => ({
         ...state,
         data: state.data.filter((item: T) => item._id !== data._id),
         loading: false,
+        error: undefined,
       }))
       break
   }
@@ -85,17 +106,21 @@ export function createEntityStore<T extends BaseEntity>(
       item: initData[0],
       add: async (
         entityData: T,
+        properties: IServiceMethodProperties<T>,
         enableCache = true,
         cacheLifeTime: number = 60 * 1000 * 5
       ) => {
         set((state) => ({ ...state, loading: true }))
-        await service.add(
+        const res = await service.add(
           entityData,
-          stopLoadingRollback(set),
+          properties,
+          stateHandlerError(set),
           enableCache,
           cacheLifeTime
         )
-        updateState<T>('add', entityData, set)
+        if (!!res) stateHandlerSuccess<T>('add', entityData, set)
+
+        return !!res
       },
       update: async (
         entityData: { _id: string } & Partial<T>,
@@ -103,13 +128,21 @@ export function createEntityStore<T extends BaseEntity>(
         cacheLifeTime: number = 60 * 1000 * 5
       ) => {
         set((state) => ({ ...state, loading: true }))
-        await service.update(
+        const res = await service.update(
           entityData,
-          stopLoadingRollback(set),
+          stateHandlerError(set),
           enableCache,
           cacheLifeTime
         )
-        updateState<{ _id: string } & Partial<T>>('update', entityData, set)
+        if (!!res) {
+          stateHandlerSuccess<{ _id: string } & Partial<T>>(
+            'update',
+            entityData,
+            set
+          )
+        }
+
+        return !!res
       },
       remove: async (
         id: string,
@@ -117,27 +150,32 @@ export function createEntityStore<T extends BaseEntity>(
         cacheLifeTime: number = 60 * 1000 * 5
       ) => {
         set((state) => ({ ...state, loading: true }))
-        await service.remove(
+        const res = await service.remove(
           id,
-          stopLoadingRollback(set),
+          stateHandlerError(set),
           enableCache,
           cacheLifeTime
         )
-        updateState<BaseEntity>('remove', { _id: id }, set)
+        if (!!res) stateHandlerSuccess<BaseEntity>('remove', { _id: id }, set)
+        return !!res
       },
       get: async (
-        properties: { [N in keyof T]: any },
+        properties: IServiceMethodProperties<T>,
         enableCache = true,
         cacheLifeTime: number = 60 * 1000 * 5
       ) => {
+        console.log('getting again!')
         set((state) => ({ ...state, loading: true }))
-        await service.get(
-          (data?: T | T[]) => {
-            updateState('get', data as T[], set)
+        const res = await service.get(
+          properties,
+          (data: T | T[] = []) => {
+            stateHandlerSuccess('get', data as T[], set)
           },
+          stateHandlerError(set),
           enableCache,
           cacheLifeTime
         )
+        return !!res
       },
     }
   })

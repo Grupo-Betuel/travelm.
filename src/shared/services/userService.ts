@@ -1,5 +1,5 @@
 import { BaseService } from '@services/BaseService'
-import { ProductEntity } from '@models/ProductEntity'
+import { PostEntity } from '@models/PostEntity'
 import { UserEntity } from '@models/UserEntity'
 
 export class UserService extends BaseService<UserEntity> {

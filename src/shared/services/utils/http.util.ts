@@ -1,13 +1,9 @@
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios'
 import { IAuthResponse } from '@interfaces/auth.interface'
 import { BaseService } from '@services/BaseService'
-
-enum StatusCode {
-  Unauthorized = 401,
-  Forbidden = 403,
-  TooManyRequests = 429,
-  InternalServerError = 500,
-}
+import { StatusCode } from '@interfaces/REST.interface'
+import { toast } from 'react-toastify'
+import { IResponseError } from '@interfaces/error.interface'
 
 const headers: Readonly<Record<string, string | boolean>> = {
   Accept: 'application/json',
@@ -100,26 +96,57 @@ class Http {
   // Handle global app errors
   // We can handle generic app errors depending on the status code
   // eslint-disable-next-line
-  private handleError(error: any) {
+  private handleError(error: IResponseError) {
     const { status } = error
 
     switch (status) {
       case StatusCode.InternalServerError: {
+        toast(`Server: ${error.data.message}`, {
+          autoClose: false,
+          type: 'error',
+        })
+        // Handle InternalServerError
+        break
+      }
+      case StatusCode.NotFound: {
+        toast(`Not Found: ${error.data.message}`, {
+          autoClose: false,
+          type: 'error',
+        })
+        // Handle Not Found
+        break
+      }
+      case StatusCode.BadRequest: {
+        toast(`${error.data.message}`, {
+          autoClose: false,
+          type: 'error',
+        })
         // Handle InternalServerError
         break
       }
       case StatusCode.Forbidden: {
+        toast(`Forbidden: ${error.data.message}`, {
+          autoClose: false,
+          type: 'error',
+        })
         // Handle Forbidden
         break
       }
       case StatusCode.Unauthorized: {
         // Handle Unauthorized
+        toast(`Unauthorized: ${error.data.message}`, {
+          autoClose: false,
+          type: 'error',
+        })
         break
       }
-      case StatusCode.TooManyRequests: {
+      case StatusCode.TooManyRequests:
+        toast(`Too many requests: ${error.data.message}`, {
+          autoClose: false,
+          type: 'error',
+        })
         // Handle TooManyRequests
         break
-      }
     }
 
     return Promise.reject(error)

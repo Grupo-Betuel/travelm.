@@ -1,27 +1,29 @@
 import React from 'react'
-import { Button, Checkbox, ConfigProvider, Form, Input } from 'antd'
+import { Button, Form, Input } from 'antd'
 import { useAppStore } from '@services/store'
-import auth from '../../../pages/auth'
+import { useRouter } from 'next/router'
+import { IAuthProps } from '@screens/Auth/Auth'
 
-const validateMessages = {
-  required: "'${name}' is required bro!",
-  // ...
-}
-
-export const Login = () => {
+export const Login = ({ isModal }: IAuthProps) => {
+  const router = useRouter()
   const authEntity = useAppStore((state) =>
     state['auth/login']((statea) => statea)
   )
 
-  const submit = (data: any) => {
-    console.log('data =>', data)
-    authEntity.add(data)
+  const submit = async (data: any) => {
+    if (await authEntity.add(data)) {
+      // TODO: success Login
+      if (isModal) {
+        router.back()
+      } else {
+        router.push('/')
+      }
+    }
   }
 
   return (
     <div>
       {authEntity.loading && <div>Loading...</div>}
-
       <Form
         name="basic"
         labelCol={{ span: 8 }}

@@ -1,0 +1,15 @@
+@use "/src/shared/styles/sizing-variables" as s;
+@import "/src/shared/styles/box-shadow-utils";
+@import "/src/shared/styles/border-utils";
+
+.HandlePost {
+  .handlePostPreview {
+    @extend .box-shadow;
+    @extend .folded;
+    padding: s.$size-large;
+    margin: s.$size-large;
+  }
+  .FormPost {
+    padding: s.$size-large;
+  }
+}

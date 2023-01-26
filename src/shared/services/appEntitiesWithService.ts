@@ -1,6 +1,6 @@
 import { StoreApi, UseBoundStore } from 'zustand'
 import { IEntityStore } from '@services/store/entityStore'
-import { ProductEntity } from '@models/ProductEntity'
+import { PostEntity } from '@models/PostEntity'
 import { BaseEntity } from '@models/BaseEntity'
 import { BaseService } from '@services/BaseService'
 import { ProductService } from '@services/productService'
@@ -8,8 +8,10 @@ import { UserEntity } from '@models/UserEntity'
 import { UserService } from '@services/userService'
 import { AuthUserEntity } from '@models/auth.model'
 import { AuthService } from '@services/authService'
+import { CategoryEntity } from '@models/CategoryEntity'
+import { CategoryService } from '@services/categoryService'
 
-export type EntityNamesType = 'posts' | 'users' | 'auth/login'
+export type EntityNamesType = 'posts' | 'users' | 'auth/login' | 'categories'
 
 export type EntityPerServiceType = {
   [N in EntityNamesType]: {
@@ -20,7 +22,7 @@ export type EntityPerServiceType = {
 
 export const appEntitiesWithService: EntityPerServiceType = {
   posts: {
-    entity: new ProductEntity(),
+    entity: new PostEntity(),
     service: new ProductService(),
   },
   users: {
@@ -30,6 +32,10 @@ export const appEntitiesWithService: EntityPerServiceType = {
   'auth/login': {
     entity: new AuthUserEntity(),
     service: new AuthService(),
+  },
+  categories: {
+    entity: new CategoryEntity(),
+    service: new CategoryService(),
   },
 }
 

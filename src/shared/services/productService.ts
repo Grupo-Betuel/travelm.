@@ -1,8 +1,8 @@
-import { BaseService } from "@services/BaseService";
-import { ProductEntity } from "@models/ProductEntity";
+import { BaseService } from '@services/BaseService'
+import { PostEntity } from '@models/PostEntity'
 
-export class ProductService extends BaseService<ProductEntity> {
+export class ProductService extends BaseService<PostEntity> {
   constructor() {
-    super("posts");
+    super('posts')
   }
 }

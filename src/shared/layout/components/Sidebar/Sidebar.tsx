@@ -1,10 +1,15 @@
-import Sider from "antd/lib/layout/Sider";
-import styles from "./Sidebar.module.scss";
+import styles from './Sidebar.module.scss'
+import Sider from 'antd/lib/layout/Sider'
 
-export const Sidebar = () => {
+export interface ISidebarProps {
+  children?: any
+}
+export const Sidebar = ({ children }: ISidebarProps) => {
   return (
-    <Sider className={styles.SideBarWrapper}>
-      <h3>Hi</h3>
+    <Sider className={styles.Sidebar}>
+      <div className={styles.SidebarWrapper}>
+        <div className={styles.SidebarContent}>{children}</div>
+      </div>
     </Sider>
-  );
-};
+  )
+}

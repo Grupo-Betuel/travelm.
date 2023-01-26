@@ -1,8 +1,8 @@
 import type { NextPage } from 'next'
 import { DetailView } from '@screens/DetailView'
 
-const DetailViewComponent: NextPage = () => {
+const DetailViewPage: NextPage = () => {
   return <DetailView />
 }
 
-export default DetailViewComponent
+export default DetailViewPage

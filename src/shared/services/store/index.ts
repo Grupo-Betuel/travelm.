@@ -1,7 +1,9 @@
 import create, { SetState } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { createEntityStore, IEntityStore } from '@services/store/entityStore'
-import { ProductEntity } from '@models/ProductEntity'
+import { PostEntity } from '@models/PostEntity'
+import { mountStoreDevtool } from 'simple-zustand-devtools'
+
 import {
   appEntitiesWithService,
   AppEntitiesStoreType,
@@ -55,3 +57,7 @@ export const useAppStore = create<IAppStore & IPersistStore>(
     ...appStore(set),
   })
 )
+
+if (process.env.NODE_ENV === 'development') {
+  mountStoreDevtool('appStore', useAppStore)
+}

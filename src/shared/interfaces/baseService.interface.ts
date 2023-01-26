@@ -1,26 +1,31 @@
+import { IServiceMethodProperties } from '@services/store/entityStore'
+
 export type CallbackType<T> = (data?: T | T[]) => void
-export type RollbackType = () => void
+export type HandleErrorType = (error: string) => void
 export interface AbstractBaseService<T> {
   get: (
+    properties: IServiceMethodProperties<T>,
     callBack: CallbackType<T>,
+    handleError: HandleErrorType,
     enableCache?: boolean,
     cacheLifeTime?: number
   ) => {}
   add: (
     data: T,
-    rollback: RollbackType,
+    properties: IServiceMethodProperties<T>,
+    handleError: HandleErrorType,
     enableCache?: boolean,
     cacheLifeTime?: number
   ) => {}
   update: (
     data: { _id: string } & Partial<T>,
-    rollback: RollbackType,
+    handleError: HandleErrorType,
     enableCache?: boolean,
     cacheLifeTime?: number
   ) => {}
   remove: (
     id: string,
-    rollback: RollbackType,
+    handleError: HandleErrorType,
     enableCache?: boolean,
     cacheLifeTime?: number
   ) => {}

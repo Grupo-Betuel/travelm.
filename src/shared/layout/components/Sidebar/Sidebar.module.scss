@@ -1,3 +1,27 @@
-.SideBarWrapper {
-  background: #fff !important;
+@import 'src/shared/styles/box-shadow-utils';
+
+$sidebarWidth: 360px;
+
+.Sidebar {
+  width: $sidebarWidth !important;
+  min-width: $sidebarWidth !important;
+  max-width: unset !important;
+  position: relative;
+  flex: unset !important;
+
+
+  .SidebarWrapper {
+    @extend .small-bxs;
+    width: $sidebarWidth !important;
+    background-color: white;
+    position: fixed;
+    height: 80vh;
+    left: 0;
+    overflow: hidden;
+
+    .SidebarContent {
+      overflow: scroll;
+      height: 100%;
+    }
+  }
 }

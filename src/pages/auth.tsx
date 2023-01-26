@@ -1,7 +1,7 @@
-import { Auth } from "@screens/Auth/Auth";
+import { Auth } from '@screens/Auth/Auth'
 
-const authComponent = () => {
-  return <Auth />;
-};
+const authPage = () => {
+  return <Auth />
+}
 
-export default authComponent;
+export default authPage

@@ -1,5 +1,6 @@
-export class UserEntity {
-  _id: string = ''
+import { BaseEntity } from '@models/BaseEntity'
+
+export class UserEntity extends BaseEntity {
   name: string = ''
   lastName: string = ''
   email: string = ''
@@ -7,4 +8,5 @@ export class UserEntity {
   phone: number = 0
   role: string = ''
   password: string = ''
+  storeMetadata?: any
 }

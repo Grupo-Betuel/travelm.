@@ -4,13 +4,17 @@ import React from 'react'
 import { Login } from '@screens/Auth/components/Login'
 import { Register } from '@screens/Auth/components/Register'
 
+export interface IAuthProps {
+  isModal?: boolean
+}
+
 export interface TabItem {
   key: string
   label: React.ReactNode
   children: React.ReactNode
 }
 
-const authItems: TabItem[] = [
+const authItems: (isModal?: boolean) => TabItem[] = (isModal?: boolean) => [
   {
     label: (
       <span>
@@ -18,7 +22,7 @@ const authItems: TabItem[] = [
       </span>
     ),
     key: '1',
-    children: <Login />,
+    children: <Login isModal={isModal} />,
   },
   {
     label: (
@@ -27,14 +31,14 @@ const authItems: TabItem[] = [
       </span>
     ),
     key: '2',
-    children: <Register />,
+    children: <Register isModal={isModal} />,
   },
 ]
 
-export const Auth = () => {
+export const Auth = ({ isModal }: IAuthProps) => {
   return (
     <div>
-      <Tabs defaultActiveKey="2" items={authItems} />
+      <Tabs defaultActiveKey="1" items={authItems(isModal)} />
     </div>
   )
 }

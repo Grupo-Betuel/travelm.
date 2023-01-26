@@ -4,8 +4,18 @@ import { http } from '@services/utils/http.util'
 import {
   AbstractBaseService,
   CallbackType,
-  RollbackType,
+  HandleErrorType,
 } from '@interfaces/baseService.interface'
+import { IResponseError } from '@interfaces/error.interface'
+import _ from 'lodash'
+import { deepMatch } from '../../utils/matching.util'
+import { extractContent } from '../../utils/objects.utils'
+
+export interface IServiceMethodProperties<T> {
+  queryParams?: { [N in keyof T]: any } | any
+  path?: string
+  pathValue?: string
+}
 
 export type LocalStorageKeysType = {
   [N in CRUDTypes]: string
@@ -18,7 +28,7 @@ export class BaseService<T> implements AbstractBaseService<T> {
   localStorageKey: LocalStorageKeysType
 
   constructor(public entity: EntityNamesType) {
-    this.api = `http://localhost:5000/${this.apiPrefix}/${this.version}/${this.entity}`
+    this.api = `${this.apiPrefix}/${this.version}/${this.entity}`
     this.localStorageKey = {
       get: `store-app:get::${this.entity}`,
       add: `store-app:add::${this.entity}`,
@@ -28,65 +38,78 @@ export class BaseService<T> implements AbstractBaseService<T> {
   }
 
   async get(
+    properties: IServiceMethodProperties<T> = {} as IServiceMethodProperties<T>,
     callback: CallbackType<T>,
-    enableCache = true,
+    handleError: HandleErrorType,
+    enableCache = false,
     cacheLifeTime: number = 60 * 1000 * 5
-  ) {
+  ): Promise<T[] | undefined> {
     try {
       if (enableCache) {
-        const cached = this.getCachedData('get')
-        if (cached) {
+        const cached = this.getCachedData('get', properties)
+        if (cached && cached) {
           callback(cached)
         }
       }
 
-      const { data } = await http.get<T[]>(this.api)
+      const extraPath = this.handleServiceMethodPathProperties(properties)
+
+      const { data } = await http.get<T[]>(`${this.api}${extraPath}`, {
+        params: properties.queryParams,
+      })
       enableCache && this.cacheData(data, 'get', cacheLifeTime)
-      callback(data)
-    } catch (err) {
+      callback(data || [])
+      return data
+    } catch (err: any) {
+      handleError && handleError(err.data ? err.data.message : err.message)
       // nothing
     }
   }
 
   async add(
     data: T,
-    rollback?: RollbackType,
+    properties: IServiceMethodProperties<T> = {} as IServiceMethodProperties<T>,
+    handleError?: HandleErrorType,
     enableCache = true,
     cacheLifeTime: number = 60 * 1000 * 5
-  ) {
+  ): Promise<T | undefined> {
     try {
-      const res = await http.post<T>(this.api, data)
+      const extraPath = this.handleServiceMethodPathProperties(properties)
+      const res = await http.post<T>(`${this.api}${extraPath}`, data)
       enableCache && this.cacheData(res.data, 'add', cacheLifeTime)
-    } catch (err) {
-      rollback && rollback()
+      return res as T
+    } catch (err: IResponseError | any) {
+      handleError && handleError(err.data ? err.data.message : err.message)
     }
   }
 
   async update(
     data: { _id: string } & Partial<T>,
-    rollback?: RollbackType,
+    handleError?: HandleErrorType,
     enableCache = true,
     cacheLifeTime: number = 60 * 1000 * 5
-  ) {
+  ): Promise<T | undefined> {
     try {
       const res = await http.put(`${this.api}/${data._id}`, data)
       enableCache && this.cacheData(res.data as T, 'update', cacheLifeTime)
-    } catch (err) {
-      rollback && rollback()
+      return res as T
+    } catch (err: IResponseError | any) {
+      handleError && handleError(err.data.message)
     }
   }
 
   async remove(
     id: string,
-    rollback?: RollbackType,
+    handleError?: HandleErrorType,
     enableCache = true,
     cacheLifeTime: number = 60 * 1000 * 5
-  ) {
+  ): Promise<boolean | undefined> {
     try {
       const { data } = await http.delete<T>(`${this.api}/${id}`)
       enableCache && this.cacheData(data, 'remove', cacheLifeTime)
-    } catch (err) {
-      rollback && rollback()
+      return !!data
+    } catch (err: IResponseError | any) {
+      handleError && handleError(err.data.message)
     }
   }
 
@@ -103,12 +126,36 @@ export class BaseService<T> implements AbstractBaseService<T> {
     )
   }
 
-  getCachedData(key: CRUDTypes): T | T[] | null {
+  getCachedData(
+    key: CRUDTypes,
+    properties?: IServiceMethodProperties<T>
+  ): T | T[] | null {
     const cached = localStorage.getItem(this.localStorageKey[key])
-    if (cached) {
-      return JSON.parse(cached)
+    if (cached && cached !== '[]' && cached !== '{}') {
+      const data = extractContent<T>(JSON.parse(cached))
+      const { value } = properties?.queryParams || {}
+      const res = value ? deepMatch(value, data) : data
+      return res
     }
 
     return null
+  }
+
+  handleServiceMethodPathProperties(properties: IServiceMethodProperties<T>) {
+    let extraPath = ''
+
+    if (properties.path) {
+      extraPath = `/${properties.path}`
+    }
+
+    if (properties.pathValue) {
+      if (typeof properties.pathValue === 'object') {
+        extraPath = `${extraPath}/${(properties.pathValue as any[]).join('/')}`
+      } else {
+        extraPath = `${extraPath}/${properties.pathValue}`
+      }
+    }
+
+    return extraPath
   }
 }

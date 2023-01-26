@@ -1,15 +1,14 @@
-import Sider from "antd/lib/layout/Sider";
-import styles from "./FiltersSidebar.module.scss";
-import { Input, Slider, Switch } from "antd";
-import { useState } from "react";
+import styles from './FiltersSidebar.module.scss'
+import { Input, Slider, Switch } from 'antd'
+import { useState } from 'react'
 
 export const FiltersSidebar = () => {
-  const [priceRange, setPriceRange] = useState<number[]>([]);
+  const [priceRange, setPriceRange] = useState<number[]>([])
 
-  const onChangePrice = (data: any) => setPriceRange(data);
+  const onChangePrice = (data: any) => setPriceRange(data)
 
   return (
-    <Sider className={styles.SideBarWrapper}>
+    <div className={styles.SearchWrapper}>
       <h3 className={styles.FilterTitle}>Hi</h3>
       <label className={styles.FilterWrapper}>
         <Switch defaultChecked />
@@ -25,17 +24,17 @@ export const FiltersSidebar = () => {
         <Input.Group compact>
           <Input
             defaultValue=""
-            style={{ width: "50%" }}
+            style={{ width: '50%' }}
             value={priceRange[0]}
           />
           <Input
             defaultValue=""
-            style={{ width: "50%" }}
+            style={{ width: '50%' }}
             value={priceRange[1]}
           />
         </Input.Group>
         <Slider range defaultValue={[20, 50]} onChange={onChangePrice} />
       </div>
-    </Sider>
-  );
-};
+    </div>
+  )
+}

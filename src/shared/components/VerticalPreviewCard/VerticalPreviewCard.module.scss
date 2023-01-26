@@ -9,6 +9,7 @@
   background-color: white;
   padding: s.$size-medium;
   color: colors.$color-black-1;
+  width: 100%;
   .VerticalPreviewCardGrid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
@@ -17,5 +18,10 @@
     align-items: center;
     justify-items: stretch;
     height: 18.75rem;
+    .verticalPromotionCardGridItem {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+    }
   }
 }

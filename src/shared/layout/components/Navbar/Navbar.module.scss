@@ -1,16 +1,18 @@
 @use "src/shared/styles/color-variables" as colors;
 @use "../../../styles/sizing-variables" as s;
+@use "../../../styles/layout-variables" as layout;
+
 @import "../../../styles/box-shadow-utils";
 
 .navbar {
   @extend .small-bxs;
   padding: 0 !important;
   width: 100%;
+  height: layout.$navbarHeight !important;
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(12.5rem, 1fr));
   align-items: center;
   justify-items: stretch;
-  height: auto !important;
   background: colors.$color-green-4 !important;
   z-index: 1;
 
@@ -48,3 +50,6 @@
   }
 }
 
+.contextPostsWrapper {
+  padding: 2rem;
+}

@@ -1,0 +1,12 @@
+@use '../../styles/layout-variables' as layout;
+
+.MainContentModal {
+  position: fixed;
+  width: 100%;
+  height: calc(100vh - layout.$navbarHeight);
+  background-color: white;
+  left: 0;
+  z-index: 1;
+  top: layout.$navbarHeight;
+  overflow: auto;
+}
