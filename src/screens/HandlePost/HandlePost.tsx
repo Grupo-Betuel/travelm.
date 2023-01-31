@@ -15,29 +15,15 @@ import {
 import { PostEntity } from '@shared/entities/PostEntity'
 import { InboxOutlined } from '@ant-design/icons'
 import { handleEntityHook } from '@shared/hooks/handleEntityHook'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { IOption } from '@interfaces/common.intefacce'
 import { parseToOptionList } from '../../utils/objects.utils'
 import { CategoryEntity } from '@shared/entities/CategoryEntity'
-
-// const categories = [
-//   {
-//     value: 'Carro/Camion',
-//     label: 'Carro/Camion',
-//   },
-//   {
-//     value: 'motor',
-//     label: 'Motocicleta',
-//   },
-//   {
-//     value: 'boat',
-//     label: 'Bote',
-//   },
-//   {
-//     value: 'Otro',
-//     label: 'Otro',
-//   },
-// ]
+import { getBase64FromFile } from '../../utils/blob.utils'
+import { RcFile, UploadChangeParam } from 'antd/es/upload'
+import { UploadFile } from 'antd/es/upload/interface'
+import { debounce } from 'lodash'
+import { SidebarFooter } from '@shared/layout/components/Sidebar/components/SidebarFooter'
 const condition = [
   {
     value: 'new',
@@ -62,33 +48,11 @@ const meetTypes = [
   { label: 'Door to Door', value: 'Pear' },
   { label: 'Dejar en la puerta', value: 'Orange' },
 ]
-const productEntity = {} as any
-
-const createProduct = () => {
-  if (!true) {
-    productEntity.add(
-      {
-        title: 'Example',
-        description: 'Description',
-        price: 100,
-        categoryId: '62e6a79408f79af1b90884f9',
-        subCategoryId: '62e6a79408f79af1b90884f9',
-        statusId: 1,
-        images: [
-          'https://images.pexels.com/photos/45201/kitty-cat-kitten-pet-45201.jpeg?cs=srgb&dl=pexels-pixabay-45201.jpg&fm=jpg',
-        ],
-        typeCurrencyId: 1,
-      },
-      { path: 'create' }
-    )
-  } else {
-    // productEntity.update(product.id, product)
-  }
-  // setProduct({} as PostEntity)
-}
 
 export const HandlePost = () => {
+  const [postForm] = Form.useForm()
   const [postItem, setPostItem] = useState<PostEntity>({} as PostEntity)
+
   const [categoriesSelectList, setCategoriesSelectList] = useState<IOption[]>(
     []
   )
@@ -101,8 +65,30 @@ export const HandlePost = () => {
 
   useEffect(() => {
     setCategoriesSelectList(parseToOptionList(categories, '_id', 'name'))
-  }, [])
-  const onValuesChanges = (data: any) => console.log('value', data)
+  }, [categories])
+
+  const onSelectImage = useRef(
+    debounce((data: UploadChangeParam<UploadFile>) => {
+      Promise.all(
+        data.fileList.map((file: UploadFile) =>
+          getBase64FromFile(file.originFileObj as RcFile)
+        )
+      ).then((images: string[]) => {
+        setPostItem({ ...postItem, images })
+      })
+    }, 300)
+  ).current
+
+  const onValuesChanges = (
+    value: { [N in keyof PostEntity]: any },
+    data: PostEntity
+  ) => {
+    const realDAta = {
+      ...data,
+      images: postItem.images,
+    }
+    setPostItem(realDAta)
+  }
 
   const normFile = (e: any) => {
     if (Array.isArray(e)) {
@@ -120,9 +106,9 @@ export const HandlePost = () => {
           ...values,
           subCategoryId: 'id',
           typeCurrencyId: 1,
-          images: values.images.map((item: any) => item.thumbUrl),
+          images: postItem.images,
         },
-        { path: 'create' }
+        { endpoint: 'create' }
       )
     )
   }
@@ -131,6 +117,7 @@ export const HandlePost = () => {
     <LayoutContent className={styles.HandlePost}>
       <Sidebar>
         <Form
+          form={postForm}
           className={styles.FormPost}
           name="createProduct"
           layout="vertical"
@@ -145,7 +132,14 @@ export const HandlePost = () => {
               getValueFromEvent={normFile}
               noStyle
             >
-              <Upload.Dragger name="images" listType="picture">
+              <Upload.Dragger
+                beforeUpload={() => false}
+                name="images"
+                accept="image/*"
+                listType="picture-card"
+                onChange={onSelectImage}
+                multiple
+              >
                 <p className="ant-upload-drag-icon">
                   <InboxOutlined />
                 </p>
@@ -219,15 +213,17 @@ export const HandlePost = () => {
           <Form.Item label="Ocultar de Revendedores" name="hide">
             <Switch defaultChecked />
           </Form.Item>
+        </Form>
+        <SidebarFooter>
           <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
             <Button type="primary" htmlType="submit">
               Submit
             </Button>
           </Form.Item>
-        </Form>
+        </SidebarFooter>
       </Sidebar>
       <div className={styles.handlePostPreview}>
-        <DetailView isPreview />
+        <DetailView previewItem={postItem} />
       </div>
     </LayoutContent>
   )

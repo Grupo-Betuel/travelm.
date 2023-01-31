@@ -1,6 +1,5 @@
 import styles from './DetailView.module.scss'
-import { Avatar, Button, Carousel } from 'antd'
-import logo from '@assets/images/logo.png'
+import { Avatar, Button, Carousel, Image } from 'antd'
 import { ImageBackground } from '@screens/DetailView/components/ImageBackground/ImageBackground'
 import {
   MessageOutlined,
@@ -9,43 +8,76 @@ import {
   MoreOutlined,
   UserOutlined,
   ArrowLeftOutlined,
+  ArrowRightOutlined,
 } from '@ant-design/icons'
 import { useRouter } from 'next/router'
+import { PostEntity } from '@shared/entities/PostEntity'
+import { useEffect, useRef, useState } from 'react'
+import { CarouselRef } from 'antd/es/carousel'
 
 export interface IDetailViewProps {
-  isPreview?: boolean
+  previewItem?: PostEntity
 }
-export const DetailView = ({ isPreview }: IDetailViewProps) => {
-  const router = useRouter()
 
+export const DetailView = ({ previewItem }: IDetailViewProps) => {
+  const [post, setPost] = useState<PostEntity>({ ...previewItem } as PostEntity)
+
+  const carouselRef = useRef<CarouselRef>()
+
+  useEffect(() => {
+    setPost({ ...previewItem } as PostEntity)
+  }, [previewItem])
+
+  const router = useRouter()
   const back = () => router.back()
+  const navigate = (to: 'prev' | 'next') => () =>
+    carouselRef.current && carouselRef.current[to]()
+  const hasImages = post.images && !!post.images.length
+  const hasMultipleImages = hasImages && post.images.length > 1
 
   return (
     <div className={`grid-container ${styles.DetailViewWrapper}`}>
       <div
-        className={`grid-column-${isPreview ? '2' : '3'} ${
+        className={`grid-column-${previewItem ? '1' : '1'} ${
           styles.GalleryWrapper
         }`}
       >
-        <div className={styles.DetailViewBackButton}>
-          <ArrowLeftOutlined onClick={back} />
-        </div>
-        <Carousel>
-          <div>
-            <ImageBackground image={logo} />
+        {!previewItem && (
+          <div className={styles.DetailViewBackButton}>
+            <ArrowLeftOutlined onClick={back} />
           </div>
-          <div>
-            <ImageBackground image={logo} />
-          </div>
-        </Carousel>
+        )}
+        {hasMultipleImages && (
+          <>
+            <div className={styles.DetailViewPrevButton}>
+              <ArrowLeftOutlined onClick={navigate('prev')} />
+            </div>
+            <div className={styles.DetailViewNextButton}>
+              <ArrowRightOutlined onClick={navigate('next')} />
+            </div>
+          </>
+        )}
+        <Image.PreviewGroup>
+          <Carousel
+            ref={carouselRef}
+            nextArrow={
+              <div className={styles.DetailViewButton}>
+                <ArrowRightOutlined />
+              </div>
+            }
+          >
+            {hasImages ? (
+              post.images.map((img) => <ImageBackground image={img} />)
+            ) : (
+              <ImageBackground />
+            )}
+          </Carousel>
+        </Image.PreviewGroup>
       </div>
       <div className={styles.DetailViewContent}>
         <div className={styles.DetailViewContentHeader}>
-          <span className="title">
-            Calzado Timberland del 37 al 43. Órdenes al [hidden information] ➡️
-            Disponible bajo pedido.
-          </span>
-          <span className="subtitle">DOP 3,00 - Disponible</span>
+          <span className="title">{post.title}</span>
+          <span className="subtitle">DOP {post.price} - Disponible</span>
           <span className="label">Publicado en Santo Domingo</span>
         </div>
         <div className={styles.DetailViewContentActions}>

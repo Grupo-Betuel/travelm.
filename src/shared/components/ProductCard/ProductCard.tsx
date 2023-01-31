@@ -14,7 +14,6 @@ export const ProductCard = ({ product }: IProductProps) => {
   console.log('product =>', product)
   return (
     <Link href="/detail">
-      ™
       <div className={styles.ProductCard}>
         <img src={img} />
         <span className={styles.ProductTitle}>{product.title}</span>

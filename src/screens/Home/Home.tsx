@@ -59,7 +59,7 @@ export const Home = () => {
           ],
           typeCurrencyId: '1',
         },
-        { path: 'create' }
+        { endpoint: 'create' }
       )
     } else {
       productEntity.update(product.id, product)

@@ -24,7 +24,7 @@ export const handleSearchPostHook = (): IHandleSearchPostHookData => {
     delete queryParams.searchPath
     delete queryParams.extraPath
     if (isNotEmptyObject(router.query)) {
-      get({ path: searchPath || extraPath, queryParams })
+      get({ endpoint: searchPath || extraPath, queryParams })
     }
   }
 

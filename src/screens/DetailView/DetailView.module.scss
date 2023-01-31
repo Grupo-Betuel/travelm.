@@ -1,37 +1,76 @@
-@use "../../shared/styles/sizing-variables" as size;
-@use "src/shared/styles/color-variables" as colors;
+@use '../../shared/styles/sizing-variables' as size;
+@use 'src/shared/styles/color-variables' as colors;
+@use 'src/shared/styles/breakpoints' as breakpoints;
+@use 'src/shared/styles/layout-variables' as layout;
+
+$imageButtonSize: 2.5rem;
 
 .DetailViewWrapper {
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  display: flex;
   width: 100%;
   height: 100%;
   align-items: stretch;
-  justify-content: center;
-  align-content: stretch;
+  overflow: auto;
+
+  @include breakpoints.only-on(('m')) {
+    flex-wrap: wrap !important;
+    display: none !important;
+  }
+
+  @include breakpoints.only-on(('xs')) {
+    display: block !important;
+  }
 
   .GalleryWrapper {
-    height: 100% !important;
     position: relative;
+    flex-grow: 1;
+    min-width: 200px;
+
+    @include breakpoints.only-on(('xs')) {
+      height: 40vh;
+    }
 
     div {
       height: 100%;
     }
 
-    .DetailViewBackButton {
+    .DetailViewButton {
       position: absolute;
+      color: colors.$color-gray-2;
+      font-size: size.$size-large;
+      background-color: rgba(256, 256, 256, 0.9);
+      width: $imageButtonSize;
+      height: $imageButtonSize;
+      border-radius: $imageButtonSize;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 2;
+    }
+
+    .DetailViewControlButton {
+      top: 50%;
+      margin-top: -$imageButtonSize;
+    }
+
+    .DetailViewPrevButton {
+      @extend .DetailViewButton;
+      @extend .DetailViewControlButton;
+      left: 1rem;
+    }
+
+    .DetailViewNextButton {
+      @extend .DetailViewButton;
+      @extend .DetailViewControlButton;
+      right: 1rem;
+    }
+
+    .DetailViewBackButton {
+      @extend .DetailViewButton;
       top: 20px;
       left: 20px;
-      z-index: 99;
       cursor: pointer;
-      color: colors.$color-gray-3;
-      font-size: size.$size-large;
-      background-color: rgba(0,0,0, .6);
-      width: 40px;
-      height: 40px;
-      border-radius: 40px;
-      display: flex;
-      align-items:center;
-      justify-content: center;
+      background-color: rgba(0, 0, 0, 0.6);
     }
   }
 
@@ -40,10 +79,15 @@
     flex-direction: column;
     gap: size.$size-small;
     padding-top: size.$size-small;
+    overflow: auto;
+    flex-grow: 1;
+    min-width: 150px;
 
+    @include breakpoints.only-on(('m', 'l')) {
+      min-width: layout.$sidebarWidth;
+    }
 
     .DetailViewContentHeader {
     }
-
   }
 }

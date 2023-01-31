@@ -2,24 +2,33 @@
 @import 'src/shared/styles/box-shadow-utils';
 
 .Sidebar {
+  @extend .small-bxs;
   width: layout.$sidebarWidth !important;
   min-width: layout.$sidebarWidth !important;
   max-width: unset !important;
   position: relative;
   flex: unset !important;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  max-height: calc(100vh - layout.$navbarHeight);
+
+  > div  {
+    display: flex;
+    flex-direction: column;
+  }
 
   .SidebarWrapper {
-    @extend .small-bxs;
     width: layout.$sidebarWidth !important;
     background-color: white;
-    position: sticky;
-    height: 100%;
+    position: fixed;
+    height: 95%;
     left: 0;
     overflow: hidden;
 
     .SidebarContent {
       overflow: scroll;
-      height: 100%;
+      height: 95%;
     }
   }
 }

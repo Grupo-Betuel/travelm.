@@ -4,8 +4,7 @@ import person from '@assets/images/person.png'
 import Image from 'next/image'
 import styles from './Navbar.module.scss'
 import { Button, Dropdown, Input, MenuProps, Modal, Select } from 'antd'
-const { Option } = Select
-import { ChangeEvent, useRef, useState } from 'react'
+import { ChangeEvent, useEffect, useState } from 'react'
 import { CategoriesDrawer } from '@shared/layout/components/CategoriesDrawer/CategoriesDrawer'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -13,10 +12,13 @@ import { useContextualRouting } from 'next-use-contextual-routing'
 import { Auth } from '@screens/Auth/Auth'
 import { CategoryEntity } from '@shared/entities/CategoryEntity'
 import { handleEntityHook } from '@shared/hooks/handleEntityHook'
-import { getAuthData, appLogOut } from '../../../../utils/auth.utils'
+import { appLogOut, getAuthData } from '../../../../utils/auth.utils'
 import { UserEntity } from '@shared/entities/UserEntity'
 import { MainContentModal } from '@components/MainContentModal/MainContentModal'
 import { Search } from '@screens/Search'
+import { Endpoints } from '@shared/enums/endpoints.enum'
+
+const { Option } = Select
 
 export interface ICategorySelect {
   categories: CategoryEntity[]
@@ -48,15 +50,24 @@ export const Navbar = () => {
   const { makeContextualHref, returnHref } = useContextualRouting()
   const handleReturnToHref = () => router.push(returnHref)
   const authUser = getAuthData('user') as UserEntity
-  const { data: categories } = handleEntityHook<CategoryEntity>(
-    'categories',
-    true
-  )
+  const {
+    data: categories,
+    get: getCategories,
+    ['trending-categories']: trendingCategories,
+  } = handleEntityHook<CategoryEntity>('categories', true)
   const enableContextSearch = !returnHref.includes('search')
 
+  console.log('trending', trendingCategories)
   const authenticate = () => {
     router.push(makeContextualHref({ auth: true }), 'auth', { shallow: true })
   }
+
+  useEffect(() => {
+    getTrendingCats()
+  }, [])
+
+  const getTrendingCats = () =>
+    getCategories({ endpoint: Endpoints.TRENDING_CATEGORIES })
 
   const userDropdownItems: MenuProps['items'] = [
     {
@@ -95,7 +106,7 @@ export const Navbar = () => {
   const onSearch =
     (contextSearch: boolean = false) =>
     (data: ChangeEvent<HTMLInputElement> | string) => {
-      let path = 'autocomplete-by-title'
+      let path: string = Endpoints.SEARCH_AUTO
       if (categorySlug) path = ''
       const value: string = (data as ChangeEvent<HTMLInputElement>).target
         ? (data as ChangeEvent<HTMLInputElement>).target.value
@@ -104,7 +115,6 @@ export const Navbar = () => {
       emptySearch(!!value)
 
       if (!value) return
-
       if (contextSearch) {
         const queryParams: any = {
           value,

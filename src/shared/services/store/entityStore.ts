@@ -4,9 +4,14 @@ import { BaseService, IServiceMethodProperties } from '@services/BaseService'
 import { BaseEntity } from '@shared/entities/BaseEntity'
 import { IPaginatedResponse } from '@interfaces/pagination.interface'
 import { toast } from 'react-toastify'
+import { Endpoints } from '@shared/enums/endpoints.enum'
+
+export type EntityDataType<T> = {
+  [N in Endpoints]: T[] | IPaginatedResponse<T>
+} & { content: T[] | IPaginatedResponse<T> }
 
 export interface IEntityStore<T> {
-  data: T[] | IPaginatedResponse<T>
+  data: EntityDataType<T>
   item: T
   add: (
     value: T,
@@ -49,13 +54,18 @@ export const stateHandlerError =
 export function stateHandlerSuccess<T extends BaseEntity>(
   key: keyof IEntityStore<T>,
   data: T | T[],
-  set: SetState<IEntityStore<any>>
+  set: SetState<IEntityStore<any>>,
+  endpoint?: Endpoints
 ) {
+  const endpointData = endpoint
+    ? { [endpoint]: data }
+    : ({ content: data } as EntityDataType<T>)
   switch (key) {
     case 'add':
       set((state: any) => ({
         ...state,
-        data: [...state.data, { ...data }],
+        [key]: state.data,
+        data: { ...state.data, ...endpointData },
         loading: false,
         error: undefined,
       }))
@@ -63,9 +73,9 @@ export function stateHandlerSuccess<T extends BaseEntity>(
     case 'update':
       set((state: any) => ({
         ...state,
-        data: state.data.map((item: T) =>
-          item._id === (data as T)._id ? { ...item, ...data } : item
-        ),
+        // data: state.data.map((item: T) =>
+        //   item._id === (data as T)._id ? { ...item, ...data } : item
+        // ),
         loading: false,
         error: undefined,
       }))
@@ -79,7 +89,7 @@ export function stateHandlerSuccess<T extends BaseEntity>(
         //       (prop) => (item as any)[prop] === (properties as any)[prop]
         //     )
         // ),
-        data,
+        data: { ...state.data, ...endpointData },
         loading: false,
         error: undefined,
       }))
@@ -88,7 +98,7 @@ export function stateHandlerSuccess<T extends BaseEntity>(
     case 'remove':
       set((state: any) => ({
         ...state,
-        data: state.data.filter((item: T) => item._id !== data._id),
+        // data: state.data.filter((item: T) => item._id !== data._id),
         loading: false,
         error: undefined,
       }))
@@ -169,7 +179,7 @@ export function createEntityStore<T extends BaseEntity>(
         const res = await service.get(
           properties,
           (data: T | T[] = []) => {
-            stateHandlerSuccess('get', data as T[], set)
+            stateHandlerSuccess('get', data as T[], set, properties.endpoint)
           },
           stateHandlerError(set),
           enableCache,

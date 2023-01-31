@@ -5,9 +5,15 @@ import { EntityNamesType } from '@services/appEntitiesWithService'
 import { IServiceMethodProperties } from '@services/BaseService'
 import { IPaginatedResponse } from '@interfaces/pagination.interface'
 import { debounce } from 'lodash'
-import { IEntityStore } from '@services/store/entityStore'
+import { EntityDataType, IEntityStore } from '@services/store/entityStore'
+import {
+  EndpointsDataType,
+  IEndpointDataValue,
+} from '@interfaces/endpoints.interface'
 
-export interface IGetEntityDataHookReturn<T> extends IEntityStore<T> {
+export interface IGetEntityDataHookReturn<T>
+  extends Omit<IEntityStore<T>, 'data'>,
+    Partial<EndpointsDataType<T>> {
   data: T[]
   pagination?: Omit<IPaginatedResponse<T>, 'content'>
 }
@@ -33,17 +39,40 @@ export function handleEntityHook<T>(
     setAppLoading(entity.loading)
   }, [entity.loading])
 
-  const data = (entity.data as IPaginatedResponse<T>).content
-    ? (entity.data as IPaginatedResponse<T>).content
-    : (entity.data as T[])
-  const pagination = (entity.data as IPaginatedResponse<T>).content
-    ? { ...(entity.data as IPaginatedResponse<T>), content: undefined }
-    : undefined
+  /* divideDataAndPagination, all data from the api can has pagination, this method dived the data from the pagination
+   * key: key according the endpoint data returned from api
+   * */
+  const divideDataAndPagination = (
+    key: keyof EntityDataType<T>
+  ): IEndpointDataValue<T> => {
+    const value = entity.data[key] || []
+
+    const data = (value as IPaginatedResponse<T>).content
+      ? (value as IPaginatedResponse<T>).content
+      : (value as T[])
+
+    const pagination = (value as IPaginatedResponse<T>).content
+      ? { ...(value as IPaginatedResponse<T>), content: undefined }
+      : undefined
+
+    return { data, pagination }
+  }
+
+  const getEndpointData = () => {
+    const endpointsData: EndpointsDataType<T> = {} as any
+    Object.keys(entity.data).forEach(
+      (key: keyof EndpointsDataType<T> | any) => {
+        ;(endpointsData as any)[key] = divideDataAndPagination(key)
+      }
+    )
+
+    return endpointsData
+  }
 
   return {
     ...entity,
-    data: [...(data || [])],
-    pagination,
+    ...divideDataAndPagination('content'),
+    ...getEndpointData(),
     get: getData,
   }
 }

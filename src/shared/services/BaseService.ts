@@ -10,10 +10,11 @@ import { IResponseError } from '@interfaces/error.interface'
 import _ from 'lodash'
 import { deepMatch } from '../../utils/matching.util'
 import { extractContent } from '../../utils/objects.utils'
+import { Endpoints } from '@shared/enums/endpoints.enum'
 
 export interface IServiceMethodProperties<T> {
   queryParams?: { [N in keyof T]: any } | any
-  path?: string
+  endpoint?: Endpoints
   pathValue?: string
 }
 
@@ -144,8 +145,8 @@ export class BaseService<T> implements AbstractBaseService<T> {
   handleServiceMethodPathProperties(properties: IServiceMethodProperties<T>) {
     let extraPath = ''
 
-    if (properties.path) {
-      extraPath = `/${properties.path}`
+    if (properties.endpoint) {
+      extraPath = `/${properties.endpoint}`
     }
 
     if (properties.pathValue) {
