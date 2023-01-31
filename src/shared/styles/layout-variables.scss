@@ -1,2 +1,4 @@
-$navbarHeight: 105px;
+$navbarOptionsHeight: 56px;
+$navbarSubOptionsHeight: 35px;
+$navbarHeight: $navbarOptionsHeight + $navbarSubOptionsHeight;
 $sidebarWidth: 360px;

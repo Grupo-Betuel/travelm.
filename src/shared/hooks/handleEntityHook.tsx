@@ -7,13 +7,13 @@ import { IPaginatedResponse } from '@interfaces/pagination.interface'
 import { debounce } from 'lodash'
 import { EntityDataType, IEntityStore } from '@services/store/entityStore'
 import {
-  EndpointsDataType,
-  IEndpointDataValue,
-} from '@interfaces/endpoints.interface'
+  EntityEndpointsDataType,
+  IEntityEndpointDataValue,
+} from '@interfaces/entities.interface'
 
 export interface IGetEntityDataHookReturn<T>
   extends Omit<IEntityStore<T>, 'data'>,
-    Partial<EndpointsDataType<T>> {
+    Partial<EntityEndpointsDataType<T>> {
   data: T[]
   pagination?: Omit<IPaginatedResponse<T>, 'content'>
 }
@@ -44,7 +44,7 @@ export function handleEntityHook<T>(
    * */
   const divideDataAndPagination = (
     key: keyof EntityDataType<T>
-  ): IEndpointDataValue<T> => {
+  ): IEntityEndpointDataValue<T> => {
     const value = entity.data[key] || []
 
     const data = (value as IPaginatedResponse<T>).content
@@ -59,9 +59,9 @@ export function handleEntityHook<T>(
   }
 
   const getEndpointData = () => {
-    const endpointsData: EndpointsDataType<T> = {} as any
+    const endpointsData: EntityEndpointsDataType<T> = {} as any
     Object.keys(entity.data).forEach(
-      (key: keyof EndpointsDataType<T> | any) => {
+      (key: keyof EntityEndpointsDataType<T> | any) => {
         ;(endpointsData as any)[key] = divideDataAndPagination(key)
       }
     )

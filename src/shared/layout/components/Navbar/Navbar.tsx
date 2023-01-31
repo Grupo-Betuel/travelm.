@@ -147,7 +147,9 @@ export const Navbar = () => {
   return (
     <>
       <Header className={`${styles.navbar}`}>
-        <div className="grid-container grid-column-full px-xx-l">
+        <div
+          className={`grid-container grid-column-full px-xx-l ${styles.navbarOptionsWrapper}`}
+        >
           <div className={`${styles.navbarLogoContainer} flex-start-center`}>
             <div onClick={goToHome} className="cursor-pointer">
               <Image src={logo} alt="Store Logo" />
@@ -189,24 +191,23 @@ export const Navbar = () => {
             )}
           </ul>
         </div>
-        <div className={`${styles.navbarFavoritesWrapper} px-xx-l`}>
-          <ul className="flex-between-center w-100">
-            <li>
-              <div
-                className="flex-start-center cursor-pointer"
-                onClick={toggleAllCategoriesDrawer}
-              >
-                <i className="bi bi-list font-size-9" />
-                <span>Ver Todo</span>
-              </div>
-            </li>
-            {categories.slice(0, 4).map((item) => (
-              <li key={item._id}>{item.name}</li>
-            ))}
-          </ul>
-        </div>
       </Header>
-
+      <div className={`${styles.navbarFavoritesWrapper} px-xx-l`}>
+        <ul className="flex-between-center w-100">
+          <li>
+            <div
+              className="flex-start-center cursor-pointer"
+              onClick={toggleAllCategoriesDrawer}
+            >
+              <i className="bi bi-list font-size-9" />
+              <span>Ver Todo</span>
+            </div>
+          </li>
+          {categories.slice(0, 4).map((item) => (
+            <li key={item._id}>{item.name}</li>
+          ))}
+        </ul>
+      </div>
       <CategoriesDrawer
         visible={showAllCategories}
         onClose={toggleAllCategoriesDrawer}

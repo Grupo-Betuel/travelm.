@@ -1,46 +1,52 @@
-@use "src/shared/styles/color-variables" as colors;
-@use "../../../styles/sizing-variables" as s;
-@use "../../../styles/layout-variables" as layout;
+@use 'src/shared/styles/color-variables' as colors;
+@use '../../../styles/sizing-variables' as s;
+@use '../../../styles/layout-variables' as layout;
 
-@import "../../../styles/box-shadow-utils";
+@import '../../../styles/box-shadow-utils';
 
 .navbar {
-  @extend .small-bxs;
+  //@extend .small-bxs;
   padding: 0 !important;
   width: 100%;
-  height: layout.$navbarHeight !important;
+  height: layout.$navbarOptionsHeight !important;
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(12.5rem, 1fr));
   align-items: center;
   justify-items: stretch;
   background: colors.$color-green-4 !important;
   z-index: 1;
+  position: sticky;
+  top: 0;
 
-  .navbarLogoContainer {
-    max-width: 3.125rem;
-    img {
-      filter: brightness(0) invert(1);
+  .navbarOptionsWrapper {
+    position: relative;
+    background: colors.$color-green-4 !important;
+    .navbarLogoContainer,
+    .navbarBrowserWrapper,
+    .navbarOptionsList {
+      max-height: layout.$navbarOptionsHeight !important ;
     }
-  }
+    .navbarLogoContainer {
+      max-width: 3.125rem;
+      height: layout.$navbarOptionsHeight !important;
 
-  .navbarBrowserWrapper {
-    grid-column: span 2;
-  }
-  .navbarOptionsList {
-    gap: s.$size-xx-large;
-    width: 100%;
-    grid-column: span 3;
-    li {
-      cursor: pointer;
-      color: white;
+      img {
+        filter: brightness(0) invert(1);
+      }
     }
-  }
-  .navbarFavoritesWrapper {
-    display: flex;
-    height: 2.5rem;
-    grid-column: 1 / -1;
-    color: white;
-    background: colors.$color-green-3;
+
+    .navbarBrowserWrapper {
+      grid-column: span 2;
+    }
+    .navbarOptionsList {
+      gap: s.$size-xx-large;
+      width: 100%;
+      grid-column: span 3;
+      li {
+        cursor: pointer;
+        color: white;
+      }
+    }
   }
 
   .userDropdown {
@@ -50,6 +56,13 @@
   }
 }
 
+.navbarFavoritesWrapper {
+  display: flex;
+  min-height: layout.$navbarSubOptionsHeight;
+  grid-column: 1 / -1;
+  color: white;
+  background: colors.$color-green-3;
+}
 .contextPostsWrapper {
   padding: 2rem;
 }
