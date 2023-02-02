@@ -17,6 +17,8 @@ import { UserEntity } from '@shared/entities/UserEntity'
 import { MainContentModal } from '@components/MainContentModal/MainContentModal'
 import { Search } from '@screens/Search'
 import { Endpoints } from '@shared/enums/endpoints.enum'
+import { BellOutlined } from '@ant-design/icons'
+import { NotificationDrawer } from '@shared/layout/components/NotificationDrawer'
 
 const { Option } = Select
 
@@ -41,6 +43,7 @@ const SelectBefore = (props: ICategorySelect) => (
 
 export const Navbar = () => {
   const [showAllCategories, setShowAllCategories] = useState<boolean>(false)
+  const [showNotification, setShowNotification] = useState<boolean>(false)
   const [searchValue, setSearchValue] = useState<string>()
   const [showContextSearchModal, setShowContextSearchModal] =
     useState<boolean>(false)
@@ -63,7 +66,7 @@ export const Navbar = () => {
   }
 
   useEffect(() => {
-    getTrendingCats()
+    // getTrendingCats()
   }, [])
 
   const getTrendingCats = () =>
@@ -86,6 +89,10 @@ export const Navbar = () => {
 
   const toggleAllCategoriesDrawer = () => {
     setShowAllCategories(!showAllCategories)
+  }
+
+  const toggleNotificationDrawer = () => {
+    setShowNotification(!showNotification)
   }
 
   const handleSearchRouting = (
@@ -189,6 +196,9 @@ export const Navbar = () => {
                 </Dropdown>
               </li>
             )}
+            {authUser && (
+              <BellOutlined fill="white" onClick={toggleNotificationDrawer} />
+            )}
           </ul>
         </div>
       </Header>
@@ -213,6 +223,12 @@ export const Navbar = () => {
         onClose={toggleAllCategoriesDrawer}
         authenticate={authenticate}
       />
+      {authUser && (
+        <NotificationDrawer
+          visible={showNotification}
+          onClose={toggleNotificationDrawer}
+        />
+      )}
       <Modal
         title="Basic Modal"
         open={!!authIsEnable}

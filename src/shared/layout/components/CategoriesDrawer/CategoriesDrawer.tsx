@@ -21,41 +21,41 @@ export const CategoriesDrawer = ({
 
   return (
     <Drawer
-      className={styles.categoriesDrawer}
+      className={styles.CategoriesDrawer}
       title="All Categories"
       placement="left"
       {...props}
     >
       {authUser && <h3>Hola {authUser.name}!</h3>}
-      <ul className={styles.categoryList}>
-        <li className={`${styles.categoryListItemTitle}`}>Cat 1</li>
+      <ul className={styles.CategoriesOptionsList}>
+        <li className={`${styles.CategoriesOptionTitle}`}>Cat 1</li>
         {categories.map((item) => (
-          <li key={item._id} className={`${styles.categoryListItem}`}>
+          <li key={item._id} className={`${styles.CategoriesOption}`}>
             {item.name}
           </li>
         ))}
       </ul>
-      <ul className={styles.categoryList}>
-        <li className={`${styles.categoryListItemTitle}`}>Cat 2</li>
+      <ul className={styles.CategoriesOptionsList}>
+        <li className={`${styles.CategoriesOptionTitle}`}>Cat 2</li>
         {categories.map((item) => (
-          <li key={item._id} className={`${styles.categoryListItem}`}>
+          <li key={item._id} className={`${styles.CategoriesOption}`}>
             {item.name}
           </li>
         ))}
       </ul>
-      <ul className={styles.categoryList}>
-        <li className={`${styles.categoryListItemTitle}`}>Help & Setting</li>
-        <li className={`${styles.categoryListItem}`}>Como vender?</li>
-        <li className={`${styles.categoryListItem}`}>Language</li>
+      <ul className={styles.CategoriesOptionsList}>
+        <li className={`${styles.CategoriesOptionTitle}`}>Help & Setting</li>
+        <li className={`${styles.CategoriesOption}`}>Como vender?</li>
+        <li className={`${styles.CategoriesOption}`}>Language</li>
         {authUser ? (
           <>
-            <li className={`${styles.categoryListItem}`}>Mi Cuenta</li>
-            <li className={`${styles.categoryListItem}`} onClick={appLogOut}>
+            <li className={`${styles.CategoriesOption}`}>Mi Cuenta</li>
+            <li className={`${styles.CategoriesOption}`} onClick={appLogOut}>
               Cerrar Session
             </li>
           </>
         ) : (
-          <li className={`${styles.categoryListItem}`} onClick={authenticate}>
+          <li className={`${styles.CategoriesOption}`} onClick={authenticate}>
             Login
           </li>
         )}

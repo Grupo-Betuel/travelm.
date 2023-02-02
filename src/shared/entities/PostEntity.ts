@@ -9,4 +9,7 @@ export class PostEntity extends BaseEntity {
   typeCurrencyId: string = ''
   title = ''
   description = ''
+  commission?: string
+  userId?: string
+  storeId?: string
 }

@@ -2,15 +2,15 @@
 @import "src/shared/styles/color-variables";
 @import "src/shared/styles/text-variables";
 
-.CategoriesDrawer {
+.NotificationDrawer {
   .drawer-body {
     padding: 0;
   }
-  .CategoriesOptionsList {
+  .NotificationOptionsList {
     width: 100%;
     border-bottom: 1px solid $color-gray-1;
     padding: $size-small 0;
-    .CategoriesOption {
+    .NotificationOption {
       padding: $size-xx-small $size-xx-large;
       cursor: pointer;
       background-color: #ffffff;
@@ -19,7 +19,7 @@
       }
     }
 
-    .CategoriesOptionTitle {
+    .NotificationOptionTitle {
       padding: $size-xx-small $size-xx-large;
       font-weight: bold;
       font-size: $font-size-7;

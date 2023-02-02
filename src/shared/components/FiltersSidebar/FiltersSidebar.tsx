@@ -54,11 +54,6 @@ export const FiltersSidebar = () => {
     },
   ]
 
-  // name
-  // label
-  // parameterType
-  // options
-  // createdAt
   return (
     <div className={styles.SearchWrapper}>
       <h3 className={styles.FilterTitle}>Filtros</h3>

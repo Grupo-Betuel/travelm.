@@ -9,6 +9,7 @@ import {
   Input,
   InputNumber,
   Select,
+  Slider,
   Switch,
   Upload,
 } from 'antd'
@@ -24,6 +25,9 @@ import { RcFile, UploadChangeParam } from 'antd/es/upload'
 import { UploadFile } from 'antd/es/upload/interface'
 import { debounce } from 'lodash'
 import { SidebarFooter } from '@shared/layout/components/Sidebar/components/SidebarFooter'
+import { Endpoints } from '@shared/enums/endpoints.enum'
+
+const defaultPercentValue = 10
 const condition = [
   {
     value: 'new',
@@ -108,10 +112,31 @@ export const HandlePost = () => {
           typeCurrencyId: 1,
           images: postItem.images,
         },
-        { endpoint: 'create' }
+        { endpoint: Endpoints.CREATE }
       )
     )
   }
+
+  const changeCommission =
+    (type: 'price' | 'percent' | 'quantity') => (value: number | any) => {
+      const price =
+        postForm.getFieldValue(type === 'price' ? 'commission' : 'price') ||
+        defaultPercentValue
+      const percentValue =
+        type === 'price' || type === 'percent'
+          ? (price * value) / 100
+          : (value / price) * 100
+      console.log(value, price, 'result', percentValue)
+      if (type === 'price' || type === 'percent') {
+        postForm.setFieldValue('commissionQuantity', percentValue)
+      } else {
+        postForm.setFieldValue('commission', percentValue)
+      }
+    }
+
+  const commissionPercentTooltipFormatter = (value: number) => `${value}%`
+
+  const disableCommission = !postForm.getFieldValue('price')
 
   return (
     <LayoutContent className={styles.HandlePost}>
@@ -161,7 +186,11 @@ export const HandlePost = () => {
             name="price"
             rules={[{ type: 'number', required: true }]}
           >
-            <InputNumber size="large" className="w-100" />
+            <InputNumber
+              size="large"
+              className="w-100"
+              onChange={changeCommission('price')}
+            />
           </Form.Item>
           <Form.Item
             label="Categoria"
@@ -212,6 +241,33 @@ export const HandlePost = () => {
           </Form.Item>
           <Form.Item label="Ocultar de Revendedores" name="hide">
             <Switch defaultChecked />
+          </Form.Item>
+          <Form.Item
+            label="Comision"
+            name="commissionQuantity"
+            rules={[
+              {
+                required: true,
+                type: 'number',
+                max: postForm.getFieldValue('price'),
+              },
+            ]}
+          >
+            <InputNumber
+              className="w-100"
+              addonBefore="RD$"
+              size="large"
+              disabled={disableCommission}
+              onChange={changeCommission('quantity')}
+            />
+          </Form.Item>
+          <Form.Item name="commission">
+            <Slider
+              tooltip={{ formatter: commissionPercentTooltipFormatter }}
+              defaultValue={defaultPercentValue}
+              onChange={changeCommission('percent')}
+              disabled={disableCommission}
+            />
           </Form.Item>
         </Form>
         <SidebarFooter>
