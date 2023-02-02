@@ -228,21 +228,3 @@ export const HandlePost = () => {
     </LayoutContent>
   )
 }
-
-// title: string = ''
-// slug: string = ''
-// description: string = ''
-//
-// price: number = ''
-// images: string[] = ''
-//
-// categoryId: string = ''
-// subCategoryId: string = ''
-// typeCurrencyId: string = ''
-// userId: string = ''
-// storeId: string = ''
-//
-// // params: IParam[] = "";
-// // commission: ICommission = "";
-//
-// createdAt: Date = ''

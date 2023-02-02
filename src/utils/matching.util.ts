@@ -1,4 +1,3 @@
-import { values } from 'lodash'
 import { cleanText } from './text.utils'
 
 export const isNotEmptyObject = (obj: any) => {
