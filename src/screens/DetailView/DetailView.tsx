@@ -2,33 +2,42 @@ import styles from './DetailView.module.scss'
 import { Avatar, Button, Carousel, Image } from 'antd'
 import { ImageBackground } from '@screens/DetailView/components/ImageBackground/ImageBackground'
 import {
-  MessageOutlined,
-  StarFilled,
-  ShareAltOutlined,
-  MoreOutlined,
-  UserOutlined,
   ArrowLeftOutlined,
   ArrowRightOutlined,
+  MessageOutlined,
+  MoreOutlined,
+  ShareAltOutlined,
+  StarFilled,
+  UserOutlined,
 } from '@ant-design/icons'
 import { useRouter } from 'next/router'
 import { PostEntity } from '@shared/entities/PostEntity'
 import { useEffect, useRef, useState } from 'react'
 import { CarouselRef } from 'antd/es/carousel'
+import { handleEntityHook } from '@shared/hooks/handleEntityHook'
+import { Endpoints } from '@shared/enums/endpoints.enum'
 
 export interface IDetailViewProps {
   previewItem?: PostEntity
 }
 
 export const DetailView = ({ previewItem }: IDetailViewProps) => {
+  const router = useRouter()
   const [post, setPost] = useState<PostEntity>({ ...previewItem } as PostEntity)
-
   const carouselRef = useRef<CarouselRef>()
+  const { get, item } = handleEntityHook<PostEntity>('posts')
 
   useEffect(() => {
-    setPost({ ...previewItem } as PostEntity)
-  }, [previewItem])
+    setPost({ ...item, ...previewItem } as PostEntity)
+  }, [previewItem, item])
 
-  const router = useRouter()
+  useEffect(() => {
+    const slug = router.query.slug as string
+    if (slug) {
+      get({ endpoint: Endpoints.BY_SLUG, slug })
+    }
+  }, [router.query])
+
   const back = () => router.back()
   const navigate = (to: 'prev' | 'next') => () =>
     carouselRef.current && carouselRef.current[to]()
@@ -67,7 +76,9 @@ export const DetailView = ({ previewItem }: IDetailViewProps) => {
             }
           >
             {hasImages ? (
-              post.images.map((img) => <ImageBackground image={img} />)
+              post.images.map((img, i) => (
+                <ImageBackground image={img} key={`detailViewImage${i}`} />
+              ))
             ) : (
               <ImageBackground />
             )}

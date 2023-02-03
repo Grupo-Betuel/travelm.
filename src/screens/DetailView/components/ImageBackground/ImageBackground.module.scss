@@ -1,4 +1,4 @@
-@import "src/shared/styles/box-shadow-utils";
+@import 'src/shared/styles/box-shadow-utils';
 
 .ImageBackgroundWrapper {
   position: relative;
@@ -13,15 +13,23 @@
     top: 0;
     left: 0;
     background-size: cover;
-    background-image: url("~src/shared/assets/images/logo.png");
+    background-position: center;
+    background-image: url('~src/shared/assets/images/logo.png');
     filter: blur(15px);
     width: 100%;
     height: 100%;
   }
 
   .ImageWrapper {
-    max-width: 100%;
+    width: 100%;
     display: flex;
     align-items: center;
+    height: 100%;
+    img {
+      //max-width: 100%;
+      width: 100% !important;
+      max-height: 100%;
+      object-fit: contain;
+    }
   }
 }

@@ -199,7 +199,7 @@ export const HandlePost = () => {
           >
             <Select
               size="large"
-              defaultValue="Select role"
+              placeholder="Select role"
               options={categoriesSelectList}
             />
           </Form.Item>
@@ -211,7 +211,7 @@ export const HandlePost = () => {
             <Select
               className="w-100"
               size="large"
-              defaultValue="Select role"
+              placeholder="Select role"
               options={condition}
             />
           </Form.Item>
@@ -237,10 +237,10 @@ export const HandlePost = () => {
             <Input size="large" />
           </Form.Item>
           <Form.Item label="meetTypes" name="meet">
-            <Checkbox.Group options={meetTypes} defaultValue={['Apple']} />
+            <Checkbox.Group options={meetTypes} />
           </Form.Item>
           <Form.Item label="Ocultar de Revendedores" name="hide">
-            <Switch defaultChecked />
+            <Switch checked={false} />
           </Form.Item>
           <Form.Item
             label="Comision"
@@ -264,7 +264,6 @@ export const HandlePost = () => {
           <Form.Item name="commission">
             <Slider
               tooltip={{ formatter: commissionPercentTooltipFormatter }}
-              defaultValue={defaultPercentValue}
               onChange={changeCommission('percent')}
               disabled={disableCommission}
             />

@@ -3,7 +3,7 @@ import { AutoComplete, Checkbox, Input, Select, Slider, Switch } from 'antd'
 import { useState } from 'react'
 import { cleanText } from '../../../utils/text.utils'
 import { IOption } from '@interfaces/common.intefacce'
-import { DynamicParams } from '@components/DynamicParams/DynamicParams'
+import { DynamicParams } from '@shared/components'
 
 export const FiltersSidebar = () => {
   const [priceRange, setPriceRange] = useState<number[]>([])
@@ -82,7 +82,9 @@ export const FiltersSidebar = () => {
       </div>
       <div className={styles.FilterList}>
         {Array.from(new Array(5)).map((item, i) => (
-          <div className={styles.FilterListItem}>Category {i + 1}</div>
+          <div className={styles.FilterListItem} key={i}>
+            Category {i + 1}
+          </div>
         ))}
       </div>
       <div className={`${styles.FilterWrapper} ${styles.Column}`}>

@@ -6,15 +6,13 @@
   width: layout.$sidebarWidth !important;
   min-width: layout.$sidebarWidth !important;
   max-width: unset !important;
-  position: sticky;
-  top: 0;
   flex: unset !important;
   display: flex;
   flex-direction: column;
   height: 100%;
   max-height: calc(100vh - layout.$navbarHeight);
 
-  > div  {
+  > div {
     display: flex;
     flex-direction: column;
   }
@@ -22,12 +20,9 @@
   .SidebarWrapper {
     width: layout.$sidebarWidth !important;
     background-color: white;
-    //position: relative;
-    position: sticky;
-
-    top:-300px;
-    height: 95%;
-    left: 0;
+    height: 100%;
+    top: layout.$navbarOptionsHeight !important;
+    left: inherit !important;
     overflow: hidden;
 
     .SidebarContent {

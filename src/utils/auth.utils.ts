@@ -19,17 +19,21 @@ export const getAuthData = (
   type: keyof IAuthResponse | 'all' = 'access_token'
 ): IAuthResponse | string | UserEntity => {
   try {
-    const authString =
-      localStorage && localStorage.getItem(authServiceMock.localStorageKey.add)
-    const authData = JSON.parse(authString || '{}') as IAuthResponse
-    const tokenIsExpired = isExpired(authData.access_token)
+    if (typeof window !== 'undefined') {
+      const authString =
+        localStorage &&
+        localStorage.getItem(authServiceMock.localStorageKey.add)
+      const authData = JSON.parse(authString || '{}') as IAuthResponse
+      const tokenIsExpired = isExpired(authData.access_token)
 
-    if (!authString || tokenIsExpired) {
-      resetAuthData()
-      return ''
+      if (!authString || tokenIsExpired) {
+        resetAuthData()
+        return ''
+      }
+
+      return type === 'all' ? authData : authData[type]
     }
-
-    return type === 'all' ? authData : authData[type]
+    return ''
   } catch (err: any) {
     console.log('errrrorrr', err.message)
   }

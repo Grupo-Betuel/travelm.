@@ -2,6 +2,8 @@ import { Navbar } from '@shared/layout/components/Navbar/Navbar'
 import { Layout } from 'antd'
 import { Content } from 'antd/lib/layout/layout'
 import styles from './layout.module.scss'
+import { useStickySidebar } from '@shared/hooks/useStickySidebar'
+import { layoutId } from '../../utils/layout.utils'
 
 export interface IAppLayoutProps {
   children: any
@@ -9,7 +11,7 @@ export interface IAppLayoutProps {
 const AppLayout = ({ children }: IAppLayoutProps) => {
   return (
     <>
-      <Layout className={styles.layout}>
+      <Layout className={styles.layout} id={layoutId}>
         <Navbar />
         <Layout>
           {/*<FiltersSidebar />*/}

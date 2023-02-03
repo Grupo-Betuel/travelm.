@@ -81,6 +81,7 @@ export const DynamicParams = () => {
           className="d-flex-column mb-s"
           label={param.label}
           name={param.name}
+          key={`${param.name}${i}`}
         >
           {DynamicParamComponents[param.parameterType]({
             options: param.options,

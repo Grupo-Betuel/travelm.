@@ -7,15 +7,14 @@ import {
   HandleErrorType,
 } from '@interfaces/baseService.interface'
 import { IResponseError } from '@interfaces/error.interface'
-import _ from 'lodash'
 import { deepMatch } from '../../utils/matching.util'
-import { extractContent } from '../../utils/objects.utils'
 import { Endpoints } from '@shared/enums/endpoints.enum'
+import { IPaginatedResponse } from '@interfaces/pagination.interface'
 
 export interface IServiceMethodProperties<T> {
   queryParams?: { [N in keyof T]: any } | any
   endpoint?: Endpoints
-  pathValue?: string
+  slug?: string
 }
 
 export type LocalStorageKeysType = {
@@ -114,8 +113,23 @@ export class BaseService<T> implements AbstractBaseService<T> {
     }
   }
 
-  cacheData(data: T | T[], key: CRUDTypes, cacheLifeTime: number) {
-    localStorage.setItem(this.localStorageKey[key], JSON.stringify(data))
+  cacheData(
+    data: T | T[] | IPaginatedResponse<T>,
+    key: CRUDTypes,
+    cacheLifeTime: number
+  ) {
+    if (key === 'get') {
+      let items: T[] = data as T[]
+      if ((data as IPaginatedResponse<T>).content) {
+        items = (data as IPaginatedResponse<T>).content
+      }
+      // when key is get just will be cached if it's longer than 1 item
+      items.length &&
+        items.length > 1 &&
+        localStorage.setItem(this.localStorageKey[key], JSON.stringify(data))
+    } else {
+      localStorage.setItem(this.localStorageKey[key], JSON.stringify(data))
+    }
 
     // automatic remove cache
     setTimeout(
@@ -133,8 +147,8 @@ export class BaseService<T> implements AbstractBaseService<T> {
   ): T | T[] | null {
     const cached = localStorage.getItem(this.localStorageKey[key])
     if (cached && cached !== '[]' && cached !== '{}') {
-      const data = extractContent<T>(JSON.parse(cached))
-      const { value } = properties?.queryParams || {}
+      const data = JSON.parse(cached)
+      const value = properties?.queryParams?.value || properties?.slug
       const res = value ? deepMatch(value, data) : data
       return res
     }
@@ -149,11 +163,11 @@ export class BaseService<T> implements AbstractBaseService<T> {
       extraPath = `/${properties.endpoint}`
     }
 
-    if (properties.pathValue) {
-      if (typeof properties.pathValue === 'object') {
-        extraPath = `${extraPath}/${(properties.pathValue as any[]).join('/')}`
+    if (properties.slug) {
+      if (typeof properties.slug === 'object') {
+        extraPath = `${extraPath}/${(properties.slug as any[]).join('/')}`
       } else {
-        extraPath = `${extraPath}/${properties.pathValue}`
+        extraPath = `${extraPath}/${properties.slug}`
       }
     }
 

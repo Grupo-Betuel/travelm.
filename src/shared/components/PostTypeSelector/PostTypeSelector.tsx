@@ -1,5 +1,5 @@
-import { VerticalPreviewCard } from '@components/VerticalPreviewCard'
-import { IVerticalPreviewCardItem } from '@components/VerticalPreviewCard/VerticalPreviewCard'
+import { VerticalPreviewCard } from '@shared/components'
+import { IVerticalPreviewCardItem } from '@shared/components'
 import img from '@assets/images/logo.png'
 import { useRouter } from 'next/router'
 

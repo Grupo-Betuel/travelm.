@@ -6,10 +6,9 @@ export const isNotEmptyObject = (obj: any) => {
 }
 
 export function deepMatch<T>(value: any, values: T[] = []): T[] {
-  if (!values) return []
+  if (!values || typeof values.filter !== 'function') return []
   const results = values.filter((item) =>
     cleanText(JSON.stringify(item)).includes(cleanText(value))
   )
-  console.log('results', results)
   return results
 }

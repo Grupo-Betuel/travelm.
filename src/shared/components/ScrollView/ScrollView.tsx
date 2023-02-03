@@ -1,25 +1,25 @@
-import styles from "./ScrollView.module.scss";
-import Image from "next/image";
-import logo from "@assets/images/logo.png";
-import { useEffect, useRef } from "react";
+import styles from './ScrollView.module.scss'
+import Image from 'next/image'
+import logo from '@assets/images/logo.png'
+import { useEffect, useRef } from 'react'
 
 export const ScrollView = () => {
   const preview = (back?: boolean) => () => {
-    const scrollView = scrollViewRef.current as HTMLDivElement;
-    const progress = 200;
+    const scrollView = scrollViewRef.current as HTMLDivElement
+    const progress = 200
 
     if (scrollView) {
       scrollView.scrollTo({
         left: back
           ? scrollView.scrollLeft - progress
           : scrollView.scrollLeft + progress,
-        behavior: "smooth"
-      });
+        behavior: 'smooth',
+      })
     }
-  };
+  }
 
-  const products = Array.from(new Array(20));
-  const scrollViewRef = useRef({} as any);
+  const products = Array.from(new Array(20))
+  const scrollViewRef = useRef({} as any)
 
   return (
     <div className={styles.ScrollViewContainer}>
@@ -30,9 +30,9 @@ export const ScrollView = () => {
           onClick={preview(true)}
         />
         <div className={styles.ScrollView} ref={scrollViewRef}>
-          {products.map((item) => (
-            <div className={styles.ScrollViewItem}>
-              <Image src={logo} />
+          {products.map((item, i) => (
+            <div className={styles.ScrollViewItem} key={i}>
+              <Image priority src={logo} />
             </div>
           ))}
         </div>
@@ -42,6 +42,5 @@ export const ScrollView = () => {
         />
       </div>
     </div>
-
-  );
-};
+  )
+}

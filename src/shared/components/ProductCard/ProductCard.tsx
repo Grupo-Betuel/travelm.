@@ -9,27 +9,34 @@ export interface IProductProps {
 }
 export const ProductCard = ({ product, handleAction }: IProductProps) => {
   const img = product && product.images ? product.images[0] : ''
-  const handle = () => handleAction(product)
+  const handle = (ev: any) => {
+    ev.stopPropagation()
+    handleAction(product)
+  }
 
   return (
-    <Link href="/detail">
-      <Badge.Ribbon text="Tienda">
-        <Card
-          className={styles.ProductCard}
-          bodyStyle={{ padding: '10px' }}
-          cover={<img src={img} className={styles.ProductImage} />}
-        >
-          <div className={styles.ProductCardContent}>
-            <span className={styles.ProductTitle}>{product.title}</span>
-            {/*<Rate allowHalf defaultValue={4.5} disabled />*/}
-            <span className={styles.ProductPrice}>RD$ 1,500</span>
-            <span className={styles.ProductCommission}>Comision: RD$ 150</span>
-            <Button className="mt-s" onClick={handle}>
-              Add to my Board
-            </Button>
-          </div>
-        </Card>
-      </Badge.Ribbon>
+    <Link href={`/detail/${product.slug}`}>
+      <div>
+        <Badge.Ribbon text="Tienda">
+          <Card
+            className={styles.ProductCard}
+            bodyStyle={{ padding: '10px' }}
+            cover={<img src={img} className={styles.ProductImage} />}
+          >
+            <div className={styles.ProductCardContent}>
+              <span className={styles.ProductTitle}>{product.title}</span>
+              {/*<Rate allowHalf defaultValue={4.5} disabled />*/}
+              <span className={styles.ProductPrice}>RD$ 1,500</span>
+              <span className={styles.ProductCommission}>
+                Comision: RD$ 150
+              </span>
+              <Button className="mt-s" onClick={handle}>
+                Add to my Board
+              </Button>
+            </div>
+          </Card>
+        </Badge.Ribbon>
+      </div>
     </Link>
   )
 }

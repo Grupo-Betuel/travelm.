@@ -57,14 +57,23 @@ export function stateHandlerSuccess<T extends BaseEntity>(
   set: SetState<IEntityStore<any>>,
   endpoint?: Endpoints
 ) {
-  const endpointData = endpoint
-    ? { [endpoint]: data }
-    : ({ content: data } as EntityDataType<T>)
+  let endpointData = {}
+  let item: T
+  let content = data as T[]
+  if (!content.length || content.length === 1) {
+    item = !content.length ? (data as T) : content[0]
+  } else {
+    endpointData = endpoint
+      ? { [endpoint]: data }
+      : ({ content: data } as EntityDataType<T>)
+  }
+
   switch (key) {
     case 'add':
       set((state: any) => ({
         ...state,
         [key]: state.data,
+        item: item ? item : state.item,
         data: { ...state.data, ...endpointData },
         loading: false,
         error: undefined,
@@ -76,6 +85,7 @@ export function stateHandlerSuccess<T extends BaseEntity>(
         // data: state.data.map((item: T) =>
         //   item._id === (data as T)._id ? { ...item, ...data } : item
         // ),
+        item: item ? item : state.item,
         loading: false,
         error: undefined,
       }))
@@ -89,6 +99,7 @@ export function stateHandlerSuccess<T extends BaseEntity>(
         //       (prop) => (item as any)[prop] === (properties as any)[prop]
         //     )
         // ),
+        item: item ? item : state.item,
         data: { ...state.data, ...endpointData },
         loading: false,
         error: undefined,
@@ -174,7 +185,6 @@ export function createEntityStore<T extends BaseEntity>(
         enableCache = true,
         cacheLifeTime: number = 60 * 1000 * 5
       ) => {
-        console.log('getting again!')
         set((state) => ({ ...state, loading: true }))
         const res = await service.get(
           properties,

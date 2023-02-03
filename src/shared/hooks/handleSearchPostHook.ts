@@ -9,17 +9,15 @@ export interface IHandleSearchPostHookData {
 
 export const handleSearchPostHook = (): IHandleSearchPostHookData => {
   const router = useRouter()
-  const { data, get } = handleEntityHook<PostEntity>('posts', false)
+  const { data, get } = handleEntityHook<PostEntity>('posts', false, {}, 600)
 
   useEffect(() => {
-    console.log('query!!', router.query)
     getPosts()
   }, [router.query])
 
   const getPosts = () => {
     const searchPath = ((router.query.searchPath as string[]) || []).join(',')
     const extraPath = router.query.extraPath as string
-    console.log('searchPath => ', searchPath, 'pathValues', extraPath)
     const queryParams = { ...router.query }
     delete queryParams.searchPath
     delete queryParams.extraPath

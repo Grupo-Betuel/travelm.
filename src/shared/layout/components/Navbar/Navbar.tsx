@@ -4,7 +4,7 @@ import person from '@assets/images/person.png'
 import Image from 'next/image'
 import styles from './Navbar.module.scss'
 import { Button, Dropdown, Input, MenuProps, Modal, Select } from 'antd'
-import { ChangeEvent, useEffect, useState } from 'react'
+import { ChangeEvent, useCallback, useEffect, useState } from 'react'
 import { CategoriesDrawer } from '@shared/layout/components/CategoriesDrawer/CategoriesDrawer'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -14,11 +14,16 @@ import { CategoryEntity } from '@shared/entities/CategoryEntity'
 import { handleEntityHook } from '@shared/hooks/handleEntityHook'
 import { appLogOut, getAuthData } from '../../../../utils/auth.utils'
 import { UserEntity } from '@shared/entities/UserEntity'
-import { MainContentModal } from '@components/MainContentModal/MainContentModal'
+import { MainContentModal } from '@shared/components'
 import { Search } from '@screens/Search'
 import { Endpoints } from '@shared/enums/endpoints.enum'
 import { BellOutlined } from '@ant-design/icons'
 import { NotificationDrawer } from '@shared/layout/components/NotificationDrawer'
+import { HandleAuthVisibility } from '@shared/components'
+import {
+  navbarOptionsHeight,
+  navbarSubOptionsHeight,
+} from '../../../../utils/layout.utils'
 
 const { Option } = Select
 
@@ -52,7 +57,7 @@ export const Navbar = () => {
   const authIsEnable = router.query.auth
   const { makeContextualHref, returnHref } = useContextualRouting()
   const handleReturnToHref = () => router.push(returnHref)
-  const authUser = getAuthData('user') as UserEntity
+  const authUser = getAuthData('access_token') as UserEntity
   const {
     data: categories,
     get: getCategories,
@@ -60,7 +65,6 @@ export const Navbar = () => {
   } = handleEntityHook<CategoryEntity>('categories', true)
   const enableContextSearch = !returnHref.includes('search')
 
-  console.log('trending', trendingCategories)
   const authenticate = () => {
     router.push(makeContextualHref({ auth: true }), 'auth', { shallow: true })
   }
@@ -75,7 +79,7 @@ export const Navbar = () => {
   const userDropdownItems: MenuProps['items'] = [
     {
       key: 'account',
-      label: 'Mi cuenta',
+      label: <Link href="/profile">Mi Pagina</Link>,
     },
     {
       key: 'posts',
@@ -101,7 +105,7 @@ export const Navbar = () => {
     isContext?: boolean
   ) => {
     if (isContext) {
-      router.push(makeContextualHref(queryParams), path)
+      router.push(makeContextualHref(queryParams), path, { shallow: true })
     } else {
       router.push({
         pathname: path,
@@ -113,8 +117,6 @@ export const Navbar = () => {
   const onSearch =
     (contextSearch: boolean = false) =>
     (data: ChangeEvent<HTMLInputElement> | string) => {
-      let path: string = Endpoints.SEARCH_AUTO
-      if (categorySlug) path = ''
       const value: string = (data as ChangeEvent<HTMLInputElement>).target
         ? (data as ChangeEvent<HTMLInputElement>).target.value
         : (data as string)
@@ -129,11 +131,10 @@ export const Navbar = () => {
           extraPath: ['autocomplete-by-title'].join('/'),
         }
         const queryString = new URLSearchParams(queryParams).toString()
-        console.log(queryString)
-        const contextPath = `/search/${path}/?${queryString}`
+        const contextPath = `/search/?${queryString}`
         handleSearchRouting(contextPath, queryParams, contextSearch)
       } else {
-        handleSearchRouting(`/search/${path}/`, { value, categorySlug })
+        handleSearchRouting(`/search/`, { value, categorySlug })
         setShowContextSearchModal(false)
       }
     }
@@ -159,7 +160,7 @@ export const Navbar = () => {
         >
           <div className={`${styles.navbarLogoContainer} flex-start-center`}>
             <div onClick={goToHome} className="cursor-pointer">
-              <Image src={logo} alt="Store Logo" />
+              <Image priority src={logo} alt="Store Logo" />
             </div>
           </div>
           <div className={`${styles.navbarBrowserWrapper} flex-center-center`}>
@@ -178,28 +179,35 @@ export const Navbar = () => {
               onSearch={onSearch(false)}
             />
           </div>
-          <ul className={`${styles.navbarOptionsList} flex-end-center`}>
-            {!authUser && <li onClick={authenticate}>Iniciar Session</li>}
-            <li>
+          <div className={`${styles.navbarOptionsList} flex-end-center`}>
+            <HandleAuthVisibility visibleOn="no-auth">
+              <div onClick={authenticate}>Iniciar Session</div>
+            </HandleAuthVisibility>
+            <div>
               <Link href="/post">
                 <Button type="default">Publicar</Button>
               </Link>
-            </li>
-            {authUser && (
-              <li className={styles.userDropdown}>
+            </div>
+            <HandleAuthVisibility visibleOn="auth">
+              <div className={styles.userDropdown}>
                 <Dropdown
                   menu={{ items: userDropdownItems }}
                   trigger={['click']}
                   placement="bottom"
                 >
-                  <Image src={person} alt="user icon" />
+                  <Image priority src={person} alt="user icon" />
                 </Dropdown>
-              </li>
-            )}
-            {authUser && (
-              <BellOutlined fill="white" onClick={toggleNotificationDrawer} />
-            )}
-          </ul>
+              </div>
+            </HandleAuthVisibility>
+            <div>
+              <HandleAuthVisibility visibleOn="auth">
+                <BellOutlined
+                  color="white"
+                  onClick={toggleNotificationDrawer}
+                />
+              </HandleAuthVisibility>
+            </div>
+          </div>
         </div>
       </Header>
       <div className={`${styles.navbarFavoritesWrapper} px-xx-l`}>
@@ -219,13 +227,13 @@ export const Navbar = () => {
         </ul>
       </div>
       <CategoriesDrawer
-        visible={showAllCategories}
+        open={showAllCategories}
         onClose={toggleAllCategoriesDrawer}
         authenticate={authenticate}
       />
       {authUser && (
         <NotificationDrawer
-          visible={showNotification}
+          open={showNotification}
           onClose={toggleNotificationDrawer}
         />
       )}

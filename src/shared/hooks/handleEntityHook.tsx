@@ -21,14 +21,15 @@ export interface IGetEntityDataHookReturn<T>
 export function handleEntityHook<T>(
   entityName: EntityNamesType,
   loadDataAutomatically?: boolean,
-  properties?: IServiceMethodProperties<T>
+  properties?: IServiceMethodProperties<T>,
+  debounceTime?: number
 ): IGetEntityDataHookReturn<T> {
   const entity = useAppStore((state) => state[entityName]((statep) => statep))
   const { setAppLoading } = useContext(appLoadingContext)
   const getData = useRef(
     debounce((props: IServiceMethodProperties<T> = {}) => {
       entity.get({ ...properties, ...props })
-    }, 600)
+    }, debounceTime)
   ).current
 
   useEffect(() => {

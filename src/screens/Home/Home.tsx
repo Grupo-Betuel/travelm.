@@ -1,18 +1,17 @@
-import { VerticalPreviewCard } from '@components/VerticalPreviewCard'
+import { VerticalPreviewCard } from '@shared/components'
 import styles from './Home.module.scss'
 import logo from '@assets/images/logo.png'
-import { LandingCarousel } from './components/HomeCarousel'
-import { ScrollView } from '@components/ScrollView/ScrollView'
+import { ScrollView } from '@shared/components'
 import { useAppStore } from '@services/store'
 import { PostEntity } from '@shared/entities/PostEntity'
 import { useEffect, useState } from 'react'
+import { LandingCarousel } from '@shared/components'
 
 export const Home = () => {
   const count = useAppStore((state) => state.count)
   const name = useAppStore((state) => state.name)
   const handleCount = useAppStore((state) => state.handleCount)
   const productEntity = useAppStore((state) => state.posts((statep) => statep))
-  console.log('products', productEntity.data)
   const content = (productEntity.data as any).content
   const productData = content ? content : productEntity.data
   const [product, setProduct] = useState<PostEntity>(new PostEntity())

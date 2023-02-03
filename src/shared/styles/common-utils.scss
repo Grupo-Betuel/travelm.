@@ -12,7 +12,6 @@
 .subtitle {
   display: block;
   font-size: texts.$font-size-8;
-  //font-weight: 700;
 }
 
 .title {
@@ -28,4 +27,7 @@
 
 .text-bold {
   font-weight: bold;
+}
+.d-none {
+  display: none;
 }

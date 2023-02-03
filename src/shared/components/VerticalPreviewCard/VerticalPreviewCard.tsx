@@ -8,7 +8,7 @@ export interface IVerticalPreviewCardItem {
 
 export interface IVerticalPreviewCardProps {
   items: IVerticalPreviewCardItem[]
-  onSelect: (ev?: any) => void
+  onSelect?: (ev?: any) => void
 }
 
 export const VerticalPreviewCard = ({
@@ -19,11 +19,13 @@ export const VerticalPreviewCard = ({
     <div className={styles.VerticalPreviewCardWrapper} onClick={onSelect}>
       <span className="subtitle">Title</span>
       <div className={styles.VerticalPreviewCardGrid}>
-        {items.map((item) => (
+        {items.map((item, i) => (
           <div
             className={`${styles.verticalPromotionCardGridItem} hover-red-2`}
+            key={i}
           >
             <Image
+              priority
               src={item.image}
               width="100%"
               height="100%"

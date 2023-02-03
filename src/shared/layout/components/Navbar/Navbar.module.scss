@@ -42,7 +42,7 @@
       gap: s.$size-xx-large;
       width: 100%;
       grid-column: span 3;
-      li {
+      > div {
         cursor: pointer;
         color: white;
       }

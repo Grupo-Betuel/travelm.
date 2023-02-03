@@ -27,7 +27,7 @@ export const ImageBackground: FC<ImageBackgroundProps> = ({ image }) => {
           rootClassName={styles.ImageWrapper}
         />
       ) : (
-        <Image src={logo} />
+        <Image priority src={logo} />
       )}
     </div>
   )
