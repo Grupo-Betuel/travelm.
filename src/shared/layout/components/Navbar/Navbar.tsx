@@ -17,7 +17,7 @@ import { UserEntity } from '@shared/entities/UserEntity'
 import { MainContentModal } from '@shared/components'
 import { Search } from '@screens/Search'
 import { Endpoints } from '@shared/enums/endpoints.enum'
-import { BellOutlined } from '@ant-design/icons'
+import { BellOutlined, UserOutlined } from '@ant-design/icons'
 import { NotificationDrawer } from '@shared/layout/components/NotificationDrawer'
 import { HandleAuthVisibility } from '@shared/components'
 import {
@@ -180,33 +180,40 @@ export const Navbar = () => {
             />
           </div>
           <div className={`${styles.navbarOptionsList} flex-end-center`}>
-            <HandleAuthVisibility visibleOn="no-auth">
+            <HandleAuthVisibility
+              visibleOn="no-auth"
+              className={styles.navbarOptionsListItem}
+            >
               <div onClick={authenticate}>Iniciar Session</div>
             </HandleAuthVisibility>
-            <div>
+            <div className={styles.navbarOptionsListItem}>
               <Link href="/post">
                 <Button type="default">Publicar</Button>
               </Link>
             </div>
-            <HandleAuthVisibility visibleOn="auth">
+            <HandleAuthVisibility
+              visibleOn="auth"
+              className={styles.navbarOptionsListItem}
+            >
               <div className={styles.userDropdown}>
                 <Dropdown
                   menu={{ items: userDropdownItems }}
                   trigger={['click']}
                   placement="bottom"
                 >
-                  <Image priority src={person} alt="user icon" />
+                  <UserOutlined className={styles.navbarIconOption} />
                 </Dropdown>
               </div>
             </HandleAuthVisibility>
-            <div>
-              <HandleAuthVisibility visibleOn="auth">
-                <BellOutlined
-                  color="white"
-                  onClick={toggleNotificationDrawer}
-                />
-              </HandleAuthVisibility>
-            </div>
+            <HandleAuthVisibility
+              visibleOn="auth"
+              className={styles.navbarOptionsListItem}
+            >
+              <BellOutlined
+                className={styles.navbarIconOption}
+                onClick={toggleNotificationDrawer}
+              />
+            </HandleAuthVisibility>
           </div>
         </div>
       </Header>

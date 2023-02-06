@@ -20,10 +20,8 @@
   .SidebarWrapper {
     width: layout.$sidebarWidth !important;
     background-color: white;
-    height: 100%;
-    top: layout.$navbarOptionsHeight !important;
-    left: inherit !important;
-    overflow: hidden;
+    max-height: calc(100vh - layout.$navbarOptionsHeight);
+    overflow: auto;
 
     .SidebarContent {
       overflow: scroll;

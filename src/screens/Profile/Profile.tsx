@@ -1,25 +1,68 @@
 import styles from './Profile.module.scss'
 import { LandingCarousel } from '@shared/components'
-import { Avatar, Button, Rate, Tooltip } from 'antd'
-import { UserOutlined } from '@ant-design/icons'
-import { Search } from '@screens/Search'
+import { Avatar, Button, Dropdown, Rate, Tabs, TabsProps, Tooltip } from 'antd'
+import { CloudUploadOutlined, UserOutlined } from '@ant-design/icons'
+import { ProfilePosts } from '@screens/Profile/components'
+import { ProfileReviews } from '@screens/Profile/components'
 
 export const Profile = () => {
+  const profileTabItems: TabsProps['items'] = [
+    {
+      key: '1',
+      label: `Posts`,
+      children: <ProfilePosts />,
+    },
+    {
+      key: '2',
+      label: `Reseñas`,
+      children: <ProfileReviews />,
+    },
+    {
+      key: '3',
+      label: `Empleados (Revendedores Oficiales)`,
+      children: `Content of Tab Pane 3`,
+    },
+  ]
   return (
     <div className={styles.Profile}>
       <div className={styles.ProfileHeader}>
-        <LandingCarousel />
+        <div style={{ position: 'relative' }}>
+          <LandingCarousel />
+          <Button
+            style={{ position: 'absolute', bottom: 100, right: 20, zIndex: 1 }}
+            icon={<CloudUploadOutlined />}
+          >
+            Cambiar Portada
+          </Button>
+        </div>
         <div className={styles.ProfileHeaderOptionsWrapper}>
           <div className={styles.ProfileHeaderUserAbout}>
-            <Avatar
-              className={styles.ProfileHeaderAvatar}
-              size={150}
-              icon={<UserOutlined />}
-            />
+            <Dropdown
+              menu={{
+                items: [
+                  {
+                    label: 'Ver Foto',
+                    key: 'watch',
+                  },
+                  {
+                    label: 'Cambiar Foto',
+                    key: 'upload',
+                  },
+                ],
+              }}
+              trigger={['click']}
+              placement="bottom"
+            >
+              <Avatar
+                className={styles.ProfileHeaderAvatar}
+                size={150}
+                icon={<UserOutlined />}
+              />
+            </Dropdown>
             <div className="d-flex-column">
               <h1 className="title">Italia Shop</h1>
               <div className="flex-start-end gap-s mb-s">
-                <Rate allowHalf defaultValue={2.5} />
+                <Rate allowHalf defaultValue={2.5} disabled />
                 <span>3K Seguidores</span>
               </div>
               <div className="flex-start-center gap-s">
@@ -53,7 +96,9 @@ export const Profile = () => {
           </div>
         </div>
       </div>
-      <Search />
+      <div className={styles.ProfileContent}>
+        <Tabs items={profileTabItems} />
+      </div>
     </div>
   )
 }

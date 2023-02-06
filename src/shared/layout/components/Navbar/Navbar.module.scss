@@ -25,6 +25,10 @@
     .navbarBrowserWrapper,
     .navbarOptionsList {
       max-height: layout.$navbarOptionsHeight !important ;
+      .navbarOptionsListItem {
+        display: flex;
+        align-items: center;
+      }
     }
     .navbarLogoContainer {
       max-width: 3.125rem;
@@ -33,6 +37,10 @@
       img {
         filter: brightness(0) invert(1);
       }
+    }
+    .navbarIconOption {
+      font-size: 32px;
+      color: white;
     }
 
     .navbarBrowserWrapper {

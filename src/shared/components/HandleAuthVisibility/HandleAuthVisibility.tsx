@@ -4,10 +4,12 @@ import { PropsWithChildren, useEffect, useState } from 'react'
 export interface IHandleAuthVisibilityProps {
   children: any
   visibleOn?: 'auth' | 'no-auth'
+  className?: string
 }
 export const HandleAuthVisibility = ({
   children,
   visibleOn,
+  className,
 }: IHandleAuthVisibilityProps) => {
   const authToken: string = getAuthData('access_token') as string
   const [mustBeRendered, setMustBeRendered] = useState(false)
@@ -21,6 +23,8 @@ export const HandleAuthVisibility = ({
   }, [children])
 
   return (
-    <div className={!mustBeRendered ? 'd-none' : undefined}>{children}</div>
+    <div className={`${className} ${!mustBeRendered ? 'd-none' : undefined}`}>
+      {children}
+    </div>
   )
 }

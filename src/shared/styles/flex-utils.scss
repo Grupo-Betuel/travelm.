@@ -1,6 +1,7 @@
 @use "sizing-variables" as size;
 
 $flexAlignments: (
+  "around": space-around,
   "between": space-between,
   "center": center,
   "start": flex-start,
