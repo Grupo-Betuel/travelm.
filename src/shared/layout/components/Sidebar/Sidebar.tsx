@@ -6,10 +6,6 @@ import {
   navbarOptionsHeight,
   sidebarId,
 } from '../../../../utils/layout.utils'
-import {
-  IUseStickySidebarProps,
-  useStickySidebar,
-} from '@shared/hooks/useStickySidebar'
 import { Affix } from 'antd'
 
 const footerName = 'SidebarFooter'
@@ -17,9 +13,7 @@ export interface ISidebarProps {
   children?: React.ReactNode[]
 }
 
-export const Sidebar = (
-  { children }: ISidebarProps = { children: [] }
-) => {
+export const Sidebar = ({ children }: ISidebarProps = { children: [] }) => {
   const sidebarRef = useRef<HTMLDivElement>()
   const [top, setTop] = useState(navbarOptionsHeight)
 
