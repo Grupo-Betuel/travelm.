@@ -1,7 +1,8 @@
 @use 'src/shared/styles/sizing-variables' as size;
+@use 'src/shared/styles/layout-variables' as layout;
 
 .Profile {
-  max-width: 1500px;
+  max-width: layout.$maxLandingWidth;
   width: 100%;
 
   .ProfileHeader {

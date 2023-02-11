@@ -1,8 +1,9 @@
-@import "../../shared/styles/sizing-variables";
-@import "src/shared/styles/color-variables";
+@use 'src/shared/styles/layout-variables' as layout;
+@import '../../shared/styles/sizing-variables';
+@import 'src/shared/styles/color-variables';
 
 .HomeWrapper {
-  max-width: 1500px;
+  max-width: layout.$maxLandingWidth;
   width: 100%;
   .HomeContent {
     padding: $size-large;
@@ -22,7 +23,7 @@
   .HomeSection {
     padding: $size-large;
     background-color: white;
-    box-shadow: 0.3125rem 0.3125rem 0.625rem rgba(0,0,0, .3);
+    box-shadow: 0.3125rem 0.3125rem 0.625rem rgba(0, 0, 0, 0.3);
     border-radius: 0.625rem;
   }
 }

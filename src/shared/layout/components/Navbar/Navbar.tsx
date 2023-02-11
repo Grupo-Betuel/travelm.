@@ -1,9 +1,8 @@
 import { Header } from 'antd/lib/layout/layout'
 import logo from '@assets/images/logo.png'
-import person from '@assets/images/person.png'
 import Image from 'next/image'
 import styles from './Navbar.module.scss'
-import { Button, Dropdown, Input, MenuProps, Modal, Select } from 'antd'
+import { Button, Drawer, Dropdown, Input, MenuProps, Modal, Select } from 'antd'
 import { ChangeEvent, useCallback, useEffect, useState } from 'react'
 import { CategoriesDrawer } from '@shared/layout/components/CategoriesDrawer/CategoriesDrawer'
 import Link from 'next/link'
@@ -17,13 +16,20 @@ import { UserEntity } from '@shared/entities/UserEntity'
 import { MainContentModal } from '@shared/components'
 import { Search } from '@screens/Search'
 import { Endpoints } from '@shared/enums/endpoints.enum'
-import { BellOutlined, UserOutlined } from '@ant-design/icons'
+import {
+  BellOutlined,
+  UserOutlined,
+  MessageOutlined,
+  CalendarOutlined,
+} from '@ant-design/icons'
 import { NotificationDrawer } from '@shared/layout/components/NotificationDrawer'
 import { HandleAuthVisibility } from '@shared/components'
 import {
   navbarOptionsHeight,
   navbarSubOptionsHeight,
 } from '../../../../utils/layout.utils'
+import { DatesDrawer } from '@shared/layout/components/DatesDrawer'
+import { Messaging } from '@screens/Messaging'
 
 const { Option } = Select
 
@@ -49,6 +55,8 @@ const SelectBefore = (props: ICategorySelect) => (
 export const Navbar = () => {
   const [showAllCategories, setShowAllCategories] = useState<boolean>(false)
   const [showNotification, setShowNotification] = useState<boolean>(false)
+  const [showMessaging, setShowMessaging] = useState<boolean>(false)
+  const [showDates, setShowDates] = useState<boolean>(false)
   const [searchValue, setSearchValue] = useState<string>()
   const [showContextSearchModal, setShowContextSearchModal] =
     useState<boolean>(false)
@@ -97,6 +105,14 @@ export const Navbar = () => {
 
   const toggleNotificationDrawer = () => {
     setShowNotification(!showNotification)
+  }
+
+  const toggleMessagingDrawer = () => {
+    setShowMessaging(!showMessaging)
+  }
+
+  const toggleDatesDrawer = () => {
+    setShowDates(!showDates)
   }
 
   const handleSearchRouting = (
@@ -174,7 +190,7 @@ export const Navbar = () => {
                   onSelect={onSelectCategory}
                 />
               }
-              placeholder="DetailView"
+              placeholder="Messaging"
               onChange={onSearch(true)}
               onSearch={onSearch(false)}
             />
@@ -214,6 +230,24 @@ export const Navbar = () => {
                 onClick={toggleNotificationDrawer}
               />
             </HandleAuthVisibility>
+            <HandleAuthVisibility
+              visibleOn="auth"
+              className={styles.navbarOptionsListItem}
+            >
+              <MessageOutlined
+                className={styles.navbarIconOption}
+                onClick={toggleMessagingDrawer}
+              />
+            </HandleAuthVisibility>
+            <HandleAuthVisibility
+              visibleOn="auth"
+              className={styles.navbarOptionsListItem}
+            >
+              <CalendarOutlined
+                className={styles.navbarIconOption}
+                onClick={toggleDatesDrawer}
+              />
+            </HandleAuthVisibility>
           </div>
         </div>
       </Header>
@@ -242,6 +276,18 @@ export const Navbar = () => {
         <NotificationDrawer
           open={showNotification}
           onClose={toggleNotificationDrawer}
+        />
+      )}
+      {authUser && (
+        <Drawer open={showMessaging} onClose={toggleMessagingDrawer}>
+          <Messaging sidebarMode />
+        </Drawer>
+      )}
+      {authUser && (
+        <DatesDrawer
+          size="large"
+          open={showDates}
+          onClose={toggleDatesDrawer}
         />
       )}
       <Modal

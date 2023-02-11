@@ -1,0 +1,28 @@
+@import "../../../styles/sizing-variables";
+@import "src/shared/styles/color-variables";
+@import "src/shared/styles/text-variables";
+
+.DatesDrawer {
+  .drawer-body {
+    padding: 0;
+  }
+  .DatesOptionsList {
+    width: 100%;
+    border-bottom: 1px solid $color-gray-1;
+    padding: $size-small 0;
+    .DatesOption {
+      padding: $size-xx-small $size-xx-large;
+      cursor: pointer;
+      background-color: #ffffff;
+      &:hover {
+        filter: brightness(90%)
+      }
+    }
+
+    .DatesOptionTitle {
+      padding: $size-xx-small $size-xx-large;
+      font-weight: bold;
+      font-size: $font-size-7;
+    }
+  }
+}

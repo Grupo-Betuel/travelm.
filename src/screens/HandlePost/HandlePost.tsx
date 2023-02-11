@@ -24,7 +24,7 @@ import { getBase64FromFile } from '../../utils/blob.utils'
 import { RcFile, UploadChangeParam } from 'antd/es/upload'
 import { UploadFile } from 'antd/es/upload/interface'
 import { debounce } from 'lodash'
-import { SidebarFooter } from '@shared/layout/components/Sidebar/components/SidebarFooter'
+import { StickyFooter } from '@shared/layout/components/StickyFooter/StickyFooter'
 import { Endpoints } from '@shared/enums/endpoints.enum'
 
 const defaultPercentValue = 10
@@ -269,13 +269,13 @@ export const HandlePost = () => {
             />
           </Form.Item>
         </Form>
-        <SidebarFooter>
+        <StickyFooter>
           <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
             <Button type="primary" htmlType="submit">
               Submit
             </Button>
           </Form.Item>
-        </SidebarFooter>
+        </StickyFooter>
       </Sidebar>
       <div className={styles.handlePostPreview}>
         <DetailView previewItem={postItem} />

@@ -11,6 +11,7 @@ $imageButtonSize: 2.5rem;
   height: 100%;
   align-items: stretch;
   overflow: auto;
+  gap: 0;
 
   @include breakpoints.only-on(('m')) {
     flex-wrap: wrap !important;
@@ -74,20 +75,51 @@ $imageButtonSize: 2.5rem;
     }
   }
 
-  .DetailViewContent {
+  .DetailViewPostDetails {
     display: flex;
     flex-direction: column;
     gap: size.$size-small;
-    padding-top: size.$size-small;
     overflow: auto;
     flex-grow: 1;
-    min-width: 150px;
+    min-width: layout.$sidebarWidth;
+    width: layout.$sidebarWidth;
+    padding-left: size.$size-x-large;
+    position: relative;
+    z-index: 9;
+    background: white;
 
-    @include breakpoints.only-on(('m', 'l')) {
-      min-width: layout.$sidebarWidth;
+    //@include breakpoints.only-on(('m', 'l')) {
+    //  min-width: layout.$sidebarWidth;
+    //}
+
+    .DetailViewPostDetailsHeader {
+      position: sticky;
+      top: 0;
+      z-index: 1;
+      background-color: white;
+      padding: size.$size-small 0;
     }
 
-    .DetailViewContentHeader {
+    .DetailViewPostDetailsActions {}
+
+    .DetailViewPostDetailsContent{
+      .DetailViewPostDetailsContentInfo {
+
+      }
+      .DetailViewPostDetailsContentDescription {
+
+      }
+      .DetailViewPostDetailsContentLocation {
+
+      }
+      .DetailViewPostDetailsContentSellerInfo {
+
+      }
+      .DetailViewPostDetailsContentComments {
+        margin-top: size.$size-x-large;
+
+      }
     }
+
   }
 }

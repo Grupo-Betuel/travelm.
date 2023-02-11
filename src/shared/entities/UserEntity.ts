@@ -8,5 +8,6 @@ export class UserEntity extends BaseEntity {
   phone: number = 0
   role: string = ''
   password: string = ''
+  profile: string = ''
   storeMetadata?: any
 }

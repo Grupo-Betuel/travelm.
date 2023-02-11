@@ -3,29 +3,35 @@
 
 .Sidebar {
   @extend .small-bxs;
-  width: layout.$sidebarWidth !important;
+  //width: layout.$sidebarWidth;
   min-width: layout.$sidebarWidth !important;
   max-width: unset !important;
   flex: unset !important;
   display: flex;
   flex-direction: column;
   height: 100%;
-  max-height: calc(100vh - layout.$navbarHeight);
 
+  .SidebarAffix {
+    height: 100%;
+    > div {
+      height: 100%;
+    }
+  }
   > div {
     display: flex;
     flex-direction: column;
   }
 
   .SidebarWrapper {
-    width: layout.$sidebarWidth !important;
+    //width: layout.$sidebarWidth;
+    width: 100%;
     background-color: white;
-    max-height: calc(100vh - layout.$navbarOptionsHeight);
+    height: 100%;
+    max-height: calc(100vh - layout.$navbarHeight);
     overflow: auto;
 
     .SidebarContent {
       overflow: scroll;
-      height: 95%;
     }
   }
 }
