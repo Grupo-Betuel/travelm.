@@ -9,7 +9,9 @@ export interface IHandleSearchPostHookData {
 
 export const handleSearchPostHook = (): IHandleSearchPostHookData => {
   const router = useRouter()
-  const { data, get } = handleEntityHook<PostEntity>('posts', false, {}, 600)
+  const { data, get } = handleEntityHook<PostEntity>('posts', false, {
+    debounceTime: 600,
+  })
 
   useEffect(() => {
     getPosts()

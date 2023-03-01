@@ -6,10 +6,10 @@ import { toast } from 'react-toastify'
 import { IResponseError } from '@interfaces/error.interface'
 
 const headers: Readonly<Record<string, string | boolean>> = {
-  Accept: 'application/json',
-  'Content-Type': 'application/json; charset=utf-8',
-  'access-control-allow-credentials': true,
-  'access-control-allow-origin': '*',
+  // Accept: 'application/json',
+  // 'Content-Type': 'application/json; charset=utf-8',
+  // 'access-control-allow-credentials': true,
+  // 'access-control-allow-origin': '*',
 }
 
 // We can use the following function to inject the JWT token through an interceptor

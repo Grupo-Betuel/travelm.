@@ -6,7 +6,7 @@ export class PostEntity extends BaseEntity {
   subCategoryId: string = ''
   slug: string = ''
   statusId: string = ''
-  images: any[] = []
+  images: string[] = []
   typeCurrencyId: string = ''
   title = ''
   description = ''

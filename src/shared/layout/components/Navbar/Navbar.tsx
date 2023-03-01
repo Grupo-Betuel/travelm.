@@ -15,7 +15,7 @@ import { appLogOut, getAuthData } from '../../../../utils/auth.utils'
 import { UserEntity } from '@shared/entities/UserEntity'
 import { MainContentModal } from '@shared/components'
 import { Search } from '@screens/Search'
-import { Endpoints } from '@shared/enums/endpoints.enum'
+import { EndpointsAndEntityStateKeys } from '@shared/enums/endpoints.enum'
 import {
   BellOutlined,
   UserOutlined,
@@ -24,10 +24,6 @@ import {
 } from '@ant-design/icons'
 import { NotificationDrawer } from '@shared/layout/components/NotificationDrawer'
 import { HandleAuthVisibility } from '@shared/components'
-import {
-  navbarOptionsHeight,
-  navbarSubOptionsHeight,
-} from '../../../../utils/layout.utils'
 import { DatesDrawer } from '@shared/layout/components/DatesDrawer'
 import { Messaging } from '@screens/Messaging'
 
@@ -45,7 +41,7 @@ const SelectBefore = (props: ICategorySelect) => (
     onChange={props.onSelect}
   >
     {props.categories.map((item, i) => (
-      <Option value={item.slug} key={item._id}>
+      <Option value={item.slug} key={item.slug}>
         {item.name}
       </Option>
     ))}
@@ -82,7 +78,7 @@ export const Navbar = () => {
   }, [])
 
   const getTrendingCats = () =>
-    getCategories({ endpoint: Endpoints.TRENDING_CATEGORIES })
+    getCategories({ endpoint: EndpointsAndEntityStateKeys.TRENDING_CATEGORIES })
 
   const userDropdownItems: MenuProps['items'] = [
     {
@@ -263,7 +259,7 @@ export const Navbar = () => {
             </div>
           </li>
           {categories.slice(0, 4).map((item) => (
-            <li key={item._id}>{item.name}</li>
+            <li key={item.slug}>{item.name}</li>
           ))}
         </ul>
       </div>

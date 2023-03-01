@@ -18,7 +18,7 @@ import { PostEntity } from '@shared/entities/PostEntity'
 import { createElement, useEffect, useRef, useState } from 'react'
 import { CarouselRef } from 'antd/es/carousel'
 import { handleEntityHook } from '@shared/hooks/handleEntityHook'
-import { Endpoints } from '@shared/enums/endpoints.enum'
+import { EndpointsAndEntityStateKeys } from '@shared/enums/endpoints.enum'
 import { Resizable } from 're-resizable'
 import { sidebarWidth } from '../../utils/layout.utils'
 import { Sidebar } from '@shared/layout/components/Sidebar/Sidebar'
@@ -58,7 +58,7 @@ export const DetailView = ({ previewItem }: IDetailViewProps) => {
   useEffect(() => {
     const slug = router.query.slug as string
     if (slug) {
-      get({ endpoint: Endpoints.BY_SLUG, slug })
+      get({ slug })
     }
   }, [router.query])
 

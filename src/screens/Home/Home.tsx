@@ -1,147 +1,74 @@
-import { VerticalPreviewCard } from '@shared/components'
+import {
+  LandingCarousel,
+  ScrollView,
+  VerticalPreviewCard,
+} from '@shared/components'
 import styles from './Home.module.scss'
-import logo from '@assets/images/logo.png'
-import { ScrollView } from '@shared/components'
-import { useAppStore } from '@services/store'
 import { PostEntity } from '@shared/entities/PostEntity'
-import { useEffect, useState } from 'react'
-import { LandingCarousel } from '@shared/components'
+import { useEffect } from 'react'
+import { handleEntityHook } from '@shared/hooks/handleEntityHook'
+import { EndpointsAndEntityStateKeys } from '@shared/enums/endpoints.enum'
 
 export const Home = () => {
-  const count = useAppStore((state) => state.count)
-  const name = useAppStore((state) => state.name)
-  const handleCount = useAppStore((state) => state.handleCount)
-  const productEntity = useAppStore((state) => state.posts((statep) => statep))
-  const content = (productEntity.data as any).content
-  const productData = content ? content : productEntity.data
-  const [product, setProduct] = useState<PostEntity>(new PostEntity())
-  const products = [
-    {
-      title: 'First Item',
-      image: logo,
-    },
-    {
-      title: 'First Item',
-      image: logo,
-    },
-    {
-      title: 'First Item',
-      image: logo,
-    },
-    {
-      title: 'First Item',
-      image: logo,
-    },
-  ]
+  const {
+    data: products,
+    get: getPosts,
+    ['random-by-role']: randomResellerPosts,
+    ['you-may-like']: youMayLikePosts,
+    randomStoresPosts,
+  } = handleEntityHook<PostEntity>('posts', true)
 
-  const onchange = ({ target: { value, name } }: any) =>
-    setProduct({
-      ...product,
-      [name]: value,
+  useEffect(() => {
+    console.log('que tal todo ?')
+    // getting reseler posts
+    getPosts({
+      endpoint: EndpointsAndEntityStateKeys.RANDOM_BY_ROLE,
+      queryParams: { role: 'reseller', size: 4 },
     })
 
-  const onSelectProduct = (item: PostEntity) => () => setProduct({ ...item })
+    // getting stores posts
+    getPosts({
+      endpoint: EndpointsAndEntityStateKeys.RANDOM_BY_ROLE,
+      queryParams: { role: 'store', size: 4 },
+      storeDataInStateKey: EndpointsAndEntityStateKeys.RANDOM_POSTS_BY_STORE,
+    })
 
-  const createProduct = () => {
-    if (!product.id) {
-      productEntity.add(
-        {
-          ...product,
-          title: 'Example',
-          description: 'Description',
-          price: 100,
-          categoryId: '62e6a79408f79af1b90884f9',
-          subCategoryId: '62e6a79408f79af1b90884f9',
-          statusId: 1,
-          images: [
-            'https://images.pexels.com/photos/45201/kitty-cat-kitten-pet-45201.jpeg?cs=srgb&dl=pexels-pixabay-45201.jpg&fm=jpg',
-          ],
-          typeCurrencyId: '1',
-        },
-        { endpoint: 'create' }
-      )
-    } else {
-      productEntity.update(product.id, product)
-    }
-    setProduct({} as PostEntity)
-  }
-
-  const removeProduct = (id: number) => () => {
-    productEntity.remove(id)
-  }
-  useEffect(() => {
-    productEntity.get({})
+    // getting you may like posts
+    getPosts({
+      endpoint: EndpointsAndEntityStateKeys.YOU_MAY_LIKE,
+      queryParams: { userId: '63acacde930fa11a04bc351f' },
+    })
   }, [])
+
+  console.log('products =>', youMayLikePosts)
+
   return (
     <div className={styles.HomeWrapper}>
-      {/*<div className="prods">*/}
-      {/*  {productEntity.loading ? (*/}
-      {/*    <p>Loading...</p>*/}
-      {/*  ) : (*/}
-      {/*    <h1>*/}
-      {/*      Count {count} - {name}*/}
-      {/*    </h1>*/}
-      {/*  )}*/}
-      {/*  <br />*/}
-      {/*  <br />*/}
-      {/*  <input*/}
-      {/*    type="text"*/}
-      {/*    name="title"*/}
-      {/*    onChange={onchange}*/}
-      {/*    value={product.title}*/}
-      {/*    placeholder="title"*/}
-      {/*  />{' '}*/}
-      {/*  <br /> <br />*/}
-      {/*  <input*/}
-      {/*    type="text"*/}
-      {/*    name="description"*/}
-      {/*    onChange={onchange}*/}
-      {/*    value={product.description}*/}
-      {/*    placeholder="description"*/}
-      {/*  />{' '}*/}
-      {/*  <br /> <br />*/}
-      {/*  <input*/}
-      {/*    type="text"*/}
-      {/*    name="image"*/}
-      {/*    onChange={onchange}*/}
-      {/*    value={product.image}*/}
-      {/*    placeholder="image"*/}
-      {/*  />{' '}*/}
-      {/*  <br /> <br />*/}
-      {/*  <button onClick={createProduct}>*/}
-      {/*    {product.id ? 'Update' : 'Create'} product*/}
-      {/*  </button>{' '}*/}
-      {/*  <br /> <br />*/}
-      {/*  <button onClick={handleCount()}>Increase</button>*/}
-      {/*  <br /> <br />*/}
-      {/*  <button onClick={handleCount(true)}>Decrease</button>*/}
-      {/*  <br />*/}
-      {/*  <br />*/}
-      {/*  <div className={styles.products}>*/}
-      {/*    {productData.map((item, i) => (*/}
-      {/*      <div key={i} onClick={onSelectProduct(item)}>*/}
-      {/*        <img src={item.image} alt="" />*/}
-      {/*        <h5>{item.title}</h5>*/}
-      {/*        <p>{item.description}</p>*/}
-      {/*        <a href="#" onClick={removeProduct(item.id)}>*/}
-      {/*          Eliminar*/}
-      {/*        </a>*/}
-      {/*      </div>*/}
-      {/*    ))}*/}
-      {/*  </div>*/}
-      {/*</div>*/}
       <div className={styles.LandingCarouselWrapper}>
         <LandingCarousel />
       </div>
       <div className={styles.HomeContent}>
         <div className={styles.HomeTopCardsGrid}>
-          <VerticalPreviewCard items={products} />
-          <VerticalPreviewCard items={products.slice(0, 3)} />
-          <VerticalPreviewCard items={products.slice(0, 1)} />
-          <VerticalPreviewCard items={products} />
+          <VerticalPreviewCard
+            items={randomResellerPosts?.data}
+            title="Revendedores"
+          />
+          <VerticalPreviewCard
+            items={randomStoresPosts?.data}
+            title="Publicaciones de Tienda"
+          />
+          <VerticalPreviewCard
+            items={products.slice(0, 4)}
+            title="Publicaciones"
+          />
+
+          <VerticalPreviewCard
+            items={products.slice(4, 8)}
+            title="Publicaciones"
+          />
         </div>
-        <ScrollView />
-        <ScrollView />
+        <ScrollView products={youMayLikePosts?.data} />
+        <ScrollView products={youMayLikePosts?.data} />
       </div>
     </div>
   )

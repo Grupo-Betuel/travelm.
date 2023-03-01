@@ -4,7 +4,7 @@ import { UserEntity } from '@shared/entities/UserEntity'
 import { MaskedInput } from 'antd-mask-input'
 import { useRouter } from 'next/router'
 import { IAuthProps } from '@screens/Auth/Auth'
-import { Endpoints } from '@shared/enums/endpoints.enum'
+import { EndpointsAndEntityStateKeys } from '@shared/enums/endpoints.enum'
 
 export const Register = ({ isModal }: IAuthProps) => {
   const userEntity = useAppStore((state) => state.users((stateu) => stateu))
@@ -23,7 +23,11 @@ export const Register = ({ isModal }: IAuthProps) => {
 
     console.log('data => ', data)
 
-    if (await userEntity.add(data, { endpoint: Endpoints.CREATE })) {
+    if (
+      await userEntity.add(data, {
+        endpoint: EndpointsAndEntityStateKeys.CREATE,
+      })
+    ) {
       if (
         await authEntity.add({
           email: data.email,

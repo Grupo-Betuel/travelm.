@@ -11,6 +11,10 @@ import {
   IEntityEndpointDataValue,
 } from '@interfaces/entities.interface'
 
+export interface HandleEntityProps<T> extends IServiceMethodProperties<T> {
+  debounceTime?: number
+}
+
 export interface IGetEntityDataHookReturn<T>
   extends Omit<IEntityStore<T>, 'data'>,
     Partial<EntityEndpointsDataType<T>> {
@@ -21,15 +25,18 @@ export interface IGetEntityDataHookReturn<T>
 export function handleEntityHook<T>(
   entityName: EntityNamesType,
   loadDataAutomatically?: boolean,
-  properties?: IServiceMethodProperties<T>,
-  debounceTime?: number
+  properties?: HandleEntityProps<T>
 ): IGetEntityDataHookReturn<T> {
   const entity = useAppStore((state) => state[entityName]((statep) => statep))
   const { setAppLoading } = useContext(appLoadingContext)
+
+  const getDataMethod = (props: IServiceMethodProperties<T> = {}) => {
+    entity.get({ ...properties, ...props })
+  }
   const getData = useRef(
-    debounce((props: IServiceMethodProperties<T> = {}) => {
-      entity.get({ ...properties, ...props })
-    }, debounceTime)
+    properties?.debounceTime
+      ? debounce(getDataMethod, properties.debounceTime)
+      : getDataMethod
   ).current
 
   useEffect(() => {
@@ -60,7 +67,8 @@ export function handleEntityHook<T>(
   }
 
   const getEndpointData = () => {
-    const endpointsData: EntityEndpointsDataType<T> = {} as any
+    const endpointsData: EntityEndpointsDataType<T> =
+      {} as EntityEndpointsDataType<T>
     Object.keys(entity.data).forEach(
       (key: keyof EntityEndpointsDataType<T> | any) => {
         ;(endpointsData as any)[key] = divideDataAndPagination(key)

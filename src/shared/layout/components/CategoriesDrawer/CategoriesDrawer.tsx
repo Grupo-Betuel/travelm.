@@ -30,7 +30,7 @@ export const CategoriesDrawer = ({
       <ul className={styles.CategoriesOptionsList}>
         <li className={`${styles.CategoriesOptionTitle}`}>Cat 1</li>
         {categories.map((item) => (
-          <li key={item._id} className={`${styles.CategoriesOption}`}>
+          <li key={item.slug} className={`${styles.CategoriesOption}`}>
             {item.name}
           </li>
         ))}
@@ -38,7 +38,7 @@ export const CategoriesDrawer = ({
       <ul className={styles.CategoriesOptionsList}>
         <li className={`${styles.CategoriesOptionTitle}`}>Cat 2</li>
         {categories.map((item) => (
-          <li key={item._id} className={`${styles.CategoriesOption}`}>
+          <li key={item.slug} className={`${styles.CategoriesOption}`}>
             {item.name}
           </li>
         ))}

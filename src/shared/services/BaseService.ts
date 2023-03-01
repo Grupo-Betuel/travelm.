@@ -8,13 +8,14 @@ import {
 } from '@interfaces/baseService.interface'
 import { IResponseError } from '@interfaces/error.interface'
 import { deepMatch } from '../../utils/matching.util'
-import { Endpoints } from '@shared/enums/endpoints.enum'
+import { EndpointsAndEntityStateKeys } from '@shared/enums/endpoints.enum'
 import { IPaginatedResponse } from '@interfaces/pagination.interface'
 
 export interface IServiceMethodProperties<T> {
   queryParams?: { [N in keyof T]: any } | any
-  endpoint?: Endpoints
+  endpoint?: EndpointsAndEntityStateKeys
   slug?: string
+  storeDataInStateKey?: EndpointsAndEntityStateKeys
 }
 
 export type LocalStorageKeysType = {

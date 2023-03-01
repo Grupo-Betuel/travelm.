@@ -25,7 +25,7 @@ import { RcFile, UploadChangeParam } from 'antd/es/upload'
 import { UploadFile } from 'antd/es/upload/interface'
 import { debounce } from 'lodash'
 import { StickyFooter } from '@shared/layout/components/StickyFooter/StickyFooter'
-import { Endpoints } from '@shared/enums/endpoints.enum'
+import { EndpointsAndEntityStateKeys } from '@shared/enums/endpoints.enum'
 
 const defaultPercentValue = 10
 const condition = [
@@ -112,7 +112,7 @@ export const HandlePost = () => {
           typeCurrencyId: 1,
           images: postItem.images,
         },
-        { endpoint: Endpoints.CREATE }
+        { endpoint: EndpointsAndEntityStateKeys.CREATE }
       )
     )
   }

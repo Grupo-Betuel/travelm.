@@ -1,9 +1,14 @@
 import styles from './ScrollView.module.scss'
-import Image from 'next/image'
 import logo from '@assets/images/logo.png'
 import { useEffect, useRef } from 'react'
+import { PostEntity } from '@shared/entities/PostEntity'
+import { Image } from 'antd'
 
-export const ScrollView = () => {
+export interface IScrollViewProps {
+  products?: PostEntity[]
+}
+
+export const ScrollView = ({ products }: IScrollViewProps) => {
   const preview = (back?: boolean) => () => {
     const scrollView = scrollViewRef.current as HTMLDivElement
     const progress = 200
@@ -18,7 +23,6 @@ export const ScrollView = () => {
     }
   }
 
-  const products = Array.from(new Array(20))
   const scrollViewRef = useRef({} as any)
 
   return (
@@ -30,9 +34,9 @@ export const ScrollView = () => {
           onClick={preview(true)}
         />
         <div className={styles.ScrollView} ref={scrollViewRef}>
-          {products.map((item, i) => (
+          {(products || ([] as typeof products)).map((item, i) => (
             <div className={styles.ScrollViewItem} key={i}>
-              <Image priority src={logo} />
+              <Image src={item.images[0]} />
             </div>
           ))}
         </div>

@@ -1,8 +1,8 @@
 import { IPaginatedResponse } from '@interfaces/pagination.interface'
-import { Endpoints } from '@shared/enums/endpoints.enum'
+import { EndpointsAndEntityStateKeys } from '@shared/enums/endpoints.enum'
 
 export type EntityEndpointsDataType<T> = {
-  [N in Endpoints]: IEntityEndpointDataValue<T>
+  [N in EndpointsAndEntityStateKeys]: IEntityEndpointDataValue<T>
 }
 
 export interface IEntityEndpointDataValue<T> {
