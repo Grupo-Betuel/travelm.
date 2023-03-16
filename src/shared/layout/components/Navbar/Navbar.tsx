@@ -72,7 +72,7 @@ export const Navbar = () => {
   const { applyFilters } = handleSearchPostHook()
 
   const authenticate = () => {
-    router.push(makeContextualHref({ auth: true }), 'auth', { shallow: true })
+    router.push(makeContextualHref({ auth: true } as any), 'auth', { shallow: true })
   }
 
   useEffect(() => {
