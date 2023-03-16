@@ -1,4 +1,4 @@
-@use "sizing-variables" as size;
+@use 'sizing-variables' as size;
 $gridSizes: (1, 2, 3, 4, 5, 6);
 
 .d-grid {
@@ -38,12 +38,11 @@ $gridSizes: (1, 2, 3, 4, 5, 6);
 }
 
 $gridModes: (
-  "fit": auto-fit,
-  "fill": auto-fill,
+  'fit': auto-fit,
+  'fill': auto-fill,
 );
 
 @each $columnSize in $gridSizes {
-
   @each $label, $mode in $gridModes {
     .grid-column-#{$label}-#{$columnSize} {
       @extend .grid-container;
@@ -51,7 +50,10 @@ $gridModes: (
     }
     .grid-column-#{$label}-#{$columnSize}50 {
       @extend .grid-container;
-      grid-template-columns: repeat($mode, minmax($columnSize * 100px + 50px, 1fr));
+      grid-template-columns: repeat(
+        $mode,
+        minmax($columnSize * 100px + 50px, 1fr)
+      );
     }
 
     .grid-row-#{$label}-#{$columnSize} {
@@ -61,7 +63,10 @@ $gridModes: (
 
     .grid-row-#{$label}-#{$columnSize}50 {
       @extend .grid-container;
-      grid-template-rows: repeat(auto-fit, minmax($columnSize * 100px + 50px, 1fr));
+      grid-template-rows: repeat(
+        auto-fit,
+        minmax($columnSize * 100px + 50px, 1fr)
+      );
     }
   }
 }

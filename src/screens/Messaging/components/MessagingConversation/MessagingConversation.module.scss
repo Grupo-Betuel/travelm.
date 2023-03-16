@@ -1,5 +1,5 @@
-@use "src/shared/styles/sizing-variables" as sizes;
-@use "src/shared/styles/color-variables" as colors;
+@use 'src/shared/styles/sizing-variables' as sizes;
+@use 'src/shared/styles/color-variables' as colors;
 
 .MessagingConversationWrapper {
   width: 100%;
@@ -11,7 +11,6 @@
 
   .MessagingConversationUserInfo {
     .MessagingConversationUserInfoActions {
-
       .MessagingConversationUserInfoActionsIcon {
         cursor: pointer;
         width: sizes.$size-large * 2;

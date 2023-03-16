@@ -1,6 +1,6 @@
-@import "../../../styles/sizing-variables";
-@import "src/shared/styles/color-variables";
-@import "src/shared/styles/text-variables";
+@import '../../../styles/sizing-variables';
+@import 'src/shared/styles/color-variables';
+@import 'src/shared/styles/text-variables';
 
 .CategoriesDrawer {
   .drawer-body {
@@ -15,7 +15,7 @@
       cursor: pointer;
       background-color: #ffffff;
       &:hover {
-        filter: brightness(90%)
+        filter: brightness(90%);
       }
     }
 

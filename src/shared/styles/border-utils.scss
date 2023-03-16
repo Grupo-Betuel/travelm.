@@ -1,4 +1,4 @@
-@use "sizing-variables" as s;
+@use 'sizing-variables' as s;
 
 .folded {
   border-radius: s.$size-xx-small;
@@ -32,4 +32,3 @@
 .rounded {
   border-radius: 1000px;
 }
-

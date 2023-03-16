@@ -1,7 +1,6 @@
 $filterItemPadding: 15px 30px;
 
 .SearchWrapper {
-
   .FilterWrapper {
     display: flex;
     align-items: center;
@@ -37,7 +36,7 @@ $filterItemPadding: 15px 30px;
       }
 
       &::after {
-        content: "";
+        content: '';
         position: absolute;
         bottom: 0px;
         left: 5%;

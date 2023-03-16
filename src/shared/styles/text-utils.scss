@@ -1,4 +1,3 @@
-
 @each $index, $font-size in $font-sizes {
   .font-size-#{$index} {
     font-size: $font-size;

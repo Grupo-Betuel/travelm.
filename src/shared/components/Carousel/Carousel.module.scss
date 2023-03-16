@@ -1,4 +1,4 @@
-@import "src/shared/styles/text-variables";
+@import 'src/shared/styles/text-variables';
 
 .CarouselWrapper {
   position: relative;
@@ -22,6 +22,5 @@
   .CarouselRightArrow {
     @extend .Arrow;
     right: 30px;
-
   }
 }
