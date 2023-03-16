@@ -3,7 +3,7 @@ name: 'Deployment to Develop'
 on:
   push:
     branches:
-      - main
+      - master
 
 jobs:
   depl-develop:
@@ -11,7 +11,7 @@ jobs:
     steps:
       - uses: actions/checkout@v1
         with:
-          ref: main
+          ref: master
       - name: Build the docker-compose stack
         run: docker-compose up --build -d dev
       - name: Check running containers
