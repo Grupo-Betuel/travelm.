@@ -107,7 +107,7 @@ export const handleSearchPostHook = (): IHandleSearchPostHookData => {
     })
     const queryString = new URLSearchParams(filters as any).toString()
     const searchPath = `/search/?${queryString}`
-    router.push(makeContextualHref(allFilters), searchPath, {
+    router.push(makeContextualHref(allFilters as any), searchPath, {
       shallow: true,
     })
   }
