@@ -3,9 +3,21 @@ services:
   web:
     build:
       context: ./
+      dockerfile: dockerfiles/Dockerfile.prod
     container_name: app-store-front
     image: app-store-front:v1
     expose:
       - 3000
     ports:
       - "3000:3000"
+
+  dev:
+    build:
+      context: ./
+      dockerfile: dockerfiles/Dockerfile.dev
+    container_name: app-store-front-develop
+    image: app-store-front-develop:v1
+    expose:
+      - 3001
+    ports:
+      - "3001:3001"
