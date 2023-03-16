@@ -1,4 +1,4 @@
-version: "3"
+version: '3'
 services:
   web:
     build:
@@ -9,7 +9,7 @@ services:
     expose:
       - 3000
     ports:
-      - "3000:3000"
+      - '3000:3000'
 
   dev:
     build:
@@ -20,4 +20,4 @@ services:
     expose:
       - 3001
     ports:
-      - "3001:3001"
+      - '3001:3001'

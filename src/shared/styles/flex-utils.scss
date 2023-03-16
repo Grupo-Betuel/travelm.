@@ -1,11 +1,11 @@
-@use "sizing-variables" as size;
+@use 'sizing-variables' as size;
 
 $flexAlignments: (
-  "around": space-around,
-  "between": space-between,
-  "center": center,
-  "start": flex-start,
-  "end": flex-end,
+  'around': space-around,
+  'between': space-between,
+  'center': center,
+  'start': flex-start,
+  'end': flex-end,
 );
 
 .d-flex {
@@ -72,5 +72,4 @@ $flexAlignments: (
     align-items: $alignment;
     flex-direction: column;
   }
-
 }

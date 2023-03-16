@@ -1,5 +1,5 @@
-@use "text-variables" as texts;
-@use "color-variables" as colors;
+@use 'text-variables' as texts;
+@use 'color-variables' as colors;
 
 .cursor-pointer {
   cursor: pointer;

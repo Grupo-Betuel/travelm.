@@ -100,26 +100,21 @@ $imageButtonSize: 2.5rem;
       padding: size.$size-small 0;
     }
 
-    .DetailViewPostDetailsActions {}
+    .DetailViewPostDetailsActions {
+    }
 
-    .DetailViewPostDetailsContent{
+    .DetailViewPostDetailsContent {
       .DetailViewPostDetailsContentInfo {
-
       }
       .DetailViewPostDetailsContentDescription {
-
       }
       .DetailViewPostDetailsContentLocation {
-
       }
       .DetailViewPostDetailsContentSellerInfo {
-
       }
       .DetailViewPostDetailsContentComments {
         margin-top: size.$size-x-large;
-
       }
     }
-
   }
 }

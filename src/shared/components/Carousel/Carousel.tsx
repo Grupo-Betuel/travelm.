@@ -1,28 +1,28 @@
-import { Carousel, CarouselProps } from "antd";
-import { useRef } from "react";
-import styles from "./Carousel.module.scss";
+import { Carousel, CarouselProps } from 'antd'
+import { useRef } from 'react'
+import styles from './Carousel.module.scss'
 
 const contentStyle: React.CSSProperties = {
-  height: "160px",
-  color: "#fff",
-  lineHeight: "160px",
-  textAlign: "center",
-  background: "#364d79",
-};
+  height: '160px',
+  color: '#fff',
+  lineHeight: '160px',
+  textAlign: 'center',
+  background: '#364d79',
+}
 
 export interface IAppCarouselProps extends CarouselProps {
-  showArrow?: boolean;
+  showArrow?: boolean
 }
 
 export const AppCarousel = (props: IAppCarouselProps) => {
-  const { showArrow } = { showArrow: true, ...props };
+  const { showArrow } = { showArrow: true, ...props }
 
-  const carousel = useRef<any>();
+  const carousel = useRef<any>()
 
   const next = () => {
-    carousel.current && carousel.current?.next();
-  };
-  const prev = () => carousel.current && carousel.current?.prev();
+    carousel.current && carousel.current?.next()
+  }
+  const prev = () => carousel.current && carousel.current?.prev()
 
   return (
     <div className={styles.CarouselWrapper}>
@@ -53,5 +53,5 @@ export const AppCarousel = (props: IAppCarouselProps) => {
         />
       )}
     </div>
-  );
-};
+  )
+}

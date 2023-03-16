@@ -1,6 +1,6 @@
-import { ThemeConfig } from "antd/es/config-provider/context";
+import { ThemeConfig } from 'antd/es/config-provider/context'
 
-export const defaultTheme: ThemeConfig= {
+export const defaultTheme: ThemeConfig = {
   token: {
     colorPrimary: '#00b96b',
   },
