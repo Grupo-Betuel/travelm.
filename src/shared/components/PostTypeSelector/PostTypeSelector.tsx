@@ -1,7 +1,7 @@
 import { VerticalPreviewCard } from '@shared/components'
-import { IVerticalPreviewCardItem } from '@shared/components'
 import img from '@assets/images/logo.png'
 import { useRouter } from 'next/router'
+import { IVerticalPreviewCardItem } from '@components/VerticalPreviewCard/VerticalPreviewCard'
 
 export type PostTypes = 'product' | 'vehicle' | 'real-state'
 
@@ -21,7 +21,7 @@ export const PostTypeSelector = () => {
       image: 'https://cdn-icons-png.flaticon.com/512/2590/2590435.png',
       title: 'Bienes Raices',
     },
-  ]
+  ] as any
 
   const onSelectPostType = (type: PostTypes) => () => {
     router.push(`/post/${type}`)

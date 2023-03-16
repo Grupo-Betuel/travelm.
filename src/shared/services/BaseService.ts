@@ -10,12 +10,14 @@ import { IResponseError } from '@interfaces/error.interface'
 import { deepMatch } from '../../utils/matching.util'
 import { EndpointsAndEntityStateKeys } from '@shared/enums/endpoints.enum'
 import { IPaginatedResponse } from '@interfaces/pagination.interface'
+import { extractContent } from '../../utils/objects.utils'
 
 export interface IServiceMethodProperties<T> {
   queryParams?: { [N in keyof T]: any } | any
   endpoint?: EndpointsAndEntityStateKeys
   slug?: string
   storeDataInStateKey?: EndpointsAndEntityStateKeys
+  queryString?: string
 }
 
 export type LocalStorageKeysType = {
@@ -44,22 +46,39 @@ export class BaseService<T> implements AbstractBaseService<T> {
     handleError: HandleErrorType,
     enableCache = false,
     cacheLifeTime: number = 60 * 1000 * 5
-  ): Promise<T[] | undefined> {
+  ): Promise<T[] | IPaginatedResponse<T> | undefined> {
     try {
       if (enableCache) {
         const cached = this.getCachedData('get', properties)
         if (cached && cached) {
-          callback(cached)
+          callback(cached, true)
         }
       }
 
       const extraPath = this.handleServiceMethodPathProperties(properties)
 
-      const { data } = await http.get<T[]>(`${this.api}${extraPath}`, {
-        params: properties.queryParams,
-      })
-      enableCache && this.cacheData(data, 'get', cacheLifeTime)
-      callback(data || [])
+      let { data } = await http.get<T[] | IPaginatedResponse<T>>(
+        `${this.api}${extraPath}`,
+        {
+          params: { ...properties.queryParams, perPage: 5 },
+        }
+      )
+      if (enableCache) {
+        const cachedData: T[] = this.cacheData(
+          extractContent(data),
+          'get',
+          cacheLifeTime,
+          properties
+        ) as T[]
+
+        if (cachedData && (data as IPaginatedResponse<T>).content) {
+          ;(data as IPaginatedResponse<T>).content = cachedData
+        } else if (cachedData) {
+          data = cachedData
+        }
+      }
+
+      callback((data as T[]) || [])
       return data
     } catch (err: any) {
       handleError && handleError(err.data ? err.data.message : err.message)
@@ -115,19 +134,30 @@ export class BaseService<T> implements AbstractBaseService<T> {
   }
 
   cacheData(
-    data: T | T[] | IPaginatedResponse<T>,
+    data: T | T[],
     key: CRUDTypes,
-    cacheLifeTime: number
-  ) {
+    cacheLifeTime: number,
+    properties?: IServiceMethodProperties<T>
+  ): T | T[] {
     if (key === 'get') {
-      let items: T[] = data as T[]
-      if ((data as IPaginatedResponse<T>).content) {
-        items = (data as IPaginatedResponse<T>).content
+      let oldData: T[] = []
+
+      if (
+        properties &&
+        properties.storeDataInStateKey ===
+          EndpointsAndEntityStateKeys.INFINITE_SCROLL_DATA
+      ) {
+        oldData = JSON.parse(
+          localStorage.getItem(this.localStorageKey[key]) || '[]'
+        )
       }
+
+      let items: T[] = [...(data as T[]), ...oldData]
       // when key is get just will be cached if it's longer than 1 item
       items.length &&
         items.length > 1 &&
-        localStorage.setItem(this.localStorageKey[key], JSON.stringify(data))
+        localStorage.setItem(this.localStorageKey[key], JSON.stringify(items))
+      return items
     } else {
       localStorage.setItem(this.localStorageKey[key], JSON.stringify(data))
     }
@@ -140,6 +170,8 @@ export class BaseService<T> implements AbstractBaseService<T> {
       cacheLifeTime,
       this.localStorageKey[key]
     )
+
+    return data
   }
 
   getCachedData(
@@ -149,7 +181,7 @@ export class BaseService<T> implements AbstractBaseService<T> {
     const cached = localStorage.getItem(this.localStorageKey[key])
     if (cached && cached !== '[]' && cached !== '{}') {
       const data = JSON.parse(cached)
-      const value = properties?.queryParams?.value || properties?.slug
+      const value = properties?.queryParams?.title || properties?.slug
       const res = value ? deepMatch(value, data) : data
       return res
     }
@@ -170,6 +202,10 @@ export class BaseService<T> implements AbstractBaseService<T> {
       } else {
         extraPath = `${extraPath}/${properties.slug}`
       }
+    }
+
+    if (properties.queryString) {
+      extraPath = `${extraPath}?${properties.queryString}`
     }
 
     return extraPath

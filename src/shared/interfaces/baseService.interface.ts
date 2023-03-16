@@ -1,6 +1,6 @@
-import { IServiceMethodProperties } from '@services/store/entityStore'
+import { IServiceMethodProperties } from '@services/BaseService'
 
-export type CallbackType<T> = (data?: T | T[]) => void
+export type CallbackType<T> = (data?: T | T[], isCached?: boolean) => void
 export type HandleErrorType = (error: string) => void
 export interface AbstractBaseService<T> {
   get: (

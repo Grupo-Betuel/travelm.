@@ -9,7 +9,7 @@ export interface IVerticalPreviewCardItem {
 export interface IVerticalPreviewCardProps {
   items?: IVerticalPreviewCardItem[]
   onSelect?: (ev?: any) => void
-  title: string
+  title?: string
 }
 
 export const VerticalPreviewCard = (

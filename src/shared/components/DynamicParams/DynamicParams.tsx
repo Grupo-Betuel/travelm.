@@ -1,22 +1,25 @@
-import styles from 'DynamicParams.module.scss'
 import { ParamEntity, ParamTypes } from '@shared/entities/ParamEntity'
 import { Button, Checkbox, Form, Input, Radio, Select } from 'antd'
 import { IOption } from '@interfaces/common.intefacce'
+import { SelectProps } from 'antd/es/select'
 
 export interface IDynamicParamProps {
-  options?: IOption[]
+  options?: string[]
   name?: string
 }
+
 const DynamicParamComponents: {
   [N in ParamTypes]: React.FC<IDynamicParamProps>
 } = {
-  SELECT: (props: IDynamicParamProps) => <Select {...props} />,
+  SELECT: (props: IDynamicParamProps) => (
+    <Select {...(props as SelectProps<any, any>)} />
+  ),
   CHECKBOX: (props: IDynamicParamProps) => <Checkbox.Group {...props} />,
   RADIO: (props: IDynamicParamProps) => (
     <Radio.Group>
       {props.options?.map((option) => (
-        <Radio.Button value={option.value} key={option.value}>
-          {option.label}
+        <Radio.Button value={option} key={option}>
+          {option}
         </Radio.Button>
       ))}
     </Radio.Group>
@@ -24,51 +27,13 @@ const DynamicParamComponents: {
   INPUT: (props: IDynamicParamProps) => <Input {...props}></Input>,
 }
 
-export const DynamicParams = () => {
-  const params: ParamEntity[] = [
-    {
-      name: 'dynamic1',
-      label: 'Dynamic Param 1',
-      parameterType: 'CHECKBOX',
-      options: ['Option 1', 'Option 2', 'Option 3'],
-    },
-    {
-      name: 'dynamic2',
-      label: 'Dynamic Param 2',
-      parameterType: 'RADIO',
-      options: [
-        {
-          value: 'mostRecent',
-          label: 'Example 1',
-        },
-        {
-          value: 'mostRecent2',
-          label: 'Example 2',
-        },
-      ],
-    },
-    {
-      name: 'dynamic3',
-      label: 'Dynamic Param 3',
-      parameterType: 'SELECT',
-      options: [
-        {
-          value: 'mostRecent',
-          label: 'Mas Recientes',
-        },
-        {
-          value: 'mostRecent2',
-          label: 'Mas Baratos',
-        },
-      ],
-    },
-    {
-      name: 'dynamic4',
-      label: 'Dynamic Param 4',
-      parameterType: 'INPUT',
-    },
-  ]
+export interface IDynamicParamsProps {
+  params: ParamEntity[]
+  renderType: 'searchParameterType' | 'responseParameterType'
+}
+export const DynamicParams = ({ params, renderType }: IDynamicParamsProps) => {
   const submit = (data: any) => console.log(data)
+
   return (
     <Form
       name="createProduct"
@@ -83,7 +48,7 @@ export const DynamicParams = () => {
           name={param.name}
           key={`${param.name}${i}`}
         >
-          {DynamicParamComponents[param.parameterType]({
+          {DynamicParamComponents[param[renderType]]({
             options: param.options,
             name: param.name,
           })}

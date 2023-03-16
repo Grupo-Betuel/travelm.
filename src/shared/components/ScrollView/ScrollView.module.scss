@@ -1,8 +1,8 @@
-@use "../../styles/sizing-variables" as s;
-@use "src/shared/styles/text-variables" as text;
-@use "src/shared/styles/color-variables" as colors;
-@import "src/shared/styles/box-shadow-utils";
-@import "src/shared/styles/border-utils";
+@use '../../styles/sizing-variables' as s;
+@use 'src/shared/styles/text-variables' as text;
+@use 'src/shared/styles/color-variables' as colors;
+@import 'src/shared/styles/box-shadow-utils';
+@import 'src/shared/styles/border-utils';
 
 .ScrollViewContainer {
   @extend .small-bxs;
@@ -23,7 +23,14 @@
       justify-content: center;
 
       .ScrollViewItem {
-        min-width: 200px;
+        @extend .folded;
+        overflow: hidden;
+        min-width: 14rem;
+        .ScrollViewItemImage {
+          width: 14rem;
+          height: 14rem;
+          object-fit: cover;
+        }
       }
     }
 
@@ -47,7 +54,6 @@
     .ScrollViewRightArrow {
       @extend .Arrow;
       right: 0rem;
-
     }
   }
 }

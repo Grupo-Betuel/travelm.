@@ -45,7 +45,9 @@ class Http {
       // withCredentials: true,
     })
 
-    http.interceptors.request.use(injectToken, (error) => Promise.reject(error))
+    http.interceptors.request.use(injectToken as any, (error) =>
+      Promise.reject(error)
+    )
 
     http.interceptors.response.use(
       (response) => response,

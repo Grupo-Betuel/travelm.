@@ -16,12 +16,9 @@ import {
 import { useRouter } from 'next/router'
 import { PostEntity } from '@shared/entities/PostEntity'
 import { createElement, useEffect, useRef, useState } from 'react'
-import { CarouselRef } from 'antd/es/carousel'
 import { handleEntityHook } from '@shared/hooks/handleEntityHook'
-import { EndpointsAndEntityStateKeys } from '@shared/enums/endpoints.enum'
 import { Resizable } from 're-resizable'
 import { sidebarWidth } from '../../utils/layout.utils'
-import { Sidebar } from '@shared/layout/components/Sidebar/Sidebar'
 import { StickyFooter } from '@shared/layout/components/StickyFooter/StickyFooter'
 
 export interface IDetailViewProps {
@@ -48,7 +45,7 @@ const data = Array.from({ length: 23 }).map((_, i) => ({
 export const DetailView = ({ previewItem }: IDetailViewProps) => {
   const router = useRouter()
   const [post, setPost] = useState<PostEntity>({ ...previewItem } as PostEntity)
-  const carouselRef = useRef<CarouselRef>()
+  const carouselRef = useRef<any>()
   const { get, item } = handleEntityHook<PostEntity>('posts')
 
   useEffect(() => {

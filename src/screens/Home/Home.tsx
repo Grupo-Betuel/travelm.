@@ -19,7 +19,6 @@ export const Home = () => {
   } = handleEntityHook<PostEntity>('posts', true)
 
   useEffect(() => {
-    console.log('que tal todo ?')
     // getting reseler posts
     getPosts({
       endpoint: EndpointsAndEntityStateKeys.RANDOM_BY_ROLE,
@@ -39,8 +38,6 @@ export const Home = () => {
       queryParams: { userId: '63acacde930fa11a04bc351f' },
     })
   }, [])
-
-  console.log('products =>', youMayLikePosts)
 
   return (
     <div className={styles.HomeWrapper}>
@@ -67,8 +64,8 @@ export const Home = () => {
             title="Publicaciones"
           />
         </div>
-        <ScrollView products={youMayLikePosts?.data} />
-        <ScrollView products={youMayLikePosts?.data} />
+        <ScrollView title="You may like" products={youMayLikePosts?.data} />
+        <ScrollView title="Recents posts" products={products} />
       </div>
     </div>
   )

@@ -26,6 +26,7 @@ import { UploadFile } from 'antd/es/upload/interface'
 import { debounce } from 'lodash'
 import { StickyFooter } from '@shared/layout/components/StickyFooter/StickyFooter'
 import { EndpointsAndEntityStateKeys } from '@shared/enums/endpoints.enum'
+import { Formatter } from 'antd/es/slider'
 
 const defaultPercentValue = 10
 const condition = [
@@ -134,7 +135,8 @@ export const HandlePost = () => {
       }
     }
 
-  const commissionPercentTooltipFormatter = (value: number) => `${value}%`
+  const commissionPercentTooltipFormatter: Formatter = (value?: number) =>
+    `${value}%`
 
   const disableCommission = !postForm.getFieldValue('price')
 

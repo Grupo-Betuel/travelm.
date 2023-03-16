@@ -13,10 +13,16 @@ export interface ISearchProps {
   hideSidebar?: boolean
 }
 export const Search = ({ hideSidebar }: ISearchProps) => {
-  const { posts } = handleSearchPostHook()
+  const {
+    posts,
+    applyFilters,
+    categories,
+    loadMoreCallback,
+    noMoreContent,
+    loading,
+  } = handleSearchPostHook()
   const data: PostEntity[] = crudData as any
   const [openModal, setOpenModal] = useState(false)
-
   const handlePostActions = (post: PostEntity) => {
     // if (post.storeId) {
     //   setOpenModal(!openModal)
@@ -29,17 +35,38 @@ export const Search = ({ hideSidebar }: ISearchProps) => {
     <LayoutContent className={styles.SearchWrapper}>
       {!hideSidebar && (
         <Sidebar>
-          <FiltersSidebar />
+          <h1>posts: {posts.length}</h1>
+          <FiltersSidebar applyFilters={applyFilters} categories={categories} />
         </Sidebar>
       )}
       <div className={`${styles.SearchContent} grid-gap-15 grid-column-fill-2`}>
-        {data.map((item, i) => (
+        {[...posts].map((item, i) => (
           <ProductCard
             handleAction={handlePostActions}
             product={item}
             key={i}
           />
         ))}
+        {!hideSidebar && posts.length && (
+          <div className="grid-column-full py-x-l">
+            {loading ? (
+              <h1 className="flex-center-center w-100">Loading...</h1>
+            ) : (
+              <div>
+                {!noMoreContent ? (
+                  <h1
+                    ref={loadMoreCallback}
+                    className="flex-center-center w-100"
+                  >
+                    Mas Contenido
+                  </h1>
+                ) : (
+                  <h1 className="d-flex w-100">No hay mas datos...</h1>
+                )}
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </LayoutContent>
   )

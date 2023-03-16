@@ -10,8 +10,15 @@ import { AuthUserEntity } from '@shared/entities/AuthEntity'
 import { AuthService } from '@services/authService'
 import { CategoryEntity } from '@shared/entities/CategoryEntity'
 import { CategoryService } from '@services/categoryService'
+import { ParamEntity } from '@shared/entities/ParamEntity'
+import { ParamService } from '@services/paramService'
 
-export type EntityNamesType = 'posts' | 'users' | 'auth/login' | 'categories'
+export type EntityNamesType =
+  | 'posts'
+  | 'users'
+  | 'auth/login'
+  | 'categories'
+  | 'filter-params'
 
 export type EntityPerServiceType = {
   [N in EntityNamesType]: {
@@ -36,6 +43,10 @@ export const appEntitiesWithService: EntityPerServiceType = {
   categories: {
     entity: new CategoryEntity(),
     service: new CategoryService(),
+  },
+  'filter-params': {
+    entity: new ParamEntity(),
+    service: new ParamService(),
   },
 }
 

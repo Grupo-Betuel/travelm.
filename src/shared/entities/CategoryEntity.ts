@@ -5,5 +5,6 @@ export class CategoryEntity extends BaseEntity {
   name = ''
   slug = ''
   subCategories: SubCategoryEntity[] = []
-  createdAt = new Date()
+  createdAt?: Date = new Date()
+  params: string[] = []
 }

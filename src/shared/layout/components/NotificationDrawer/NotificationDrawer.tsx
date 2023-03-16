@@ -45,7 +45,7 @@ export const NotificationDrawer = ({ ...props }: INotificationDrawerProps) => {
             <Skeleton avatar title={false} loading={item.loading} active>
               <List.Item.Meta
                 avatar={<Avatar src={item.picture} />}
-                title={<a href="https://ant.design">{item.name?.last}</a>}
+                title={<a href="https://ant.design">{item.name}</a>}
                 description="Diego"
               />
               <div>Content</div>

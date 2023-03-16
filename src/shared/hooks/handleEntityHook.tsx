@@ -29,7 +29,9 @@ export function handleEntityHook<T>(
 ): IGetEntityDataHookReturn<T> {
   const entity = useAppStore((state) => state[entityName]((statep) => statep))
   const { setAppLoading } = useContext(appLoadingContext)
-
+  const entityDataRef = useRef<EntityEndpointsDataType<T>>(
+    {} as EntityEndpointsDataType<T>
+  )
   const getDataMethod = (props: IServiceMethodProperties<T> = {}) => {
     entity.get({ ...properties, ...props })
   }
@@ -66,7 +68,7 @@ export function handleEntityHook<T>(
     return { data, pagination }
   }
 
-  const getEndpointData = () => {
+  const getAllEntityData = () => {
     const endpointsData: EntityEndpointsDataType<T> =
       {} as EntityEndpointsDataType<T>
     Object.keys(entity.data).forEach(
@@ -78,10 +80,14 @@ export function handleEntityHook<T>(
     return endpointsData
   }
 
+  useEffect(() => {
+    entityDataRef.current = getAllEntityData()
+  }, [entity.data])
+
   return {
     ...entity,
     ...divideDataAndPagination('content'),
-    ...getEndpointData(),
+    ...entityDataRef.current,
     get: getData,
   }
 }

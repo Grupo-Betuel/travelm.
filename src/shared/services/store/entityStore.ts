@@ -31,6 +31,7 @@ export interface IEntityStore<T> {
     cacheLifeTime?: number
   ) => void
   loading?: boolean
+  fetching?: boolean
   error?: string
 }
 
@@ -55,16 +56,17 @@ export function stateHandlerSuccess<T extends BaseEntity>(
   key: keyof IEntityStore<T>,
   data: T | T[],
   set: SetState<IEntityStore<any>>,
-  properties?: IServiceMethodProperties<T>
+  properties?: IServiceMethodProperties<T>,
+  isCached?: boolean
 ) {
   let endpointData = {}
   let item: T
   let content = data as T[]
-  if (!(data as any).content && (!content.length || content.length === 1)) {
-    item = !content.length ? (data as T) : content[0]
+  if (!(data as any).content && !Array.isArray(content)) {
+    item = !(content as T[]).length ? (data as T) : content[0]
   } else {
     const stateDataKey = properties?.storeDataInStateKey || properties?.endpoint
-
+    console.log('store in', properties?.storeDataInStateKey)
     endpointData = stateDataKey
       ? { [stateDataKey]: data }
       : ({ content: data } as EntityDataType<T>)
@@ -78,6 +80,7 @@ export function stateHandlerSuccess<T extends BaseEntity>(
         item: item ? item : state.item,
         data: { ...state.data, ...endpointData },
         loading: false,
+        fetching: !!isCached,
         error: undefined,
       }))
       break
@@ -86,6 +89,7 @@ export function stateHandlerSuccess<T extends BaseEntity>(
         ...state,
         item: item ? item : state.item,
         loading: false,
+        fetching: !!isCached,
         error: undefined,
       }))
       break
@@ -95,6 +99,7 @@ export function stateHandlerSuccess<T extends BaseEntity>(
         item: item ? item : state.item,
         data: { ...state.data, ...endpointData },
         loading: false,
+        fetching: !!isCached,
         error: undefined,
       }))
 
@@ -104,6 +109,7 @@ export function stateHandlerSuccess<T extends BaseEntity>(
         ...state,
         // data: state.data.filter((item: T) => item._id !== data._id),
         loading: false,
+        fetching: !!isCached,
         error: undefined,
       }))
       break
@@ -114,7 +120,7 @@ export function createEntityStore<T extends BaseEntity>(
   initData: T[],
   service: BaseService<T>
 ): UseBoundStore<StoreApi<IEntityStore<T>>> {
-  return create<IEntityStore<T>>((set: SetState<IEntityStore<T>>) => {
+  return create<IEntityStore<T>>((set: SetState<IEntityStore<T>>): any => {
     return {
       data: initData,
       item: initData[0],
@@ -178,11 +184,13 @@ export function createEntityStore<T extends BaseEntity>(
         enableCache = true,
         cacheLifeTime: number = 60 * 1000 * 5
       ) => {
-        set((state) => ({ ...state, loading: true }))
+        set((state) => ({ ...state, loading: true, fetching: true }))
+        console.log('klk men!')
+
         const res = await service.get(
           properties,
-          (data: T | T[] = []) => {
-            stateHandlerSuccess('get', data as T[], set, properties)
+          (data: T | T[] = [], isCached?: boolean) => {
+            stateHandlerSuccess('get', data as T[], set, properties, isCached)
           },
           stateHandlerError(set),
           enableCache,

@@ -21,8 +21,6 @@ export const Register = ({ isModal }: IAuthProps) => {
     }
     data.phone = Number(data.phone.toString().replace(/[- ()]/g, ''))
 
-    console.log('data => ', data)
-
     if (
       await userEntity.add(data, {
         endpoint: EndpointsAndEntityStateKeys.CREATE,

@@ -36,5 +36,6 @@ export const getAuthData = (
     return ''
   } catch (err: any) {
     console.log('errrrorrr', err.message)
+    return ''
   }
 }

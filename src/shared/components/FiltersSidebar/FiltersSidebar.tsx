@@ -1,32 +1,61 @@
 import styles from './FiltersSidebar.module.scss'
-import { AutoComplete, Checkbox, Input, Select, Slider, Switch } from 'antd'
-import { useState } from 'react'
+import { Checkbox, Input, Select, Slider } from 'antd'
+import { useEffect, useState } from 'react'
 import { cleanText } from '../../../utils/text.utils'
-import { IOption } from '@interfaces/common.intefacce'
 import { DynamicParams } from '@shared/components'
+import { IPostFilters } from '@interfaces/posts.interface'
+import { CategoryEntity } from '@shared/entities/CategoryEntity'
+import { IOption } from '@interfaces/common.intefacce'
+import { handleEntityHook } from '@shared/hooks/handleEntityHook'
+import { ParamEntity } from '@shared/entities/ParamEntity'
+import { SubCategoryEntity } from '@shared/entities/SubCategoryEntity'
+import { EndpointsAndEntityStateKeys } from '@shared/enums/endpoints.enum'
+import { CheckboxValueType } from 'antd/es/checkbox/Group'
+import { UserRoles } from '@interfaces/users.interface'
+import { valid } from 'semver'
 
-export const FiltersSidebar = () => {
+export interface IFilterSidebarProps {
+  applyFilters: (filters: Partial<IPostFilters>) => void
+  categories: CategoryEntity[]
+}
+
+export const FiltersSidebar = ({
+  applyFilters,
+  categories,
+}: IFilterSidebarProps) => {
   const [priceRange, setPriceRange] = useState<number[]>([])
+  const [filters, setFilters] = useState<Partial<IPostFilters>>()
+  const { 'by-ids': filterParams, get: getParams } =
+    handleEntityHook<ParamEntity>('filter-params')
+
+  useEffect(() => {
+    if (filters) {
+      applyFilters(filters)
+    }
+  }, [filters])
 
   const onChangePrice = (data: any) => setPriceRange(data)
-  const catAndSubCatOptions = Array.from(new Array(10)).map((item, i) => ({
-    label: 'Cat ' + (i + 1),
-    options: [
-      {
-        value: Math.random(),
-        label: 'Celulares ' + (i + 1),
-      },
-      {
-        value: Math.random() + 1,
-        label: 'Celulares ' + (i + 2),
-      },
-    ],
+
+  const catAndSubCatOptions: IOption[] = categories.map((item, i) => ({
+    label: item.name,
+    options: item.subCategories.map((item) => ({
+      value: item._id,
+      label: item.name,
+      data: item.params,
+    })),
   }))
 
   const filterCategoriesOptions = (input: string, option?: IOption) => {
     return cleanText(option?.label ?? '').includes(cleanText(input))
   }
-  const roles = ['Todos', 'Revendedores', 'Tiendas', 'Vendedores']
+
+  const roles = [
+    { value: '', label: 'Todos' },
+    { value: UserRoles.RESELLER, label: 'Revendedores' },
+    { value: UserRoles.SELLER, label: 'Vendedores' },
+    { value: UserRoles.STORE, label: 'Tiendas' },
+  ]
+
   const sortBy = [
     {
       value: 'mostRecent',
@@ -54,6 +83,32 @@ export const FiltersSidebar = () => {
     },
   ]
 
+  const changeCategory = (
+    optionsValue: string[],
+    options: IOption | IOption[]
+  ) => {
+    const params: string[] = [] as any
+    ;(options as IOption[]).forEach((opt: IOption) => {
+      opt.data.forEach((p: string) => params.push(p))
+    })
+
+    const paramsIds = params.join('&ids=')
+    console.log('paramsIds => ', paramsIds)
+    getParams({
+      endpoint: EndpointsAndEntityStateKeys.PARAMS_BY_IDS,
+      queryString: `ids=${paramsIds}`,
+    })
+  }
+
+  const onChangeRole = (checkedValue: Array<CheckboxValueType>) => {
+    console.log('checked', checkedValue)
+
+    setFilters({
+      ...filters,
+      role: checkedValue as UserRoles[],
+    })
+  }
+
   return (
     <div className={styles.SearchWrapper}>
       <h3 className={styles.FilterTitle}>Filtros</h3>
@@ -68,6 +123,7 @@ export const FiltersSidebar = () => {
           // style={{ width: 200 }}
           // onChange={handleChange}
           options={catAndSubCatOptions}
+          onChange={changeCategory}
         />
       </div>
 
@@ -76,8 +132,7 @@ export const FiltersSidebar = () => {
         <Checkbox.Group
           className="grid-column-fit-1 mt-s"
           options={roles}
-          defaultValue={['Apple']}
-          // onChange={onChange}
+          onChange={onChangeRole}
         />
       </div>
       <div className={styles.FilterList}>
@@ -86,16 +141,6 @@ export const FiltersSidebar = () => {
             Category {i + 1}
           </div>
         ))}
-      </div>
-      <div className={`${styles.FilterWrapper} ${styles.Column}`}>
-        <label>Ordenar por</label>
-        <Select
-          className="w-100 mt-s"
-          // defaultValue="lucy"
-          // style={{ width: 200 }}
-          // onChange={handleChange}
-          options={sortBy}
-        />
       </div>
       <div className={`${styles.FilterWrapper} ${styles.Column}`}>
         <span className={styles.FilterLabel}>Precio</span>
@@ -116,7 +161,10 @@ export const FiltersSidebar = () => {
         <Slider range defaultValue={[20, 50]} onChange={onChangePrice} />
       </div>
       <div className={styles.FilterWrapper}>
-        <DynamicParams />
+        <DynamicParams
+          params={filterParams?.data || []}
+          renderType="responseParameterType"
+        />
       </div>
     </div>
   )

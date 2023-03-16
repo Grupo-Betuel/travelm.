@@ -26,6 +26,7 @@ import { NotificationDrawer } from '@shared/layout/components/NotificationDrawer
 import { HandleAuthVisibility } from '@shared/components'
 import { DatesDrawer } from '@shared/layout/components/DatesDrawer'
 import { Messaging } from '@screens/Messaging'
+import { handleSearchPostHook } from '@shared/hooks/handleSearchPostHook'
 
 const { Option } = Select
 
@@ -49,6 +50,7 @@ const SelectBefore = (props: ICategorySelect) => (
 )
 
 export const Navbar = () => {
+  const router = useRouter()
   const [showAllCategories, setShowAllCategories] = useState<boolean>(false)
   const [showNotification, setShowNotification] = useState<boolean>(false)
   const [showMessaging, setShowMessaging] = useState<boolean>(false)
@@ -57,7 +59,6 @@ export const Navbar = () => {
   const [showContextSearchModal, setShowContextSearchModal] =
     useState<boolean>(false)
   const [categorySlug, setCategorySlug] = useState<string>()
-  const router = useRouter()
   const authIsEnable = router.query.auth
   const { makeContextualHref, returnHref } = useContextualRouting()
   const handleReturnToHref = () => router.push(returnHref)
@@ -68,13 +69,17 @@ export const Navbar = () => {
     ['trending-categories']: trendingCategories,
   } = handleEntityHook<CategoryEntity>('categories', true)
   const enableContextSearch = !returnHref.includes('search')
+  const { applyFilters } = handleSearchPostHook()
 
   const authenticate = () => {
     router.push(makeContextualHref({ auth: true }), 'auth', { shallow: true })
   }
 
   useEffect(() => {
-    // getTrendingCats()
+    setTimeout(() => {
+      const { title } = router.query
+      // setSearchValue(title as string)
+    })
   }, [])
 
   const getTrendingCats = () =>
@@ -111,49 +116,32 @@ export const Navbar = () => {
     setShowDates(!showDates)
   }
 
-  const handleSearchRouting = (
-    path: string,
-    queryParams: any,
-    isContext?: boolean
-  ) => {
-    if (isContext) {
-      router.push(makeContextualHref(queryParams), path, { shallow: true })
-    } else {
-      router.push({
-        pathname: path,
-        query: queryParams,
-      })
-    }
-  }
-
   const onSearch =
     (contextSearch: boolean = false) =>
     (data: ChangeEvent<HTMLInputElement> | string) => {
-      const value: string = (data as ChangeEvent<HTMLInputElement>).target
+      const title: string = (data as ChangeEvent<HTMLInputElement>).target
         ? (data as ChangeEvent<HTMLInputElement>).target.value
         : (data as string)
-      setSearchValue(value)
-      emptySearch(!!value)
+      setSearchValue(title)
+      emptySearch(!!title)
 
-      if (!value) return
+      // if (!title) return
       if (contextSearch) {
-        const queryParams: any = {
-          value,
-          categorySlug,
-          extraPath: ['autocomplete-by-title'].join('/'),
-        }
-        const queryString = new URLSearchParams(queryParams).toString()
-        const contextPath = `/search/?${queryString}`
-        handleSearchRouting(contextPath, queryParams, contextSearch)
+        applyFilters({ title: title || '' })
       } else {
-        handleSearchRouting(`/search/`, { value, categorySlug })
+        router.push({
+          pathname: '/search/',
+          query: { title, categorySlug },
+        })
         setShowContextSearchModal(false)
       }
     }
 
   const emptySearch = (isShown: boolean = false) => {
-    !isShown && handleReturnToHref()
-    setShowContextSearchModal(isShown)
+    if (enableContextSearch) {
+      !isShown && handleReturnToHref()
+      setShowContextSearchModal(isShown)
+    }
   }
 
   const onSelectCategory = (slug: string) => setCategorySlug(slug)
@@ -166,7 +154,7 @@ export const Navbar = () => {
 
   return (
     <>
-      <Header className={`${styles.navbar}`}>
+      <Header className={styles.navbar}>
         <div
           className={`grid-container grid-column-full px-xx-l ${styles.navbarOptionsWrapper}`}
         >
@@ -177,7 +165,9 @@ export const Navbar = () => {
           </div>
           <div className={`${styles.navbarBrowserWrapper} flex-center-center`}>
             <Input.Search
-              value={searchValue}
+              value={
+                searchValue === undefined ? router.query.title : searchValue
+              }
               size="large"
               allowClear
               addonBefore={
@@ -294,7 +284,7 @@ export const Navbar = () => {
       >
         <Auth isModal />
       </Modal>
-      <MainContentModal show={showContextSearchModal && enableContextSearch}>
+      <MainContentModal show={showContextSearchModal}>
         <Search hideSidebar={true} />
       </MainContentModal>
     </>

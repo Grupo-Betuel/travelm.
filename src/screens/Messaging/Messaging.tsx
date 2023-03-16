@@ -38,12 +38,12 @@ export const Messaging = ({ sidebarMode }: IMessagingProps) => {
         <Tabs
           items={[
             {
-              key: 1,
+              key: '1',
               label: 'Usuarios',
               children: <ChatList />,
             },
             {
-              key: 2,
+              key: '2',
               label: 'Publicaciones',
               children: <ChatList />,
             },
