@@ -6,6 +6,15 @@ on:
       - master
 
 jobs:
+
+  create-envfile:
+    runs-on: self-hosted
+    steps:
+    - name: Make envfile
+      uses: SpicyPizza/create-envfile@v1.3
+      with:
+        envKey_NEXT_PUBLIC_API_URL: ${{ secrets.NEXT_PUBLIC_API_URL }}
+
   depl-develop:
     runs-on: self-hosted
     steps:
