@@ -3,6 +3,7 @@ import { PostTypeSelector } from '@shared/components'
 
 const PostPage: NextPage = () => {
   // return <PostTypeSelector />
+  
   return <div></div>
 }
 
