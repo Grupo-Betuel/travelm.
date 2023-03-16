@@ -17,6 +17,7 @@ jobs:
 
   depl-develop:
     runs-on: self-hosted
+    needs: create-envfile
     steps:
       - uses: actions/checkout@v1
         with:
