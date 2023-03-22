@@ -2,14 +2,14 @@ import { handleEntityHook } from '@shared/hooks/handleEntityHook'
 import { PostEntity } from '@shared/entities/PostEntity'
 import { useRouter } from 'next/router'
 import { deepMatch, isNotEmptyObject } from '../../utils/matching.util'
-import { useEffect, useRef, useState } from 'react'
+import { EffectCallback, useContext, useEffect, useRef, useState } from 'react'
 import { EndpointsAndEntityStateKeys } from '@shared/enums/endpoints.enum'
 import { useContextualRouting } from 'next-use-contextual-routing'
 import { IPostFilters } from '@interfaces/posts.interface'
 import { IPaginatedResponse } from '@interfaces/pagination.interface'
 import { CategoryEntity } from '@shared/entities/CategoryEntity'
 import { useInfiniteScroll } from './useInfiniteScrollHook'
-import { all } from 'axios'
+import { appPostsFiltersContext } from '../../pages/_app'
 export interface IHandleSearchPostHookData {
   posts: PostEntity[]
   pagination: IPaginatedResponse<PostEntity>
@@ -29,6 +29,7 @@ export const handleSearchPostHook = (): IHandleSearchPostHookData => {
   const { makeContextualHref } = useContextualRouting()
   const didMount = useRef(false)
   const queryRef = useRef(router.query)
+
   const {
     searchPostsResults,
     get,
@@ -77,6 +78,7 @@ export const handleSearchPostHook = (): IHandleSearchPostHookData => {
   }, [router.query])
 
   const getPosts = () => {
+    // TODO: remove this comment is they are not usable
     // const searchPath = ((router.query.searchPath as string[]) || []).join(',')
     // const extraPath = router.query.extraPath as string
     // console.log('query', router.query)
@@ -87,7 +89,9 @@ export const handleSearchPostHook = (): IHandleSearchPostHookData => {
       ? allFilters
       : router.query
 
+    console.log('filters to apply', filtersToApply)
     if (isNotEmptyObject(filtersToApply)) {
+      allFilters = filtersToApply
       const getProps = {
         queryParams: filtersToApply,
         storeDataInStateKey: EndpointsAndEntityStateKeys.SEARCH_POST_RESULTS,
@@ -102,10 +106,13 @@ export const handleSearchPostHook = (): IHandleSearchPostHookData => {
 
   const applyFilters = (filters: Partial<IPostFilters>) => {
     allFilters = { ...allFilters, ...filters }
+    // Object.keys({ ...appPostsFilters, ...allFilters, ...filters }).forEach(key => {
+    //   if(isA)
+    // })
     setTimeout(() => {
       console.log('filters', allFilters)
     })
-    const queryString = new URLSearchParams(filters as any).toString()
+    const queryString = new URLSearchParams(allFilters as any).toString()
     const searchPath = `/search/?${queryString}`
     router.push(makeContextualHref(allFilters), searchPath, {
       shallow: true,
@@ -114,74 +121,142 @@ export const handleSearchPostHook = (): IHandleSearchPostHookData => {
 
   const categories = [
     {
-      _id: 'id',
+      _id: '1',
       name: 'Beach',
       slug: 'Beach-62e6a79408f79af1b90884f9',
-      params: ['62e6a4be2a30bd57a67c2f22', '62e6a4be5666906144292211'],
+      params: [],
       subCategories: [
         {
           _id: '6317f24929b0f8bd8b03da7a',
           name: 'Santiago',
           slug: 'santiago-6317f24929b0f8bd8b03da7a',
-          params: ['62e6a4bedb534f3194480acd'],
+          params: [
+            '62e6a4bee913ef5766c03c78',
+            '62e6a4be2ea2dc4523e3eec5',
+            '62e6a4beb0bc36c8f8b68f55',
+            '62e6a4be6bd0a30a819500ad',
+            '62e6a4be2aa1f505b6a02c64',
+            '62e6a4bedb8933b769c124d4',
+          ],
         },
         {
           _id: '6317f2498172dbab64271170',
           name: 'Miles',
           slug: 'miles-6317f2498172dbab64271170',
-          params: ['62e6a4be2ea2dc4523e3eec5', '62e6a4bebcd6f975f3f0c2dd'],
+          params: [
+            '62e6a4be6ea48d78842f8848',
+            '62e6a4bef1c8e5d054424e77',
+            '62e6a4bedbee4c49eecc9b48',
+            '62e6a4be7a090cb05ae786f1',
+            '62e6a4bedf1eebce985ea893',
+            '62e6a4be7af3961c750c6c8c',
+          ],
         },
       ],
     },
     {
-      _id: 'id',
+      _id: '2',
       name: 'Case',
       slug: 'Case-62e6a794c1377e489bc5906c',
-      params: ['62e6a4be70c9068e7eee0198', '62e6a4bece0f8832ed6991d9'],
+      params: [
+        '62e6a4bee913ef5766c03c78',
+        '62e6a4be2ea2dc4523e3eec5',
+        '62e6a4beb0bc36c8f8b68f55',
+        '62e6a4be6bd0a30a819500ad',
+        '62e6a4be2aa1f505b6a02c64',
+        '62e6a4bedb8933b769c124d4',
+      ],
       subCategories: [
-        {
-          _id: '6317f24971e38dbd59545f3d',
-          name: 'Oconnor',
-          slug: 'oconnor-6317f24971e38dbd59545f3d',
-          params: ['62e6a4bebcd6f975f3f0c2dd', '62e6a4be0f8b69394a91401d'],
-        },
         {
           _id: '6317f2492544dc2c9b0de3ec',
           name: 'Patterson',
           slug: 'patterson-6317f2492544dc2c9b0de3ec',
-          params: ['62e6a4be6bd0a30a819500ad'],
+          params: [
+            '62e6a4be6ea48d78842f8848',
+            '62e6a4be81142f3ffb887794',
+            '62e6a4be2ea2dc4523e3eec5',
+            '62e6a4bece0f8832ed6991d9',
+            '62e6a4bebd316d56503f32ce',
+            '62e6a4be327ca1bfa62087e9',
+          ],
+        },
+        {
+          _id: '6317f24971e38dbd59545f3d',
+          name: 'Oconnor',
+          slug: 'oconnor-6317f24971e38dbd59545f3d',
+          params: [
+            '62e6a4befb6fb311b438fd12',
+            '62e6a4bedb8933b769c124d4',
+            '62e6a4be90c526b722292f02',
+            '62e6a4be777ebd8553f175d0',
+            '62e6a4bedbee4c49eecc9b48',
+            '62e6a4bedbee4c49eecc9b48',
+          ],
         },
       ],
     },
     {
-      _id: 'id',
+      _id: '3',
       name: 'Dunlap',
       slug: 'Dunlap-62e6a794064c739cbde21386',
-      params: ['62e6a4be7af3961c750c6c8c'],
+      params: [
+        '62e6a4befb6fb311b438fd12',
+        '62e6a4bedb8933b769c124d4',
+        '62e6a4be90c526b722292f02',
+        '62e6a4be777ebd8553f175d0',
+        '62e6a4bedbee4c49eecc9b48',
+        '62e6a4bedbee4c49eecc9b48',
+      ],
       subCategories: [],
     },
     {
-      _id: 'id',
+      _id: '4',
       name: 'Tucker',
       slug: 'Tucker-62e6a7949ce4fcf22a0db38b',
-      params: ['62e6a4be68ecbe05d9a433fc'],
+      params: [
+        '62e6a4be6ea48d78842f8848',
+        '62e6a4bef1c8e5d054424e77',
+        '62e6a4bedbee4c49eecc9b48',
+        '62e6a4be7a090cb05ae786f1',
+        '62e6a4bedf1eebce985ea893',
+        '62e6a4be7af3961c750c6c8c',
+      ],
       subCategories: [
         {
           _id: '6317f2494ac4175bcc087aba',
           name: 'Merritt',
           slug: 'merritt-6317f2494ac4175bcc087aba',
-          params: ['62e6a4bea3a7ffa0f1ec9411'],
+          params: [
+            '62e6a4be88093398a18dda04',
+            '62e6a4bec2349f4884707872',
+            '62e6a4be0caf8d0672f57c1a',
+            '62e6a4bedb8933b769c124d4',
+            '62e6a4be448a75130096a246',
+            '62e6a4be5fb0f3b98dc10e8a',
+          ],
         },
       ],
     },
     {
-      _id: 'id',
+      _id: '5',
       name: 'Wilder',
       slug: 'Wilder-62e6a794419421a611d60e99',
+      params: [
+        '62e6a4be6ea48d78842f8848',
+        '62e6a4be81142f3ffb887794',
+        '62e6a4be2ea2dc4523e3eec5',
+        '62e6a4bece0f8832ed6991d9',
+        '62e6a4bebd316d56503f32ce',
+        '62e6a4be327ca1bfa62087e9',
+      ],
       subCategories: [],
-      params: ['62e6a4be68ecbe05d9a433fc', '62e6a4be4d9086afa43bcec9'],
     },
   ]
+
+  // reseting filters
+  useEffect((): any => {
+    return () => (allFilters = {})
+  }, [])
 
   return {
     posts,

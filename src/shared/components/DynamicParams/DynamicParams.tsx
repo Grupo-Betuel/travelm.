@@ -1,7 +1,7 @@
 import { ParamEntity, ParamTypes } from '@shared/entities/ParamEntity'
-import { Button, Checkbox, Form, Input, Radio, Select } from 'antd'
-import { IOption } from '@interfaces/common.intefacce'
+import { Checkbox, Form, Input, Radio, Select } from 'antd'
 import { SelectProps } from 'antd/es/select'
+import { IFilterParam } from '@interfaces/params.interface'
 
 export interface IDynamicParamProps {
   options?: string[]
@@ -30,22 +30,38 @@ const DynamicParamComponents: {
 export interface IDynamicParamsProps {
   params: ParamEntity[]
   renderType: 'searchParameterType' | 'responseParameterType'
+  onChanges?: (filterParams: IFilterParam[]) => void
 }
-export const DynamicParams = ({ params, renderType }: IDynamicParamsProps) => {
-  const submit = (data: any) => console.log(data)
+export const DynamicParams = ({
+  params,
+  renderType,
+  onChanges,
+}: IDynamicParamsProps) => {
+  const handleDynamicChanges = (changeData: any, dynamicData?: any) => {
+    const filterParams: IFilterParam[] = []
+    Object.keys(dynamicData).forEach((k) => {
+      if (!dynamicData[k]) return
+      filterParams.push({
+        paramId: k,
+        answer: dynamicData[k],
+      })
+    })
+
+    onChanges && onChanges(filterParams)
+  }
 
   return (
     <Form
       name="createProduct"
       layout="vertical"
-      onFinish={submit}
+      onValuesChange={handleDynamicChanges}
       className="grid-column-fit-3"
     >
       {params.map((param: ParamEntity, i: number) => (
         <Form.Item
           className="d-flex-column mb-s"
           label={param.label}
-          name={param.name}
+          name={param._id}
           key={`${param.name}${i}`}
         >
           {DynamicParamComponents[param[renderType]]({
@@ -54,11 +70,6 @@ export const DynamicParams = ({ params, renderType }: IDynamicParamsProps) => {
           })}
         </Form.Item>
       ))}
-      <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
-        <Button type="primary" htmlType="submit">
-          Submit
-        </Button>
-      </Form.Item>
     </Form>
   )
 }

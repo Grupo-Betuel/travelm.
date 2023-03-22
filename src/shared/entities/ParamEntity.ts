@@ -1,6 +1,5 @@
 import { BaseEntity } from '@shared/entities/BaseEntity'
-
-export type ParamTypes = 'CHECKBOX' | 'RADIO' | 'INPUT' | 'SELECT'
+import { ParamTypes } from '@interfaces/params.interface'
 
 export class ParamEntity extends BaseEntity {
   name?: string = ''

@@ -1,5 +1,5 @@
 import { SetState, StoreApi, UseBoundStore } from 'zustand'
-import create from 'zustand'
+import { create } from 'zustand'
 import { BaseService, IServiceMethodProperties } from '@services/BaseService'
 import { BaseEntity } from '@shared/entities/BaseEntity'
 import { IPaginatedResponse } from '@interfaces/pagination.interface'

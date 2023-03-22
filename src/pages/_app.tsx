@@ -10,12 +10,35 @@ import { UserEntity } from '@shared/entities/UserEntity'
 import 'react-toastify/dist/ReactToastify.css'
 import { ToastContainer } from 'react-toastify'
 import { useAppStore } from '@services/store'
+import { IPostFilters } from '@interfaces/posts.interface'
 
 export interface IAppProps {
   protected?: boolean
 }
 
-export const appLoadingContext = createContext<any>({ loading: false })
+export interface IAppLoadingContextValue {
+  appLoading?: boolean
+  setAppLoading: (value: boolean) => void
+}
+
+{
+  /*TODO: Check if global posts filters is neccesarry*/
+}
+export interface IAppPostsFiltersContextValue {
+  appPostsFilters: IPostFilters
+  setAppPostsFilters: (data: IPostFilters) => void
+}
+export const appLoadingContext = createContext<IAppLoadingContextValue>(
+  {} as IAppLoadingContextValue
+)
+
+{
+  /*TODO: Check if global posts filters is neccesarry*/
+}
+export const appPostsFiltersContext =
+  createContext<IAppPostsFiltersContextValue>(
+    {} as IAppPostsFiltersContextValue
+  )
 
 function MyApp({ Component, pageProps }: AppProps<IAppProps>) {
   const userEntity = useAppStore((state) => state.users((s) => s))
@@ -23,6 +46,7 @@ function MyApp({ Component, pageProps }: AppProps<IAppProps>) {
   const authEntity = useAppStore((state) => state['auth/login']((s) => s))
   const [user, setUser] = useState<UserEntity | unknown>(null)
   const [appLoading, setAppLoading] = useState<boolean>(false)
+  const [appPostsFilters, setAppPostsFilters] = useState<IPostFilters>({})
 
   useEffect(() => {
     setAppLoading(
@@ -45,11 +69,17 @@ function MyApp({ Component, pageProps }: AppProps<IAppProps>) {
           <Spin size="large" />
         </div>
       )}
+
+      {/*TODO: Check if global posts filters is neccesarry*/}
+      {/*<appPostsFiltersContext.Provider*/}
+      {/*  value={{ appPostsFilters, setAppPostsFilters }}*/}
+      {/*>*/}
       <appLoadingContext.Provider value={{ appLoading, setAppLoading }}>
         <AppLayout>
           <Component {...pageProps} />
         </AppLayout>
       </appLoadingContext.Provider>
+      {/*</appPostsFiltersContext.Provider>*/}
       <ToastContainer />
     </ConfigProvider>
   )

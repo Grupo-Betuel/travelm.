@@ -34,10 +34,7 @@ export const Search = ({ hideSidebar }: ISearchProps) => {
   return (
     <LayoutContent className={styles.SearchWrapper}>
       {!hideSidebar && (
-        <Sidebar>
-          <h1>posts: {posts.length}</h1>
-          <FiltersSidebar applyFilters={applyFilters} categories={categories} />
-        </Sidebar>
+        <FiltersSidebar applyFilters={applyFilters} categories={categories} />
       )}
       <div className={`${styles.SearchContent} grid-gap-15 grid-column-fill-2`}>
         {[...posts].map((item, i) => (

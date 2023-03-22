@@ -80,6 +80,7 @@ export function handleEntityHook<T>(
     return endpointsData
   }
 
+  // TODO: check if this is util yet....
   useEffect(() => {
     entityDataRef.current = getAllEntityData()
   }, [entity.data])
@@ -87,7 +88,8 @@ export function handleEntityHook<T>(
   return {
     ...entity,
     ...divideDataAndPagination('content'),
-    ...entityDataRef.current,
+    // ...entityDataRef.current, // this doesn't update the component
+    ...getAllEntityData(), // this update the component when data is returned
     get: getData,
   }
 }

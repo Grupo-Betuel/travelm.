@@ -1,7 +1,6 @@
-import create, { SetState } from 'zustand'
+import { create, SetState } from 'zustand'
 import { persist } from 'zustand/middleware'
-import { createEntityStore, IEntityStore } from '@services/store/entityStore'
-import { PostEntity } from '@shared/entities/PostEntity'
+import { createEntityStore } from '@services/store/entityStore'
 import { mountStoreDevtool } from 'simple-zustand-devtools'
 
 import {
