@@ -3,10 +3,8 @@
 .MainContentModal {
   position: fixed;
   width: 100%;
-  height: calc(100vh - layout.$navbarHeight);
   background-color: white;
   left: 0;
   z-index: 99;
-  top: layout.$navbarHeight;
   overflow: auto;
 }

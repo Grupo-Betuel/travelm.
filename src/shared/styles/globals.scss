@@ -2,6 +2,7 @@
 @import 'antd/dist/reset.css';
 @import 'color-variables.scss';
 @import 'text-variables.scss';
+@import 'layout-variables.scss';
 @import 'color-utils';
 @import 'text-utils';
 @import 'flex-utils';
@@ -28,4 +29,14 @@
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.FullAppViewPortHeight {
+  height: calc(100vh - $navbarHeight) !important;
+  top: $navbarHeight !important;
+}
+
+.FullAppViewPortHeightNavbarOptions {
+  height: calc(100vh - $navbarOptionsHeight) !important;
+  top: $navbarOptionsHeight !important;
 }

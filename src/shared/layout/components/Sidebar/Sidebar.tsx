@@ -18,7 +18,8 @@ export const Sidebar = (
   { children, className }: ISidebarProps = { children: [] }
 ) => {
   const sidebarRef = useRef<HTMLDivElement>()
-  const [top, setTop] = useState(navbarOptionsHeight)
+  const [enableSidebarOptionHiddenHeight, setEnableSidebarOptionHiddenHeight] =
+    useState<boolean>()
 
   const SidebarFooter = () => (
     <>
@@ -34,10 +35,18 @@ export const Sidebar = (
     <Sider className={`${styles.Sidebar}`} ref={sidebarRef as any}>
       <Affix
         className={styles.SidebarAffix}
-        offsetTop={top}
+        offsetTop={navbarOptionsHeight}
         target={() => document.getElementById(layoutId)}
+        onChange={setEnableSidebarOptionHiddenHeight}
       >
-        <div className={`${className} ${styles.SidebarWrapper}`} id={sidebarId}>
+        <div
+          className={`${className} ${styles.SidebarWrapper} ${
+            enableSidebarOptionHiddenHeight
+              ? styles.HiddenNavbarOptionsHeight
+              : ''
+          }`}
+          id={sidebarId}
+        >
           <div className={styles.SidebarContent}>
             {children?.filter
               ? children?.filter((item: any) => item.type.name !== footerName)

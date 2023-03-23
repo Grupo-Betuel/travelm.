@@ -1,5 +1,4 @@
 import { useContext, useEffect, useRef } from 'react'
-import { appLoadingContext } from '../../pages/_app'
 import { useAppStore } from '@services/store'
 import { EntityNamesType } from '@services/appEntitiesWithService'
 import { IServiceMethodProperties } from '@services/BaseService'
@@ -10,6 +9,7 @@ import {
   EntityEndpointsDataType,
   IEntityEndpointDataValue,
 } from '@interfaces/entities.interface'
+import { AppLoadingContext } from '@shared/contexts/AppLoadingContext'
 
 export interface HandleEntityProps<T> extends IServiceMethodProperties<T> {
   debounceTime?: number
@@ -28,7 +28,7 @@ export function handleEntityHook<T>(
   properties?: HandleEntityProps<T>
 ): IGetEntityDataHookReturn<T> {
   const entity = useAppStore((state) => state[entityName]((statep) => statep))
-  const { setAppLoading } = useContext(appLoadingContext)
+  const { setAppLoading } = useContext(AppLoadingContext)
   const entityDataRef = useRef<EntityEndpointsDataType<T>>(
     {} as EntityEndpointsDataType<T>
   )
