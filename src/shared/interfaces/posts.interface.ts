@@ -1,5 +1,6 @@
 import { IFilterParam } from '@interfaces/params.interface'
 import { UserRoles } from '@interfaces/users.interface'
+import { IOption } from './common.intefacce'
 
 export type SortOrderTypes = 'asc' | 'desc'
 
@@ -15,6 +16,8 @@ export interface IPostFilters {
   commission?: boolean
 }
 
-export type PostFiltersTagNamesTypes = {
-  [N in keyof IPostFilters]: string
+export type PostFiltersTagNamesType = {
+  [N in Exclude<keyof IPostFilters, 'filterParams'>]: string
+} & {
+  filterParams?: IOption[]
 }

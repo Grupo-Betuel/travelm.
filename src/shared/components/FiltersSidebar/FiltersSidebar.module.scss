@@ -1,15 +1,12 @@
 $filterItemPadding: 15px 30px;
 
 .SearchWrapper {
-  .FilterTagsWrapper {
-    padding: $filterItemPadding;
-  }
   .FilterWrapper {
     display: flex;
     align-items: center;
     justify-content: space-between;
     padding: $filterItemPadding;
-    margin: 0 ;
+    margin: 0;
 
     &.Column {
       flex-direction: column;
@@ -21,10 +18,23 @@ $filterItemPadding: 15px 30px;
     }
   }
 
-  .FilterTitle {
-    font-size: 36px;
-    font-weight: bold;
+  .FilterHeader {
     padding: $filterItemPadding;
+
+    .FilterHeaderTitleWrapper {
+      display: flex;
+      justify-content: space-between;
+      align-items: start;
+      .FilterHeaderTitle {
+        font-size: 36px;
+        font-weight: bold;
+      }
+    }
+    .FilterTagsWrapper {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .5rem;
+    }
   }
 
   .FilterList {

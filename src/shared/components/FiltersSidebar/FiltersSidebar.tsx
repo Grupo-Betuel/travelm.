@@ -1,11 +1,20 @@
 import styles from './FiltersSidebar.module.scss'
-import { Button, Checkbox, Form, Input, Slider, Tag, TreeSelect } from 'antd'
+import {
+  Button,
+  Checkbox,
+  Form,
+  Input,
+  Slider,
+  Tag,
+  Tooltip,
+  TreeSelect,
+} from 'antd'
 import React, { ChangeEvent, useContext, useEffect, useState } from 'react'
 import { cleanText } from '../../../utils/text.utils'
-import { DynamicParams } from '@shared/components'
+import { DynamicParams, PostsFiltersTags } from '@shared/components'
 import {
   IPostFilters,
-  PostFiltersTagNamesTypes,
+  PostFiltersTagNamesType,
 } from '@interfaces/posts.interface'
 import { CategoryEntity } from '@shared/entities/CategoryEntity'
 import { IOption } from '@interfaces/common.intefacce'
@@ -23,6 +32,7 @@ import { parseQueryToObject } from '../../../utils/objects.utils'
 import { PostFiltersTagNames } from '../../../utils/constants/post.contstants'
 import { appPostsFiltersContext } from 'src/pages/_app'
 import { isNotEmptyObject } from 'src/utils/matching.util'
+import { ClearOutlined } from '@ant-design/icons'
 
 export interface IFilterSidebarProps {
   applyFilters: (filters: IPostFilters) => void
@@ -49,7 +59,7 @@ export const FiltersSidebar = ({
   useEffect(() => {
     if (!isNotEmptyObject(appPostsFilters)) {
       postsFiltersForm.resetFields()
-      loadPostFiltersTags();
+      loadPostFiltersTags()
     }
   }, [appPostsFilters])
 
@@ -82,6 +92,7 @@ export const FiltersSidebar = ({
       role: queryFilters.role,
       filterParams: queryFilters.filterParams,
     })
+    loadPostFiltersTags()
   }
 
   const loadDynamicParamsFromSelectedCategory = (
@@ -205,12 +216,6 @@ export const FiltersSidebar = ({
     })),
   }))
 
-  const filterCategoriesOptions = (input: string, option?: IOption) => {
-    const inputCleaned = cleanText(input)
-    const optionLabelCleaned = cleanText(option?.label ?? '')
-    return optionLabelCleaned.includes(inputCleaned)
-  }
-
   const roles = [
     { value: UserRoles.RESELLER, label: 'Revendedores' },
     { value: UserRoles.SELLER, label: 'Vendedores' },
@@ -245,70 +250,99 @@ export const FiltersSidebar = ({
   ]
 
   const [postFiltersTags, setPostFiltersTags] =
-    useState<PostFiltersTagNamesTypes>()
+    useState<PostFiltersTagNamesType>()
 
   const loadPostFiltersTags = () => {
-    const tags: PostFiltersTagNamesTypes = {}
+    const tags: PostFiltersTagNamesType = {} as PostFiltersTagNamesType
+    console.log('appPostsFilters: ', appPostsFilters)
     ;(Object.keys(appPostsFilters) as any).forEach((K: keyof IPostFilters) => {
       if (!appPostsFilters[K]) return
       const label = PostFiltersTagNames[K]
       let value = appPostsFilters[K]
 
-      if ((K === 'categoryId' || K === 'subCategoryId') && appPostsFilters[K]) {
+      if (K === 'categoryId' || K === 'subCategoryId') {
         const cat = getCategoryById(appPostsFilters[K] as string)
         if (cat) {
           value = cat.name
         }
       }
 
-      tags[K] = `${label}: ${value}`
-      console.log('tags[K] =>', tags[K])
-    })
+      if (K === 'filterParams') {
+        const selectedParams = appPostsFilters[K] as IFilterParam[]
+        tags[K] = selectedParams.map((param) => {
+          if (filterParams?.data) {
+            const currParam =
+              filterParams.data.find((pr) => pr._id === param.paramId) ||
+              ({} as any)
+            return {
+              label: `${currParam?.name}: ${param.answer}`,
+              value: param.paramId,
+            }
+          }
+        }) as IOption[]
+        return
+      }
 
-    console.log('appPostsFilters ->', appPostsFilters, tags)
+      tags[K] = `${label}: ${value}`
+    })
 
     setPostFiltersTags(tags)
   }
 
-  const removeFilterPerKey = (key: keyof IPostFilters) => () => {
+  const removeFilterPerKey = (key: keyof IPostFilters, dynamicId?: string) => {
     console.log('removeFilterPerKey() called, key: ', key)
-    const newFilters = {
-      ...appPostsFilters,
-      [key]: '',
+    let newFilters = appPostsFilters
+    if (dynamicId && appPostsFilters.filterParams) {
+      newFilters = {
+        ...appPostsFilters,
+        filterParams: appPostsFilters.filterParams.filter(
+          (param) => param.paramId !== dynamicId
+        ),
+      }
+    } else {
+      newFilters = {
+        ...appPostsFilters,
+        [key]: '',
+      }
+      console.log('newFilters: ', newFilters)
+
+      let formKey = key === 'subCategoryId' ? 'categoryId' : key
+      postsFiltersForm.setFieldValue(formKey, '')
     }
-    console.log('newFilters: ', newFilters)
     setAppPostsFilters(newFilters)
 
-    let formKey = key === 'subCategoryId' ? 'categoryId' : key
-    postsFiltersForm.setFieldValue(formKey, '')
     handleFilters(newFilters)
   }
+
+  const clearFilters = () => {
+    setAppPostsFilters({})
+  }
+
 
   return (
     <Sidebar>
       <div className={styles.SearchWrapper}>
         <Form<IPostFilters> form={postsFiltersForm} layout="vertical">
-          <h3 className={styles.FilterTitle}>Filtros</h3>
-          {/*// TODO: tag filters*/}
-          {postFiltersTags && (
-            <div className={`${styles.FilterTagsWrapper}`}>
-              {(Object.keys(postFiltersTags) as any).map(
-                (f: keyof IPostFilters) => {
-                  return (
-                    postFiltersTags[f] && (
-                      <Tag
-                        color="green"
-                        closable
-                        onClose={removeFilterPerKey(f)}
-                      >
-                        <span>{postFiltersTags[f]}</span>
-                      </Tag>
-                    )
-                  )
-                }
-              )}
+          <div className={styles.FilterHeader}>
+            <div className={styles.FilterHeaderTitleWrapper}>
+              <h3 className={styles.FilterHeaderTitle}>Filtros</h3>
+              <Tooltip title="Limpiar filtros">
+                <ClearOutlined
+                  className="cursor-pointer"
+                  onClick={clearFilters}
+                />
+              </Tooltip>
             </div>
-          )}
+            {/*// TODO: tag filters*/}
+            {postFiltersTags && (
+              <div className={`${styles.FilterTagsWrapper}`}>
+                <PostsFiltersTags
+                  tags={postFiltersTags}
+                  onCloseTag={removeFilterPerKey}
+                />
+              </div>
+            )}
+          </div>
           <Form.Item
             name="title"
             label="Filtrar por titulo"

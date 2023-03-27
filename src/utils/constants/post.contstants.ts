@@ -1,6 +1,6 @@
-import { PostFiltersTagNamesTypes } from '@interfaces/posts.interface'
+import { PostFiltersTagNamesType } from '@interfaces/posts.interface'
 
-export const PostFiltersTagNames: PostFiltersTagNamesTypes = {
+export const PostFiltersTagNames: PostFiltersTagNamesType = {
   title: 'Titulo',
   categoryId: 'Categoria',
   subCategoryId: 'Sub categoria',
