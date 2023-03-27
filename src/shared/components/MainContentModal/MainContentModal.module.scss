@@ -7,4 +7,8 @@
   left: 0;
   z-index: 99;
   overflow: auto;
+  
+  &.Transparent {
+    background-color: transparent;
+  }
 }

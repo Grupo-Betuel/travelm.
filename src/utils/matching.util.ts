@@ -1,3 +1,4 @@
+import { IOption } from '@interfaces/common.intefacce'
 import { cleanText } from './text.utils'
 
 export const isNotEmptyObject = (obj: any) => {
@@ -12,3 +13,5 @@ export function deepMatch<T>(value: any, values: T[] = []): T[] {
   )
   return results
 }
+
+export const filterOptions = (inputValue: string, option: IOption) => !!deepMatch(inputValue, [option]).length

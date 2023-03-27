@@ -11,3 +11,4 @@ export const PostFiltersTagNames: PostFiltersTagNamesType = {
   createAt: 'Creado',
   commission: 'Comision',
 }
+

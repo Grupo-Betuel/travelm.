@@ -2,7 +2,16 @@ import { Header } from 'antd/lib/layout/layout'
 import logo from '@assets/images/logo.png'
 import Image from 'next/image'
 import styles from './Navbar.module.scss'
-import { Button, Drawer, Dropdown, Input, MenuProps, Modal, Select } from 'antd'
+import {
+  AutoComplete,
+  Button,
+  Drawer,
+  Dropdown,
+  Input,
+  MenuProps,
+  Modal,
+  Select,
+} from 'antd'
 import {
   ChangeEvent,
   useCallback,
@@ -34,6 +43,10 @@ import { DatesDrawer } from '@shared/layout/components/DatesDrawer'
 import { Messaging } from '@screens/Messaging'
 import { handleSearchPostHook } from '@shared/hooks/handleSearchPostHook'
 import { appPostsFiltersContext } from 'src/pages/_app'
+import { HistoryEntity } from '@shared/entities/HistoryEntity'
+import { HISTORY_CONSTRAINTS } from '@shared/enums/history.enum'
+import { parseToOptionList } from 'src/utils/objects.utils'
+import { filterOptions } from 'src/utils/matching.util'
 
 const { Option } = Select
 
@@ -41,6 +54,8 @@ export interface ICategorySelect {
   categories: CategoryEntity[]
   onSelect: (slug: string) => void
 }
+
+export type NavbarToolsTypes = 'dates' | 'messaging' | 'notifications'
 
 const SelectBefore = (props: ICategorySelect) => (
   <Select
@@ -58,7 +73,7 @@ const SelectBefore = (props: ICategorySelect) => (
 
 export const Navbar = () => {
   const router = useRouter()
-
+  const [currentNavbarTool, setCurrentNavbarTool] = useState<NavbarToolsTypes>()
   const [showAllCategories, setShowAllCategories] = useState<boolean>(false)
   const [showNotification, setShowNotification] = useState<boolean>(false)
   const [showMessaging, setShowMessaging] = useState<boolean>(false)
@@ -70,12 +85,18 @@ export const Navbar = () => {
   const authIsEnable = router.query.auth
   const { makeContextualHref, returnHref } = useContextualRouting()
   const handleReturnToHref = () => router.push(returnHref)
-  const authUser = getAuthData('access_token') as UserEntity
+  const authUser = getAuthData('user') as UserEntity
   const {
     data: categories,
     get: getCategories,
     ['trending-categories']: trendingCategories,
   } = handleEntityHook<CategoryEntity>('categories', true)
+  const {
+    data: userHistory,
+    get: getHistory,
+    add: addHistory,
+  } = handleEntityHook<HistoryEntity>('searches')
+
   const enableContextSearch = !returnHref.includes('search')
   const { applyFilters } = handleSearchPostHook()
   const { appPostsFilters, setAppPostsFilters } = useContext(
@@ -86,10 +107,13 @@ export const Navbar = () => {
   }
 
   useEffect(() => {
-    setTimeout(() => {
-      const { title } = router.query
-      // setSearchValue(title as string)
-    })
+    if (authUser._id) {
+      getHistory({
+        queryParams: {
+          userId: authUser._id,
+        },
+      })
+    }
   }, [])
 
   const getTrendingCats = () =>
@@ -126,6 +150,13 @@ export const Navbar = () => {
     setShowDates(!showDates)
   }
 
+  const createUserHistory = (title: string) => {
+    if (title.length > HISTORY_CONSTRAINTS.MIN_SEARCH_LENGTH && authUser._id) {
+      console.log('addHistory', addHistory)
+      addHistory({ userId: authUser._id, search: title })
+      getHistory({ queryParams: { userId: authUser._id } })
+    }
+  }
   const onSearch =
     (contextSearch: boolean = false) =>
     (data: ChangeEvent<HTMLInputElement> | string) => {
@@ -140,12 +171,14 @@ export const Navbar = () => {
       if (contextSearch) {
         if (!enableContextSearch) return
         applyFilters({ title: title || '' })
+        createUserHistory(title)
       } else {
         setAppPostsFilters({})
         router.push({
           pathname: '/search/',
           query: { title, categorySlug, clearFilters: true },
         })
+        createUserHistory(title)
         setShowContextSearchModal(false)
       }
     }
@@ -165,6 +198,14 @@ export const Navbar = () => {
     setShowContextSearchModal(false)
   }
 
+  const handleCurrentNavbarTool = (tool: NavbarToolsTypes) => () => {
+    setCurrentNavbarTool(currentNavbarTool === tool ? undefined : tool)
+  }
+
+  const closeCurrentNavTool = () => {
+    setCurrentNavbarTool(undefined)
+  }
+
   return (
     <>
       <Header className={styles.navbar}>
@@ -177,22 +218,29 @@ export const Navbar = () => {
             </div>
           </div>
           <div className={`${styles.navbarBrowserWrapper} flex-center-center`}>
-            <Input.Search
-              value={
-                searchValue === undefined ? router.query.title : searchValue
-              }
-              size="large"
-              allowClear
-              addonBefore={
-                <SelectBefore
-                  categories={categories}
-                  onSelect={onSelectCategory}
-                />
-              }
-              placeholder="Messaging"
-              onChange={onSearch(true)}
-              onSearch={onSearch(false)}
-            />
+            <AutoComplete
+              style={{ width: '100%' }}
+              options={parseToOptionList(userHistory, 'search', 'search')}
+              filterOption={true}
+              onSelect={onSearch(false)}
+            >
+              <Input.Search
+                value={
+                  searchValue === undefined ? router.query.title : searchValue
+                }
+                size="large"
+                allowClear
+                addonBefore={
+                  <SelectBefore
+                    categories={categories}
+                    onSelect={onSelectCategory}
+                  />
+                }
+                placeholder="Messaging"
+                onChange={onSearch(true)}
+                onSearch={onSearch(false)}
+              />
+            </AutoComplete>
           </div>
           <div className={`${styles.navbarOptionsList} flex-end-center`}>
             <HandleAuthVisibility
@@ -226,7 +274,7 @@ export const Navbar = () => {
             >
               <BellOutlined
                 className={styles.navbarIconOption}
-                onClick={toggleNotificationDrawer}
+                onClick={handleCurrentNavbarTool('notifications')}
               />
             </HandleAuthVisibility>
             <HandleAuthVisibility
@@ -235,7 +283,7 @@ export const Navbar = () => {
             >
               <MessageOutlined
                 className={styles.navbarIconOption}
-                onClick={toggleMessagingDrawer}
+                onClick={handleCurrentNavbarTool('messaging')}
               />
             </HandleAuthVisibility>
             <HandleAuthVisibility
@@ -244,7 +292,7 @@ export const Navbar = () => {
             >
               <CalendarOutlined
                 className={styles.navbarIconOption}
-                onClick={toggleDatesDrawer}
+                onClick={handleCurrentNavbarTool('dates')}
               />
             </HandleAuthVisibility>
           </div>
@@ -272,22 +320,33 @@ export const Navbar = () => {
         authenticate={authenticate}
       />
       {authUser && (
-        <NotificationDrawer
-          open={showNotification}
-          onClose={toggleNotificationDrawer}
-        />
-      )}
-      {authUser && (
-        <Drawer open={showMessaging} onClose={toggleMessagingDrawer}>
-          <Messaging sidebarMode />
-        </Drawer>
-      )}
-      {authUser && (
-        <DatesDrawer
-          size="large"
-          open={showDates}
-          onClose={toggleDatesDrawer}
-        />
+        <MainContentModal show={!!currentNavbarTool} transparent>
+          <Drawer
+            open={!!currentNavbarTool}
+            getContainer={false}
+            onClose={closeCurrentNavTool}
+            size={currentNavbarTool === 'dates' ? 'large' : undefined}
+            bodyStyle={{ padding: 0 }}
+          >
+            {/* /// TODO: remove drawer prefix in these components */}
+            {currentNavbarTool === 'notifications' && (
+              <NotificationDrawer
+                getContainer={false}
+                open={showNotification}
+                onClose={toggleNotificationDrawer}
+              />
+            )}
+            {currentNavbarTool === 'messaging' && <Messaging sidebarMode />}
+
+            {currentNavbarTool === 'dates' && (
+              <DatesDrawer
+                getContainer={false}
+                open={showDates}
+                onClose={toggleDatesDrawer}
+              />
+            )}
+          </Drawer>
+        </MainContentModal>
       )}
       <Modal
         title="Basic Modal"

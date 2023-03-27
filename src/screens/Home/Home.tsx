@@ -8,6 +8,7 @@ import { PostEntity } from '@shared/entities/PostEntity'
 import { useEffect } from 'react'
 import { handleEntityHook } from '@shared/hooks/handleEntityHook'
 import { EndpointsAndEntityStateKeys } from '@shared/enums/endpoints.enum'
+import { getAuthData } from 'src/utils/auth.utils'
 
 export const Home = () => {
   const {
@@ -17,7 +18,7 @@ export const Home = () => {
     ['you-may-like']: youMayLikePosts,
     randomStoresPosts,
   } = handleEntityHook<PostEntity>('posts', true)
-
+  const authUser = getAuthData('user')
   useEffect(() => {
     // getting reseler posts
     getPosts({
@@ -35,8 +36,14 @@ export const Home = () => {
     // getting you may like posts
     getPosts({
       endpoint: EndpointsAndEntityStateKeys.YOU_MAY_LIKE,
-      queryParams: { userId: '63acacde930fa11a04bc351f' },
+      queryParams: { userId: authUser._id as string },
     })
+
+     // getting most viewd posts
+    //  getPosts({
+    //   endpoint: EndpointsAndEntityStateKeys.YOU_MAY_LIKE,
+    //   queryParams: { userId: authUser._id },
+    // })
   }, [])
 
   return (

@@ -12,10 +12,11 @@ const footerName = 'StickyFooter'
 export interface ISidebarProps {
   children?: any
   className?: string
+  expanded?: boolean
 }
 
 export const Sidebar = (
-  { children, className }: ISidebarProps = { children: [] }
+  { children, className, expanded }: ISidebarProps = { children: [] }
 ) => {
   const sidebarRef = useRef<HTMLDivElement>()
   const [enableSidebarOptionHiddenHeight, setEnableSidebarOptionHiddenHeight] =
@@ -32,7 +33,10 @@ export const Sidebar = (
   )
 
   return (
-    <Sider className={`${styles.Sidebar}`} ref={sidebarRef as any}>
+    <Sider
+      className={`${styles.Sidebar} ${expanded ? styles.SidebarExpanded : ''}`}
+      ref={sidebarRef as any}
+    >
       <Affix
         className={styles.SidebarAffix}
         offsetTop={navbarOptionsHeight}

@@ -7,10 +7,12 @@ import styles from './MainContentModal.module.scss'
 export interface IMainContentModalProps {
   children?: any
   show?: boolean
+  transparent?: boolean
 }
 export const MainContentModal = ({
   children,
   show,
+  transparent,
 }: IMainContentModalProps) => {
   const [top, setTop] = useState(navbarOptionsHeight)
   const [enableSidebarOptionHiddenHeight, setEnableSidebarOptionHiddenHeight] =
@@ -20,7 +22,9 @@ export const MainContentModal = ({
 
   return show ? (
     <div
-      className={`${styles.MainContentModal} ${appViewportHeight.appViewportHeightClassName}`}
+      className={`${styles.MainContentModal} ${
+        transparent ? styles.Transparent : ''
+      } ${appViewportHeight.appViewportHeightClassName}`}
     >
       {children}
     </div>

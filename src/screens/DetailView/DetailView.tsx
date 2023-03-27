@@ -21,6 +21,11 @@ import { Resizable } from 're-resizable'
 import { sidebarWidth } from '../../utils/layout.utils'
 import { StickyFooter } from '@shared/layout/components/StickyFooter/StickyFooter'
 import { useContextualRouting } from 'next-use-contextual-routing'
+import { ViewEntity } from '@shared/entities/ViewEntity'
+import { VIEW_CONSTRAINTS } from '@shared/enums/view.enum'
+import { getAuthData } from 'src/utils/auth.utils'
+import { UserEntity } from '@shared/entities/UserEntity'
+import { EndpointsAndEntityStateKeys } from '@shared/enums/endpoints.enum'
 
 export interface IDetailViewProps {
   previewPost?: PostEntity
@@ -57,7 +62,20 @@ export const DetailView = ({
   } as PostEntity)
   const carouselRef = useRef<any>()
   const { get, item } = handleEntityHook<PostEntity>('posts')
+  const { add: addView } = handleEntityHook<ViewEntity>('views')
+  const [addViewTimeout, setAddViewTimeout] = useState<NodeJS.Timeout>()
   const { makeContextualHref } = useContextualRouting()
+  const authUser = getAuthData('user') as UserEntity
+
+  useEffect(() => {
+    const viewTimeout = setTimeout(() => {
+      handleAddView()
+    }, VIEW_CONSTRAINTS.TIMEOUT_LIMIT)
+    setAddViewTimeout(viewTimeout)
+
+    return () => clearTimeout(viewTimeout)
+  }, [])
+
   useEffect(() => {
     setPost({ ...item, ...previewPost, ...selectedPost } as PostEntity)
   }, [previewPost, item, selectedPost])
@@ -69,6 +87,18 @@ export const DetailView = ({
     }
   }, [router.query])
 
+  const handleAddView = () => {
+    if (!authUser._id || authUser._id === post.userId) return
+    addView(
+      {
+        postId: post._id as string,
+        userId: authUser._id,
+        postTitle: post.title,
+        subCategoryId: post.subCategoryId || "example",
+      },
+      { endpoint: EndpointsAndEntityStateKeys.CREATE }
+    )
+  }
   const back = () => {
     console.log('returnHref', returnHref)
     if (returnHref) {

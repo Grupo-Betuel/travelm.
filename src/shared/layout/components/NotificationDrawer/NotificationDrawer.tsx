@@ -24,11 +24,7 @@ export const NotificationDrawer = ({ ...props }: INotificationDrawerProps) => {
   const initLoading = false
 
   return (
-    <Drawer
-      className={styles.NotificationDrawer}
-      title="Notificaciones"
-      {...props}
-    >
+    <div className={styles.NotificationDrawer}>
       {authUser && <h3>{authUser.name} recuerda!</h3>}
       <List
         className="demo-loadmore-list"
@@ -58,6 +54,6 @@ export const NotificationDrawer = ({ ...props }: INotificationDrawerProps) => {
         <li className={`${styles.NotificationOption}`}>Como vender?</li>
         <li className={`${styles.NotificationOption}`}>Language</li>
       </ul>
-    </Drawer>
+    </div>
   )
 }

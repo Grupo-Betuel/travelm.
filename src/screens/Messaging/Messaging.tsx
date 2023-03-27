@@ -34,7 +34,7 @@ const ChatList = () => {
 export const Messaging = ({ sidebarMode }: IMessagingProps) => {
   return (
     <LayoutContent className={styles.Messaging}>
-      <Sidebar className={styles.MessagingChatsWrapper}>
+      <Sidebar className={styles.MessagingChatsWrapper} expanded={sidebarMode}>
         <Tabs
           items={[
             {

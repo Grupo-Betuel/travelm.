@@ -97,7 +97,7 @@ export const DatesDrawer = ({ ...props }: IDatesDrawerProps) => {
   }
 
   return (
-    <Drawer className={styles.DatesDrawer} title="Citas" {...props}>
+    <div className={styles.DatesDrawer}>
       {authUser && <h3>{authUser.name} recuerda!</h3>}
       <Calendar
         dateCellRender={dateCellRender}
@@ -131,6 +131,6 @@ export const DatesDrawer = ({ ...props }: IDatesDrawerProps) => {
         <li className={`${styles.DatesOption}`}>Como vender?</li>
         <li className={`${styles.DatesOption}`}>Language</li>
       </ul>
-    </Drawer>
+    </div>
   )
 }

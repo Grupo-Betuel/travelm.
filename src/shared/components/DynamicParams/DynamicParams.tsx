@@ -58,6 +58,7 @@ export const DynamicParams = ({
   }
 
   useEffect(() => {
+    console.log('selectedParams =>',  selectedParams);
     parseSelectedParamsToFormValue()
   }, [selectedParams])
 

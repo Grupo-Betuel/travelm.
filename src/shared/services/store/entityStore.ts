@@ -76,7 +76,6 @@ export function stateHandlerSuccess<T extends BaseEntity>(
     case 'add':
       set((state: any) => ({
         ...state,
-        [key]: state.data,
         item: item ? item : state.item,
         data: { ...state.data, ...endpointData },
         loading: false,

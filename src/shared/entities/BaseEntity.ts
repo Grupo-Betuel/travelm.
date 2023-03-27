@@ -1,3 +1,3 @@
 export class BaseEntity {
-  _id: string = ''
+  _id?: string = ''
 }

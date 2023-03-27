@@ -12,6 +12,10 @@ import { CategoryEntity } from '@shared/entities/CategoryEntity'
 import { CategoryService } from '@services/categoryService'
 import { ParamEntity } from '@shared/entities/ParamEntity'
 import { ParamService } from '@services/paramService'
+import { HistoryEntity } from '@shared/entities/HistoryEntity'
+import { HistoryService } from './historyService'
+import { ViewEntity } from '@shared/entities/ViewEntity'
+import { ViewService } from './viewService'
 
 export type EntityNamesType =
   | 'posts'
@@ -19,6 +23,8 @@ export type EntityNamesType =
   | 'auth/login'
   | 'categories'
   | 'filter-params'
+  | 'searches'
+  | 'views'
 
 export type EntityPerServiceType = {
   [N in EntityNamesType]: {
@@ -47,6 +53,14 @@ export const appEntitiesWithService: EntityPerServiceType = {
   'filter-params': {
     entity: new ParamEntity(),
     service: new ParamService(),
+  },
+  searches: {
+    entity: new HistoryEntity(),
+    service: new HistoryService(),
+  },
+  views: {
+    entity: new ViewEntity(),
+    service: new ViewService(),
   },
 }
 

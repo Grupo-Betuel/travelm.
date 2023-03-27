@@ -10,6 +10,10 @@
   flex-direction: column;
   height: 100%;
 
+  &.SidebarExpanded {
+    width: 100% !important;
+  }
+
   .SidebarAffix {
     height: 100%;
     > div {
