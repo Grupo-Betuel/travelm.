@@ -1,15 +1,14 @@
-import { handleEntityHook } from '@shared/hooks/handleEntityHook'
 import { PostEntity } from '@shared/entities/PostEntity'
 import { useRouter } from 'next/router'
-import { deepMatch, isNotEmptyObject } from '../../utils/matching.util'
-import { EffectCallback, useContext, useEffect, useRef, useState } from 'react'
+import { isNotEmptyObject } from '../../utils/matching.util'
+import { useEffect, useRef, useState } from 'react'
 import { EndpointsAndEntityStateKeys } from '@shared/enums/endpoints.enum'
 import { useContextualRouting } from 'next-use-contextual-routing'
 import { IPostFilters } from '@interfaces/posts.interface'
 import { IPaginatedResponse } from '@interfaces/pagination.interface'
 import { CategoryEntity } from '@shared/entities/CategoryEntity'
+import queryString from 'query-string'
 import { useInfiniteScroll } from './useInfiniteScrollHook'
-import { appPostsFiltersContext } from '../../pages/_app'
 export interface IHandleSearchPostHookData {
   posts: PostEntity[]
   pagination: IPaginatedResponse<PostEntity>
@@ -26,7 +25,7 @@ export const handleSearchPostHook = (): IHandleSearchPostHookData => {
   const router = useRouter()
   const [posts, setPosts] = useState<PostEntity[]>([])
   const [noMoreContent, setNoMoreContent] = useState<boolean>(false)
-  const { makeContextualHref } = useContextualRouting()
+  const { makeContextualHref, returnHref } = useContextualRouting()
   const didMount = useRef(false)
   const queryRef = useRef(router.query)
 
@@ -63,13 +62,24 @@ export const handleSearchPostHook = (): IHandleSearchPostHookData => {
     setPosts(infinityScrollData?.data || [])
   }, [infinityScrollData?.data])
 
+  // TODO: check why this is being executed twice
   useEffect(() => {
+    console.log('return', returnHref)
     // if (JSON.stringify(queryRef.current) !== JSON.stringify(router.query)) {
     //   console.log('query =>', router.query, queryRef.current)
     //   queryRef.current = router.query
     //   console.log('changed')
-    console.log("query =>", router.query)
-    if (isNotEmptyObject(router.query) && !router.query.slug && !router.query.return) {
+    console.log('query =>', router.query)
+
+    // clearing filters
+    if (router.query.clearFilters) {
+      allFilters = {}
+    }
+    if (
+      isNotEmptyObject(router.query) &&
+      !router.query.slug &&
+      !router.query.return
+    ) {
       getPosts()
       // console.log('changed')
       // queryRef.current = router.query
@@ -89,7 +99,6 @@ export const handleSearchPostHook = (): IHandleSearchPostHookData => {
       ? allFilters
       : router.query
 
-    console.log('filters to apply', filtersToApply)
     if (isNotEmptyObject(filtersToApply)) {
       allFilters = filtersToApply
       const getProps = {
@@ -104,14 +113,27 @@ export const handleSearchPostHook = (): IHandleSearchPostHookData => {
     }
   }
 
+  const parsePostFilters = (filters: IPostFilters): IPostFilters => {
+    const responseF: IPostFilters = {}
+    const f: IPostFilters = { ...allFilters, ...filters }
+    console.log('filters =>', f)
+    ;(Object.keys(f) as (keyof IPostFilters)[]).forEach(
+      (key: keyof IPostFilters) => {
+        const v = f[key]
+        if (!!v) {
+          ;(responseF as any)[key] = v
+        }
+        if (typeof v === 'object') {
+          responseF[key] = JSON.stringify(v) as any
+        }
+      }
+    )
+
+    return responseF
+  }
+
   const applyFilters = (filters: Partial<IPostFilters>) => {
-    allFilters = { ...allFilters, ...filters }
-    // Object.keys({ ...appPostsFilters, ...allFilters, ...filters }).forEach(key => {
-    //   if(isA)
-    // })
-    setTimeout(() => {
-      console.log('filters', allFilters)
-    })
+    allFilters = parsePostFilters(filters)
     const queryString = new URLSearchParams(allFilters as any).toString()
     const searchPath = `/search/?${queryString}`
     router.push(makeContextualHref(allFilters), searchPath, {

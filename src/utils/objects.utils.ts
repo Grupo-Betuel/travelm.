@@ -24,18 +24,21 @@ export enum ObjectQueryIdentifierEnum {
 }
 
 export function parseQueryToObject<T>(path: string): T {
-  const res: T = queryString.parse(path, {
-    arrayFormat: 'comma',
-    parseNumbers: true,
-  }) as T
-  ;(Object.keys(res as object) as any).forEach((K: keyof T) => {
-    if (
-      typeof res[K] === 'string' &&
-      (res[K] as string).includes(ObjectQueryIdentifierEnum.OBJECT)
-    ) {
-      res[K] = JSON.parse(res[K] as string)
+  const res: T = Object.fromEntries(new URLSearchParams(path))
+  
+  // const res: T = queryString.parse(path, {
+  //   arrayFormat: 'comma',
+  //   parseNumbers: true,
+  // }) as T
+
+  console.log('res filters', res, path)
+  Object.keys(res).forEach((K: any) => {
+    const v = (res as any)[K]
+    if (v.includes('{') || v.includes('[')) {
+      ;(res as any)[K] = JSON.parse(v)
     }
   })
 
+  console.log('results', res)
   return res
 }

@@ -9,6 +9,7 @@ $filterItemPadding: 15px 30px;
     align-items: center;
     justify-content: space-between;
     padding: $filterItemPadding;
+    margin: 0 ;
 
     &.Column {
       flex-direction: column;

@@ -83,25 +83,28 @@ function MyApp({ Component, pageProps }: AppProps<IAppProps>) {
       )}
 
       {/*TODO: Check if global posts filters is neccesarry*/}
-      {/*<appPostsFiltersContext.Provider*/}
-      {/*  value={{ appPostsFilters, setAppPostsFilters }}*/}
-      {/*>*/}
-      <AppLoadingContext.Provider value={{ appLoading, setAppLoading }}>
-        <AppViewportHeightContext.Provider
-          value={{ appViewportHeightClassName, setAppviewPortHeightClassName }}
-        >
-          <AppLayout>
-            <Affix
-              offsetTop={navbarOptionsHeight}
-              target={() => document.getElementById(layoutId)}
-              onChange={onChangeLayoutAffix}
-              children=""
-            />
-            <Component {...pageProps} />
-          </AppLayout>
-        </AppViewportHeightContext.Provider>
-      </AppLoadingContext.Provider>
-      {/*</appPostsFiltersContext.Provider>*/}
+      <appPostsFiltersContext.Provider
+        value={{ appPostsFilters, setAppPostsFilters }}
+      >
+        <AppLoadingContext.Provider value={{ appLoading, setAppLoading }}>
+          <AppViewportHeightContext.Provider
+            value={{
+              appViewportHeightClassName,
+              setAppviewPortHeightClassName,
+            }}
+          >
+            <AppLayout>
+              <Affix
+                offsetTop={navbarOptionsHeight}
+                target={() => document.getElementById(layoutId)}
+                onChange={onChangeLayoutAffix}
+                children=""
+              />
+              <Component {...pageProps} />
+            </AppLayout>
+          </AppViewportHeightContext.Provider>
+        </AppLoadingContext.Provider>
+      </appPostsFiltersContext.Provider>
       <ToastContainer />
     </ConfigProvider>
   )

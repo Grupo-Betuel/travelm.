@@ -1,6 +1,6 @@
 import styles from './FiltersSidebar.module.scss'
 import { Button, Checkbox, Form, Input, Slider, Tag, TreeSelect } from 'antd'
-import { ChangeEvent, useEffect, useState } from 'react'
+import React, { ChangeEvent, useContext, useEffect, useState } from 'react'
 import { cleanText } from '../../../utils/text.utils'
 import { DynamicParams } from '@shared/components'
 import {
@@ -21,6 +21,8 @@ import { IFilterParam } from '@interfaces/params.interface'
 import { useRouter } from 'next/router'
 import { parseQueryToObject } from '../../../utils/objects.utils'
 import { PostFiltersTagNames } from '../../../utils/constants/post.contstants'
+import { appPostsFiltersContext } from 'src/pages/_app'
+import { isNotEmptyObject } from 'src/utils/matching.util'
 
 export interface IFilterSidebarProps {
   applyFilters: (filters: IPostFilters) => void
@@ -31,22 +33,36 @@ export const FiltersSidebar = ({
   applyFilters,
   categories,
 }: IFilterSidebarProps) => {
-  const [filters, setFilters] = useState<IPostFilters>({})
+  // const [filters, setFilters] = useState<IPostFilters>({})
+  const { appPostsFilters, setAppPostsFilters } = useContext(
+    appPostsFiltersContext
+  )
   const { 'by-ids': filterParams, get: getParams } =
     handleEntityHook<ParamEntity>('filter-params')
   const router = useRouter()
-
-  const handleFilters = (newFilters: IPostFilters = {}) => {
-    console.log('klk??', { ...filters, ...newFilters })
-    applyFilters({ ...filters, ...newFilters })
-    loadPostFiltersTags()
-  }
-
   const [postsFiltersForm] = Form.useForm<IPostFilters>()
 
   useEffect(() => {
     loadFiltersFromQuery()
   }, [])
+
+  useEffect(() => {
+    if (!isNotEmptyObject(appPostsFilters)) {
+      postsFiltersForm.resetFields()
+      loadPostFiltersTags();
+    }
+  }, [appPostsFilters])
+
+  const handleFilters = (newFilters: IPostFilters = {}) => {
+    applyFilters({ ...appPostsFilters, ...newFilters })
+    loadPostFiltersTags()
+  }
+
+  const onFilterByTitle = ({
+    target: { value },
+  }: React.ChangeEvent<HTMLInputElement>) => {
+    handleFilters({ ...appPostsFilters, title: value })
+  }
 
   const loadFiltersFromQuery = () => {
     const queryFilters = parseQueryToObject<IPostFilters>(router.asPath)
@@ -58,20 +74,23 @@ export const FiltersSidebar = ({
 
     loadDynamicParamsFromSelectedCategory(queryFilters)
 
-    setFilters({
-      ...filters,
+    setAppPostsFilters({
+      ...appPostsFilters,
       priceRange: queryFilters.priceRange,
       categoryId: queryFilters.categoryId,
       subCategoryId: queryFilters.subCategoryId,
       role: queryFilters.role,
+      filterParams: queryFilters.filterParams,
     })
   }
 
   const loadDynamicParamsFromSelectedCategory = (
     queryFilters: IPostFilters
   ) => {
-    if (queryFilters.categoryId) {
-      const selectedCat = getCategoryById(queryFilters.categoryId)
+    if (queryFilters.categoryId || queryFilters.subCategoryId) {
+      const selectedCat = getCategoryById(
+        (queryFilters.categoryId || queryFilters.subCategoryId) as string
+      )
       if (selectedCat) {
         onSelectCategory(queryFilters.categoryId, { data: selectedCat })
       }
@@ -98,8 +117,8 @@ export const FiltersSidebar = ({
   }
 
   const onChangeRole = (checkedValue: Array<CheckboxValueType>) => {
-    setFilters({
-      ...filters,
+    setAppPostsFilters({
+      ...appPostsFilters,
       role: checkedValue as UserRoles[],
     })
   }
@@ -108,28 +127,32 @@ export const FiltersSidebar = ({
     target: { value, name },
   }: ChangeEvent<HTMLInputElement>) => {
     if (!value) return
-    const val1 = filters.priceRange ? Number(filters.priceRange[0]) : 0
-    const val2 = filters.priceRange ? Number(filters.priceRange[1]) : 0
+    const val1 = appPostsFilters.priceRange
+      ? Number(appPostsFilters.priceRange[0])
+      : 0
+    const val2 = appPostsFilters.priceRange
+      ? Number(appPostsFilters.priceRange[1])
+      : 0
     const priceRange: [number, number] =
       name === 'first' ? [Number(value), val2] : [val1, Number(value)]
 
-    setFilters({
-      ...filters,
+    setAppPostsFilters({
+      ...appPostsFilters,
       priceRange,
     })
   }
 
   const onChangeRangePrice = (data: [number, number]) => {
-    setFilters({
-      ...filters,
+    setAppPostsFilters({
+      ...appPostsFilters,
       priceRange: data,
     })
   }
 
   const onChangeCategory = (value?: string) => {
     if (!value) {
-      setFilters({
-        ...filters,
+      setAppPostsFilters({
+        ...appPostsFilters,
         subCategoryId: '',
         categoryId: '',
       })
@@ -158,15 +181,15 @@ export const FiltersSidebar = ({
       ? { categoryId: id, subCategoryId: '' }
       : { subCategoryId: id, categoryId: '' }
 
-    setFilters({
-      ...filters,
+    setAppPostsFilters({
+      ...appPostsFilters,
       ...categoryFilter,
     })
   }
 
   const onChangeFilterParams = (filterParams: IFilterParam[]) => {
-    setFilters({
-      ...filters,
+    setAppPostsFilters({
+      ...appPostsFilters,
       filterParams,
     })
   }
@@ -183,13 +206,12 @@ export const FiltersSidebar = ({
   }))
 
   const filterCategoriesOptions = (input: string, option?: IOption) => {
-    const inputCleaned = cleanText(input);
-    const optionLabelCleaned = cleanText(option?.label ?? '');
-    return optionLabelCleaned.includes(inputCleaned);
+    const inputCleaned = cleanText(input)
+    const optionLabelCleaned = cleanText(option?.label ?? '')
+    return optionLabelCleaned.includes(inputCleaned)
   }
 
   const roles = [
-    { value: '', label: 'Todos' },
     { value: UserRoles.RESELLER, label: 'Revendedores' },
     { value: UserRoles.SELLER, label: 'Vendedores' },
     { value: UserRoles.STORE, label: 'Tiendas' },
@@ -223,17 +245,17 @@ export const FiltersSidebar = ({
   ]
 
   const [postFiltersTags, setPostFiltersTags] =
-    useState<PostFiltersTagNamesTypes>({})
+    useState<PostFiltersTagNamesTypes>()
 
   const loadPostFiltersTags = () => {
     const tags: PostFiltersTagNamesTypes = {}
-    ;(Object.keys(filters) as any).forEach((K: keyof IPostFilters) => {
-      if (!filters[K]) return
+    ;(Object.keys(appPostsFilters) as any).forEach((K: keyof IPostFilters) => {
+      if (!appPostsFilters[K]) return
       const label = PostFiltersTagNames[K]
-      let value = filters[K]
+      let value = appPostsFilters[K]
 
-      if ((K === 'categoryId' || K === 'subCategoryId') && filters[K]) {
-        const cat = getCategoryById(filters[K] as string)
+      if ((K === 'categoryId' || K === 'subCategoryId') && appPostsFilters[K]) {
+        const cat = getCategoryById(appPostsFilters[K] as string)
         if (cat) {
           value = cat.name
         }
@@ -243,7 +265,7 @@ export const FiltersSidebar = ({
       console.log('tags[K] =>', tags[K])
     })
 
-    console.log('filters ->', filters, tags)
+    console.log('appPostsFilters ->', appPostsFilters, tags)
 
     setPostFiltersTags(tags)
   }
@@ -251,11 +273,11 @@ export const FiltersSidebar = ({
   const removeFilterPerKey = (key: keyof IPostFilters) => () => {
     console.log('removeFilterPerKey() called, key: ', key)
     const newFilters = {
-      ...filters,
+      ...appPostsFilters,
       [key]: '',
     }
     console.log('newFilters: ', newFilters)
-    setFilters(newFilters)
+    setAppPostsFilters(newFilters)
 
     let formKey = key === 'subCategoryId' ? 'categoryId' : key
     postsFiltersForm.setFieldValue(formKey, '')
@@ -268,19 +290,38 @@ export const FiltersSidebar = ({
         <Form<IPostFilters> form={postsFiltersForm} layout="vertical">
           <h3 className={styles.FilterTitle}>Filtros</h3>
           {/*// TODO: tag filters*/}
-          <div className={`${styles.FilterTagsWrapper}`}>
-            {(Object.keys(postFiltersTags) as any).map(
-              (f: keyof IPostFilters) => {
-                return (
-                  postFiltersTags[f] && (
-                    <Tag color="green" closable onClose={removeFilterPerKey(f)}>
-                      <span>{postFiltersTags[f]}</span>
-                    </Tag>
+          {postFiltersTags && (
+            <div className={`${styles.FilterTagsWrapper}`}>
+              {(Object.keys(postFiltersTags) as any).map(
+                (f: keyof IPostFilters) => {
+                  return (
+                    postFiltersTags[f] && (
+                      <Tag
+                        color="green"
+                        closable
+                        onClose={removeFilterPerKey(f)}
+                      >
+                        <span>{postFiltersTags[f]}</span>
+                      </Tag>
+                    )
                   )
-                )
-              }
-            )}
-          </div>
+                }
+              )}
+            </div>
+          )}
+          <Form.Item
+            name="title"
+            label="Filtrar por titulo"
+            className={`${styles.FilterWrapper} ${styles.Column}`}
+          >
+            <Input.Search
+              value={appPostsFilters.title}
+              size="large"
+              allowClear
+              placeholder="Filtrar"
+              onChange={onFilterByTitle}
+            />
+          </Form.Item>
           <Form.Item
             name="categoryId"
             label="Selecciona Categoria"
@@ -308,7 +349,7 @@ export const FiltersSidebar = ({
               onChange={onChangeRole}
             />
           </Form.Item>
-          {/* TODO: Check what should be a good filters type for those styled list*/}
+          {/* TODO: Check what should be a good appPostsFilters type for those styled list*/}
           {/*<div className={styles.FilterList}>*/}
           {/*  {Array.from(new Array(5)).map((item, i) => (*/}
           {/*    <div className={styles.FilterListItem} key={i}>*/}
@@ -327,7 +368,11 @@ export const FiltersSidebar = ({
                 type="number"
                 name="first"
                 style={{ width: '50%' }}
-                value={filters.priceRange ? filters.priceRange[0] : undefined}
+                value={
+                  appPostsFilters.priceRange
+                    ? appPostsFilters.priceRange[0]
+                    : undefined
+                }
                 onChange={onChangeInputPrice}
               />
               <Input
@@ -336,7 +381,11 @@ export const FiltersSidebar = ({
                 name="second"
                 style={{ width: '50%' }}
                 onChange={onChangeInputPrice}
-                value={filters.priceRange ? filters.priceRange[1] : undefined}
+                value={
+                  appPostsFilters.priceRange
+                    ? appPostsFilters.priceRange[1]
+                    : undefined
+                }
               />
             </Input.Group>
           </Form.Item>
@@ -344,7 +393,7 @@ export const FiltersSidebar = ({
             <Slider
               range
               max={10000}
-              value={filters.priceRange}
+              value={appPostsFilters.priceRange}
               defaultValue={[20, 50]}
               onChange={onChangeRangePrice}
             />
@@ -352,7 +401,12 @@ export const FiltersSidebar = ({
         </Form>
         <div className={styles.FilterWrapper}>
           <DynamicParams
-            params={filterParams?.data || []}
+            params={
+              appPostsFilters.categoryId || appPostsFilters.subCategoryId
+                ? filterParams?.data || []
+                : []
+            }
+            selectedParams={appPostsFilters.filterParams}
             renderType="responseParameterType"
             onChanges={onChangeFilterParams}
           />

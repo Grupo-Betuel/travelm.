@@ -3,7 +3,13 @@ import logo from '@assets/images/logo.png'
 import Image from 'next/image'
 import styles from './Navbar.module.scss'
 import { Button, Drawer, Dropdown, Input, MenuProps, Modal, Select } from 'antd'
-import { ChangeEvent, useCallback, useEffect, useState } from 'react'
+import {
+  ChangeEvent,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from 'react'
 import { CategoriesDrawer } from '@shared/layout/components/CategoriesDrawer/CategoriesDrawer'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -27,6 +33,7 @@ import { HandleAuthVisibility } from '@shared/components'
 import { DatesDrawer } from '@shared/layout/components/DatesDrawer'
 import { Messaging } from '@screens/Messaging'
 import { handleSearchPostHook } from '@shared/hooks/handleSearchPostHook'
+import { appPostsFiltersContext } from 'src/pages/_app'
 
 const { Option } = Select
 
@@ -51,6 +58,7 @@ const SelectBefore = (props: ICategorySelect) => (
 
 export const Navbar = () => {
   const router = useRouter()
+
   const [showAllCategories, setShowAllCategories] = useState<boolean>(false)
   const [showNotification, setShowNotification] = useState<boolean>(false)
   const [showMessaging, setShowMessaging] = useState<boolean>(false)
@@ -70,7 +78,9 @@ export const Navbar = () => {
   } = handleEntityHook<CategoryEntity>('categories', true)
   const enableContextSearch = !returnHref.includes('search')
   const { applyFilters } = handleSearchPostHook()
-
+  const { appPostsFilters, setAppPostsFilters } = useContext(
+    appPostsFiltersContext
+  )
   const authenticate = () => {
     router.push(makeContextualHref({ auth: true }), 'auth', { shallow: true })
   }
@@ -122,16 +132,19 @@ export const Navbar = () => {
       const title: string = (data as ChangeEvent<HTMLInputElement>).target
         ? (data as ChangeEvent<HTMLInputElement>).target.value
         : (data as string)
+      console.log('title', title)
       setSearchValue(title)
       emptySearch(!!title)
 
       // if (!title) return
       if (contextSearch) {
+        if (!enableContextSearch) return
         applyFilters({ title: title || '' })
       } else {
+        setAppPostsFilters({})
         router.push({
           pathname: '/search/',
-          query: { title, categorySlug },
+          query: { title, categorySlug, clearFilters: true },
         })
         setShowContextSearchModal(false)
       }
