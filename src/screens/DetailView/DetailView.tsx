@@ -68,6 +68,7 @@ export const DetailView = ({
   const authUser = getAuthData('user') as UserEntity
 
   useEffect(() => {
+    if (previewPost) return
     const viewTimeout = setTimeout(() => {
       handleAddView()
     }, VIEW_CONSTRAINTS.TIMEOUT_LIMIT)
@@ -94,7 +95,7 @@ export const DetailView = ({
         postId: post._id as string,
         userId: authUser._id,
         postTitle: post.title,
-        subCategoryId: post.subCategoryId || "example",
+        subCategoryId: post.subCategoryId || 'example',
       },
       { endpoint: EndpointsAndEntityStateKeys.CREATE }
     )

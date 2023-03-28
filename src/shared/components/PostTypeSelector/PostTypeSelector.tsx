@@ -9,19 +9,19 @@ export const PostTypeSelector = () => {
   const router = useRouter()
   const postTypes: IVerticalPreviewCardItem[] = [
     {
-      image: img,
+      images: [img as string],
       title: 'Producto',
     },
     {
-      image:
-        'https://www.freeiconspng.com/thumbs/car-icon-png/transport-car-icon--6.png',
+      images:
+        ['https://www.freeiconspng.com/thumbs/car-icon-png/transport-car-icon--6.png'],
       title: 'Vehiculo',
     },
     {
-      image: 'https://cdn-icons-png.flaticon.com/512/2590/2590435.png',
+      images: ['https://cdn-icons-png.flaticon.com/512/2590/2590435.png'],
       title: 'Bienes Raices',
     },
-  ] as any
+  ]
 
   const onSelectPostType = (type: PostTypes) => () => {
     router.push(`/post/${type}`)
