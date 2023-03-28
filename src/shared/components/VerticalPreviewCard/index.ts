@@ -1,1 +1,1 @@
-export { VerticalPreviewCard } from "./VerticalPreviewCard";
+export { VerticalPreviewCard } from './VerticalPreviewCard'

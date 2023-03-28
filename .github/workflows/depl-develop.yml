@@ -1,0 +1,29 @@
+name: 'Deployment to Develop'
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+
+  create-envfile:
+    runs-on: self-hosted
+    steps:
+    - name: Make envfile
+      uses: SpicyPizza/create-envfile@v1.3
+      with:
+        envKey_NEXT_PUBLIC_API_URL: ${{ secrets.NEXT_PUBLIC_API_URL }}
+
+  depl-develop:
+    runs-on: self-hosted
+    needs: create-envfile
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          ref: master
+          clean: false
+      - name: Build the docker-compose stack
+        run: docker-compose up --build -d dev
+      - name: Check running containers
+        run: docker ps -a

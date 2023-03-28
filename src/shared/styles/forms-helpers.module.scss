@@ -1,18 +1,18 @@
 .error-message {
   color: crimson;
   font-weight: bold;
-  padding: .5rem 0;
+  padding: 0.5rem 0;
 }
 
 .requiredFieldError::after {
   @extend .error-message;
-  content: "Este campo es requerido";
+  content: 'Este campo es requerido';
 }
 
 @mixin minLength($length: 1) {
   .minLength#{$length}::after {
     @extend .error-message;
-    content: "Mínimo " + $length + " caracteres";
+    content: 'Mínimo ' + $length + ' caracteres';
   }
 }
 

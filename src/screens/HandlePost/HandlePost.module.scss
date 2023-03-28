@@ -1,7 +1,7 @@
-@use "/src/shared/styles/sizing-variables" as s;
-@use "/src/shared/styles/layout-variables" as layout;
-@import "/src/shared/styles/box-shadow-utils";
-@import "/src/shared/styles/border-utils";
+@use '/src/shared/styles/sizing-variables' as s;
+@use '/src/shared/styles/layout-variables' as layout;
+@import '/src/shared/styles/box-shadow-utils';
+@import '/src/shared/styles/border-utils';
 
 .HandlePost {
   .handlePostPreview {

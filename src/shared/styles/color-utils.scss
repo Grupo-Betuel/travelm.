@@ -1,9 +1,8 @@
-
 // generate a border-color, text, and background classes according to earch color in $colors
 @each $colorType, $variants in $colors {
   @each $variant, $color in $variants {
     $colorVariant: '-' + $variant;
-    @if($variant == 1) {
+    @if ($variant == 1) {
       // if it's first color variant the class will be ej: text-color-blue
       $colorVariant: '';
     }
