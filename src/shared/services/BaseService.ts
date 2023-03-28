@@ -60,7 +60,7 @@ export class BaseService<T> implements AbstractBaseService<T> {
       let { data } = await http.get<T[] | IPaginatedResponse<T>>(
         `${this.api}${extraPath}`,
         {
-          params: { ...properties.queryParams, perPage: 10 },
+          params: { ...properties.queryParams },
         }
       )
       if (enableCache) {
