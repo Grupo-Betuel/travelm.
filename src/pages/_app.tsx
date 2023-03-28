@@ -43,7 +43,7 @@ function MyApp({ Component, pageProps }: AppProps<IAppProps>) {
   const productEntity = useAppStore((state) => state.posts((s) => s))
   const authEntity = useAppStore((state) => state['auth/login']((s) => s))
   const [user, setUser] = useState<UserEntity | unknown>(null)
-  const [appLoading, setAppLoading] = useState<boolean>(false)
+  const [appLoading, setAppLoading] = useState<boolean>()
   const [appPostsFilters, setAppPostsFilters] = useState<IPostFilters>({})
   const [appViewportHeightClassName, setAppviewPortHeightClassName] =
     useState<AppViewportHeightClassNames>(

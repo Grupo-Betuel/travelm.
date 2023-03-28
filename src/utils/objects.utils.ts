@@ -24,15 +24,16 @@ export enum ObjectQueryIdentifierEnum {
 }
 
 export function parseQueryToObject<T>(path: string): T {
-  const res: T = Object.fromEntries(new URLSearchParams(path))
+  const res: T = Object.fromEntries(new URLSearchParams(path)) as T
   
+  // TODO: remove this comment 
   // const res: T = queryString.parse(path, {
   //   arrayFormat: 'comma',
   //   parseNumbers: true,
   // }) as T
 
   console.log('res filters', res, path)
-  Object.keys(res).forEach((K: any) => {
+  Object.keys(res as any).forEach((K: any) => {
     const v = (res as any)[K]
     if (v.includes('{') || v.includes('[')) {
       ;(res as any)[K] = JSON.parse(v)

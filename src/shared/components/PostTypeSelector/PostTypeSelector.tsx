@@ -9,7 +9,7 @@ export const PostTypeSelector = () => {
   const router = useRouter()
   const postTypes: IVerticalPreviewCardItem[] = [
     {
-      images: [img as string],
+      images: ["https://www.freeiconspng.com/thumbs/car-icon-png/transport-car-icon--6.png"],
       title: 'Producto',
     },
     {

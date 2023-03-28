@@ -14,7 +14,7 @@ export interface IEntityStore<T> {
   data: EntityDataType<T>
   item: T
   add: (
-    value: T,
+    value: Omit<T, '_id'>,
     properties?: IServiceMethodProperties<T>,
     enableCache?: boolean,
     cacheLifeTime?: number
