@@ -1,5 +1,4 @@
 import { Header } from 'antd/lib/layout/layout'
-import Image from 'next/image'
 import styles from './Navbar.module.scss'
 import {
   AutoComplete,
