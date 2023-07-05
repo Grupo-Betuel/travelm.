@@ -40,11 +40,9 @@ export enum AppViewportHeightClassNames {
 }
 function MyApp({ Component, pageProps }: AppProps<IAppProps>) {
   const userEntity = useAppStore((state) => state.users((s) => s))
-  const productEntity = useAppStore((state) => state.posts((s) => s))
   const authEntity = useAppStore((state) => state['auth/login']((s) => s))
   const [user, setUser] = useState<UserEntity | unknown>(null)
   const [appLoading, setAppLoading] = useState<boolean>()
-  const [appPostsFilters, setAppPostsFilters] = useState<IPostFilters>({})
   const [appViewportHeightClassName, setAppviewPortHeightClassName] =
     useState<AppViewportHeightClassNames>(
       AppViewportHeightClassNames.WITH_NAVBAR
@@ -52,9 +50,9 @@ function MyApp({ Component, pageProps }: AppProps<IAppProps>) {
 
   useEffect(() => {
     setAppLoading(
-      !!userEntity.loading || !!productEntity.loading || !!authEntity.loading
+      !!userEntity.loading || authEntity.loading
     )
-  }, [userEntity.loading, productEntity.loading, authEntity.loading])
+  }, [userEntity.loading, authEntity.loading])
 
   useEffect(() => {
     setUser(getAuthData())
@@ -83,9 +81,7 @@ function MyApp({ Component, pageProps }: AppProps<IAppProps>) {
       )}
 
       {/*TODO: Check if global posts filters is neccesarry*/}
-      <appPostsFiltersContext.Provider
-        value={{ appPostsFilters, setAppPostsFilters }}
-      >
+
         <AppLoadingContext.Provider value={{ appLoading, setAppLoading }}>
           <AppViewportHeightContext.Provider
             value={{
@@ -104,7 +100,6 @@ function MyApp({ Component, pageProps }: AppProps<IAppProps>) {
             </AppLayout>
           </AppViewportHeightContext.Provider>
         </AppLoadingContext.Provider>
-      </appPostsFiltersContext.Provider>
       <ToastContainer />
     </ConfigProvider>
   )

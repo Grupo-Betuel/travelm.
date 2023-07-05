@@ -1,3 +1,0 @@
-export enum VIEW_CONSTRAINTS {
-  TIMEOUT_LIMIT = 5000,
-}

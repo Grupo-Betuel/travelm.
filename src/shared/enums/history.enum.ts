@@ -1,3 +1,0 @@
-export enum HISTORY_CONSTRAINTS {
-  MIN_SEARCH_LENGTH = 3,
-}
