@@ -1,30 +1,36 @@
 @use 'src/shared/styles/layout-variables' as layout;
+@use 'src/shared/styles/color-variables' as colors;
 @import '../../shared/styles/sizing-variables';
-@import 'src/shared/styles/color-variables';
 
 .HomeWrapper {
   max-width: layout.$maxLandingWidth;
   width: 100%;
   .HomeContent {
-    padding: $size-large;
+    padding: $size-xxx-large * 2;
     display: flex;
     flex-direction: column;
-    gap: $size-large;
-    .HomeTopCardsGrid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(18.75rem, 1fr));
-      justify-items: start;
-      gap: $size-large;
-      position: relative;
-      margin-top: -250px;
+    gap: $size-xxx-large;
+    margin-top: -50px;
+    position: relative;
+    z-index: 1;
+    .HomeContentProducts {
+      .HomeContentProductsScrollViewCategories {
+        margin: $size-xxx-large * 3 0;
+      }
     }
-  }
-
-  .HomeSection {
-    padding: $size-large;
-    background-color: white;
-    box-shadow: 0.3125rem 0.3125rem 0.625rem rgba(0, 0, 0, 0.3);
-    border-radius: 0.625rem;
+    .HomeCardsGrid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: $size-x-large * 2;
+      position: relative;
+    }
+    .HomeSearchWrapper {
+      padding: 0 7rem;
+      .HomeInputSearch {
+        font-size: 2.5rem;
+        color: colors.$color-white-2;
+      }
+    }
   }
 }
 

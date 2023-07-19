@@ -9,16 +9,25 @@ import {
 } from '@services/appEntitiesWithService'
 import { EntityNamesType } from '@services/appEntitiesWithService'
 import { BaseEntity } from '@shared/entities/BaseEntity'
+import OrderEntity from '@shared/entities/OrderEntity'
 
 /// APP STORE
 export interface IAppStore extends AppEntitiesStoreType {
   count: number
   handleCount: (isSubs?: boolean) => () => void
+  handleCurrentOrder: (order: OrderEntity) => void
+  currentOrder: OrderEntity
 }
 
 export const appStore = (set: SetState<IAppStore>) => {
   const appStoreInit: IAppStore = {
     count: 0,
+    handleCurrentOrder: (order: OrderEntity) => {
+      set((state) => ({
+        ...state,
+        currentOrder: order,
+      }))
+    },
     handleCount: (isSubstract?: boolean) => () => {
       set((state) => ({
         ...state,
@@ -46,6 +55,7 @@ export interface IPersistStore {
 const persistStore = persist<IPersistStore>(
   (set) => ({
     name: 'Williams',
+    // order: new OrderEntity(),
   }),
   { name: 'persist/commission' }
 )

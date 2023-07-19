@@ -30,7 +30,7 @@ export const LandingCarousel = (props: IAppMainPromotionCarouselProps) => {
               <Image
                 className={styles.HomeCarouselItemImage}
                 rootClassName={styles.HomeCarouselItemImageWrapper}
-                src="https://imageup.me/images/f06c0473-da9c-4d46-b6a6-49f774bb640f.png"
+                src="https://i.pinimg.com/originals/eb/a7/60/eba760e4d470d2de478d26038e5fc9a9.jpg"
               ></Image>
             </div>
           </div>
@@ -39,7 +39,7 @@ export const LandingCarousel = (props: IAppMainPromotionCarouselProps) => {
               <Image
                 className={styles.HomeCarouselItemImage}
                 rootClassName={styles.HomeCarouselItemImageWrapper}
-                src="https://i.pinimg.com/originals/c4/a2/05/c4a2050a1cbbd8158e717f29185d9ab1.jpg"
+                src="https://i.pinimg.com/originals/eb/a7/60/eba760e4d470d2de478d26038e5fc9a9.jpg"
               ></Image>
             </div>
           </div>
@@ -48,7 +48,7 @@ export const LandingCarousel = (props: IAppMainPromotionCarouselProps) => {
               <Image
                 className={styles.HomeCarouselItemImage}
                 rootClassName={styles.HomeCarouselItemImageWrapper}
-                src="https://imageup.me/images/f06c0473-da9c-4d46-b6a6-49f774bb640f.png"
+                src="https://i.pinimg.com/originals/eb/a7/60/eba760e4d470d2de478d26038e5fc9a9.jpg"
               ></Image>
             </div>
           </div>
@@ -57,7 +57,7 @@ export const LandingCarousel = (props: IAppMainPromotionCarouselProps) => {
               <Image
                 className={styles.HomeCarouselItemImage}
                 rootClassName={styles.HomeCarouselItemImageWrapper}
-                src="https://imageup.me/images/f06c0473-da9c-4d46-b6a6-49f774bb640f.png"
+                src="https://i.pinimg.com/originals/eb/a7/60/eba760e4d470d2de478d26038e5fc9a9.jpg"
               ></Image>
             </div>
           </div>

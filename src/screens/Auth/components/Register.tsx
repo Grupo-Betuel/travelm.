@@ -1,37 +1,35 @@
 import { Button, Form, Input, Select } from 'antd'
 import { useAppStore } from '@services/store'
-import { UserEntity } from '@shared/entities/UserEntity'
+import { ClientEntity } from '@shared/entities/ClientEntity'
 import { MaskedInput } from 'antd-mask-input'
 import { useRouter } from 'next/router'
 import { IAuthProps } from '@screens/Auth/Auth'
 import { EndpointsAndEntityStateKeys } from '@shared/enums/endpoints.enum'
+import React from 'react'
+import { SendOutlined, UserAddOutlined } from '@ant-design/icons'
 
-export const Register = ({ isModal }: IAuthProps) => {
-  const userEntity = useAppStore((state) => state.users((stateu) => stateu))
-  const authEntity = useAppStore((state) =>
-    state['auth/login']((stateu) => stateu)
-  )
+export const Register = ({ isModal, onSubmit }: IAuthProps) => {
+  const clientEntity = useAppStore((state) => state.clients((stateu) => stateu))
   const router = useRouter()
 
-  const createUser = async (data: UserEntity) => {
-    data.storeMetadata = {
-      website: 'https://www.google.com',
-      info: 'info',
-      benefits: [''],
-    }
+  const createClient = async (data: ClientEntity) => {
     data.phone = Number(data.phone.toString().replace(/[- ()]/g, ''))
-
+    console.log('create client', data)
     if (
-      await userEntity.add(data, {
-        endpoint: EndpointsAndEntityStateKeys.CREATE,
+      await clientEntity.add(data, {
+        endpoint: EndpointsAndEntityStateKeys.REGISTER,
       })
     ) {
       if (
-        await authEntity.add({
-          email: data.email,
-          password: data.password,
-        })
+        await clientEntity.add(
+          {
+            phone: data.phone,
+            password: data.password,
+          },
+          { endpoint: EndpointsAndEntityStateKeys.LOGIN }
+        )
       ) {
+        if (onSubmit) return onSubmit(data)
         if (isModal) {
           router.back()
         } else {
@@ -39,65 +37,52 @@ export const Register = ({ isModal }: IAuthProps) => {
         }
       }
     } else {
-      router.push('/auth')
+      // router.push('/auth')
     }
   }
 
   return (
     <Form
+      className="pt-s"
       name="registerUser"
-      labelCol={{ span: 8 }}
-      wrapperCol={{ span: 16 }}
+      layout="vertical"
       initialValues={{ remember: true }}
-      onFinish={createUser}
+      onFinish={createClient}
     >
-      <Form.Item label="Name" name="name" rules={[{ required: true }]}>
+      <Form.Item label="Nombre" name="firstName" rules={[{ required: true }]}>
         <Input size="large" />
       </Form.Item>
       <Form.Item label="Apellido" name="lastName" rules={[{ required: true }]}>
         <Input size="large" />
       </Form.Item>
-
       <Form.Item
-        label="Email"
-        name="email"
-        rules={[{ required: true, type: 'email' }]}
+        label="Whatsappp"
+        name="phone"
+        rules={[{ type: 'string', required: true, min: 17 }]}
       >
-        <Input size="large" />
-      </Form.Item>
-      <Form.Item label="Username" name="userName" rules={[{ required: true }]}>
-        <Input size="large" />
-      </Form.Item>
-      <Form.Item label="Telefono" name="phone" rules={[{ required: true }]}>
-        <MaskedInput mask={'+1 (000) 000-0000'} size="large" />
-      </Form.Item>
-      <Form.Item label="Role" name="role" rules={[{ required: true }]}>
-        <Select
+        <MaskedInput
+          type="text"
+          value={''}
+          mask={'+1 (000) 000-0000'}
+          maskOptions={{
+            lazy: true,
+          }}
           size="large"
-          defaultValue="Select role"
-          style={{ width: 120 }}
-          options={[
-            {
-              value: 'user',
-              label: 'User',
-            },
-            {
-              value: 'reseller',
-              label: 'Revendedor',
-            },
-            {
-              value: 'store',
-              label: 'Tienda',
-            },
-          ]}
         />
       </Form.Item>
       <Form.Item label="Password" name="password" rules={[{ required: true }]}>
         <Input.Password size="large" />
       </Form.Item>
-      <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
-        <Button type="primary" htmlType="submit">
-          Submit
+      <Form.Item>
+        <Button
+          htmlType="submit"
+          type="primary"
+          shape="round"
+          block
+          size="large"
+          icon={<UserAddOutlined />}
+        >
+          Registrarse
         </Button>
       </Form.Item>
     </Form>

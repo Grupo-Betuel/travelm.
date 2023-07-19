@@ -4,9 +4,9 @@ import AppLayout from '@shared/layout'
 import { Affix, ConfigProvider, Spin } from 'antd'
 import { defaultValidateMessages as validateMessages } from '../config/form-validation.config'
 import { defaultTheme } from '../config/theme.config'
-import { createContext, useEffect, useState } from 'react'
+import { createContext, useEffect, useMemo, useState } from 'react'
 import { getAuthData } from '../utils/auth.utils'
-import { UserEntity } from '@shared/entities/UserEntity'
+import { ClientEntity } from '@shared/entities/ClientEntity'
 import 'react-toastify/dist/ReactToastify.css'
 import { ToastContainer } from 'react-toastify'
 import { useAppStore } from '@services/store'
@@ -14,6 +14,8 @@ import { IPostFilters } from '@interfaces/posts.interface'
 import { layoutId, navbarOptionsHeight } from 'src/utils/layout.utils'
 import { AppLoadingContext } from '@shared/contexts/AppLoadingContext'
 import { AppViewportHeightContext } from '@shared/contexts/AppViewportHeightContext'
+import { OrderContext } from '@shared/contexts/OrderContext'
+import OrderService from '@services/orderService'
 
 export interface IAppProps {
   protected?: boolean
@@ -39,36 +41,37 @@ export enum AppViewportHeightClassNames {
   WITH_NAVBAR_OPTION = 'FullAppViewPortHeightNavbarOptions',
 }
 function MyApp({ Component, pageProps }: AppProps<IAppProps>) {
-  const userEntity = useAppStore((state) => state.users((s) => s))
-  const authEntity = useAppStore((state) => state['auth/login']((s) => s))
-  const [user, setUser] = useState<UserEntity | unknown>(null)
+  const clientEntity = useAppStore((state) => state.clients((s) => s))
+  const [user, setUser] = useState<ClientEntity | unknown>(null)
   const [appLoading, setAppLoading] = useState<boolean>()
-  const [appViewportHeightClassName, setAppviewPortHeightClassName] =
+  const [appViewportHeightClassName, setAppViewportHeightClassName] =
     useState<AppViewportHeightClassNames>(
       AppViewportHeightClassNames.WITH_NAVBAR
     )
+  const orderService = useMemo(() => new OrderService(), [])
+  const [cartIsOpen, setCartIsOpen] = useState(false)
 
   useEffect(() => {
-    setAppLoading(
-      !!userEntity.loading || authEntity.loading
-    )
-  }, [userEntity.loading, authEntity.loading])
+    setAppLoading(!!clientEntity.loading)
+  }, [clientEntity.loading])
 
   useEffect(() => {
-    setUser(getAuthData())
+    // setUser(getAuthData())
   }, [pageProps])
 
   if (pageProps.protected && !user) {
     return <div>Invalid</div>
   }
 
+  const toggleShoppingCart = () => setCartIsOpen(!cartIsOpen)
+
   const onChangeLayoutAffix = (affixed?: boolean) => {
     if (affixed) {
-      setAppviewPortHeightClassName(
+      setAppViewportHeightClassName(
         AppViewportHeightClassNames.WITH_NAVBAR_OPTION
       )
     } else {
-      setAppviewPortHeightClassName(AppViewportHeightClassNames.WITH_NAVBAR)
+      setAppViewportHeightClassName(AppViewportHeightClassNames.WITH_NAVBAR)
     }
   }
 
@@ -81,12 +84,14 @@ function MyApp({ Component, pageProps }: AppProps<IAppProps>) {
       )}
 
       {/*TODO: Check if global posts filters is neccesarry*/}
-
-        <AppLoadingContext.Provider value={{ appLoading, setAppLoading }}>
+      <AppLoadingContext.Provider value={{ appLoading, setAppLoading }}>
+        <OrderContext.Provider
+          value={{ orderService, toggleCart: toggleShoppingCart, cartIsOpen }}
+        >
           <AppViewportHeightContext.Provider
             value={{
               appViewportHeightClassName,
-              setAppviewPortHeightClassName,
+              setAppviewPortHeightClassName: setAppViewportHeightClassName,
             }}
           >
             <AppLayout>
@@ -99,7 +104,8 @@ function MyApp({ Component, pageProps }: AppProps<IAppProps>) {
               <Component {...pageProps} />
             </AppLayout>
           </AppViewportHeightContext.Provider>
-        </AppLoadingContext.Provider>
+        </OrderContext.Provider>
+      </AppLoadingContext.Provider>
       <ToastContainer />
     </ConfigProvider>
   )

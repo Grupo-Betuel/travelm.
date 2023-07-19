@@ -1,17 +1,26 @@
 import styles from './ScrollView.module.scss'
-import { useEffect, useRef } from 'react'
-import { PostEntity } from '@shared/entities/PostEntity'
-import { Image } from 'antd'
+import { useRef } from 'react'
+import { ProductCard } from '@shared/components'
+import { ProductEntity } from '@shared/entities/ProductEntity'
 
 export interface IScrollViewProps {
-  products?: PostEntity[]
+  products: ProductEntity[]
   title: string
+  handleProductClick?: (product: ProductEntity) => void
+  wrapperClassName?: string
+  handleSeeMore?: (product: ProductEntity) => void
 }
 
-export const ScrollView = ({ products, title }: IScrollViewProps) => {
+export const ScrollView = ({
+  products,
+  title,
+  handleProductClick,
+  wrapperClassName,
+  handleSeeMore,
+}: IScrollViewProps) => {
   const preview = (back?: boolean) => () => {
     const scrollView = scrollViewRef.current as HTMLDivElement
-    const progress = 200
+    const progress = 280
 
     if (scrollView) {
       scrollView.scrollTo({
@@ -23,24 +32,29 @@ export const ScrollView = ({ products, title }: IScrollViewProps) => {
     }
   }
 
+  const onSeeMore = () => {
+    handleSeeMore && handleSeeMore(products[0])
+  }
+
   const scrollViewRef = useRef({} as any)
 
   return (
-    <div className={styles.ScrollViewContainer}>
-      <span className="subtitle">{title}</span>
+    <div className={`${styles.ScrollViewContainer} ${wrapperClassName}`}>
+      <div className="flex-between-end mb-l">
+        <h2 className="title m-0">{title}</h2>
+        <span className="cursor-pointer subtitle text-blue" onClick={onSeeMore}>
+          Ver mas
+        </span>
+      </div>
       <div className={styles.ScrollViewWrapper}>
         <i
           className={`bi bi-chevron-left ${styles.ScrollViewLeftArrow}`}
           onClick={preview(true)}
         />
         <div className={styles.ScrollView} ref={scrollViewRef}>
-          {(products || []).map((item, i) => (
-            <div className={styles.ScrollViewItem} key={i}>
-              <Image
-                preview={false}
-                className={styles.ScrollViewItemImage}
-                src={item.images[0]}
-              />
+          {products.map((product, i) => (
+            <div className={styles.ScrollViewItem} key={`scrollview-item-${i}`}>
+              <ProductCard onClick={handleProductClick} product={product} />
             </div>
           ))}
         </div>

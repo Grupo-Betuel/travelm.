@@ -1,33 +1,78 @@
 import { Badge, Button, Card, Rate } from 'antd'
 import styles from './ProductCard.module.scss'
 import Link from 'next/link'
-import { PostEntity } from '@shared/entities/PostEntity'
+import { ProductEntity } from '@shared/entities/ProductEntity'
+import { ProductsConstants } from '@shared/constants/products.constants'
+import { useMemo } from 'react'
+import { useAppStore } from '@services/store'
+import { useOrderContext } from '@shared/contexts/OrderContext'
 
 export interface IProductProps {
-  product: PostEntity
-  handleAction: (post: PostEntity) => void
+  product: ProductEntity
+  onClick?: (post: ProductEntity) => void
 }
-export const ProductCard = ({ product, handleAction }: IProductProps) => {
+export const ProductCard = ({ product, onClick }: IProductProps) => {
+  const order = useAppStore((state) => state.currentOrder)
   const img = product && product.images ? product.images[0] : ''
-  const handle = (ev: any) => {
+  const isAlmostSoldOut =
+    product.stock <= ProductsConstants.ALMOST_SOLD_OUT_QUANTITY &&
+    product.stock > 0
+  const { orderService, toggleCart } = useOrderContext()
+  const handleProductAction = (ev: any) => {
     ev.stopPropagation()
-    handleAction(product)
+    if (isOnCart) {
+      toggleCart()
+    } else if (!product.productParams.length) {
+      orderService.handleLocalOrderSales({ ...product, product, quantity: 1 })
+      toggleCart()
+    } else if (product.productParams.length) {
+      onClick && onClick(product)
+    }
   }
 
+  const ribbonText = useMemo(() => {
+    if (isAlmostSoldOut) {
+      return ProductsConstants.ALMOST_SOLD_OUT
+    } else if (!product.stock || product.stock === 0) {
+      return ProductsConstants.SOLD_OUT
+    }
+    return ''
+  }, [product.stock])
+
+  const isOnCart = useMemo(
+    () => order?.sales.some((sale) => sale.product._id === product._id),
+    [order?.sales]
+  )
+
+  const handleClick = () => {
+    onClick && onClick(product)
+  }
   return (
-    <Badge.Ribbon text="Tienda">
+    <Badge.Ribbon text={ribbonText} color="red">
       <Card
         className={styles.ProductCard}
-        bodyStyle={{ padding: '10px' }}
+        bodyStyle={{ padding: '10px 0' }}
         cover={<img src={img} className={styles.ProductImage} />}
+        onClick={handleClick}
       >
         <div className={styles.ProductCardContent}>
-          <span className={styles.ProductTitle}>{product.title}</span>
-          {/*<Rate allowHalf defaultValue={4.5} disabled />*/}
-          <span className={styles.ProductPrice}>RD$ 1,500</span>
-          <span className={styles.ProductCommission}>Comision: RD$ 150</span>
-          <Button className="mt-s" onClick={handle}>
-            Add to my Board
+          <div className={styles.ProductCardContentHeader}>
+            <span className={styles.ProductTitle}>{product.name}</span>
+            <span className={styles.ProductPrice}>
+              RD$ {product.price.toLocaleString()}
+            </span>
+          </div>
+          <div>
+            {isAlmostSoldOut && (
+              <span className="text-red">
+                Solo quedan: {product.stock || 0}
+              </span>
+            )}
+          </div>
+          <Button className="mt-s" onClick={handleProductAction}>
+            {isOnCart
+              ? ProductsConstants.VIEW_CART
+              : ProductsConstants.ADD_CART}
           </Button>
         </div>
       </Card>

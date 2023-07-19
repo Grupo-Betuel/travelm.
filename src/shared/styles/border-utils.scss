@@ -1,7 +1,7 @@
 @use 'sizing-variables' as s;
 
 .folded {
-  border-radius: s.$size-xx-small;
+  border-radius: s.$size-min-small !important;
 }
 
 .fold-top {

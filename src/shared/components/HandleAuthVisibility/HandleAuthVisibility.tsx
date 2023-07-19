@@ -1,5 +1,5 @@
-import { getAuthData } from '../../../utils/auth.utils'
-import { PropsWithChildren, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
+import { useAuthClientHook } from '@shared/hooks/useAuthClientHook'
 
 export interface IHandleAuthVisibilityProps {
   children: any
@@ -11,20 +11,16 @@ export const HandleAuthVisibility = ({
   visibleOn,
   className,
 }: IHandleAuthVisibilityProps) => {
-  const authToken: string = getAuthData('access_token') as string
   const [mustBeRendered, setMustBeRendered] = useState(false)
+  const { client } = useAuthClientHook()
 
   useEffect(() => {
     if (visibleOn === 'auth') {
-      setMustBeRendered(!!authToken)
+      setMustBeRendered(!!client)
     } else if (visibleOn === 'no-auth') {
-      setMustBeRendered(!authToken)
+      setMustBeRendered(!client)
     }
   }, [children])
 
-  return (
-    <div className={`${className} ${!mustBeRendered ? 'd-none' : undefined}`}>
-      {children}
-    </div>
-  )
+  return <>{mustBeRendered && <div className={className}>{children}</div>}</>
 }

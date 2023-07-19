@@ -5,7 +5,7 @@
 @import '../../../styles/box-shadow-utils';
 
 .navbar {
-  //@extend .small-bxs;
+  @extend .small-bxs;
   padding: 0 !important;
   width: 100%;
   height: layout.$navbarOptionsHeight !important;
@@ -13,14 +13,14 @@
   grid-template-columns: repeat(auto-fill, minmax(12.5rem, 1fr));
   align-items: center;
   justify-items: stretch;
-  background: colors.$color-green-4 !important;
-  z-index: 1;
+  background: white !important;
+  z-index: 9999;
   position: sticky;
   top: 0;
 
   .navbarOptionsWrapper {
     position: relative;
-    background: colors.$color-green-4 !important;
+    background: white !important;
     .navbarLogoContainer,
     .navbarBrowserWrapper,
     .navbarOptionsList {
@@ -28,31 +28,29 @@
       .navbarOptionsListItem {
         display: flex;
         align-items: center;
+        white-space: nowrap;
+        &.navbarOptionsListItemActive {
+          border-bottom: 5px solid colors.$color-blue-2;
+        }
       }
     }
     .navbarLogoContainer {
-      max-width: 3.125rem;
-      height: layout.$navbarOptionsHeight !important;
-
-      img {
-        filter: brightness(0) invert(1);
+      display: flex;
+      .navbarLogo {
+        height: layout.$navbarOptionsHeight - 15px !important;
+        display: block;
+        max-width: 3.125rem;
       }
     }
     .navbarIconOption {
       font-size: 32px;
-      color: white;
     }
 
-    .navbarBrowserWrapper {
-      grid-column: span 2;
-    }
     .navbarOptionsList {
       gap: s.$size-xx-large;
       width: 100%;
-      grid-column: span 3;
       > div {
         cursor: pointer;
-        color: white;
       }
     }
   }
@@ -68,7 +66,6 @@
   display: flex;
   min-height: layout.$navbarSubOptionsHeight;
   grid-column: 1 / -1;
-  color: white;
   background: colors.$color-green-3;
 }
 .contextPostsWrapper {

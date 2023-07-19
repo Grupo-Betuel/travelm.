@@ -1,12 +1,12 @@
 import { Avatar, Drawer, DrawerProps, List, Skeleton } from 'antd'
 import styles from './NotificationDrawer.module.scss'
 import { getAuthData } from '../../../../utils/auth.utils'
-import { UserEntity } from '@shared/entities/UserEntity'
+import { ClientEntity } from '@shared/entities/ClientEntity'
 
 export interface INotificationDrawerProps extends DrawerProps {}
 
 export const NotificationDrawer = ({ ...props }: INotificationDrawerProps) => {
-  const authUser = getAuthData('user') as UserEntity
+  const authUser = getAuthData('user') as ClientEntity
   const notificationList = [
     {
       loading: false,

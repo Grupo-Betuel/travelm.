@@ -5,6 +5,7 @@
   height: 100%;
   min-height: 100vh;
   overflow: auto;
+  background: #fff;
 
   .content {
     display: flex;
@@ -13,5 +14,7 @@
     align-items: center;
     min-height: calc(100vh - layout.$navbarHeight);
     width: 100%;
+    background: #fff;
+
   }
 }

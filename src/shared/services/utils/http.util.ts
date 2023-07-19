@@ -19,7 +19,7 @@ const injectToken = (config: AxiosRequestConfig): AxiosRequestConfig => {
     const authService = new BaseService('auth/login')
     const authString = localStorage.getItem(authService.localStorageKey.add)
     const authData = JSON.parse(authString || '{}') as IAuthResponse
-    const token = authData.access_token
+    const token = authData.client
 
     if (token != null) {
       if (config.headers) config.headers.Authorization = `Bearer ${token}`
@@ -111,10 +111,10 @@ class Http {
         break
       }
       case StatusCode.NotFound: {
-        toast(`Not Found: ${error.data.message}`, {
-          autoClose: false,
-          type: 'error',
-        })
+        // toast(`Not Found: ${error.data.message}`, {
+        //   autoClose: false,
+        //   type: 'error',
+        // })
         // Handle Not Found
         break
       }
@@ -127,10 +127,10 @@ class Http {
         break
       }
       case StatusCode.Forbidden: {
-        toast(`Forbidden: ${error.data.message}`, {
-          autoClose: false,
-          type: 'error',
-        })
+        // toast(`Forbidden: ${error.data.message}`, {
+        //   autoClose: false,
+        //   type: 'error',
+        // })
         // Handle Forbidden
         break
       }

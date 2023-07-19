@@ -5,55 +5,52 @@
 @import 'src/shared/styles/border-utils';
 
 .ScrollViewContainer {
-  @extend .small-bxs;
-  @extend .folded;
-  padding: s.$size-large;
-  background-color: white;
+  position: relative;
 
   .ScrollViewWrapper {
     position: relative;
-    padding: s.$size-large;
 
     .ScrollView {
       overflow-x: scroll;
       width: 100%;
       display: flex;
-      gap: s.$size-medium;
+      gap: s.$size-xxx-large * 2;
       align-items: center;
-      justify-content: center;
+      padding: 0 s.$size-medium;
+
+      &::-webkit-scrollbar {
+        display: none;
+        width: 6px;
+        border-left: 1px solid #e6ecf8;
+      }
+      &::-webkit-scrollbar-thumb {
+        background-color: #d6872c;
+      }
 
       .ScrollViewItem {
-        @extend .folded;
-        overflow: hidden;
-        min-width: 14rem;
-        .ScrollViewItemImage {
-          width: 14rem;
-          height: 14rem;
-          object-fit: cover;
-        }
+        min-width: 300px;
       }
     }
 
     .Arrow {
       position: absolute;
-      font-size: text.$font-size-10;
+      font-size: text.$font-size-15;
       font-weight: bold;
       cursor: pointer;
-      color: colors.$color-blue-1;
+      color: colors.$color-gray-1;
       top: 50%;
-      margin-top: -14px;
+      margin-top: calc(text.$font-size-15 / 2 * -1);
       z-index: 9;
-      background-color: white;
     }
 
     .ScrollViewLeftArrow {
       @extend .Arrow;
-      left: 0rem;
+      left: -3.5rem;
     }
 
     .ScrollViewRightArrow {
       @extend .Arrow;
-      right: 0rem;
+      right: -3.5rem;
     }
   }
 }

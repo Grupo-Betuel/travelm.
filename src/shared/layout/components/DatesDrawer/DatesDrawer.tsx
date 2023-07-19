@@ -10,7 +10,7 @@ import {
 } from 'antd'
 import styles from './DatesDrawer.module.scss'
 import { getAuthData } from '../../../../utils/auth.utils'
-import { UserEntity } from '@shared/entities/UserEntity'
+import { ClientEntity } from '@shared/entities/ClientEntity'
 import { Dayjs } from 'dayjs'
 
 const getListData = (value: Dayjs) => {
@@ -63,7 +63,7 @@ export const DatesDrawer = ({ ...props }: IDatesDrawerProps) => {
     ) : null
   }
 
-  const authUser = getAuthData('user') as UserEntity
+  const authUser = getAuthData('user') as ClientEntity
   const DatesList = [
     {
       loading: false,

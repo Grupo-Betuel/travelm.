@@ -1,12 +1,12 @@
 import { isExpired } from 'react-jwt'
-import { UserEntity } from '@shared/entities/UserEntity'
+import { ClientEntity } from '@shared/entities/ClientEntity'
 import { BaseService } from '@services/BaseService'
-import { IAuthResponse } from '@interfaces/auth.interface'
+import { ClientService } from '@services/clientService'
 
-const authServiceMock = new BaseService('auth/login')
+const clientService = new ClientService()
 
 export const resetAuthData = () => {
-  localStorage.removeItem(authServiceMock.localStorageKey.add)
+  localStorage.removeItem(clientService.localStorageKey.add)
 }
 
 export const appLogOut = () => {
@@ -16,22 +16,21 @@ export const appLogOut = () => {
 
 // @ts-ignore
 export const getAuthData = (
-  type: keyof IAuthResponse | 'all' = 'access_token'
-): IAuthResponse | string | UserEntity => {
+  type: keyof ClientEntity | 'all' = 'token'
+): string | ClientEntity => {
   try {
     if (typeof window !== 'undefined') {
       const authString =
-        localStorage &&
-        localStorage.getItem(authServiceMock.localStorageKey.add)
-      const authData = JSON.parse(authString || '{}') as IAuthResponse
-      const tokenIsExpired = isExpired(authData.access_token)
+        localStorage && localStorage.getItem(clientService.localStorageKey.add)
+      const authData = JSON.parse(authString || '{}') as ClientEntity
+      const tokenIsExpired = authData.token && isExpired(authData.token)
 
       if (!authString || tokenIsExpired) {
         resetAuthData()
         return ''
       }
 
-      return type === 'all' ? authData : authData[type]
+      return (type === 'all' ? authData : authData[type]) as any
     }
     return ''
   } catch (err: any) {

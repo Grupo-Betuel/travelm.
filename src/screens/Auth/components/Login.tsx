@@ -3,15 +3,22 @@ import { Button, Form, Input } from 'antd'
 import { useAppStore } from '@services/store'
 import { useRouter } from 'next/router'
 import { IAuthProps } from '@screens/Auth/Auth'
+import { EndpointsAndEntityStateKeys } from '@shared/enums/endpoints.enum'
+import { MaskedInput } from 'antd-mask-input'
+import { UserOutlined } from '@ant-design/icons'
 
 export const Login = ({ isModal }: IAuthProps) => {
   const router = useRouter()
-  const authEntity = useAppStore((state) =>
-    state['auth/login']((statea) => statea)
-  )
+  const clientEntity = useAppStore((state) => state.clients((statea) => statea))
 
   const submit = async (data: any) => {
-    if (await authEntity.add(data)) {
+    data.phone = Number(data.phone.toString().replace(/[- ()]/g, ''))
+
+    if (
+      await clientEntity.add(data, {
+        endpoint: EndpointsAndEntityStateKeys.LOGIN,
+      })
+    ) {
       // TODO: success Login
       if (isModal) {
         router.back()
@@ -22,46 +29,37 @@ export const Login = ({ isModal }: IAuthProps) => {
   }
 
   return (
-    <div>
-      {authEntity.loading && <div>Loading...</div>}
-      <Form
-        name="basic"
-        labelCol={{ span: 8 }}
-        wrapperCol={{ span: 16 }}
-        initialValues={{ remember: true }}
-        onFinish={submit}
-        autoComplete="off"
-      >
-        <Form.Item
-          label="Email"
-          name="email"
-          rules={[{ type: 'email', pattern: /[A-z]/, required: true }]}
+    <Form
+      className="pt-s"
+      name="basic"
+      layout="vertical"
+      onFinish={submit}
+      autoComplete="off"
+    >
+      <Form.Item label="Whatsapp" name="phone" rules={[{ required: true }]}>
+        <MaskedInput
+          maskOptions={{
+            lazy: true,
+          }}
+          mask={'+1 (000) 000-0000'}
+          size="large"
+        />
+      </Form.Item>
+      <Form.Item label="Password" name="password" rules={[{ required: true }]}>
+        <Input.Password size="large" />
+      </Form.Item>
+      <Form.Item>
+        <Button
+          htmlType="submit"
+          type="primary"
+          shape="round"
+          block
+          size="large"
+          icon={<UserOutlined />}
         >
-          <Input size="large" />
-        </Form.Item>
-
-        <Form.Item
-          label="Password"
-          name="password"
-          rules={[{ required: true }]}
-        >
-          <Input.Password size="large" />
-        </Form.Item>
-
-        {/*<Form.Item*/}
-        {/*  name="remember"*/}
-        {/*  valuePropName="checked"*/}
-        {/*  wrapperCol={{ offset: 8, span: 16 }}*/}
-        {/*>*/}
-        {/*  <Checkbox>Remember me</Checkbox>*/}
-        {/*</Form.Item>*/}
-
-        <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
-          <Button type="primary" htmlType="submit">
-            Submit
-          </Button>
-        </Form.Item>
-      </Form>
-    </div>
+          Iniciar Sesión
+        </Button>
+      </Form.Item>
+    </Form>
   )
 }

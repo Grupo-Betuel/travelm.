@@ -3,25 +3,22 @@
 
 .HomeCarouselWrapper {
   position: relative;
+  background: white;
+  &::before {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 140px;
+    z-index: 1;
+    bottom: 0;
+    background: linear-gradient(180deg, transparent, white 55%);
+  }
   .HomeCarouselItemWrapper {
     height: 500px;
     line-height: 160px;
     text-align: center;
-    background: colors.$color-gray-3;
+    background: white;
 
-    &::before {
-      content: '';
-      position: absolute;
-      width: 100%;
-      height: 150px;
-      z-index: 1;
-      bottom: 0;
-      background: linear-gradient(
-        180deg,
-        transparent,
-        colors.$color-white-3 71%
-      );
-    }
     .HomeCarouselItemImageWrapper {
       width: 100%;
       height: 100%;

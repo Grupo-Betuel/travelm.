@@ -1,7 +1,7 @@
 import { Drawer, DrawerProps } from 'antd'
 import styles from './CategoriesDrawer.module.scss'
 import { getAuthData, appLogOut } from '../../../../utils/auth.utils'
-import { UserEntity } from '@shared/entities/UserEntity'
+import { ClientEntity } from '@shared/entities/ClientEntity'
 import { handleEntityHook } from '@shared/hooks/handleEntityHook'
 import { CategoryEntity } from '@shared/entities/CategoryEntity'
 
@@ -13,7 +13,7 @@ export const CategoriesDrawer = ({
   authenticate,
   ...props
 }: ICategoriesDrawerProps) => {
-  const authUser = getAuthData('user') as UserEntity
+  const authUser = getAuthData('user') as ClientEntity
   const { data: categories } = handleEntityHook<CategoryEntity>(
     'categories',
     true

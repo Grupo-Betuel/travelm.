@@ -39,7 +39,7 @@ export const stateHandlerError =
   (set: SetState<IEntityStore<any>>) => (error: string) => {
     console.error('application error', error)
     if (process.env.NODE_ENV === 'development') {
-      toast(`Forbidden: ${error.toString()}`, {
+      toast(`Forbidden: ${error?.toString()}`, {
         autoClose: false,
         type: 'error',
       })
@@ -62,11 +62,12 @@ export function stateHandlerSuccess<T extends BaseEntity>(
   let endpointData = {}
   let item: T
   let content = data as T[]
+  if (content.length === 1) item = content[0]
+
   if (!(data as any).content && !Array.isArray(content)) {
     item = !(content as T[]).length ? (data as T) : content[0]
   } else {
     const stateDataKey = properties?.storeDataInStateKey || properties?.endpoint
-    console.log('store in', properties?.storeDataInStateKey)
     endpointData = stateDataKey
       ? { [stateDataKey]: data }
       : ({ content: data } as EntityDataType<T>)
@@ -143,7 +144,7 @@ export function createEntityStore<T extends BaseEntity>(
       },
       update: async (
         entityData: { _id: string } & Partial<T>,
-        enableCache?: boolean,
+        enableCache: boolean = true,
         cacheLifeTime: number = 60 * 1000 * 5
       ) => {
         set((state) => ({ ...state, loading: true }))

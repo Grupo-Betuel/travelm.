@@ -85,9 +85,12 @@ export function handleEntityHook<T>(
     entityDataRef.current = getAllEntityData()
   }, [entity.data])
 
+  const { data, pagination } = divideDataAndPagination('content')
   return {
     ...entity,
-    ...divideDataAndPagination('content'),
+    data,
+    pagination,
+    // ...divideDataAndPagination('content'),
     // ...entityDataRef.current, // this doesn't update the component
     ...getAllEntityData(), // this update the component when data is returned
     get: getData,

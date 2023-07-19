@@ -1,11 +1,13 @@
 import { Tabs } from 'antd'
-import { UserOutlined, UserSwitchOutlined } from '@ant-design/icons'
+import { UserAddOutlined, UserOutlined } from '@ant-design/icons'
 import React from 'react'
 import { Login } from '@screens/Auth/components/Login'
 import { Register } from '@screens/Auth/components/Register'
+import { ClientEntity } from '@shared/entities/ClientEntity'
 
 export interface IAuthProps {
   isModal?: boolean
+  onSubmit?: (data: ClientEntity) => void
 }
 
 export interface TabItem {
@@ -27,7 +29,7 @@ const authItems: (isModal?: boolean) => TabItem[] = (isModal?: boolean) => [
   {
     label: (
       <span>
-        <UserSwitchOutlined /> Register
+        <UserAddOutlined /> Registrate
       </span>
     ),
     key: '2',
@@ -36,9 +38,5 @@ const authItems: (isModal?: boolean) => TabItem[] = (isModal?: boolean) => [
 ]
 
 export const Auth = ({ isModal }: IAuthProps) => {
-  return (
-    <div>
-      <Tabs defaultActiveKey="1" items={authItems(isModal)} />
-    </div>
-  )
+  return <Tabs defaultActiveKey="1" items={authItems(isModal)} />
 }

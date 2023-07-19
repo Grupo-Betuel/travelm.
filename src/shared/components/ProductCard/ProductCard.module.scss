@@ -4,33 +4,48 @@
 @import 'src/shared/styles/border-utils';
 
 .ProductCard {
-  @extend .small-bxs;
-  @extend .folded;
   background-color: white;
   cursor: pointer;
+  box-shadow: unset;
+  border: none;
 
   .ProductCardContent {
     display: flex;
     flex-direction: column;
+    padding: 0 !important;
+
+    .ProductCardContentHeader {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 1rem;
+      gap: 1rem;
+
+      .ProductTitle {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: -webkit-box;
+        font-size: f.$font-size-6;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+      }
+
+      .ProductPrice {
+        font-weight: bold;
+        font-size: f.$font-size-10;
+        white-space: nowrap;
+        margin-top: -5px;
+      }
+    }
   }
   .ProductImage {
+    @extend .folded;
     width: 100%;
-    height: 12.5rem;
+    height: 340px;
     object-fit: cover;
   }
 
-  .ProductTitle {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    display: -webkit-box;
-    -webkit-line-clamp: 3;
-    -webkit-box-orient: vertical;
-  }
 
-  .ProductPrice {
-    font-weight: bold;
-    font-size: f.$font-size-8;
-  }
   .ProductCommission {
     font-style: italic;
     color: colors.$color-gray-1;

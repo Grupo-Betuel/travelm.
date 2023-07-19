@@ -1,13 +1,11 @@
 import { BaseEntity } from './/BaseEntity'
 
-export class UserEntity extends BaseEntity {
-  name: string = ''
+export class ClientEntity extends BaseEntity {
+  firstName: string = ''
   lastName: string = ''
   email: string = ''
   userName: string = ''
   phone: number = 0
-  role: string = ''
   password: string = ''
-  profile: string = ''
-  storeMetadata?: any
+  token?: string
 }

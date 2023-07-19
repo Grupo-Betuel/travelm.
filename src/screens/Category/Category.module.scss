@@ -1,0 +1,47 @@
+@use 'src/shared/styles/layout-variables' as layout;
+@use 'src/shared/styles/color-variables' as colors;
+@import '../../shared/styles/sizing-variables';
+
+.CategoryWrapper {
+  max-width: layout.$maxLandingWidth;
+  width: 100%;
+  .CategoryContent {
+    padding: $size-xxx-large * 2;
+    display: flex;
+    flex-direction: column;
+    gap: $size-xxx-large;
+    margin-top: -50px;
+    position: relative;
+    z-index: 1;
+    .CategoryContentProducts {
+      .CategoryContentProductsScrollViewCategories {
+        margin: $size-xxx-large * 3 0;
+      }
+    }
+    .CategoryCardsGrid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: $size-x-large * 2;
+      position: relative;
+    }
+    .CategorySearchWrapper {
+      padding: 0 7rem;
+      .CategoryInputSearch {
+        font-size: 2.5rem;
+        color: colors.$color-white-2;
+      }
+    }
+  }
+}
+
+.products {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 30px;
+  div {
+    cursor: pointer;
+  }
+  img {
+    max-width: 200px;
+  }
+}

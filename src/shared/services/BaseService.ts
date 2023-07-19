@@ -31,7 +31,7 @@ export class BaseService<T> implements AbstractBaseService<T> {
   localStorageKey: LocalStorageKeysType
 
   constructor(public entity: EntityNamesType) {
-    this.api = `${this.apiPrefix}/${this.version}/${this.entity}`
+    this.api = `${this.apiPrefix}/${this.entity}`
     this.localStorageKey = {
       get: `store-app:get::${this.entity}`,
       add: `store-app:add::${this.entity}`,
@@ -63,7 +63,7 @@ export class BaseService<T> implements AbstractBaseService<T> {
           params: { ...properties.queryParams },
         }
       )
-      if (enableCache) {
+      if (enableCache && !!(data as any)?.length) {
         const cachedData: T[] = this.cacheData(
           extractContent(data),
           'get',
@@ -99,7 +99,8 @@ export class BaseService<T> implements AbstractBaseService<T> {
       enableCache && this.cacheData(res.data, 'add', cacheLifeTime)
       return res as T
     } catch (err: IResponseError | any) {
-      handleError && handleError(err.data ? err.data.message : err.message)
+      console.log('error!', err)
+      handleError && handleError(err.data ? err?.data?.message : err?.message)
     }
   }
 
@@ -110,8 +111,8 @@ export class BaseService<T> implements AbstractBaseService<T> {
     cacheLifeTime: number = 60 * 1000 * 5
   ): Promise<T | undefined> {
     try {
-      const res = await http.put(`${this.api}/${data._id}`, data)
-      enableCache && this.cacheData(res.data as T, 'update', cacheLifeTime)
+      const res = await http.put(`${this.api}`, data)
+      enableCache && this.cacheData(res.data as T, 'add', cacheLifeTime)
       return res as T
     } catch (err: IResponseError | any) {
       handleError && handleError(err.data.message)
@@ -153,11 +154,17 @@ export class BaseService<T> implements AbstractBaseService<T> {
       }
 
       let items: T[] = [...(data as T[]), ...oldData]
+      let itemsData: T[] = Array.from(
+        new Set(items.map((item: any) => item._id))
+      ).map((id) => items.find((item: any) => item._id === id)) as T[]
       // when key is get just will be cached if it's longer than 1 item
-      items.length &&
-        items.length > 1 &&
-        localStorage.setItem(this.localStorageKey[key], JSON.stringify(items))
-      return items
+      itemsData.length &&
+        itemsData.length > 1 &&
+        localStorage.setItem(
+          this.localStorageKey[key],
+          JSON.stringify(itemsData)
+        )
+      return itemsData
     } else {
       localStorage.setItem(this.localStorageKey[key], JSON.stringify(data))
     }
