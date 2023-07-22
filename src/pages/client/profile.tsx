@@ -7,7 +7,6 @@ import { useAuthClientHook } from '@shared/hooks/useAuthClientHook'
 import { useAppStore } from '@services/store'
 import { useForm } from 'antd/lib/form/Form'
 import { toast } from 'react-toastify'
-import { parseToNumberFormat } from '../../utils/text.utils'
 
 export default function ClientProfile() {
   const clientEntity = useAppStore((state) => state.clients((stateu) => stateu))
@@ -15,7 +14,6 @@ export default function ClientProfile() {
   const [profileForm] = useForm()
 
   useEffect(() => {
-    console.log('client', client)
     profileForm.setFieldsValue({
       ...client,
       phone: client?.phone,
@@ -93,4 +91,12 @@ export default function ClientProfile() {
       </Form.Item>
     </Form>
   )
+}
+
+export const getServerSideProps = async () => {
+  return {
+    props: {
+      protected: true,
+    },
+  }
 }

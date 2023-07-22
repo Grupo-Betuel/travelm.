@@ -6,6 +6,7 @@ import { ProductsConstants } from '@shared/constants/products.constants'
 import { useMemo } from 'react'
 import { useAppStore } from '@services/store'
 import { useOrderContext } from '@shared/contexts/OrderContext'
+import { getSaleDataFromProduct } from '../../../utils/objects.utils'
 
 export interface IProductProps {
   product: ProductEntity
@@ -23,7 +24,10 @@ export const ProductCard = ({ product, onClick }: IProductProps) => {
     if (isOnCart) {
       toggleCart()
     } else if (!product.productParams.length) {
-      orderService.handleLocalOrderSales({ ...product, product, quantity: 1 })
+      orderService.handleLocalOrderSales({
+        ...getSaleDataFromProduct(product),
+        quantity: 1,
+      })
       toggleCart()
     } else if (product.productParams.length) {
       onClick && onClick(product)
@@ -48,7 +52,11 @@ export const ProductCard = ({ product, onClick }: IProductProps) => {
     onClick && onClick(product)
   }
   return (
-    <Badge.Ribbon text={ribbonText} color="red">
+    <Badge.Ribbon
+      text={ribbonText}
+      style={{ display: ribbonText ? 'block' : 'none' }}
+      color={isAlmostSoldOut ? 'gold' : 'red'}
+    >
       <Card
         className={styles.ProductCard}
         bodyStyle={{ padding: '10px 0' }}
@@ -69,11 +77,13 @@ export const ProductCard = ({ product, onClick }: IProductProps) => {
               </span>
             )}
           </div>
-          <Button className="mt-s" onClick={handleProductAction}>
-            {isOnCart
-              ? ProductsConstants.VIEW_CART
-              : ProductsConstants.ADD_CART}
-          </Button>
+          {product.stock ? (
+            <Button className="mt-s" onClick={handleProductAction}>
+              {isOnCart
+                ? ProductsConstants.VIEW_CART
+                : ProductsConstants.ADD_CART}
+            </Button>
+          ) : null}
         </div>
       </Card>
     </Badge.Ribbon>

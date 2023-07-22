@@ -1,6 +1,8 @@
 import { IPaginatedResponse } from '@interfaces/pagination.interface'
 import { IOption } from '@interfaces/common.intefacce'
 import queryString from 'query-string'
+import { ProductEntity } from '@shared/entities/ProductEntity'
+import { ISale } from '@shared/entities/OrderEntity'
 
 export function extractContent<T>(data: IPaginatedResponse<T> | T[]): T[] {
   return (data as IPaginatedResponse<T>).content
@@ -25,8 +27,8 @@ export enum ObjectQueryIdentifierEnum {
 
 export function parseQueryToObject<T>(path: string): T {
   const res: T = Object.fromEntries(new URLSearchParams(path)) as T
-  
-  // TODO: remove this comment 
+
+  // TODO: remove this comment
   // const res: T = queryString.parse(path, {
   //   arrayFormat: 'comma',
   //   parseNumbers: true,
@@ -42,4 +44,16 @@ export function parseQueryToObject<T>(path: string): T {
 
   console.log('results', res)
   return res
+}
+
+export const getSaleDataFromProduct = (
+  product: ProductEntity
+): Partial<ISale> => {
+  return {
+    productId: product._id,
+    product: product,
+    company: product.company,
+    unitPrice: product.price,
+    unitCost: product.cost,
+  }
 }

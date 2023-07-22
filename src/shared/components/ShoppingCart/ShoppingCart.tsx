@@ -45,6 +45,9 @@ export const ShoppingCart = ({ itemActions, sales }: IShoppingCartProps) => {
       className={styles.ShoppingCartList}
       itemLayout="vertical"
       size="large"
+      locale={{
+        emptyText: 'No hay productos en el carrito',
+      }}
       dataSource={sales}
       renderItem={(sale, i) => (
         <List.Item

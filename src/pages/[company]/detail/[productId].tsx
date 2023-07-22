@@ -1,6 +1,6 @@
-import CompanyProducts from '../[company]'
+import CompanyProducts from '../index'
 import { DetailView } from '@components/DetailView'
-import { Company } from 'src/screens/Company'
+import { Company } from '@screens/Company'
 
 export default function ProductDetail() {
   return (

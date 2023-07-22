@@ -1,8 +1,13 @@
-import { Button, Drawer, DrawerProps, Image, List, Space, Steps } from 'antd'
+import { Button, Drawer, DrawerProps, Spin, Steps } from 'antd'
 import styles from './ShoppingCartDrawer.module.scss'
-import { getAuthData } from '../../../utils/auth.utils'
 import React, { FC, useEffect, useMemo, useState } from 'react'
-import { DeleteOutlined, EditOutlined, SendOutlined } from '@ant-design/icons'
+import {
+  DeleteOutlined,
+  EditOutlined,
+  PlusOutlined,
+  SendOutlined,
+  ShoppingCartOutlined,
+} from '@ant-design/icons'
 import { useRouter } from 'next/router'
 import { useAppStore } from '@services/store'
 import { handleEntityHook } from '@shared/hooks/handleEntityHook'
@@ -12,10 +17,9 @@ import { ShoppingCart } from '@components/ShoppingCart'
 import { Register } from '@screens/Auth/components/Register'
 import { ProductEntity } from '@shared/entities/ProductEntity'
 import { toast } from 'react-toastify'
-import { ClientEntity } from '@shared/entities/ClientEntity'
-import Link from 'next/link'
 import { StickyFooter } from '@shared/layout/components/StickyFooter/StickyFooter'
 import Title from 'antd/lib/typography/Title'
+import { useOrderContext } from '@shared/contexts/OrderContext'
 
 export interface IShoppingCartDrawerProps extends DrawerProps {}
 
@@ -32,13 +36,18 @@ export const ShoppingCartDrawer = ({
   const router = useRouter()
   const order = useAppStore((state) => state.currentOrder)
   const { client } = useAuthClientHook()
-  const { add: sendOrder, loading } = handleEntityHook<OrderEntity>('orders')
+  const {
+    add: sendOrder,
+    update: updateOrder,
+    loading,
+  } = handleEntityHook<OrderEntity>('orders')
   const [current, setCurrent] = useState(0)
   const substotal = useMemo(() => {
     return order?.sales?.reduce((acc, sale) => {
       return acc + sale.product.price * sale.quantity
     }, 0)
   }, [order])
+  const { orderService } = useOrderContext()
 
   useEffect(() => {
     if (client) {
@@ -54,23 +63,38 @@ export const ShoppingCartDrawer = ({
   }
 
   const editSale = (product: ProductEntity) => {
-    router.push(`/detail/${product?._id}`)
+    router.push(`/${product.company}/detail/${product?._id}`)
     onClose && onClose({} as any)
   }
 
+  const removeSale = (product: ProductEntity) => {
+    orderService.removeSale(product._id)
+    // router.push(`/${product.company}/detail/${product?._id}`)
+    // onClose && onClose({} as any)
+  }
+
   const handleSendOrder = async () => {
-    if (client || current === 1) {
-      toast.success('Enviando Orden...')
-      // await sendOrder({ ...order, client })
+    if (order?._id) {
+      await updateOrder({ _id: order._id, ...order })
     } else {
-      next()
+      if (client || current === 1) {
+        await sendOrder({ ...order, client })
+      } else {
+        next()
+      }
     }
+    // TODO: Success
   }
   const onChangeStep = (value: number) => {
     setCurrent(value)
   }
   const goToProfile = () => {
     router.push('/client/profile')
+    onClose && onClose()
+  }
+
+  const goToHome = () => {
+    router.push('/')
     onClose && onClose()
   }
 
@@ -81,6 +105,11 @@ export const ShoppingCartDrawer = ({
       bodyStyle={{ paddingBottom: 0, paddingTop: 0 }}
       className={styles.ShoppingCartDrawer}
     >
+      {loading && (
+        <div className="loading">
+          <Spin size="large" />
+        </div>
+      )}
       <div className={styles.ShoppingCartDrawerHeader}>
         {!client ? (
           <Steps
@@ -125,6 +154,7 @@ export const ShoppingCartDrawer = ({
                 icon: DeleteOutlined,
                 text: 'Eliminar',
                 key: 'list-vertical-star-o',
+                onClick: removeSale,
               },
               {
                 icon: EditOutlined,
@@ -143,15 +173,32 @@ export const ShoppingCartDrawer = ({
                 RD$ {(substotal || '0').toLocaleString()}
               </Title>
             </div>
+            {order?._id && (
+              <Button
+                className="mb-l"
+                shape="round"
+                block
+                size="large"
+                icon={client ? <PlusOutlined /> : null}
+                onClick={goToHome}
+              >
+                Agregar más productos
+              </Button>
+            )}
             <Button
-              type="primary"
+              type={'primary'}
               shape="round"
               block
               size="large"
-              icon={React.createElement(SendOutlined)}
-              onClick={handleSendOrder}
+              icon={client ? <ShoppingCartOutlined /> : null}
+              onClick={!order?.sales?.length ? undefined : handleSendOrder}
+              disabled={order?.sales?.length === 0}
             >
-              {client ? 'Enviar Orden' : 'Siguiente'}
+              {order?._id
+                ? 'Actualizar Order'
+                : client
+                ? 'Realizar Orden'
+                : 'Siguiente'}
             </Button>
           </StickyFooter>
         </>

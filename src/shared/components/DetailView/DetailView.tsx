@@ -9,11 +9,13 @@ import {
   InputNumber,
   List,
   Space,
+  Spin,
   Tag,
 } from 'antd'
 import {
   ArrowLeftOutlined,
   ArrowRightOutlined,
+  CloseOutlined,
   LikeOutlined,
   MessageOutlined,
   ShoppingCartOutlined,
@@ -44,6 +46,8 @@ import { ISale } from '@shared/entities/OrderEntity'
 import OrderService from '@services/orderService'
 import { structuredClone } from 'next/dist/compiled/@edge-runtime/primitives/structured-clone'
 import { useOrderContext } from '@shared/contexts/OrderContext'
+import { useAppStore } from '@services/store'
+import { getSaleDataFromProduct } from '../../../utils/objects.utils'
 
 export interface IDetailViewProps {
   previewPost?: any
@@ -73,13 +77,14 @@ const controlNamePrefix = 'quantity-'
 export const DetailView = ({ previewPost, returnHref }: IDetailViewProps) => {
   const [product, setProduct] = useState<ProductEntity>({} as ProductEntity)
   const [sale, setSale] = useState<Partial<ISale>>({} as ISale)
+  const [showMoreDescription, setShowMoreDescription] = useState(false)
   const router = useRouter()
   const carouselRef = useRef<any>()
-  const { get, item } = handleEntityHook<ProductEntity>('products')
+  const { loading, get, item } = handleEntityHook<ProductEntity>('products')
   const { makeContextualHref } = useContextualRouting()
-  const authClient = getAuthData('all') as ClientEntity
   const [productOptionsForm] = Form.useForm()
   const { orderService } = useOrderContext()
+  const currentOrder = useAppStore((state) => state.currentOrder)
 
   useEffect(() => {
     const productId = router.query.productId as string
@@ -93,15 +98,14 @@ export const DetailView = ({ previewPost, returnHref }: IDetailViewProps) => {
   }, [item])
 
   useEffect(() => {
-    if (product._id) {
-      const savedSale = orderService.getSaleByProductId(product._id) || {}
+    if (product._id && currentOrder) {
+      // const savedSale = orderService.getSaleByProductId(product._id) || {}
+      const savedSale = currentOrder.sales.find(
+        (s) => s.product._id === product._id
+      )
       setSale({
+        ...getSaleDataFromProduct(product),
         ...savedSale,
-        productId: product._id,
-        product: product,
-        company: product.company,
-        unitPrice: product.price,
-        unitCost: product.cost,
       })
     }
   }, [product])
@@ -146,21 +150,32 @@ export const DetailView = ({ previewPost, returnHref }: IDetailViewProps) => {
   }
 
   const handleSaleQuantity = (value?: any) => {
+    const quantity = Number(value || 0)
     const newSale: Partial<ISale> = {
       ...structuredClone(sale),
-      quantity: Number(value),
+      quantity,
     }
-    orderService?.handleLocalOrderSales(newSale)
-    setSale(newSale)
+    if (quantity <= product.stock) {
+      if (quantity > 0) {
+        orderService?.handleLocalOrderSales(newSale)
+      } else {
+        orderService?.removeSale(product._id)
+      }
+      setSale(newSale)
+    }
   }
 
+  const resetSaleProductParam = (parentId: string, variantId?: string) => () =>
+    handleSaleProductParamsChange(parentId, variantId)(0)
+
   const handleSaleProductParamsChange =
-    (parentId: string, variantId?: string) => (value?: any) => {
+    (parentId: string, variantId?: string) => async (value?: any) => {
       let newSale = structuredClone(sale)
       let total = 0
       const productData = structuredClone(product)
       const quantity = Number(value || 0)
-      const exist = sale?.productParams?.find((p) => p._id === parentId)
+      const exist = newSale?.productParams?.find((p) => p._id === parentId)
+
       let productParam = exist
       if (!productParam) {
         productParam =
@@ -184,18 +199,21 @@ export const DetailView = ({ previewPost, returnHref }: IDetailViewProps) => {
       productParam.quantity = total
 
       if (exist) {
-        const newParams = sale?.productParams?.map((p) => {
+        const newParams = newSale?.productParams?.map((p) => {
           if (p._id === parentId) {
             return productParam
           }
           return p
         }) as IProductParam[]
-        newSale = { ...sale, productParams: newParams.filter((item) => !!item) }
+        newSale = {
+          ...newSale,
+          productParams: newParams.filter((item) => !!item),
+        }
       } else {
-        const newParams = [...(sale?.productParams || [])]
+        const newParams = [...(newSale?.productParams || [])]
         newParams.push(productParam)
         newSale = {
-          ...sale,
+          ...newSale,
           productParams: newParams,
         }
       }
@@ -205,15 +223,34 @@ export const DetailView = ({ previewPost, returnHref }: IDetailViewProps) => {
         0
       newSale.quantity = saleTotal
 
-      setSale({ ...newSale })
-
-      if (saleTotal <= 0) {
-        newSale.productParams = newSale?.productParams?.filter(
-          (item) => item._id !== parentId
+      const paramId = variantId || parentId
+      const controlName = `${controlNamePrefix}${paramId}`
+      const controlIsValid = await productOptionsForm
+        .validateFields([controlName])
+        .then(
+          () => {
+            return true
+          },
+          () => {
+            return false
+          }
         )
-      }
 
-      orderService?.handleLocalOrderSales(newSale)
+      if (controlIsValid) {
+        setSale({ ...newSale })
+
+        if (saleTotal <= 0) {
+          orderService?.removeSale(product._id)
+        } else {
+          if (quantity <= 0) {
+            newSale.productParams = newSale?.productParams?.filter(
+              (item) => item._id !== parentId
+            )
+          }
+
+          orderService?.handleLocalOrderSales(newSale)
+        }
+      }
     }
 
   const getQuantityValue = (parentId: string, variantId?: string) => {
@@ -247,253 +284,308 @@ export const DetailView = ({ previewPost, returnHref }: IDetailViewProps) => {
     return initialValues
   }, [sale])
 
-  return (
-    <div className={`grid-container ${styles.DetailViewWrapper}`}>
-      <div className={`grid-column-1 ${styles.GalleryWrapper}`}>
-        {!previewPost && (
-          <div className={styles.DetailViewBackButton} onClick={back}>
-            <ArrowLeftOutlined />
-          </div>
-        )}
-        {hasMultipleImages && (
-          <>
-            <div className={styles.DetailViewPrevButton}>
-              <ArrowLeftOutlined onClick={navigate('prev')} />
-            </div>
-            <div className={styles.DetailViewNextButton}>
-              <ArrowRightOutlined onClick={navigate('next')} />
-            </div>
-          </>
-        )}
-        <Image.PreviewGroup>
-          <Carousel
-            ref={carouselRef}
-            nextArrow={
-              <div className={styles.DetailViewButton}>
-                <ArrowRightOutlined />
-              </div>
-            }
-          >
-            {hasImages ? (
-              product.images.map((img, i) => (
-                <ImageBackground image={img} key={`detailViewImage${i}`} />
-              ))
-            ) : (
-              <ImageBackground />
-            )}
-          </Carousel>
-        </Image.PreviewGroup>
-      </div>
-      <Resizable
-        defaultSize={{ width: sidebarWidth, height: 'auto' }}
-        enable={{ left: true, right: false }}
-        className={styles.DetailViewPostDetails}
-      >
-        <div className={styles.DetailViewPostDetailsHeader}>
-          <span className="title">{product.name}</span>
-          <span className="subtitle">RD$ {product.price} - 34 Disponibles</span>
-          <span className="label">Alguna informacion</span>
-        </div>
-        <div className={styles.DetailViewPostDetailsContent}>
-          <span className="subtitle mb-m">Opciones</span>
-          <Form
-            form={productOptionsForm}
-            name="productOptionsForm"
-            className={styles.DetailViewPostDetailsContentOptionsWrapper}
-          >
-            {product?.productParams && product?.productParams.length ? (
-              product?.productParams?.map((param, i) => {
-                const isActive = sale?.productParams?.find(
-                  (item) => item._id === param._id
-                )
-                return (
-                  <div
-                    className={`${styles.DetailViewPostDetailsContentOption} ${
-                      isActive
-                        ? `${styles.active} ${
-                            param.relatedParams?.length ? ' w-100' : ''
-                          }`
-                        : ''
-                    }`}
-                    key={`detailViewOption${i}`}
-                  >
-                    <Button
-                      className={styles.DetailViewPostDetailsContentOptionBtn}
-                      shape="round"
-                      size="middle"
-                      onClick={handleSaleProductParams(param)}
-                    >
-                      {param.label}
-                      {param.type === 'color' ? (
-                        <span
-                          className={
-                            styles.DetailViewPostDetailsContentOptionBtnColorOption
-                          }
-                          style={{ backgroundColor: param.value }}
-                        ></span>
-                      ) : (
-                        param.value
-                      )}
-                    </Button>
-                    {param?.relatedParams && !!param?.relatedParams.length ? (
-                      <div
-                        className={
-                          styles.DetailViewPostDetailsContentOptionVariants
-                        }
-                      >
-                        {param.relatedParams?.map((variant, i) => (
-                          <div
-                            className={
-                              styles.DetailViewPostDetailsContentOptionVariantsItem
-                            }
-                            key={`detailViewOptionVariant${i}`}
-                          >
-                            <Tag>
-                              {variant.label} - {variant.value}
-                            </Tag>
-                            <Form.Item
-                              name={`${controlNamePrefix}${variant._id}`}
-                              rules={[
-                                {
-                                  type: 'number',
-                                  required: true,
-                                  message: maxQuantityError(variant.quantity),
-                                  max: variant.quantity,
-                                  min: 0,
-                                },
-                              ]}
-                            >
-                              <InputNumber
-                                type="number"
-                                placeholder="Cantidad"
-                                value={getQuantityValue(param._id, variant._id)}
-                                defaultValue={0}
-                                onChange={handleSaleProductParamsChange(
-                                  param._id,
-                                  variant._id
-                                )}
-                                min={0}
-                              />
-                            </Form.Item>
-                          </div>
-                        ))}
-                      </div>
-                    ) : (
-                      <Form.Item
-                        name={`${controlNamePrefix}${param._id}`}
-                        rules={[
-                          {
-                            type: 'number',
-                            required: true,
-                            message: maxQuantityError(param.quantity),
-                            max: param.quantity,
-                            min: 0,
-                          },
-                        ]}
-                      >
-                        <InputNumber
-                          type="number"
-                          className={
-                            styles.DetailViewPostDetailsContentOptionQuantity
-                          }
-                          placeholder="Cantidad"
-                          onChange={handleSaleProductParamsChange(param._id)}
-                          value={getQuantityValue(param._id)}
-                          defaultValue={0}
-                          min={0}
-                        />
-                      </Form.Item>
-                    )}
-                  </div>
-                )
-              })
-            ) : (
-              <Form.Item
-                name="quantity"
-                rules={[
-                  {
-                    type: 'number',
-                    required: true,
-                    message: maxQuantityError(product.stock),
-                    max: product.stock,
-                    min: 0,
-                  },
-                ]}
-              >
-                <InputNumber
-                  type="number"
-                  onChange={handleSaleQuantity}
-                  value={sale.quantity}
-                  defaultValue={0}
-                  min={0}
-                />
-              </Form.Item>
-            )}
-          </Form>
-          <div className={styles.DetailViewPostDetailsContentDescription}>
-            <h2 className="subtitle">Descripcion</h2>
-            <p>{product.description}</p>
-          </div>
+  const { toggleCart } = useOrderContext()
 
-          <div className={styles.DetailViewPostDetailsContentComments}>
-            <span className="subtitle mb-xx-s">Comentarios</span>
-            <div className="flex-between-center p-m gap-s">
-              <Input
-                placeholder="Escribir comentario"
-                suffix={<UploadOutlined />}
-              />
-              <Button icon={<MessageOutlined />}>Enviar</Button>
+  return (
+    <>
+      {loading && (
+        <div className="loading">
+          <Spin size="large" />
+        </div>
+      )}
+      <div className={`grid-container ${styles.DetailViewWrapper}`}>
+        <div className={styles.ProductDetailBanner}>
+          <h1>Offerta!</h1>
+        </div>
+        <div className={`grid-column-1 ${styles.GalleryWrapper}`}>
+          {!previewPost && (
+            <div className={styles.DetailViewBackButton} onClick={back}>
+              <ArrowLeftOutlined />
             </div>
-            <List
-              itemLayout="vertical"
-              size="large"
-              dataSource={data}
-              footer={
-                <div>
-                  <b>ant design</b> footer part
+          )}
+          {hasMultipleImages && (
+            <>
+              <div className={styles.DetailViewPrevButton}>
+                <ArrowLeftOutlined onClick={navigate('prev')} />
+              </div>
+              <div className={styles.DetailViewNextButton}>
+                <ArrowRightOutlined onClick={navigate('next')} />
+              </div>
+            </>
+          )}
+          <Image.PreviewGroup>
+            <Carousel
+              ref={carouselRef}
+              nextArrow={
+                <div className={styles.DetailViewButton}>
+                  <ArrowRightOutlined />
                 </div>
               }
-              renderItem={(item) => (
-                <List.Item
-                  key={item.title}
-                  actions={[
-                    <IconText
-                      icon={StarOutlined}
-                      text="156"
-                      key="list-vertical-star-o"
-                    />,
-                    <IconText
-                      icon={LikeOutlined}
-                      text="156"
-                      key="list-vertical-like-o"
-                    />,
-                    <IconText
-                      icon={MessageOutlined}
-                      text="2"
-                      key="list-vertical-message"
-                    />,
+            >
+              {hasImages ? (
+                product.images.map((img, i) => (
+                  <ImageBackground image={img} key={`detailViewImage${i}`} />
+                ))
+              ) : (
+                <ImageBackground />
+              )}
+            </Carousel>
+          </Image.PreviewGroup>
+        </div>
+        <Resizable
+          defaultSize={{ width: sidebarWidth, height: 'auto' }}
+          enable={{ left: true, right: false }}
+          className={styles.DetailViewPostDetails}
+        >
+          <div className={styles.DetailViewPostDetailsHeader}>
+            <span className="title">{product.name}</span>
+            <span className="subtitle">
+              RD$ {product.price?.toLocaleString()}
+            </span>
+            <span className="label">{product.stock} unidades disponibles</span>
+          </div>
+          <div className={styles.DetailViewPostDetailsContent}>
+            <span className="subtitle mb-m">Cantidades</span>
+            <Form
+              form={productOptionsForm}
+              name="productOptionsForm"
+              className={styles.DetailViewPostDetailsContentOptionsWrapper}
+            >
+              {product?.productParams && product?.productParams.length ? (
+                product?.productParams?.map((param, i) => {
+                  const isActive = sale?.productParams?.find(
+                    (item) => item._id === param._id
+                  )
+                  return (
+                    <div
+                      className={`${
+                        styles.DetailViewPostDetailsContentOption
+                      } ${
+                        isActive
+                          ? `${styles.active} ${
+                              param.relatedParams?.length ? ' w-100' : ''
+                            }`
+                          : ''
+                      }`}
+                      key={`detailViewOption${i}`}
+                    >
+                      <Button
+                        className={styles.DetailViewPostDetailsContentOptionBtn}
+                        shape="round"
+                        size="middle"
+                        onClick={handleSaleProductParams(param)}
+                      >
+                        {param.label}
+                        {param.type === 'color' ? (
+                          <span
+                            className={
+                              styles.DetailViewPostDetailsContentOptionBtnColorOption
+                            }
+                            style={{ backgroundColor: param.value }}
+                          ></span>
+                        ) : (
+                          param.value
+                        )}
+                      </Button>
+                      {param?.relatedParams && !!param?.relatedParams.length ? (
+                        <div
+                          className={
+                            styles.DetailViewPostDetailsContentOptionVariants
+                          }
+                        >
+                          {param.relatedParams?.map((variant, i) => (
+                            <div
+                              className={
+                                styles.DetailViewPostDetailsContentOptionVariantsItem
+                              }
+                              key={`detailViewOptionVariant${i}`}
+                            >
+                              <Tag>
+                                {variant.label} - {variant.value}
+                              </Tag>
+                              <Form.Item
+                                name={`${controlNamePrefix}${variant._id}`}
+                                rules={[
+                                  {
+                                    type: 'number',
+                                    required: true,
+                                    message: maxQuantityError(variant.quantity),
+                                    max: variant.quantity,
+                                    min: 0,
+                                  },
+                                ]}
+                              >
+                                <InputNumber
+                                  type="number"
+                                  placeholder="Cantidad"
+                                  value={getQuantityValue(
+                                    param._id,
+                                    variant._id
+                                  )}
+                                  defaultValue={0}
+                                  onChange={handleSaleProductParamsChange(
+                                    param._id,
+                                    variant._id
+                                  )}
+                                  addonAfter={
+                                    <CloseOutlined
+                                      onClick={resetSaleProductParam(
+                                        param._id,
+                                        variant._id
+                                      )}
+                                    />
+                                  }
+                                  min={0}
+                                />
+                              </Form.Item>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <Form.Item
+                          name={`${controlNamePrefix}${param._id}`}
+                          rules={[
+                            {
+                              type: 'number',
+                              required: true,
+                              message: maxQuantityError(param.quantity),
+                              max: param.quantity,
+                              min: 0,
+                            },
+                          ]}
+                        >
+                          <InputNumber
+                            type="number"
+                            className={
+                              styles.DetailViewPostDetailsContentOptionQuantity
+                            }
+                            placeholder="Cantidad"
+                            onChange={handleSaleProductParamsChange(param._id)}
+                            value={getQuantityValue(param._id)}
+                            defaultValue={0}
+                            min={0}
+                            addonAfter={
+                              <CloseOutlined
+                                onClick={resetSaleProductParam(param._id)}
+                              />
+                            }
+                          />
+                        </Form.Item>
+                      )}
+                    </div>
+                  )
+                })
+              ) : (
+                <Form.Item
+                  name="quantity"
+                  rules={[
+                    {
+                      type: 'number',
+                      required: true,
+                      message: maxQuantityError(product.stock),
+                      max: product.stock,
+                      min: 0,
+                    },
                   ]}
                 >
-                  <List.Item.Meta
-                    avatar={<Avatar src={item.avatar} />}
-                    title={<a href={item.href}>{item.title}</a>}
-                    description={item.description}
+                  <InputNumber
+                    type="number"
+                    addonAfter={
+                      <CloseOutlined onClick={() => handleSaleQuantity(0)} />
+                    }
+                    onChange={handleSaleQuantity}
+                    value={sale.quantity}
+                    defaultValue={0}
+                    min={0}
                   />
-                  {item.content}
-                </List.Item>
+                </Form.Item>
               )}
-            />
+            </Form>
+            <div
+              className={styles.DetailViewPostDetailsContentDescriptionWrapper}
+            >
+              <h2 className="subtitle">Descripcion</h2>
+              <div
+                className={`${styles.DetailViewPostDetailsContentDescription} ${
+                  showMoreDescription ? styles.showMoreDescription : ''
+                }`}
+              >
+                {product.description}
+              </div>
+              <a
+                className={styles.DetailViewPostDetailsContentDescriptionToggle}
+                onClick={() => setShowMoreDescription(!showMoreDescription)}
+              >
+                {!showMoreDescription ? 'Mostrar mas' : 'Mostrar menos'}
+              </a>
+            </div>
+
+            <div
+              className={styles.DetailViewPostDetailsContentComments}
+              style={{ display: 'none' }}
+            >
+              <span className="subtitle mb-xx-s">Comentarios</span>
+              <div className="flex-between-center p-m gap-s">
+                <Input
+                  placeholder="Escribir comentario"
+                  suffix={<UploadOutlined />}
+                />
+                <Button icon={<MessageOutlined />}>Enviar</Button>
+              </div>
+              <List
+                itemLayout="vertical"
+                size="large"
+                dataSource={data}
+                footer={
+                  <div>
+                    <b>ant design</b> footer part
+                  </div>
+                }
+                renderItem={(item) => (
+                  <List.Item
+                    key={item.title}
+                    actions={[
+                      <IconText
+                        icon={StarOutlined}
+                        text="156"
+                        key="list-vertical-star-o"
+                      />,
+                      <IconText
+                        icon={LikeOutlined}
+                        text="156"
+                        key="list-vertical-like-o"
+                      />,
+                      <IconText
+                        icon={MessageOutlined}
+                        text="2"
+                        key="list-vertical-message"
+                      />,
+                    ]}
+                  >
+                    <List.Item.Meta
+                      avatar={<Avatar src={item.avatar} />}
+                      title={<a href={item.href}>{item.title}</a>}
+                      description={item.description}
+                    />
+                    {item.content}
+                  </List.Item>
+                )}
+              />
+            </div>
           </div>
-        </div>
-        <StickyFooter className={styles.DetailViewPostDetailsActions}>
-          <Button icon={<ShoppingCartOutlined />} size="large" className="me-m">
-            Agregar Al Carrito
-          </Button>
-          <Button icon={<ShoppingCartOutlined />} size="large" className="me-m">
-            Procesar orden
-          </Button>
-        </StickyFooter>
-      </Resizable>
-    </div>
+          <StickyFooter className={styles.DetailViewPostDetailsActions}>
+            <Button
+              icon={<ShoppingCartOutlined />}
+              size="large"
+              className="me-m"
+              type="primary"
+              onClick={toggleCart}
+            >
+              Realizar orden
+            </Button>
+          </StickyFooter>
+        </Resizable>
+      </div>
+    </>
   )
 }

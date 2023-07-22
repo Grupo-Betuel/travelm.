@@ -16,6 +16,7 @@ import { AppLoadingContext } from '@shared/contexts/AppLoadingContext'
 import { AppViewportHeightContext } from '@shared/contexts/AppViewportHeightContext'
 import { OrderContext } from '@shared/contexts/OrderContext'
 import OrderService from '@services/orderService'
+import { useAuthClientHook } from '@shared/hooks/useAuthClientHook'
 
 export interface IAppProps {
   protected?: boolean
@@ -40,26 +41,22 @@ export enum AppViewportHeightClassNames {
   WITH_NAVBAR = 'FullAppViewPortHeight',
   WITH_NAVBAR_OPTION = 'FullAppViewPortHeightNavbarOptions',
 }
+
 function MyApp({ Component, pageProps }: AppProps<IAppProps>) {
   const clientEntity = useAppStore((state) => state.clients((s) => s))
-  const [user, setUser] = useState<ClientEntity | unknown>(null)
   const [appLoading, setAppLoading] = useState<boolean>()
   const [appViewportHeightClassName, setAppViewportHeightClassName] =
     useState<AppViewportHeightClassNames>(
-      AppViewportHeightClassNames.WITH_NAVBAR
+      AppViewportHeightClassNames.WITH_NAVBAR_OPTION
     )
   const orderService = useMemo(() => new OrderService(), [])
   const [cartIsOpen, setCartIsOpen] = useState(false)
-
+  const { client } = useAuthClientHook()
   useEffect(() => {
     setAppLoading(!!clientEntity.loading)
   }, [clientEntity.loading])
 
-  useEffect(() => {
-    // setUser(getAuthData())
-  }, [pageProps])
-
-  if (pageProps.protected && !user) {
+  if (pageProps.protected && !client) {
     return <div>Invalid</div>
   }
 
@@ -67,11 +64,11 @@ function MyApp({ Component, pageProps }: AppProps<IAppProps>) {
 
   const onChangeLayoutAffix = (affixed?: boolean) => {
     if (affixed) {
-      setAppViewportHeightClassName(
-        AppViewportHeightClassNames.WITH_NAVBAR_OPTION
-      )
+      // setAppViewportHeightClassName(
+      //   AppViewportHeightClassNames.WITH_NAVBAR_OPTION
+      // )
     } else {
-      setAppViewportHeightClassName(AppViewportHeightClassNames.WITH_NAVBAR)
+      // setAppViewportHeightClassName(AppViewportHeightClassNames.WITH_NAVBAR)
     }
   }
 

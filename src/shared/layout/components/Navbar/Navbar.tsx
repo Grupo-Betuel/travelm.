@@ -1,12 +1,30 @@
 import { Header } from 'antd/lib/layout/layout'
 import styles from './Navbar.module.scss'
-import { Avatar, Badge, Dropdown, Modal, Select, Space } from 'antd'
+import {
+  Avatar,
+  Badge,
+  Button,
+  Dropdown,
+  Menu,
+  MenuProps,
+  Modal,
+  Select,
+  Space,
+} from 'antd'
 import {
   ArrowLeftOutlined,
+  BankOutlined,
+  CloseOutlined,
+  DatabaseOutlined,
+  DesktopOutlined,
   DownOutlined,
+  FileOutlined,
   HomeOutlined,
+  PieChartOutlined,
   RollbackOutlined,
   ShoppingCartOutlined,
+  TeamOutlined,
+  UserOutlined,
 } from '@ant-design/icons'
 import { HandleAuthVisibility } from '@shared/components'
 import { useContextualRouting } from 'next-use-contextual-routing'
@@ -30,8 +48,38 @@ import { CompanyEntity } from '@shared/entities/CompanyEntity'
 import { useRouter } from 'next/router'
 import { useOrderContext } from '@shared/contexts/OrderContext'
 import { useAppStore } from '@services/store'
+import Sider from 'antd/lib/layout/Sider'
 
-const { Option } = Select
+type MenuItem = Required<MenuProps>['items'][number]
+
+function getItem(
+  label: React.ReactNode,
+  key: React.Key,
+  icon?: React.ReactNode,
+  children?: MenuItem[]
+): MenuItem {
+  return {
+    key,
+    icon,
+    children,
+    label,
+  } as MenuItem
+}
+
+const items: MenuItem[] = [
+  getItem('Option 1', '1', <PieChartOutlined />),
+  getItem('Option 2', '2', <DesktopOutlined />),
+  getItem('User', 'sub1', <UserOutlined />, [
+    getItem('Tom', '3'),
+    getItem('Bill', '4'),
+    getItem('Alex', '5'),
+  ]),
+  getItem('Team', 'sub2', <TeamOutlined />, [
+    getItem('Team 1', '6'),
+    getItem('Team 2', '8'),
+  ]),
+  getItem('Files', '9', <FileOutlined />),
+]
 
 export interface ICategorySelect {
   onSelect: (slug: string) => void
@@ -41,6 +89,7 @@ const navbarOptionsLimit = 4
 export const Navbar = () => {
   const [companyName, setCompanyName] = useState('')
   const [categoryId, setCategoryId] = useState('')
+  const [showSidebar, setHideSidebar] = useState(true)
   const router = useRouter()
   const { makeContextualHref, returnHref } = useContextualRouting()
   const authIsEnable = router.query.auth
@@ -55,8 +104,21 @@ export const Navbar = () => {
   const [selectedCompanies, setSelectedCompanies] = useState<CompanyEntity[]>(
     []
   )
+  const salesQuantityData = useAppStore((state) => {
+    return state.currentOrder?.sales.reduce((acc, sale) => {
+      return acc + sale.quantity
+    }, 0)
+  })
 
-  const { orderService, cartIsOpen, toggleCart } = useOrderContext()
+  const [salesQuantity, setSalesQuantity] = useState(0)
+
+  useEffect(() => {
+    if (salesQuantityData) {
+      setSalesQuantity(salesQuantityData)
+    }
+  }, [salesQuantityData])
+
+  const { cartIsOpen, toggleCart } = useOrderContext()
 
   useEffect(() => {
     const company = router.query.company as string
@@ -80,8 +142,10 @@ export const Navbar = () => {
       data = parseCatToMenuItem(companyCategories?.data || [])
     } else {
       data = parseCompaniesToMenuItem(companies || [])
-      setSelectedCompanies(companies || [])
     }
+    const company = companies.find((c) => c.companyId === companyName)
+    company ? setSelectedCompanies([company]) : setSelectedCompanies([])
+
     setNavbarOptions(data)
   }, [companies, companyCategories?.data, companyName])
 
@@ -90,7 +154,11 @@ export const Navbar = () => {
       key: cat._id,
       title: cat.title,
       label: cat.title,
-      onClick: () => router.push(`/category/${cat._id}`),
+      icon: <DatabaseOutlined />,
+      onClick: () => {
+        router.push(`/${cat.company}/category/${cat._id}`)
+        setHideSidebar(true)
+      },
     }))
 
   const parseCompaniesToMenuItem = (companies: CompanyEntity[]) =>
@@ -98,9 +166,11 @@ export const Navbar = () => {
       key: company._id,
       title: company.name,
       label: company.name,
+      icon: <BankOutlined />,
       onClick: () => {
         router.push(`/${company.companyId}`)
         setSelectedCompanies([company])
+        setHideSidebar(true)
       },
     }))
 
@@ -127,19 +197,21 @@ export const Navbar = () => {
             className={`${styles.navbarLogoContainer} flex-start-center gap-l`}
           >
             <Link href={`/`}>
-              <ArrowLeftOutlined style={{ fontSize: '30px' }} />
+              <HomeOutlined style={{ fontSize: '30px' }} />
             </Link>
-            {/*{selectedCompanies.map((company) => (*/}
-            {/*  <div*/}
-            {/*    onClick={goToCompany(company)}*/}
-            {/*    className="cursor-pointer"*/}
-            {/*    key={company._id}*/}
-            {/*  >*/}
-            {/*    <img className={styles.navbarLogo} src={company.logo} />*/}
-            {/*  </div>*/}
-            {/*))}*/}
+            {selectedCompanies.map((company) => (
+              <div
+                onClick={goToCompany(company)}
+                className="cursor-pointer"
+                key={company._id}
+              >
+                <img className={styles.navbarLogo} src={company.logo} />
+              </div>
+            ))}
           </div>
-          <div className={`${styles.navbarOptionsList} flex-center-center`}>
+          <div
+            className={`${styles.navbarOptionsList} ${styles.navbarOptionsListCenter} flex-center-center`}
+          >
             {navbarOptions
               .slice(0, navbarOptionsLimit)
               .map((navOption: MenuItemType, i) => (
@@ -194,6 +266,11 @@ export const Navbar = () => {
                         label: 'Perfil',
                       },
                       {
+                        key: 'my-orders',
+                        onClick: () => router.push('/client/orders'),
+                        label: 'Mis Ordenes',
+                      },
+                      {
                         key: 'sign-out',
                         onClick: () => appLogOut(),
                         label: 'Cerrar Sesión',
@@ -215,8 +292,12 @@ export const Navbar = () => {
               </div>
             </HandleAuthVisibility>
             <div className={styles.navbarOptionsListItem} onClick={toggleCart}>
-              <Badge count={orderService?.localOrder?.sales?.length}>
-                <ShoppingCartOutlined style={{ fontSize: '24px' }} />
+              <Badge count={!cartIsOpen ? salesQuantity : 0}>
+                {cartIsOpen ? (
+                  <CloseOutlined style={{ fontSize: '24px' }} />
+                ) : (
+                  <ShoppingCartOutlined style={{ fontSize: '24px' }} />
+                )}
               </Badge>
             </div>
           </div>
@@ -233,6 +314,22 @@ export const Navbar = () => {
       </Modal>
 
       <ShoppingCartDrawer open={cartIsOpen} onClose={toggleCart} />
+      <Sider
+        className={styles.navbarSidebar}
+        collapsible
+        collapsedWidth={0}
+        collapsed={showSidebar}
+        onCollapse={(value) => setHideSidebar(value)}
+        theme={'light'}
+      >
+        <div className="demo-logo-vertical" />
+        <Menu
+          theme="light"
+          defaultSelectedKeys={['1']}
+          mode="inline"
+          items={navbarOptions}
+        />
+      </Sider>
     </>
   )
 }

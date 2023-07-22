@@ -1,5 +1,8 @@
 @use 'src/shared/styles/layout-variables' as layout;
 @use 'src/shared/styles/color-variables' as colors;
+@use 'src/shared/styles/sizing-variables' as sizes;
+@use 'src/shared/styles/breakpoints' as breakpoints;
+
 @import '../../shared/styles/sizing-variables';
 
 .CategoryWrapper {
@@ -13,6 +16,10 @@
     margin-top: -50px;
     position: relative;
     z-index: 1;
+    @include breakpoints.only-on(('m', 'xs')) {
+      padding: sizes.$size-x-large;
+    }
+
     .CategoryContentProducts {
       .CategoryContentProductsScrollViewCategories {
         margin: $size-xxx-large * 3 0;
@@ -23,12 +30,23 @@
       grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
       gap: $size-x-large * 2;
       position: relative;
+      @include breakpoints.only-on(('m', 'xs')) {
+        gap: $size-x-large;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      }
     }
     .CategorySearchWrapper {
       padding: 0 7rem;
+      background: white;
+      @include breakpoints.only-on(('m', 'xs')) {
+        padding: 0 0.2rem;
+      }
       .CategoryInputSearch {
         font-size: 2.5rem;
         color: colors.$color-white-2;
+        @include breakpoints.only-on(('m', 'xs')) {
+          font-size: 2rem;
+        }
       }
     }
   }

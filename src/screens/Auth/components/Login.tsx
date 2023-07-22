@@ -1,5 +1,5 @@
 import React from 'react'
-import { Button, Form, Input } from 'antd'
+import { Button, Form, Input, Spin } from 'antd'
 import { useAppStore } from '@services/store'
 import { useRouter } from 'next/router'
 import { IAuthProps } from '@screens/Auth/Auth'
@@ -36,6 +36,11 @@ export const Login = ({ isModal }: IAuthProps) => {
       onFinish={submit}
       autoComplete="off"
     >
+      {clientEntity.loading && (
+        <div className="loading">
+          <Spin size="large" />
+        </div>
+      )}
       <Form.Item label="Whatsapp" name="phone" rules={[{ required: true }]}>
         <MaskedInput
           maskOptions={{

@@ -1,5 +1,5 @@
 import { Navbar } from '@shared/layout/components/Navbar/Navbar'
-import { Layout } from 'antd'
+import { FloatButton, Layout } from 'antd'
 import { Content } from 'antd/lib/layout/layout'
 import styles from './layout.module.scss'
 import { layoutId } from '../../utils/layout.utils'

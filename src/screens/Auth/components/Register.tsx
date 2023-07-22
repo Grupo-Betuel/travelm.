@@ -1,4 +1,4 @@
-import { Button, Form, Input, Select } from 'antd'
+import { Button, Form, Input, Select, Spin } from 'antd'
 import { useAppStore } from '@services/store'
 import { ClientEntity } from '@shared/entities/ClientEntity'
 import { MaskedInput } from 'antd-mask-input'
@@ -49,6 +49,11 @@ export const Register = ({ isModal, onSubmit }: IAuthProps) => {
       initialValues={{ remember: true }}
       onFinish={createClient}
     >
+      {clientEntity.loading && (
+        <div className="loading">
+          <Spin size="large" />
+        </div>
+      )}
       <Form.Item label="Nombre" name="firstName" rules={[{ required: true }]}>
         <Input size="large" />
       </Form.Item>

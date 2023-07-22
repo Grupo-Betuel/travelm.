@@ -7,7 +7,7 @@ import {
   ProductCard,
   ScrollView,
 } from '@shared/components'
-import { Input } from 'antd'
+import { Affix, Input } from 'antd'
 import { SearchOutlined } from '@ant-design/icons'
 import { handleEntityHook } from '@shared/hooks/handleEntityHook'
 import { ProductEntity } from '@shared/entities/ProductEntity'
@@ -16,6 +16,7 @@ import { useRouter } from 'next/router'
 import { useContextualRouting } from 'next-use-contextual-routing'
 import { DetailView } from '@components/DetailView'
 import { deepMatch } from '../../utils/matching.util'
+import { layoutId, navbarOptionsHeight } from '../../utils/layout.utils'
 
 export type CompanyTypes = 'betueltech' | 'betueldance'
 
@@ -72,7 +73,7 @@ export const Home = ({ hideCarousel }: HomeProps) => {
   const goToProductDetail = (product: ProductEntity) => {
     router.push(
       makeContextualHref({ productId: product._id }),
-      `/detail/${product._id}`,
+      `/${product.company}/detail/${product._id}`,
       {
         shallow: true,
       }
@@ -84,7 +85,7 @@ export const Home = ({ hideCarousel }: HomeProps) => {
   }
 
   const onSearch = ({ target: { value } }: ChangeEvent<HTMLInputElement>) => {
-    const results = deepMatch<ProductEntity>(value, productsData?.data || [])
+    const results = deepMatch<ProductEntity>(value, productsData || [])
     setProducts([...results])
   }
 
@@ -93,22 +94,29 @@ export const Home = ({ hideCarousel }: HomeProps) => {
       <MainContentModal show={showContextProductDetailModal}>
         <DetailView returnHref={returnHref}></DetailView>
       </MainContentModal>
-      <div className={styles.LandingCarouselWrapper}>
-        {!hideCarousel && <LandingCarousel />}
-      </div>
+      {/*<div className={styles.LandingCarouselWrapper}>*/}
+      {/*  {!hideCarousel && <LandingCarousel />}*/}
+      {/*</div>*/}
       <div className={styles.HomeContent}>
-        <div className={styles.HomeSearchWrapper}>
-          {/*<Input placeholder="Borderless" bordered={false} />*/}
-          <Input
-            className={styles.HomeInputSearch}
-            placeholder="Buscar"
-            suffix={<SearchOutlined className="site-form-item-icon" />}
-            bordered={false}
-            onChange={onSearch}
-            size="large"
-          />
-        </div>
-        {products.length > 0 ? (
+        <Affix
+          className={styles.SidebarAffix}
+          offsetTop={navbarOptionsHeight}
+          target={() => document.getElementById(layoutId)}
+        >
+          <div className={styles.HomeSearchWrapper}>
+            {/*<Input placeholder="Borderless" bordered={false} />*/}
+            <Input
+              className={styles.HomeInputSearch}
+              placeholder="Buscar"
+              suffix={<SearchOutlined className="site-form-item-icon" />}
+              bordered={false}
+              onChange={onSearch}
+              size="large"
+            />
+          </div>
+          {!products?.length && <h2 className="p-xx-l">No hay resultados!</h2>}
+        </Affix>
+        {products.length > 0 && (
           <div className={styles.HomeContentProducts}>
             {Object.keys(productsPerCompanies).map((categoryId, i) => {
               const category = productsPerCompanies[categoryId]
@@ -135,8 +143,6 @@ export const Home = ({ hideCarousel }: HomeProps) => {
               ))}
             </div>
           </div>
-        ) : (
-          <h2>No hay resultados!</h2>
         )}
       </div>
     </div>

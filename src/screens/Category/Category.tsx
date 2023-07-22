@@ -7,7 +7,7 @@ import {
   ProductCard,
   ScrollView,
 } from '@shared/components'
-import { Input } from 'antd'
+import { Affix, Input } from 'antd'
 import { SearchOutlined } from '@ant-design/icons'
 import { handleEntityHook } from '@shared/hooks/handleEntityHook'
 import { ProductEntity } from '@shared/entities/ProductEntity'
@@ -17,6 +17,7 @@ import { EndpointsAndEntityStateKeys } from '@shared/enums/endpoints.enum'
 import { useContextualRouting } from 'next-use-contextual-routing'
 import { DetailView } from '@components/DetailView'
 import { deepMatch } from '../../utils/matching.util'
+import { layoutId, navbarOptionsHeight } from '../../utils/layout.utils'
 
 export interface CategoryProps {}
 export type ProductPerCategoryType = {
@@ -61,7 +62,7 @@ export const Category = ({}: CategoryProps) => {
   const goToProductDetail = (product: ProductEntity) => {
     router.push(
       makeContextualHref({ productId: product._id }),
-      `/detail/${product._id}`,
+      `/${product.company}/detail/${product._id}`,
       {
         shallow: true,
       }
@@ -82,17 +83,26 @@ export const Category = ({}: CategoryProps) => {
         <DetailView returnHref={returnHref}></DetailView>
       </MainContentModal>
       <div className={styles.CategoryContent}>
-        <div className={styles.CategorySearchWrapper}>
-          <Input
-            className={styles.CategoryInputSearch}
-            placeholder="Buscar"
-            suffix={<SearchOutlined className="site-form-item-icon" />}
-            bordered={false}
-            onChange={onSearch}
-            size="large"
-          />
-        </div>
-        {categoryProducts.length > 0 ? (
+        <Affix
+          className={styles.SidebarAffix}
+          offsetTop={navbarOptionsHeight}
+          target={() => document.getElementById(layoutId)}
+        >
+          <div className={styles.CategorySearchWrapper}>
+            <Input
+              className={styles.CategoryInputSearch}
+              placeholder="Buscar"
+              suffix={<SearchOutlined className="site-form-item-icon" />}
+              bordered={false}
+              onChange={onSearch}
+              size="large"
+            />
+          </div>
+          {!categoryProducts?.length && (
+            <h2 className="p-xx-l">No hay resultados!</h2>
+          )}
+        </Affix>
+        {categoryProducts.length > 0 && (
           <div className={styles.CategoryContentProducts}>
             <h2 className="mb-xx-l title">
               {categoryProducts[0].category.title}
@@ -107,8 +117,6 @@ export const Category = ({}: CategoryProps) => {
               ))}
             </div>
           </div>
-        ) : (
-          <h2>No hay resultados!</h2>
         )}
       </div>
     </div>

@@ -7,7 +7,7 @@ import {
   ProductCard,
   ScrollView,
 } from '@shared/components'
-import { Input } from 'antd'
+import { Affix, Input } from 'antd'
 import { SearchOutlined } from '@ant-design/icons'
 import { handleEntityHook } from '@shared/hooks/handleEntityHook'
 import { ProductEntity } from '@shared/entities/ProductEntity'
@@ -18,6 +18,7 @@ import Link from 'next/link'
 import { useContextualRouting } from 'next-use-contextual-routing'
 import { DetailView } from '@components/DetailView'
 import { deepMatch } from '../../utils/matching.util'
+import { layoutId, navbarOptionsHeight } from '../../utils/layout.utils'
 
 export interface CompanyProps {
   hideCarousel?: boolean
@@ -43,7 +44,8 @@ export const Company = ({ hideCarousel }: CompanyProps) => {
   const productsPerCategories = useMemo<ProductPerCategoryType>(() => {
     const data = companyProducts.reduce<ProductPerCategoryType>(
       (acc, product) => {
-        const category = product.category?._id || 'default'
+        if (!product.category?._id) return acc
+        const category = product.category?._id
 
         if (!acc[category]) {
           acc[category] = {
@@ -63,7 +65,7 @@ export const Company = ({ hideCarousel }: CompanyProps) => {
     const company = router.query.company as string
     const productId = router.query.productId as string
 
-    if (company && !companyProductsData?.data?.length) {
+    if (company && company !== companyName) {
       getProducts({
         endpoint: EndpointsAndEntityStateKeys.BY_COMPANY,
         slug: company,
@@ -81,14 +83,14 @@ export const Company = ({ hideCarousel }: CompanyProps) => {
   const goToProductDetail = (product: ProductEntity) => {
     router.push(
       makeContextualHref({ productId: product._id }),
-      `/detail/${product._id}`,
+      `/${product.company}/detail/${product._id}`,
       {
         shallow: true,
       }
     )
   }
   const handleSeeMore = (product: ProductEntity) => {
-    router.push(`/category/${product.category._id}`)
+    router.push(`/${product.company}/category/${product.category._id}`)
   }
 
   const onSearch = ({ target: { value } }: ChangeEvent<HTMLInputElement>) => {
@@ -104,21 +106,30 @@ export const Company = ({ hideCarousel }: CompanyProps) => {
       <MainContentModal show={showContextProductDetailModal}>
         <DetailView returnHref={returnHref}></DetailView>
       </MainContentModal>
-      <div className={styles.LandingCarouselWrapper}>
-        {!hideCarousel && <LandingCarousel />}
-      </div>
+      {/*<div className={styles.LandingCarouselWrapper}>*/}
+      {/*  {!hideCarousel && <LandingCarousel />}*/}
+      {/*</div>*/}
       <div className={styles.CompanyContent}>
-        <div className={styles.CompanySearchWrapper}>
-          <Input
-            className={styles.CompanyInputSearch}
-            placeholder="Buscar"
-            suffix={<SearchOutlined className="site-form-item-icon" />}
-            bordered={false}
-            onChange={onSearch}
-            size="large"
-          />
-        </div>
-        {companyProducts.length > 0 ? (
+        <Affix
+          className={styles.SidebarAffix}
+          offsetTop={navbarOptionsHeight}
+          target={() => document.getElementById(layoutId)}
+        >
+          <div className={styles.CompanySearchWrapper}>
+            <Input
+              className={styles.CompanyInputSearch}
+              placeholder="Buscar"
+              suffix={<SearchOutlined className="site-form-item-icon" />}
+              bordered={false}
+              onChange={onSearch}
+              size="large"
+            />
+          </div>
+          {!companyProducts?.length && (
+            <h2 className="p-xx-l">No hay resultados!</h2>
+          )}
+        </Affix>
+        {companyProducts.length > 0 && (
           <div className={styles.CompanyContentProducts}>
             {Object.keys(productsPerCategories).map((categoryId, i) => {
               const category = productsPerCategories[categoryId]
@@ -146,8 +157,6 @@ export const Company = ({ hideCarousel }: CompanyProps) => {
               ))}
             </div>
           </div>
-        ) : (
-          <h2>No hay resultados!</h2>
         )}
       </div>
     </div>
