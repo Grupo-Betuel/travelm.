@@ -1,24 +1,23 @@
-import { AppViewportHeightContext } from '@shared/contexts/AppViewportHeightContext'
-import { Affix } from 'antd'
-import { useContext, useState } from 'react'
-import { layoutId, navbarOptionsHeight } from 'src/utils/layout.utils'
-import styles from './MainContentModal.module.scss'
+import { AppViewportHeightContext } from '@shared/contexts/AppViewportHeightContext';
+import { Affix } from 'antd';
+import { useContext, useState } from 'react';
+import { layoutId, navbarOptionsHeight } from 'src/utils/layout.utils';
+import styles from './MainContentModal.module.scss';
 
 export interface IMainContentModalProps {
   children?: any
   show?: boolean
   transparent?: boolean
 }
-export const MainContentModal = ({
+export function MainContentModal({
   children,
   show,
   transparent,
-}: IMainContentModalProps) => {
-  const [top, setTop] = useState(navbarOptionsHeight)
-  const [enableSidebarOptionHiddenHeight, setEnableSidebarOptionHiddenHeight] =
-    useState<boolean>()
+}: IMainContentModalProps) {
+  const [top, setTop] = useState(navbarOptionsHeight);
+  const [enableSidebarOptionHiddenHeight, setEnableSidebarOptionHiddenHeight] = useState<boolean>();
 
-  const appViewportHeight = useContext(AppViewportHeightContext)
+  const appViewportHeight = useContext(AppViewportHeightContext);
 
   return show ? (
     <div
@@ -30,5 +29,5 @@ export const MainContentModal = ({
     </div>
   ) : (
     <></>
-  )
+  );
 }

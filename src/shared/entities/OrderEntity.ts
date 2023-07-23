@@ -1,8 +1,8 @@
 // import { Location } from 'whatsapp-web.js'
-import { IMessenger } from '@interfaces/messenger.interface'
-import { ClientEntity } from '@shared/entities/ClientEntity'
-import { BaseEntity } from '@shared/entities/BaseEntity'
-import { IProductParam, ProductEntity } from '@shared/entities/ProductEntity'
+import { IMessenger } from '@interfaces/messenger.interface';
+import { ClientEntity } from '@shared/entities/ClientEntity';
+import { BaseEntity } from '@shared/entities/BaseEntity';
+import { IProductParam, ProductEntity } from '@shared/entities/ProductEntity';
 
 export interface ProductId {
   _id: string
@@ -44,8 +44,8 @@ export interface ISale {
   __v: number
 }
 
-export type OrderTypes = 'shipping' | 'pickup'
-export type OrderPaymentTypes = 'cash' | 'transfer' | 'card'
+export type OrderTypes = 'shipping' | 'pickup';
+export type OrderPaymentTypes = 'cash' | 'transfer' | 'card';
 export type OrderStatusTypes =
   | 'pending'
   | 'personal-assistance'
@@ -56,7 +56,7 @@ export type OrderStatusTypes =
   | 'delivered'
   | 'canceled'
   | 'cancel-attempt'
-  | 'completed'
+  | 'completed';
 
 export interface ITransferReceipt {
   _id?: string
@@ -92,21 +92,32 @@ export interface IQuotedMessage {
 
 export type IOrderData = {
   [N in string]: OrderEntity[]
-}
+};
 
 export default class OrderEntity extends BaseEntity {
-  client?: ClientEntity
-  status: OrderStatusTypes = 'pending-info'
-  paymentType?: OrderPaymentTypes
+  client?: ClientEntity;
+
+  status: OrderStatusTypes = 'pending-info';
+
+  paymentType?: OrderPaymentTypes;
+
   // productId: ProductId = {} as ProductId
-  sales: ISale[] = []
-  company: string = undefined
-  type?: OrderTypes
-  location?: any
+  sales: ISale[] = [];
+
+  company: string = undefined;
+
+  type?: OrderTypes;
+
+  location?: any;
+
   // eslint-disable-next-line no-use-before-define
-  transferReceipt?: ITransferReceipt
-  messenger?: IMessenger
-  shippingPrice?: number
-  shippingTime?: string
-  _id?: string = undefined
+  transferReceipt?: ITransferReceipt;
+
+  messenger?: IMessenger;
+
+  shippingPrice?: number;
+
+  shippingTime?: string;
+
+  _id?: string = undefined;
 }

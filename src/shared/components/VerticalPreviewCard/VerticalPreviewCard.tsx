@@ -1,5 +1,5 @@
-import styles from './VerticalPreviewCard.module.scss'
-import { Image } from 'antd'
+import { Image } from 'antd';
+import styles from './VerticalPreviewCard.module.scss';
 
 export interface IVerticalPreviewCardItem {
   images: string[]
@@ -12,18 +12,16 @@ export interface IVerticalPreviewCardProps {
   title?: string
 }
 
-export const VerticalPreviewCard = (
-  { items, onSelect, title }: IVerticalPreviewCardProps = {
-    items: [],
-    title: 'example',
-  }
-) => {
+export function VerticalPreviewCard({ items, onSelect, title }: IVerticalPreviewCardProps = {
+  items: [],
+  title: 'example',
+}) {
   return (
     <div className={styles.VerticalPreviewCardWrapper} onClick={onSelect}>
       <span className="subtitle">{title}</span>
       <div className={styles.VerticalPreviewCardGrid}>
-        {items &&
-          items.map((item, i) => (
+        {items
+          && items.map((item, i) => (
             <div
               className={`${styles.verticalPromotionCardGridItem} hover-red-2`}
               key={i}
@@ -40,5 +38,5 @@ export const VerticalPreviewCard = (
       </div>
       <p className={styles.verticalPromotionCardAction}>Ver Mas</p>
     </div>
-  )
+  );
 }

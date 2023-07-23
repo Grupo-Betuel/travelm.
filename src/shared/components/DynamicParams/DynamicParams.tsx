@@ -1,9 +1,11 @@
-import { ParamEntity } from '@shared/entities/ParamEntity'
-import { Checkbox, Form, Input, Radio, Select } from 'antd'
-import { SelectProps } from 'antd/es/select'
-import { IFilterParam, ParamTypes } from '@interfaces/params.interface'
-import { useEffect } from 'react'
-import { useForm } from 'antd/lib/form/Form'
+import { ParamEntity } from '@shared/entities/ParamEntity';
+import {
+  Checkbox, Form, Input, Radio, Select,
+} from 'antd';
+import { SelectProps } from 'antd/es/select';
+import { IFilterParam, ParamTypes } from '@interfaces/params.interface';
+import { useEffect } from 'react';
+import { useForm } from 'antd/lib/form/Form';
 
 export interface IDynamicParamProps {
   options?: string[]
@@ -26,8 +28,8 @@ const DynamicParamComponents: {
       ))}
     </Radio.Group>
   ),
-  INPUT: (props: IDynamicParamProps) => <Input {...props}></Input>,
-}
+  INPUT: (props: IDynamicParamProps) => <Input {...props} />,
+};
 
 export interface IDynamicParamsProps {
   params: ParamEntity[]
@@ -35,45 +37,45 @@ export interface IDynamicParamsProps {
   renderType: 'searchParameterType' | 'responseParameterType'
   onChanges?: (filterParams: IFilterParam[]) => void
 }
-export const DynamicParams = ({
+export function DynamicParams({
   params,
   renderType,
   onChanges,
   selectedParams,
-}: IDynamicParamsProps) => {
-  const [dynamicForm] = useForm()
+}: IDynamicParamsProps) {
+  const [dynamicForm] = useForm();
 
   const parseSelectedParamsToFormValue = () => {
-    console.log(selectedParams, 'selectedParams')
+    console.log(selectedParams, 'selectedParams');
     if (selectedParams && selectedParams.length) {
-      const data: any = {}
+      const data: any = {};
       selectedParams.forEach((param) => {
-        data[param.paramId] = param.answer
-      })
+        data[param.paramId] = param.answer;
+      });
 
-      dynamicForm.setFieldsValue(data)
+      dynamicForm.setFieldsValue(data);
     } else {
-      dynamicForm.resetFields()
+      dynamicForm.resetFields();
     }
-  }
+  };
 
   useEffect(() => {
-    console.log('selectedParams =>',  selectedParams);
-    parseSelectedParamsToFormValue()
-  }, [selectedParams])
+    console.log('selectedParams =>', selectedParams);
+    parseSelectedParamsToFormValue();
+  }, [selectedParams]);
 
   const handleDynamicChanges = (changeData: any, dynamicData?: any) => {
-    const filterParams: IFilterParam[] = []
+    const filterParams: IFilterParam[] = [];
     Object.keys(dynamicData).forEach((k) => {
-      if (!dynamicData[k]) return
+      if (!dynamicData[k]) return;
       filterParams.push({
         paramId: k,
         answer: dynamicData[k],
-      })
-    })
+      });
+    });
 
-    onChanges && onChanges(filterParams)
-  }
+    onChanges && onChanges(filterParams);
+  };
 
   return (
     <Form
@@ -97,5 +99,5 @@ export const DynamicParams = ({
         </Form.Item>
       ))}
     </Form>
-  )
+  );
 }

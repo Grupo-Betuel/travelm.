@@ -1,8 +1,8 @@
-import { BaseService } from '@services/BaseService'
-import { ClientEntity } from '@shared/entities/ClientEntity'
+import { BaseService } from '@services/BaseService';
+import { ClientEntity } from '@shared/entities/ClientEntity';
 
 export class ClientService extends BaseService<ClientEntity> {
   constructor() {
-    super('clients')
+    super('clients');
   }
 }

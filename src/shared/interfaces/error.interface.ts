@@ -1,4 +1,4 @@
-import { StatusCode } from '@interfaces/REST.interface'
+import { StatusCode } from '@interfaces/REST.interface';
 
 export interface IResponseError {
   data: {

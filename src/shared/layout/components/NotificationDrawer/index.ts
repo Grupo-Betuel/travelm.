@@ -1,1 +1,1 @@
-export { NotificationDrawer } from './NotificationDrawer'
+export { NotificationDrawer } from './NotificationDrawer';

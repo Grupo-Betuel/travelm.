@@ -7,28 +7,28 @@ import {
   DrawerProps,
   List,
   Skeleton,
-} from 'antd'
-import styles from './DatesDrawer.module.scss'
-import { getAuthData } from '../../../../utils/auth.utils'
-import { ClientEntity } from '@shared/entities/ClientEntity'
-import { Dayjs } from 'dayjs'
+} from 'antd';
+import { ClientEntity } from '@shared/entities/ClientEntity';
+import { Dayjs } from 'dayjs';
+import styles from './DatesDrawer.module.scss';
+import { getAuthData } from '../../../../utils/auth.utils';
 
 const getListData = (value: Dayjs) => {
-  let listData
+  let listData;
   switch (value.date()) {
     case 8:
       listData = [
         { type: 'warning', content: 'This is warning event.' },
         { type: 'success', content: 'This is usual event.' },
-      ]
-      break
+      ];
+      break;
     case 10:
       listData = [
         { type: 'warning', content: 'This is warning event.' },
         { type: 'success', content: 'This is usual event.' },
         { type: 'error', content: 'This is error event.' },
-      ]
-      break
+      ];
+      break;
     case 15:
       listData = [
         { type: 'warning', content: 'This is warning event' },
@@ -37,33 +37,33 @@ const getListData = (value: Dayjs) => {
         { type: 'error', content: 'This is error event 2.' },
         { type: 'error', content: 'This is error event 3.' },
         { type: 'error', content: 'This is error event 4.' },
-      ]
-      break
+      ];
+      break;
     default:
   }
-  return listData || []
-}
+  return listData || [];
+};
 
 const getMonthData = (value: Dayjs) => {
   if (value.month() === 8) {
-    return 1394
+    return 1394;
   }
-}
+};
 
 export interface IDatesDrawerProps extends DrawerProps {}
 
-export const DatesDrawer = ({ ...props }: IDatesDrawerProps) => {
+export function DatesDrawer({ ...props }: IDatesDrawerProps) {
   const monthCellRender = (value: Dayjs) => {
-    const num = getMonthData(value)
+    const num = getMonthData(value);
     return num ? (
       <div className="notes-month">
         <section>{num}</section>
         <span>Backlog number</span>
       </div>
-    ) : null
-  }
+    ) : null;
+  };
 
-  const authUser = getAuthData('user') as ClientEntity
+  const authUser = getAuthData('user') as ClientEntity;
   const DatesList = [
     {
       loading: false,
@@ -77,11 +77,11 @@ export const DatesDrawer = ({ ...props }: IDatesDrawerProps) => {
         'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/Cat03.jpg/640px-Cat03.jpg',
       name: 'Meeting with cat on Monday at 4:00PM',
     },
-  ]
-  const initLoading = false
+  ];
+  const initLoading = false;
 
   const dateCellRender = (value: Dayjs) => {
-    const listData = getListData(value)
+    const listData = getListData(value);
     return (
       <ul className="events">
         {listData.map((item) => (
@@ -93,12 +93,18 @@ export const DatesDrawer = ({ ...props }: IDatesDrawerProps) => {
           </li>
         ))}
       </ul>
-    )
-  }
+    );
+  };
 
   return (
     <div className={styles.DatesDrawer}>
-      {authUser && <h3>{authUser.name} recuerda!</h3>}
+      {authUser && (
+      <h3>
+        {authUser.name}
+        {' '}
+        recuerda!
+      </h3>
+      )}
       <Calendar
         dateCellRender={dateCellRender}
         monthCellRender={monthCellRender}
@@ -132,5 +138,5 @@ export const DatesDrawer = ({ ...props }: IDatesDrawerProps) => {
         <li className={`${styles.DatesOption}`}>Language</li>
       </ul>
     </div>
-  )
+  );
 }

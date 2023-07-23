@@ -1,23 +1,23 @@
-import { Drawer, DrawerProps } from 'antd'
-import styles from './CategoriesDrawer.module.scss'
-import { getAuthData, appLogOut } from '../../../../utils/auth.utils'
-import { ClientEntity } from '@shared/entities/ClientEntity'
-import { handleEntityHook } from '@shared/hooks/handleEntityHook'
-import { CategoryEntity } from '@shared/entities/CategoryEntity'
+import { Drawer, DrawerProps } from 'antd';
+import { ClientEntity } from '@shared/entities/ClientEntity';
+import { handleEntityHook } from '@shared/hooks/handleEntityHook';
+import { CategoryEntity } from '@shared/entities/CategoryEntity';
+import { getAuthData, appLogOut } from '../../../../utils/auth.utils';
+import styles from './CategoriesDrawer.module.scss';
 
 export interface ICategoriesDrawerProps extends DrawerProps {
   authenticate: () => void
 }
 
-export const CategoriesDrawer = ({
+export function CategoriesDrawer({
   authenticate,
   ...props
-}: ICategoriesDrawerProps) => {
-  const authUser = getAuthData('user') as ClientEntity
+}: ICategoriesDrawerProps) {
+  const authUser = getAuthData('user') as ClientEntity;
   const { data: categories } = handleEntityHook<CategoryEntity>(
     'categories',
-    true
-  )
+    true,
+  );
 
   return (
     <Drawer
@@ -26,7 +26,13 @@ export const CategoriesDrawer = ({
       placement="left"
       {...props}
     >
-      {authUser && <h3>Hola {authUser.name}!</h3>}
+      {authUser && (
+      <h3>
+        Hola
+        {authUser.name}
+        !
+      </h3>
+      )}
       <ul className={styles.CategoriesOptionsList}>
         <li className={`${styles.CategoriesOptionTitle}`}>Cat 1</li>
         {categories.map((item) => (
@@ -61,5 +67,5 @@ export const CategoriesDrawer = ({
         )}
       </ul>
     </Drawer>
-  )
+  );
 }

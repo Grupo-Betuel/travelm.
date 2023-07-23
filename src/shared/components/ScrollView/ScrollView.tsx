@@ -1,7 +1,7 @@
-import styles from './ScrollView.module.scss'
-import { useRef } from 'react'
-import { ProductCard } from '@shared/components'
-import { ProductEntity } from '@shared/entities/ProductEntity'
+import { useRef } from 'react';
+import { ProductCard } from '@shared/components';
+import { ProductEntity } from '@shared/entities/ProductEntity';
+import styles from './ScrollView.module.scss';
 
 export interface IScrollViewProps {
   products: ProductEntity[]
@@ -11,16 +11,16 @@ export interface IScrollViewProps {
   handleSeeMore?: (product: ProductEntity) => void
 }
 
-export const ScrollView = ({
+export function ScrollView({
   products,
   title,
   handleProductClick,
   wrapperClassName,
   handleSeeMore,
-}: IScrollViewProps) => {
+}: IScrollViewProps) {
   const preview = (back?: boolean) => () => {
-    const scrollView = scrollViewRef.current as HTMLDivElement
-    const progress = 280
+    const scrollView = scrollViewRef.current as HTMLDivElement;
+    const progress = 280;
 
     if (scrollView) {
       scrollView.scrollTo({
@@ -28,15 +28,15 @@ export const ScrollView = ({
           ? scrollView.scrollLeft - progress
           : scrollView.scrollLeft + progress,
         behavior: 'smooth',
-      })
+      });
     }
-  }
+  };
 
   const onSeeMore = () => {
-    handleSeeMore && handleSeeMore(products[0])
-  }
+    handleSeeMore && handleSeeMore(products[0]);
+  };
 
-  const scrollViewRef = useRef({} as any)
+  const scrollViewRef = useRef({} as any);
 
   return (
     <div className={`${styles.ScrollViewContainer} ${wrapperClassName}`}>
@@ -64,5 +64,5 @@ export const ScrollView = ({
         />
       </div>
     </div>
-  )
+  );
 }

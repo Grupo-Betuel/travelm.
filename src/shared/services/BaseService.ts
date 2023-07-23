@@ -1,16 +1,16 @@
-import { EntityNamesType } from '@services/appEntitiesWithService'
-import { CRUDTypes } from '@interfaces/CRUD.interface'
-import { http } from '@services/utils/http.util'
+import { EntityNamesType } from '@services/appEntitiesWithService';
+import { CRUDTypes } from '@interfaces/CRUD.interface';
+import { http } from '@services/utils/http.util';
 import {
   AbstractBaseService,
   CallbackType,
   HandleErrorType,
-} from '@interfaces/baseService.interface'
-import { IResponseError } from '@interfaces/error.interface'
-import { deepMatch } from '../../utils/matching.util'
-import { EndpointsAndEntityStateKeys } from '@shared/enums/endpoints.enum'
-import { IPaginatedResponse } from '@interfaces/pagination.interface'
-import { extractContent } from '../../utils/objects.utils'
+} from '@interfaces/baseService.interface';
+import { IResponseError } from '@interfaces/error.interface';
+import { EndpointsAndEntityStateKeys } from '@shared/enums/endpoints.enum';
+import { IPaginatedResponse } from '@interfaces/pagination.interface';
+import { deepMatch } from '../../utils/matching.util';
+import { extractContent } from '../../utils/objects.utils';
 
 export interface IServiceMethodProperties<T> {
   queryParams?: { [N in keyof T]: any } | any
@@ -22,22 +22,25 @@ export interface IServiceMethodProperties<T> {
 
 export type LocalStorageKeysType = {
   [N in CRUDTypes]: string
-}
+};
 
 export class BaseService<T> implements AbstractBaseService<T> {
-  version = 'v1'
-  apiPrefix = 'api'
-  api = ''
-  localStorageKey: LocalStorageKeysType
+  version = 'v1';
+
+  apiPrefix = 'api';
+
+  api = '';
+
+  localStorageKey: LocalStorageKeysType;
 
   constructor(public entity: EntityNamesType) {
-    this.api = `${this.apiPrefix}/${this.entity}`
+    this.api = `${this.apiPrefix}/${this.entity}`;
     this.localStorageKey = {
       get: `store-app:get::${this.entity}`,
       add: `store-app:add::${this.entity}`,
       update: `store-app:update::${this.entity}`,
       remove: `store-app:remove::${this.entity}`,
-    }
+    };
   }
 
   async get(
@@ -45,43 +48,43 @@ export class BaseService<T> implements AbstractBaseService<T> {
     callback: CallbackType<T>,
     handleError: HandleErrorType,
     enableCache = false,
-    cacheLifeTime: number = 60 * 1000 * 5
+    cacheLifeTime: number = 60 * 1000 * 5,
   ): Promise<T[] | IPaginatedResponse<T> | undefined> {
     try {
       if (enableCache) {
-        const cached = this.getCachedData('get', properties)
+        const cached = this.getCachedData('get', properties);
         if (cached && cached) {
-          callback(cached, true)
+          callback(cached, true);
         }
       }
 
-      const extraPath = this.handleServiceMethodPathProperties(properties)
+      const extraPath = this.handleServiceMethodPathProperties(properties);
 
       let { data } = await http.get<T[] | IPaginatedResponse<T>>(
         `${this.api}${extraPath}`,
         {
           params: { ...properties.queryParams },
-        }
-      )
+        },
+      );
       if (enableCache && !!(data as any)?.length) {
         const cachedData: T[] = this.cacheData(
           extractContent(data),
           'get',
           cacheLifeTime,
-          properties
-        ) as T[]
+          properties,
+        ) as T[];
 
         if (cachedData && (data as IPaginatedResponse<T>).content) {
-          ;(data as IPaginatedResponse<T>).content = cachedData
+          (data as IPaginatedResponse<T>).content = cachedData;
         } else if (cachedData) {
-          data = cachedData
+          data = cachedData;
         }
       }
 
-      callback((data as T[]) || [])
-      return data
+      callback((data as T[]) || []);
+      return data;
     } catch (err: any) {
-      handleError && handleError(err.data ? err.data.message : err.message)
+      handleError && handleError(err.data ? err.data.message : err.message);
       // nothing
     }
   }
@@ -91,16 +94,16 @@ export class BaseService<T> implements AbstractBaseService<T> {
     properties: IServiceMethodProperties<T> = {} as IServiceMethodProperties<T>,
     handleError?: HandleErrorType,
     enableCache = true,
-    cacheLifeTime: number = 60 * 1000 * 5
+    cacheLifeTime: number = 60 * 1000 * 5,
   ): Promise<T | undefined> {
     try {
-      const extraPath = this.handleServiceMethodPathProperties(properties)
-      const res = await http.post<T>(`${this.api}${extraPath}`, data)
-      enableCache && this.cacheData(res.data, 'add', cacheLifeTime)
-      return res as T
+      const extraPath = this.handleServiceMethodPathProperties(properties);
+      const res = await http.post<T>(`${this.api}${extraPath}`, data);
+      enableCache && this.cacheData(res.data, 'add', cacheLifeTime);
+      return res as T;
     } catch (err: IResponseError | any) {
-      console.log('error!', err)
-      handleError && handleError(err.data ? err?.data?.message : err?.message)
+      console.log('error!', err);
+      handleError && handleError(err.data ? err?.data?.message : err?.message);
     }
   }
 
@@ -108,14 +111,14 @@ export class BaseService<T> implements AbstractBaseService<T> {
     data: { _id: string } & Partial<T>,
     handleError?: HandleErrorType,
     enableCache = true,
-    cacheLifeTime: number = 60 * 1000 * 5
+    cacheLifeTime: number = 60 * 1000 * 5,
   ): Promise<T | undefined> {
     try {
-      const res = await http.put(`${this.api}`, data)
-      enableCache && this.cacheData(res.data as T, 'add', cacheLifeTime)
-      return res as T
+      const res = await http.put(`${this.api}`, data);
+      enableCache && this.cacheData(res.data as T, 'add', cacheLifeTime);
+      return res as T;
     } catch (err: IResponseError | any) {
-      handleError && handleError(err.data.message)
+      handleError && handleError(err.data.message);
     }
   }
 
@@ -123,14 +126,14 @@ export class BaseService<T> implements AbstractBaseService<T> {
     id: string,
     handleError?: HandleErrorType,
     enableCache = true,
-    cacheLifeTime: number = 60 * 1000 * 5
+    cacheLifeTime: number = 60 * 1000 * 5,
   ): Promise<boolean | undefined> {
     try {
-      const { data } = await http.delete<T>(`${this.api}/${id}`)
-      enableCache && this.cacheData(data, 'remove', cacheLifeTime)
-      return !!data
+      const { data } = await http.delete<T>(`${this.api}/${id}`);
+      enableCache && this.cacheData(data, 'remove', cacheLifeTime);
+      return !!data;
     } catch (err: IResponseError | any) {
-      handleError && handleError(err.data.message)
+      handleError && handleError(err.data.message);
     }
   }
 
@@ -138,83 +141,82 @@ export class BaseService<T> implements AbstractBaseService<T> {
     data: T | T[],
     key: CRUDTypes,
     cacheLifeTime: number,
-    properties?: IServiceMethodProperties<T>
+    properties?: IServiceMethodProperties<T>,
   ): T | T[] {
     if (key === 'get') {
-      let oldData: T[] = []
+      let oldData: T[] = [];
 
       if (
-        properties &&
-        properties.storeDataInStateKey ===
-          EndpointsAndEntityStateKeys.INFINITE_SCROLL_DATA
+        properties
+        && properties.storeDataInStateKey
+          === EndpointsAndEntityStateKeys.INFINITE_SCROLL_DATA
       ) {
         oldData = JSON.parse(
-          localStorage.getItem(this.localStorageKey[key]) || '[]'
-        )
+          localStorage.getItem(this.localStorageKey[key]) || '[]',
+        );
       }
 
-      let items: T[] = [...(data as T[]), ...oldData]
-      let itemsData: T[] = Array.from(
-        new Set(items.map((item: any) => item._id))
-      ).map((id) => items.find((item: any) => item._id === id)) as T[]
+      const items: T[] = [...(data as T[]), ...oldData];
+      const itemsData: T[] = Array.from(
+        new Set(items.map((item: any) => item._id)),
+      ).map((id) => items.find((item: any) => item._id === id)) as T[];
       // when key is get just will be cached if it's longer than 1 item
-      itemsData.length &&
-        itemsData.length > 1 &&
-        localStorage.setItem(
+      itemsData.length
+        && itemsData.length > 1
+        && localStorage.setItem(
           this.localStorageKey[key],
-          JSON.stringify(itemsData)
-        )
-      return itemsData
-    } else {
-      localStorage.setItem(this.localStorageKey[key], JSON.stringify(data))
+          JSON.stringify(itemsData),
+        );
+      return itemsData;
     }
+    localStorage.setItem(this.localStorageKey[key], JSON.stringify(data));
 
     // automatic remove cache
     setTimeout(
       (key: string) => {
-        localStorage.removeItem(key)
+        localStorage.removeItem(key);
       },
       cacheLifeTime,
-      this.localStorageKey[key]
-    )
+      this.localStorageKey[key],
+    );
 
-    return data
+    return data;
   }
 
   getCachedData(
     key: CRUDTypes,
-    properties?: IServiceMethodProperties<T>
+    properties?: IServiceMethodProperties<T>,
   ): T | T[] | null {
-    const cached = localStorage.getItem(this.localStorageKey[key])
+    const cached = localStorage.getItem(this.localStorageKey[key]);
     if (cached && cached !== '[]' && cached !== '{}') {
-      const data = JSON.parse(cached)
-      const value = properties?.queryParams?.title || properties?.slug
-      const res = value ? deepMatch(value, data) : data
-      return res
+      const data = JSON.parse(cached);
+      const value = properties?.queryParams?.title || properties?.slug;
+      const res = value ? deepMatch(value, data) : data;
+      return res;
     }
 
-    return null
+    return null;
   }
 
   handleServiceMethodPathProperties(properties: IServiceMethodProperties<T>) {
-    let extraPath = ''
+    let extraPath = '';
 
     if (properties.endpoint) {
-      extraPath = `/${properties.endpoint}`
+      extraPath = `/${properties.endpoint}`;
     }
 
     if (properties.slug) {
       if (typeof properties.slug === 'object') {
-        extraPath = `${extraPath}/${(properties.slug as any[]).join('/')}`
+        extraPath = `${extraPath}/${(properties.slug as any[]).join('/')}`;
       } else {
-        extraPath = `${extraPath}/${properties.slug}`
+        extraPath = `${extraPath}/${properties.slug}`;
       }
     }
 
     if (properties.queryString) {
-      extraPath = `${extraPath}?${properties.queryString}`
+      extraPath = `${extraPath}?${properties.queryString}`;
     }
 
-    return extraPath
+    return extraPath;
   }
 }

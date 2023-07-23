@@ -1,8 +1,11 @@
-import { BaseEntity } from './BaseEntity'
+import { BaseEntity } from './BaseEntity';
 
 export class CompanyEntity extends BaseEntity {
-  name: string = ''
-  companyId: string = ''
-  phone: string = ''
-  logo: string = ''
+  name: string = '';
+
+  companyId: string = '';
+
+  phone: string = '';
+
+  logo: string = '';
 }

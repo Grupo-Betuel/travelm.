@@ -1,4 +1,3 @@
-import styles from './DetailView.module.scss'
 import {
   Avatar,
   Button,
@@ -11,7 +10,7 @@ import {
   Space,
   Spin,
   Tag,
-} from 'antd'
+} from 'antd';
 import {
   ArrowLeftOutlined,
   ArrowRightOutlined,
@@ -21,8 +20,8 @@ import {
   ShoppingCartOutlined,
   StarOutlined,
   UploadOutlined,
-} from '@ant-design/icons'
-import { useRouter } from 'next/router'
+} from '@ant-design/icons';
+import { useRouter } from 'next/router';
 import React, {
   ChangeEvent,
   createElement,
@@ -31,23 +30,24 @@ import React, {
   useMemo,
   useRef,
   useState,
-} from 'react'
-import { handleEntityHook } from '@shared/hooks/handleEntityHook'
-import { Resizable } from 're-resizable'
-import { StickyFooter } from '@shared/layout/components/StickyFooter/StickyFooter'
-import { useContextualRouting } from 'next-use-contextual-routing'
-import { EndpointsAndEntityStateKeys } from '@shared/enums/endpoints.enum'
-import { sidebarWidth } from '../../../utils/layout.utils'
-import { ImageBackground } from '@components/DetailView/components/ImageBackground/ImageBackground'
-import { IProductParam, ProductEntity } from '@shared/entities/ProductEntity'
-import { getAuthData } from '../../../utils/auth.utils'
-import { ClientEntity } from '@shared/entities/ClientEntity'
-import { ISale } from '@shared/entities/OrderEntity'
-import OrderService from '@services/orderService'
-import { structuredClone } from 'next/dist/compiled/@edge-runtime/primitives/structured-clone'
-import { useOrderContext } from '@shared/contexts/OrderContext'
-import { useAppStore } from '@services/store'
-import { getSaleDataFromProduct } from '../../../utils/objects.utils'
+} from 'react';
+import { handleEntityHook } from '@shared/hooks/handleEntityHook';
+import { Resizable } from 're-resizable';
+import { StickyFooter } from '@shared/layout/components/StickyFooter/StickyFooter';
+import { useContextualRouting } from 'next-use-contextual-routing';
+import { EndpointsAndEntityStateKeys } from '@shared/enums/endpoints.enum';
+import { ImageBackground } from '@components/DetailView/components/ImageBackground/ImageBackground';
+import { IProductParam, ProductEntity } from '@shared/entities/ProductEntity';
+import { ClientEntity } from '@shared/entities/ClientEntity';
+import { ISale } from '@shared/entities/OrderEntity';
+import OrderService from '@services/orderService';
+import { structuredClone } from 'next/dist/compiled/@edge-runtime/primitives/structured-clone';
+import { useOrderContext } from '@shared/contexts/OrderContext';
+import { useAppStore } from '@services/store';
+import { getAuthData } from '../../../utils/auth.utils';
+import { sidebarWidth } from '../../../utils/layout.utils';
+import styles from './DetailView.module.scss';
+import { getSaleDataFromProduct } from '../../../utils/objects.utils';
 
 export interface IDetailViewProps {
   previewPost?: any
@@ -55,12 +55,14 @@ export interface IDetailViewProps {
   returnHref?: string
 }
 
-const IconText = ({ icon, text }: { icon: React.FC; text: string }) => (
-  <Space>
-    {createElement(icon)}
-    {text}
-  </Space>
-)
+function IconText({ icon, text }: { icon: React.FC; text: string }) {
+  return (
+    <Space>
+      {createElement(icon)}
+      {text}
+    </Space>
+  );
+}
 
 const data = Array.from({ length: 23 }).map((_, i) => ({
   href: 'https://ant.design',
@@ -70,45 +72,45 @@ const data = Array.from({ length: 23 }).map((_, i) => ({
   description: 'Revendedor | Tienda | Vendedor Oficial',
   content:
     'Me Encanto la tabla de surf que compre, de muy buena calidad, excelente servicios',
-}))
+}));
 
-const controlNamePrefix = 'quantity-'
+const controlNamePrefix = 'quantity-';
 
-export const DetailView = ({ previewPost, returnHref }: IDetailViewProps) => {
-  const [product, setProduct] = useState<ProductEntity>({} as ProductEntity)
-  const [sale, setSale] = useState<Partial<ISale>>({} as ISale)
-  const [showMoreDescription, setShowMoreDescription] = useState(false)
-  const router = useRouter()
-  const carouselRef = useRef<any>()
-  const { loading, get, item } = handleEntityHook<ProductEntity>('products')
-  const { makeContextualHref } = useContextualRouting()
-  const [productOptionsForm] = Form.useForm()
-  const { orderService } = useOrderContext()
-  const currentOrder = useAppStore((state) => state.currentOrder)
+export function DetailView({ previewPost, returnHref }: IDetailViewProps) {
+  const [product, setProduct] = useState<ProductEntity>({} as ProductEntity);
+  const [sale, setSale] = useState<Partial<ISale>>({} as ISale);
+  const [showMoreDescription, setShowMoreDescription] = useState(false);
+  const router = useRouter();
+  const carouselRef = useRef<any>();
+  const { loading, get, item } = handleEntityHook<ProductEntity>('products');
+  const { makeContextualHref } = useContextualRouting();
+  const [productOptionsForm] = Form.useForm();
+  const { orderService } = useOrderContext();
+  const currentOrder = useAppStore((state) => state.currentOrder);
 
   useEffect(() => {
-    const productId = router.query.productId as string
+    const productId = router.query.productId as string;
     if (productId) {
-      get({ endpoint: EndpointsAndEntityStateKeys.BY_ID, slug: productId })
+      get({ endpoint: EndpointsAndEntityStateKeys.BY_ID, slug: productId });
     }
-  }, [router.query])
+  }, [router.query]);
 
   useEffect(() => {
-    setProduct({ ...item } as ProductEntity)
-  }, [item])
+    setProduct({ ...item } as ProductEntity);
+  }, [item]);
 
   useEffect(() => {
     if (product._id && currentOrder) {
       // const savedSale = orderService.getSaleByProductId(product._id) || {}
       const savedSale = currentOrder.sales.find(
-        (s) => s.product._id === product._id
-      )
+        (s) => s.product._id === product._id,
+      );
       setSale({
         ...getSaleDataFromProduct(product),
         ...savedSale,
-      })
+      });
     }
-  }, [product])
+  }, [product]);
 
   const back = () => {
     if (returnHref) {
@@ -117,17 +119,16 @@ export const DetailView = ({ previewPost, returnHref }: IDetailViewProps) => {
         returnHref,
         {
           shallow: true,
-        }
-      )
+        },
+      );
     } else {
-      router.push(`/${product.company}`)
+      router.push(`/${product.company}`);
     }
-  }
+  };
 
-  const navigate = (to: 'prev' | 'next') => () =>
-    carouselRef.current && carouselRef.current[to]()
-  const hasImages = product.images && !!product.images.length
-  const hasMultipleImages = hasImages && product.images.length > 1
+  const navigate = (to: 'prev' | 'next') => () => carouselRef.current && carouselRef.current[to]();
+  const hasImages = product.images && !!product.images.length;
+  const hasMultipleImages = hasImages && product.images.length > 1;
 
   const handleSaleProductParams = (param: IProductParam) => () => {
     param = {
@@ -137,154 +138,145 @@ export const DetailView = ({ previewPost, returnHref }: IDetailViewProps) => {
         ...item,
         quantity: 0,
       })),
-    }
-    const exist = sale?.productParams?.find((p) => p._id === param._id)
+    };
+    const exist = sale?.productParams?.find((p) => p._id === param._id);
     if (exist) {
-      const newParams = sale?.productParams?.filter((p) => p._id !== param._id)
-      setSale({ ...sale, productParams: newParams })
+      const newParams = sale?.productParams?.filter((p) => p._id !== param._id);
+      setSale({ ...sale, productParams: newParams });
     } else {
-      const newParams = [...(sale?.productParams || [])]
-      newParams.push(param)
-      setSale({ ...sale, productParams: newParams })
+      const newParams = [...(sale?.productParams || [])];
+      newParams.push(param);
+      setSale({ ...sale, productParams: newParams });
     }
-  }
+  };
 
   const handleSaleQuantity = (value?: any) => {
-    const quantity = Number(value || 0)
+    const quantity = Number(value || 0);
     const newSale: Partial<ISale> = {
       ...structuredClone(sale),
       quantity,
-    }
+    };
     if (quantity <= product.stock) {
       if (quantity > 0) {
-        orderService?.handleLocalOrderSales(newSale)
+        orderService?.handleLocalOrderSales(newSale);
       } else {
-        orderService?.removeSale(product._id)
+        orderService?.removeSale(product._id);
       }
-      setSale(newSale)
+      setSale(newSale);
     }
-  }
+  };
 
-  const resetSaleProductParam = (parentId: string, variantId?: string) => () =>
-    handleSaleProductParamsChange(parentId, variantId)(0)
+  const resetSaleProductParam = (parentId: string, variantId?: string) => () => handleSaleProductParamsChange(parentId, variantId)(0);
 
-  const handleSaleProductParamsChange =
-    (parentId: string, variantId?: string) => async (value?: any) => {
-      let newSale = structuredClone(sale)
-      let total = 0
-      const productData = structuredClone(product)
-      const quantity = Number(value || 0)
-      const exist = newSale?.productParams?.find((p) => p._id === parentId)
+  const handleSaleProductParamsChange = (parentId: string, variantId?: string) => async (value?: any) => {
+    let newSale = structuredClone(sale);
+    let total = 0;
+    const productData = structuredClone(product);
+    const quantity = Number(value || 0);
+    const exist = newSale?.productParams?.find((p) => p._id === parentId);
 
-      let productParam = exist
-      if (!productParam) {
-        productParam =
-          productData.productParams.find((p) => p._id === parentId) ||
-          ({} as IProductParam)
-      }
+    let productParam = exist;
+    if (!productParam) {
+      productParam = productData.productParams.find((p) => p._id === parentId)
+          || ({} as IProductParam);
+    }
 
-      const variant = productParam?.relatedParams?.find(
-        (v) => v._id === variantId
-      )
-      if (variant) {
-        variant.quantity = quantity
-        total =
-          productParam?.relatedParams?.reduce(
-            (acc, v) => acc + (v.quantity || 0),
-            0
-          ) || 0
+    const variant = productParam?.relatedParams?.find(
+      (v) => v._id === variantId,
+    );
+    if (variant) {
+      variant.quantity = quantity;
+      total = productParam?.relatedParams?.reduce(
+        (acc, v) => acc + (v.quantity || 0),
+        0,
+      ) || 0;
+    } else {
+      total = quantity;
+    }
+    productParam.quantity = total;
+
+    if (exist) {
+      const newParams = newSale?.productParams?.map((p) => {
+        if (p._id === parentId) {
+          return productParam;
+        }
+        return p;
+      }) as IProductParam[];
+      newSale = {
+        ...newSale,
+        productParams: newParams.filter((item) => !!item),
+      };
+    } else {
+      const newParams = [...(newSale?.productParams || [])];
+      newParams.push(productParam);
+      newSale = {
+        ...newSale,
+        productParams: newParams,
+      };
+    }
+
+    const saleTotal = newSale.productParams?.reduce((acc, p) => acc + (p.quantity || 0), 0)
+        || 0;
+    newSale.quantity = saleTotal;
+
+    const paramId = variantId || parentId;
+    const controlName = `${controlNamePrefix}${paramId}`;
+    const controlIsValid = await productOptionsForm
+      .validateFields([controlName])
+      .then(
+        () => true,
+        () => false,
+      );
+
+    if (controlIsValid) {
+      setSale({ ...newSale });
+
+      if (saleTotal <= 0) {
+        orderService?.removeSale(product._id);
       } else {
-        total = quantity
-      }
-      productParam.quantity = total
-
-      if (exist) {
-        const newParams = newSale?.productParams?.map((p) => {
-          if (p._id === parentId) {
-            return productParam
-          }
-          return p
-        }) as IProductParam[]
-        newSale = {
-          ...newSale,
-          productParams: newParams.filter((item) => !!item),
+        if (quantity <= 0) {
+          newSale.productParams = newSale?.productParams?.filter(
+            (item) => item._id !== parentId,
+          );
         }
-      } else {
-        const newParams = [...(newSale?.productParams || [])]
-        newParams.push(productParam)
-        newSale = {
-          ...newSale,
-          productParams: newParams,
-        }
-      }
 
-      const saleTotal =
-        newSale.productParams?.reduce((acc, p) => acc + (p.quantity || 0), 0) ||
-        0
-      newSale.quantity = saleTotal
-
-      const paramId = variantId || parentId
-      const controlName = `${controlNamePrefix}${paramId}`
-      const controlIsValid = await productOptionsForm
-        .validateFields([controlName])
-        .then(
-          () => {
-            return true
-          },
-          () => {
-            return false
-          }
-        )
-
-      if (controlIsValid) {
-        setSale({ ...newSale })
-
-        if (saleTotal <= 0) {
-          orderService?.removeSale(product._id)
-        } else {
-          if (quantity <= 0) {
-            newSale.productParams = newSale?.productParams?.filter(
-              (item) => item._id !== parentId
-            )
-          }
-
-          orderService?.handleLocalOrderSales(newSale)
-        }
+        orderService?.handleLocalOrderSales(newSale);
       }
     }
+  };
 
   const getQuantityValue = (parentId: string, variantId?: string) => {
-    const param = sale?.productParams?.find((p) => p._id === parentId)
+    const param = sale?.productParams?.find((p) => p._id === parentId);
 
-    if (variantId)
+    if (variantId) {
       return (
         param?.relatedParams?.find((v) => v._id === variantId)?.quantity || 0
-      )
-    else return param?.quantity || 0
-  }
+      );
+    }
+    return param?.quantity || 0;
+  };
 
   const maxQuantityError = useCallback(
-    (quantity: number = 0) =>
-      !quantity
-        ? 'No quedan unidades disponibles'
-        : `Solo quedan ${quantity} unidades`,
-    []
-  )
+    (quantity: number = 0) => (!quantity
+      ? 'No quedan unidades disponibles'
+      : `Solo quedan ${quantity} unidades`),
+    [],
+  );
 
   const productOptionFormValues = useMemo(() => {
-    const initialValues: any = {}
-    ;(sale?.productParams || []).forEach((param) => {
-      initialValues[`${controlNamePrefix}${param._id}`] = param.quantity
-      ;(param?.relatedParams || []).forEach((variant) => {
-        initialValues[`${controlNamePrefix}${variant._id}`] = variant.quantity
-      })
-    })
-    initialValues.quantity = sale?.quantity
-    productOptionsForm.setFieldsValue(initialValues)
-    return initialValues
-  }, [sale])
+    const initialValues: any = {};
+    (sale?.productParams || []).forEach((param) => {
+      initialValues[`${controlNamePrefix}${param._id}`] = param.quantity;
+      (param?.relatedParams || []).forEach((variant) => {
+        initialValues[`${controlNamePrefix}${variant._id}`] = variant.quantity;
+      });
+    });
+    initialValues.quantity = sale?.quantity;
+    productOptionsForm.setFieldsValue(initialValues);
+    return initialValues;
+  }, [sale]);
 
-  const { toggleCart } = useOrderContext()
+  const { toggleCart } = useOrderContext();
 
   return (
     <>
@@ -316,11 +308,11 @@ export const DetailView = ({ previewPost, returnHref }: IDetailViewProps) => {
           <Image.PreviewGroup>
             <Carousel
               ref={carouselRef}
-              nextArrow={
+              nextArrow={(
                 <div className={styles.DetailViewButton}>
                   <ArrowRightOutlined />
                 </div>
-              }
+              )}
             >
               {hasImages ? (
                 product.images.map((img, i) => (
@@ -340,9 +332,15 @@ export const DetailView = ({ previewPost, returnHref }: IDetailViewProps) => {
           <div className={styles.DetailViewPostDetailsHeader}>
             <span className="title">{product.name}</span>
             <span className="subtitle">
-              RD$ {product.price?.toLocaleString()}
+              RD$
+              {' '}
+              {product.price?.toLocaleString()}
             </span>
-            <span className="label">{product.stock} unidades disponibles</span>
+            <span className="label">
+              {product.stock}
+              {' '}
+              unidades disponibles
+            </span>
           </div>
           <div className={styles.DetailViewPostDetailsContent}>
             <span className="subtitle mb-m">Cantidades</span>
@@ -354,8 +352,8 @@ export const DetailView = ({ previewPost, returnHref }: IDetailViewProps) => {
               {product?.productParams && product?.productParams.length ? (
                 product?.productParams?.map((param, i) => {
                   const isActive = sale?.productParams?.find(
-                    (item) => item._id === param._id
-                  )
+                    (item) => item._id === param._id,
+                  );
                   return (
                     <div
                       className={`${
@@ -363,8 +361,8 @@ export const DetailView = ({ previewPost, returnHref }: IDetailViewProps) => {
                       } ${
                         isActive
                           ? `${styles.active} ${
-                              param.relatedParams?.length ? ' w-100' : ''
-                            }`
+                            param.relatedParams?.length ? ' w-100' : ''
+                          }`
                           : ''
                       }`}
                       key={`detailViewOption${i}`}
@@ -382,7 +380,7 @@ export const DetailView = ({ previewPost, returnHref }: IDetailViewProps) => {
                               styles.DetailViewPostDetailsContentOptionBtnColorOption
                             }
                             style={{ backgroundColor: param.value }}
-                          ></span>
+                          />
                         ) : (
                           param.value
                         )}
@@ -401,7 +399,10 @@ export const DetailView = ({ previewPost, returnHref }: IDetailViewProps) => {
                               key={`detailViewOptionVariant${i}`}
                             >
                               <Tag>
-                                {variant.label} - {variant.value}
+                                {variant.label}
+                                {' '}
+                                -
+                                {variant.value}
                               </Tag>
                               <Form.Item
                                 name={`${controlNamePrefix}${variant._id}`}
@@ -420,21 +421,21 @@ export const DetailView = ({ previewPost, returnHref }: IDetailViewProps) => {
                                   placeholder="Cantidad"
                                   value={getQuantityValue(
                                     param._id,
-                                    variant._id
+                                    variant._id,
                                   )}
                                   defaultValue={0}
                                   onChange={handleSaleProductParamsChange(
                                     param._id,
-                                    variant._id
+                                    variant._id,
                                   )}
-                                  addonAfter={
+                                  addonAfter={(
                                     <CloseOutlined
                                       onClick={resetSaleProductParam(
                                         param._id,
-                                        variant._id
+                                        variant._id,
                                       )}
                                     />
-                                  }
+                                  )}
                                   min={0}
                                 />
                               </Form.Item>
@@ -464,16 +465,16 @@ export const DetailView = ({ previewPost, returnHref }: IDetailViewProps) => {
                             value={getQuantityValue(param._id)}
                             defaultValue={0}
                             min={0}
-                            addonAfter={
+                            addonAfter={(
                               <CloseOutlined
                                 onClick={resetSaleProductParam(param._id)}
                               />
-                            }
+                            )}
                           />
                         </Form.Item>
                       )}
                     </div>
-                  )
+                  );
                 })
               ) : (
                 <Form.Item
@@ -536,11 +537,13 @@ export const DetailView = ({ previewPost, returnHref }: IDetailViewProps) => {
                 itemLayout="vertical"
                 size="large"
                 dataSource={data}
-                footer={
+                footer={(
                   <div>
-                    <b>ant design</b> footer part
+                    <b>ant design</b>
+                    {' '}
+                    footer part
                   </div>
-                }
+                )}
                 renderItem={(item) => (
                   <List.Item
                     key={item.title}
@@ -587,5 +590,5 @@ export const DetailView = ({ previewPost, returnHref }: IDetailViewProps) => {
         </Resizable>
       </div>
     </>
-  )
+  );
 }

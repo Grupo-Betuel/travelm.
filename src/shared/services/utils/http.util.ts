@@ -1,41 +1,41 @@
-import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios'
-import { IAuthResponse } from '@interfaces/auth.interface'
-import { BaseService } from '@services/BaseService'
-import { StatusCode } from '@interfaces/REST.interface'
-import { toast } from 'react-toastify'
-import { IResponseError } from '@interfaces/error.interface'
+import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
+import { IAuthResponse } from '@interfaces/auth.interface';
+import { BaseService } from '@services/BaseService';
+import { StatusCode } from '@interfaces/REST.interface';
+import { toast } from 'react-toastify';
+import { IResponseError } from '@interfaces/error.interface';
 
 const headers: Readonly<Record<string, string | boolean>> = {
   // Accept: 'application/json',
   // 'Content-Type': 'application/json; charset=utf-8',
   // 'access-control-allow-credentials': true,
   // 'access-control-allow-origin': '*',
-}
+};
 
 // We can use the following function to inject the JWT token through an interceptor
 // We get the `accessToken` from the localStorage that we set when we authenticate
 const injectToken = (config: AxiosRequestConfig): AxiosRequestConfig => {
   try {
-    const authService = new BaseService('auth/login')
-    const authString = localStorage.getItem(authService.localStorageKey.add)
-    const authData = JSON.parse(authString || '{}') as IAuthResponse
-    const token = authData.client
+    const authService = new BaseService('auth/login');
+    const authString = localStorage.getItem(authService.localStorageKey.add);
+    const authData = JSON.parse(authString || '{}') as IAuthResponse;
+    const token = authData.client;
 
     if (token != null) {
-      if (config.headers) config.headers.Authorization = `Bearer ${token}`
+      if (config.headers) config.headers.Authorization = `Bearer ${token}`;
     }
-    return config
+    return config;
     // eslint-disable-next-line
   } catch (error: any) {
-    throw new Error(error)
+    throw new Error(error);
   }
-}
+};
 
 class Http {
-  private instance: AxiosInstance | null = null
+  private instance: AxiosInstance | null = null;
 
   private get http(): AxiosInstance {
-    return this.instance != null ? this.instance : this.initHttp()
+    return this.instance != null ? this.instance : this.initHttp();
   }
 
   initHttp() {
@@ -43,72 +43,70 @@ class Http {
       baseURL: process.env.NEXT_PUBLIC_API_URL,
       headers,
       // withCredentials: true,
-    })
+    });
 
-    http.interceptors.request.use(injectToken as any, (error) =>
-      Promise.reject(error)
-    )
+    http.interceptors.request.use(injectToken as any, (error) => Promise.reject(error));
 
     http.interceptors.response.use(
       (response) => response,
       (error) => {
-        const { response } = error
-        return this.handleError(response)
-      }
-    )
+        const { response } = error;
+        return this.handleError(response);
+      },
+    );
 
-    this.instance = http
-    return http
+    this.instance = http;
+    return http;
   }
 
   request<T, R = AxiosResponse<T>>(config: AxiosRequestConfig): Promise<R> {
-    return this.http.request(config)
+    return this.http.request(config);
   }
 
   get<T, R = AxiosResponse<T>>(
     url: string,
-    config?: AxiosRequestConfig
+    config?: AxiosRequestConfig,
   ): Promise<R> {
-    return this.http.get<T, R>(url, config)
+    return this.http.get<T, R>(url, config);
   }
 
   post<T, R = AxiosResponse<T>>(
     url: string,
     data?: T,
-    config?: AxiosRequestConfig
+    config?: AxiosRequestConfig,
   ): Promise<R> {
-    return this.http.post<T, R>(url, data, config)
+    return this.http.post<T, R>(url, data, config);
   }
 
   put<T, R = AxiosResponse<T>>(
     url: string,
     data?: T,
-    config?: AxiosRequestConfig
+    config?: AxiosRequestConfig,
   ): Promise<R> {
-    return this.http.put<T, R>(url, data, config)
+    return this.http.put<T, R>(url, data, config);
   }
 
   delete<T, R = AxiosResponse<T>>(
     url: string,
-    config?: AxiosRequestConfig
+    config?: AxiosRequestConfig,
   ): Promise<R> {
-    return this.http.delete<T, R>(url, config)
+    return this.http.delete<T, R>(url, config);
   }
 
   // Handle global app errors
   // We can handle generic app errors depending on the status code
   // eslint-disable-next-line
   private handleError(error: IResponseError) {
-    const { status } = error
+    const { status } = error;
 
     switch (status) {
       case StatusCode.InternalServerError: {
         toast(`Server: ${error.data.message}`, {
           autoClose: false,
           type: 'error',
-        })
+        });
         // Handle InternalServerError
-        break
+        break;
       }
       case StatusCode.NotFound: {
         // toast(`Not Found: ${error.data.message}`, {
@@ -116,15 +114,15 @@ class Http {
         //   type: 'error',
         // })
         // Handle Not Found
-        break
+        break;
       }
       case StatusCode.BadRequest: {
         toast(`${error.data.message}`, {
           autoClose: false,
           type: 'error',
-        })
+        });
         // Handle InternalServerError
-        break
+        break;
       }
       case StatusCode.Forbidden: {
         // toast(`Forbidden: ${error.data.message}`, {
@@ -132,27 +130,27 @@ class Http {
         //   type: 'error',
         // })
         // Handle Forbidden
-        break
+        break;
       }
       case StatusCode.Unauthorized: {
         // Handle Unauthorized
         toast(`Unauthorized: ${error.data.message}`, {
           autoClose: false,
           type: 'error',
-        })
-        break
+        });
+        break;
       }
       case StatusCode.TooManyRequests:
         toast(`Too many requests: ${error.data.message}`, {
           autoClose: false,
           type: 'error',
-        })
+        });
         // Handle TooManyRequests
-        break
+        break;
     }
 
-    return Promise.reject(error)
+    return Promise.reject(error);
   }
 }
 
-export const http = new Http()
+export const http = new Http();

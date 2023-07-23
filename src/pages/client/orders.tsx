@@ -1,14 +1,17 @@
-import React, { useEffect, useMemo } from 'react'
-import { Space, Table, Tag, Modal, Button, Spin } from 'antd'
-const { confirm } = Modal
-import { handleEntityHook } from '@shared/hooks/handleEntityHook'
-import { EndpointsAndEntityStateKeys } from '@shared/enums/endpoints.enum'
-import OrderEntity, { OrderStatusTypes } from '@shared/entities/OrderEntity'
-import { useAuthClientHook } from '@shared/hooks/useAuthClientHook'
-import { useAppStore } from '@services/store'
-import { useOrderContext } from '@shared/contexts/OrderContext'
-import { toast } from 'react-toastify'
-import { ExclamationCircleFilled } from '@ant-design/icons'
+import React, { useEffect, useMemo } from 'react';
+import {
+  Space, Table, Tag, Modal, Button, Spin,
+} from 'antd';
+import { handleEntityHook } from '@shared/hooks/handleEntityHook';
+import { EndpointsAndEntityStateKeys } from '@shared/enums/endpoints.enum';
+import OrderEntity, { OrderStatusTypes } from '@shared/entities/OrderEntity';
+import { useAuthClientHook } from '@shared/hooks/useAuthClientHook';
+import { useAppStore } from '@services/store';
+import { useOrderContext } from '@shared/contexts/OrderContext';
+import { toast } from 'react-toastify';
+import { ExclamationCircleFilled } from '@ant-design/icons';
+
+const { confirm } = Modal;
 export default function ClientOrders() {
   const {
     get: getOrders,
@@ -16,32 +19,32 @@ export default function ClientOrders() {
     loading,
     fetching,
     [EndpointsAndEntityStateKeys.BY_CLIENT]: clientOrders,
-  } = handleEntityHook<OrderEntity>('orders')
-  const { client } = useAuthClientHook()
-  const handleCurrentOrder = useAppStore((state) => state.handleCurrentOrder)
-  const { orderService, toggleCart } = useOrderContext()
+  } = handleEntityHook<OrderEntity>('orders');
+  const { client } = useAuthClientHook();
+  const handleCurrentOrder = useAppStore((state) => state.handleCurrentOrder);
+  const { orderService, toggleCart } = useOrderContext();
 
   const getOrdersByClient = async () => {
     await getOrders({
       endpoint: EndpointsAndEntityStateKeys.BY_CLIENT,
       slug: client._id.toString(),
-    })
-  }
+    });
+  };
   useEffect(() => {
     if (client) {
-      getOrdersByClient()
+      getOrdersByClient();
     }
-  }, [client])
+  }, [client]);
 
   const editOrder = (order: OrderEntity) => () => {
-    handleCurrentOrder(order)
-    toggleCart()
-  }
+    handleCurrentOrder(order);
+    toggleCart();
+  };
   const cancelOrder = async (order: OrderEntity) => {
-    await updateOrder({ ...order, _id: order._id || '', status: 'canceled' })
-    toast('Orden cancelada con éxito')
-    getOrdersByClient()
-  }
+    await updateOrder({ ...order, _id: order._id || '', status: 'canceled' });
+    toast('Orden cancelada con éxito');
+    getOrdersByClient();
+  };
 
   const attemptCancelOrder = (order: OrderEntity) => async () => {
     confirm({
@@ -51,13 +54,13 @@ export default function ClientOrders() {
       closable: true,
       maskClosable: true,
       onOk() {
-        cancelOrder(order)
+        cancelOrder(order);
       },
       onCancel() {
         // console.log('Cancel')
       },
-    })
-  }
+    });
+  };
 
   const columns = [
     {
@@ -70,7 +73,12 @@ export default function ClientOrders() {
       title: 'Total',
       dataIndex: 'total',
       key: 'total',
-      render: (text: string) => <a>RD${text.toLocaleString()}</a>,
+      render: (text: string) => (
+        <a>
+          RD$
+          {text.toLocaleString()}
+        </a>
+      ),
     },
     {
       title: 'Tienda',
@@ -85,24 +93,24 @@ export default function ClientOrders() {
       render: (status: OrderStatusTypes) => {
         // ['pending', 'pending-info', 'checking-transfer', 'confirmed', 'delivering', 'delivered', 'cancel-attempt', 'canceled', 'completed', 'personal-assistance'],
 
-        let color = 'blue'
+        let color = 'blue';
         switch (status) {
           case 'pending-info':
           case 'pending':
-            color = 'orange'
-            break
+            color = 'orange';
+            break;
           case 'confirmed':
           case 'completed':
           case 'cancel-attempt':
-            color = 'green'
+            color = 'green';
           case 'canceled':
-            color = 'red'
-            break
+            color = 'red';
+            break;
           default:
-            color = 'blue'
-            break
+            color = 'blue';
+            break;
         }
-        return <Tag color={color}>{status?.toUpperCase()}</Tag>
+        return <Tag color={color}>{status?.toUpperCase()}</Tag>;
       },
     },
     {
@@ -110,11 +118,11 @@ export default function ClientOrders() {
       key: 'action',
       render: (_, order: OrderEntity) => (
         <Space size="middle">
-          {order.status !== 'completed' &&
-            order.status !== 'canceled' &&
-            order.status !== 'checking-transfer' &&
-            order.status !== 'delivering' &&
-            order.status !== 'delivered' && (
+          {order.status !== 'completed'
+            && order.status !== 'canceled'
+            && order.status !== 'checking-transfer'
+            && order.status !== 'delivering'
+            && order.status !== 'delivered' && (
               <>
                 <Button type="link" onClick={attemptCancelOrder(order)}>
                   Cancelar
@@ -125,11 +133,11 @@ export default function ClientOrders() {
                   </Button>
                 )}
               </>
-            )}
+          )}
         </Space>
       ),
     },
-  ]
+  ];
 
   return (
     <>
@@ -143,13 +151,11 @@ export default function ClientOrders() {
         <Table columns={columns} dataSource={clientOrders?.data || []} />
       </div>
     </>
-  )
+  );
 }
 
-export const getServerSideProps = async () => {
-  return {
-    props: {
-      protected: true,
-    },
-  }
-}
+export const getServerSideProps = async () => ({
+  props: {
+    protected: true,
+  },
+});

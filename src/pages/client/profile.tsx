@@ -1,32 +1,32 @@
-import { ClientEntity } from '@shared/entities/ClientEntity'
-import { Button, Form, Input } from 'antd'
-import { MaskedInput } from 'antd-mask-input'
-import { UserOutlined } from '@ant-design/icons'
-import React, { useEffect } from 'react'
-import { useAuthClientHook } from '@shared/hooks/useAuthClientHook'
-import { useAppStore } from '@services/store'
-import { useForm } from 'antd/lib/form/Form'
-import { toast } from 'react-toastify'
+import { ClientEntity } from '@shared/entities/ClientEntity';
+import { Button, Form, Input } from 'antd';
+import { MaskedInput } from 'antd-mask-input';
+import { UserOutlined } from '@ant-design/icons';
+import React, { useEffect } from 'react';
+import { useAuthClientHook } from '@shared/hooks/useAuthClientHook';
+import { useAppStore } from '@services/store';
+import { useForm } from 'antd/lib/form/Form';
+import { toast } from 'react-toastify';
 
 export default function ClientProfile() {
-  const clientEntity = useAppStore((state) => state.clients((stateu) => stateu))
-  const { client } = useAuthClientHook()
-  const [profileForm] = useForm()
+  const clientEntity = useAppStore((state) => state.clients((stateu) => stateu));
+  const { client } = useAuthClientHook();
+  const [profileForm] = useForm();
 
   useEffect(() => {
     profileForm.setFieldsValue({
       ...client,
       phone: client?.phone,
-    })
-  }, [client])
+    });
+  }, [client]);
 
   const updateClient = async (data: ClientEntity) => {
-    data._id = client?._id || ''
-    data.phone = Number(data.phone.toString().replace(/[- ()]/g, ''))
+    data._id = client?._id || '';
+    data.phone = Number(data.phone.toString().replace(/[- ()]/g, ''));
     if (await clientEntity.update(data)) {
-      toast.success('Perfil actualizado')
+      toast.success('Perfil actualizado');
     }
-  }
+  };
 
   return (
     <Form
@@ -60,16 +60,16 @@ export default function ClientProfile() {
         <MaskedInput
           type="text"
           name="phone"
-          mask={'+1 (000) 000-0000'}
+          mask="+1 (000) 000-0000"
           maskOptions={{
             lazy: true,
           }}
           size="large"
         />
       </Form.Item>
-      {/*<Form.Item label="Password" name="password" rules={[{ required: true }]}>*/}
-      {/*  <Input.Password size="large" />*/}
-      {/*</Form.Item>*/}
+      {/* <Form.Item label="Password" name="password" rules={[{ required: true }]}> */}
+      {/*  <Input.Password size="large" /> */}
+      {/* </Form.Item> */}
       <Form.Item
         label="Email"
         name="email"
@@ -90,13 +90,11 @@ export default function ClientProfile() {
         </Button>
       </Form.Item>
     </Form>
-  )
+  );
 }
 
-export const getServerSideProps = async () => {
-  return {
-    props: {
-      protected: true,
-    },
-  }
-}
+export const getServerSideProps = async () => ({
+  props: {
+    protected: true,
+  },
+});

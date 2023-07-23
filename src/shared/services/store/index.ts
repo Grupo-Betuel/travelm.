@@ -1,15 +1,15 @@
-import { create, SetState } from 'zustand'
-import { persist } from 'zustand/middleware'
-import { createEntityStore } from '@services/store/entityStore'
-import { mountStoreDevtool } from 'simple-zustand-devtools'
+import { create, SetState } from 'zustand';
+import { persist } from 'zustand/middleware';
+import { createEntityStore } from '@services/store/entityStore';
+import { mountStoreDevtool } from 'simple-zustand-devtools';
 
 import {
   appEntitiesWithService,
   AppEntitiesStoreType,
-} from '@services/appEntitiesWithService'
-import { EntityNamesType } from '@services/appEntitiesWithService'
-import { BaseEntity } from '@shared/entities/BaseEntity'
-import OrderEntity from '@shared/entities/OrderEntity'
+  EntityNamesType,
+} from '@services/appEntitiesWithService';
+import { BaseEntity } from '@shared/entities/BaseEntity';
+import OrderEntity from '@shared/entities/OrderEntity';
 
 /// APP STORE
 export interface IAppStore extends AppEntitiesStoreType {
@@ -26,26 +26,24 @@ export const appStore = (set: SetState<IAppStore>) => {
       set((state) => ({
         ...state,
         currentOrder: order,
-      }))
+      }));
     },
     handleCount: (isSubstract?: boolean) => () => {
       set((state) => ({
         ...state,
         count: isSubstract ? state.count - 1 : state.count + 1,
-      }))
+      }));
     },
-  } as IAppStore
+  } as IAppStore;
+  (Object.keys(appEntitiesWithService) as EntityNamesType[]).forEach(
+    (k: EntityNamesType) => ((appStoreInit as any)[k] = createEntityStore<BaseEntity>(
+      [appEntitiesWithService[k].entity],
+      appEntitiesWithService[k].service,
+    )),
+  );
 
-  ;(Object.keys(appEntitiesWithService) as EntityNamesType[]).forEach(
-    (k: EntityNamesType) =>
-      ((appStoreInit as any)[k] = createEntityStore<BaseEntity>(
-        [appEntitiesWithService[k].entity],
-        appEntitiesWithService[k].service
-      ))
-  )
-
-  return appStoreInit
-}
+  return appStoreInit;
+};
 
 /// PERSIST DATA
 export interface IPersistStore {
@@ -57,16 +55,16 @@ const persistStore = persist<IPersistStore>(
     name: 'Williams',
     // order: new OrderEntity(),
   }),
-  { name: 'persist/commission' }
-)
+  { name: 'persist/commission' },
+);
 
 export const useAppStore = create<IAppStore & IPersistStore>(
   (set, get, api) => ({
     ...persistStore(set, get, api),
     ...appStore(set),
-  })
-)
+  }),
+);
 
 if (process.env.NODE_ENV === 'development') {
-  mountStoreDevtool('appStore', useAppStore)
+  mountStoreDevtool('appStore', useAppStore);
 }

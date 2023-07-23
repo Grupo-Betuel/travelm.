@@ -1,1 +1,1 @@
-export type CRUDTypes = 'add' | 'update' | 'remove' | 'get'
+export type CRUDTypes = 'add' | 'update' | 'remove' | 'get';

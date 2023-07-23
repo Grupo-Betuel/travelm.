@@ -1,19 +1,20 @@
-import { Carousel, CarouselProps, Image } from 'antd'
-import { useRef } from 'react'
-import styles from './LandingCarousel.module.scss'
+import { Carousel, CarouselProps, Image } from 'antd';
+import { useRef } from 'react';
+import styles from './LandingCarousel.module.scss';
+
 export interface IAppMainPromotionCarouselProps extends CarouselProps {
   showArrow?: boolean
 }
 
-export const LandingCarousel = (props: IAppMainPromotionCarouselProps) => {
-  const { showArrow } = { showArrow: true, ...props }
+export function LandingCarousel(props: IAppMainPromotionCarouselProps) {
+  const { showArrow } = { showArrow: true, ...props };
 
-  const carousel = useRef<any>()
+  const carousel = useRef<any>();
 
   const next = () => {
-    carousel.current && carousel.current?.next()
-  }
-  const prev = () => carousel.current && carousel.current?.prev()
+    carousel.current && carousel.current?.next();
+  };
+  const prev = () => carousel.current && carousel.current?.prev();
 
   return (
     <div className={styles.HomeCarouselWrapper}>
@@ -31,7 +32,7 @@ export const LandingCarousel = (props: IAppMainPromotionCarouselProps) => {
                 className={styles.HomeCarouselItemImage}
                 rootClassName={styles.HomeCarouselItemImageWrapper}
                 src="https://i.pinimg.com/originals/eb/a7/60/eba760e4d470d2de478d26038e5fc9a9.jpg"
-              ></Image>
+              />
             </div>
           </div>
           <div>
@@ -40,7 +41,7 @@ export const LandingCarousel = (props: IAppMainPromotionCarouselProps) => {
                 className={styles.HomeCarouselItemImage}
                 rootClassName={styles.HomeCarouselItemImageWrapper}
                 src="https://i.pinimg.com/originals/eb/a7/60/eba760e4d470d2de478d26038e5fc9a9.jpg"
-              ></Image>
+              />
             </div>
           </div>
           <div>
@@ -49,7 +50,7 @@ export const LandingCarousel = (props: IAppMainPromotionCarouselProps) => {
                 className={styles.HomeCarouselItemImage}
                 rootClassName={styles.HomeCarouselItemImageWrapper}
                 src="https://i.pinimg.com/originals/eb/a7/60/eba760e4d470d2de478d26038e5fc9a9.jpg"
-              ></Image>
+              />
             </div>
           </div>
           <div>
@@ -58,7 +59,7 @@ export const LandingCarousel = (props: IAppMainPromotionCarouselProps) => {
                 className={styles.HomeCarouselItemImage}
                 rootClassName={styles.HomeCarouselItemImageWrapper}
                 src="https://i.pinimg.com/originals/eb/a7/60/eba760e4d470d2de478d26038e5fc9a9.jpg"
-              ></Image>
+              />
             </div>
           </div>
         </Carousel>
@@ -70,5 +71,5 @@ export const LandingCarousel = (props: IAppMainPromotionCarouselProps) => {
         />
       )}
     </div>
-  )
+  );
 }

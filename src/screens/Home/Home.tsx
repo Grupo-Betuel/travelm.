@@ -1,29 +1,31 @@
-import styles from './Home.module.scss'
-import { getAuthData } from 'src/utils/auth.utils'
-import { ClientEntity } from '@shared/entities/ClientEntity'
+import { getAuthData } from 'src/utils/auth.utils';
+import { ClientEntity } from '@shared/entities/ClientEntity';
 import {
   LandingCarousel,
   MainContentModal,
   ProductCard,
   ScrollView,
-} from '@shared/components'
-import { Affix, Input } from 'antd'
-import { SearchOutlined } from '@ant-design/icons'
-import { handleEntityHook } from '@shared/hooks/handleEntityHook'
-import { ProductEntity } from '@shared/entities/ProductEntity'
-import { useEffect, useState, useMemo, ChangeEvent } from 'react'
-import { useRouter } from 'next/router'
-import { useContextualRouting } from 'next-use-contextual-routing'
-import { DetailView } from '@components/DetailView'
-import { deepMatch } from '../../utils/matching.util'
-import { layoutId, navbarOptionsHeight } from '../../utils/layout.utils'
+} from '@shared/components';
+import { Affix, Input } from 'antd';
+import { SearchOutlined } from '@ant-design/icons';
+import { handleEntityHook } from '@shared/hooks/handleEntityHook';
+import { ProductEntity } from '@shared/entities/ProductEntity';
+import {
+  useEffect, useState, useMemo, ChangeEvent,
+} from 'react';
+import { useRouter } from 'next/router';
+import { useContextualRouting } from 'next-use-contextual-routing';
+import { DetailView } from '@components/DetailView';
+import styles from './Home.module.scss';
+import { deepMatch } from '../../utils/matching.util';
+import { layoutId, navbarOptionsHeight } from '../../utils/layout.utils';
 
-export type CompanyTypes = 'betueltech' | 'betueldance'
+export type CompanyTypes = 'betueltech' | 'betueldance';
 
 const comanyNames: { [N in CompanyTypes]: string } = {
   betueltech: 'Betuel Tech',
   betueldance: 'Betuel Dance Shop',
-}
+};
 
 export interface HomeProps {
   hideCarousel?: boolean
@@ -33,42 +35,40 @@ export type ProductPerCategoryType = {
     products: ProductEntity[]
     title: string
   }
-}
+};
 
-export const Home = ({ hideCarousel }: HomeProps) => {
-  const authClient = getAuthData('all') as ClientEntity
-  const router = useRouter()
-  const { makeContextualHref, returnHref } = useContextualRouting()
-  const [products, setProducts] = useState<ProductEntity[]>([])
-  const [showContextProductDetailModal, setShowContextProductDetailModal] =
-    useState<boolean>()
-  const { data: productsData, get: getProducts } =
-    handleEntityHook<ProductEntity>('products', true)
+export function Home({ hideCarousel }: HomeProps) {
+  const authClient = getAuthData('all') as ClientEntity;
+  const router = useRouter();
+  const { makeContextualHref, returnHref } = useContextualRouting();
+  const [products, setProducts] = useState<ProductEntity[]>([]);
+  const [showContextProductDetailModal, setShowContextProductDetailModal] = useState<boolean>();
+  const { data: productsData, get: getProducts } = handleEntityHook<ProductEntity>('products', true);
 
   const productsPerCompanies = useMemo<ProductPerCategoryType>(() => {
     const data = products.reduce<ProductPerCategoryType>((acc, product) => {
-      const category = product.company
+      const category = product.company;
 
       if (!acc[category]) {
         acc[category] = {
           products: [],
           title: comanyNames[product.company as CompanyTypes],
-        }
+        };
       }
-      acc[category].products.push(product)
-      return acc
-    }, {})
-    return data || {}
-  }, [products])
+      acc[category].products.push(product);
+      return acc;
+    }, {});
+    return data || {};
+  }, [products]);
 
   useEffect(() => {
-    const productId = router.query.productId as string
-    setShowContextProductDetailModal(!!productId)
-  }, [router.query])
+    const productId = router.query.productId as string;
+    setShowContextProductDetailModal(!!productId);
+  }, [router.query]);
 
   useEffect(() => {
-    setProducts(productsData || [])
-  }, [productsData])
+    setProducts(productsData || []);
+  }, [productsData]);
 
   const goToProductDetail = (product: ProductEntity) => {
     router.push(
@@ -76,27 +76,27 @@ export const Home = ({ hideCarousel }: HomeProps) => {
       `/${product.company}/detail/${product._id}`,
       {
         shallow: true,
-      }
-    )
-  }
+      },
+    );
+  };
 
   const handleSeeMore = (product: ProductEntity) => {
-    router.push(`/${product.company}`)
-  }
+    router.push(`/${product.company}`);
+  };
 
   const onSearch = ({ target: { value } }: ChangeEvent<HTMLInputElement>) => {
-    const results = deepMatch<ProductEntity>(value, productsData || [])
-    setProducts([...results])
-  }
+    const results = deepMatch<ProductEntity>(value, productsData || []);
+    setProducts([...results]);
+  };
 
   return (
     <div className={styles.HomeWrapper}>
       <MainContentModal show={showContextProductDetailModal}>
-        <DetailView returnHref={returnHref}></DetailView>
+        <DetailView returnHref={returnHref} />
       </MainContentModal>
-      {/*<div className={styles.LandingCarouselWrapper}>*/}
-      {/*  {!hideCarousel && <LandingCarousel />}*/}
-      {/*</div>*/}
+      {/* <div className={styles.LandingCarouselWrapper}> */}
+      {/*  {!hideCarousel && <LandingCarousel />} */}
+      {/* </div> */}
       <div className={styles.HomeContent}>
         <Affix
           className={styles.SidebarAffix}
@@ -104,7 +104,7 @@ export const Home = ({ hideCarousel }: HomeProps) => {
           target={() => document.getElementById(layoutId)}
         >
           <div className={styles.HomeSearchWrapper}>
-            {/*<Input placeholder="Borderless" bordered={false} />*/}
+            {/* <Input placeholder="Borderless" bordered={false} /> */}
             <Input
               className={styles.HomeInputSearch}
               placeholder="Buscar"
@@ -119,7 +119,7 @@ export const Home = ({ hideCarousel }: HomeProps) => {
         {products.length > 0 && (
           <div className={styles.HomeContentProducts}>
             {Object.keys(productsPerCompanies).map((categoryId, i) => {
-              const category = productsPerCompanies[categoryId]
+              const category = productsPerCompanies[categoryId];
               return (
                 <ScrollView
                   wrapperClassName={
@@ -130,7 +130,7 @@ export const Home = ({ hideCarousel }: HomeProps) => {
                   products={category.products}
                   title={category.title}
                 />
-              )
+              );
             })}
             <h2 className="mb-xx-l title">Todos los Productos</h2>
             <div className={styles.HomeCardsGrid}>
@@ -146,5 +146,5 @@ export const Home = ({ hideCarousel }: HomeProps) => {
         )}
       </div>
     </div>
-  )
+  );
 }

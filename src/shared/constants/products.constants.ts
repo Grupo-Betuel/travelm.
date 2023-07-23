@@ -5,4 +5,4 @@ export const ProductsConstants = {
   ALMOST_SOLD_OUT_QUANTITY: 10,
   ADD_CART: 'Agregar al carrito',
   VIEW_CART: 'Ver Carrito',
-}
+};

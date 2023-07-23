@@ -1,4 +1,4 @@
-import { createContext } from 'react'
+import { createContext } from 'react';
 
 export interface IAppLoadingContextValue {
   appLoading?: boolean
@@ -6,5 +6,5 @@ export interface IAppLoadingContextValue {
 }
 
 export const AppLoadingContext = createContext<IAppLoadingContextValue>(
-  {} as IAppLoadingContextValue
-)
+  {} as IAppLoadingContextValue,
+);

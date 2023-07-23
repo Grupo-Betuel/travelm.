@@ -1,5 +1,4 @@
-import { Header } from 'antd/lib/layout/layout'
-import styles from './Navbar.module.scss'
+import { Header } from 'antd/lib/layout/layout';
 import {
   Avatar,
   Badge,
@@ -10,7 +9,7 @@ import {
   Modal,
   Select,
   Space,
-} from 'antd'
+} from 'antd';
 import {
   ArrowLeftOutlined,
   BankOutlined,
@@ -25,45 +24,46 @@ import {
   ShoppingCartOutlined,
   TeamOutlined,
   UserOutlined,
-} from '@ant-design/icons'
-import { HandleAuthVisibility } from '@shared/components'
-import { useContextualRouting } from 'next-use-contextual-routing'
-import { Auth } from '@screens/Auth/Auth'
+} from '@ant-design/icons';
+import { HandleAuthVisibility } from '@shared/components';
+import { useContextualRouting } from 'next-use-contextual-routing';
+import { Auth } from '@screens/Auth/Auth';
+import { ClientEntity } from '@shared/entities/ClientEntity';
+import { ShoppingCartDrawer } from 'src/shared/components/ShoppingCartDrawer';
+import React, { useEffect, useMemo, useState } from 'react';
+import { handleEntityHook } from '@shared/hooks/handleEntityHook';
+import { ProductEntity } from '@shared/entities/ProductEntity';
+import { EndpointsAndEntityStateKeys } from '@shared/enums/endpoints.enum';
+import { CategoryEntity } from '@shared/entities/CategoryEntity';
+import { MenuItemType } from 'antd/es/menu/hooks/useItems';
+import Link from 'next/link';
+import { useAuthClientHook } from '@shared/hooks/useAuthClientHook';
+import { CompanyEntity } from '@shared/entities/CompanyEntity';
+import { useRouter } from 'next/router';
+import { useOrderContext } from '@shared/contexts/OrderContext';
+import { useAppStore } from '@services/store';
+import Sider from 'antd/lib/layout/Sider';
 import {
   appLogOut,
   getAuthData,
   resetAuthData,
-} from '../../../../utils/auth.utils'
-import { ClientEntity } from '@shared/entities/ClientEntity'
-import { ShoppingCartDrawer } from 'src/shared/components/ShoppingCartDrawer'
-import React, { useEffect, useMemo, useState } from 'react'
-import { handleEntityHook } from '@shared/hooks/handleEntityHook'
-import { ProductEntity } from '@shared/entities/ProductEntity'
-import { EndpointsAndEntityStateKeys } from '@shared/enums/endpoints.enum'
-import { CategoryEntity } from '@shared/entities/CategoryEntity'
-import { MenuItemType } from 'antd/es/menu/hooks/useItems'
-import Link from 'next/link'
-import { useAuthClientHook } from '@shared/hooks/useAuthClientHook'
-import { CompanyEntity } from '@shared/entities/CompanyEntity'
-import { useRouter } from 'next/router'
-import { useOrderContext } from '@shared/contexts/OrderContext'
-import { useAppStore } from '@services/store'
-import Sider from 'antd/lib/layout/Sider'
+} from '../../../../utils/auth.utils';
+import styles from './Navbar.module.scss';
 
-type MenuItem = Required<MenuProps>['items'][number]
+type MenuItem = Required<MenuProps>['items'][number];
 
 function getItem(
   label: React.ReactNode,
   key: React.Key,
   icon?: React.ReactNode,
-  children?: MenuItem[]
+  children?: MenuItem[],
 ): MenuItem {
   return {
     key,
     icon,
     children,
     label,
-  } as MenuItem
+  } as MenuItem;
 }
 
 const items: MenuItem[] = [
@@ -79,113 +79,107 @@ const items: MenuItem[] = [
     getItem('Team 2', '8'),
   ]),
   getItem('Files', '9', <FileOutlined />),
-]
+];
 
 export interface ICategorySelect {
   onSelect: (slug: string) => void
 }
-const navbarOptionsLimit = 4
+const navbarOptionsLimit = 4;
 
-export const Navbar = () => {
-  const [companyName, setCompanyName] = useState('')
-  const [categoryId, setCategoryId] = useState('')
-  const [showSidebar, setHideSidebar] = useState(true)
-  const router = useRouter()
-  const { makeContextualHref, returnHref } = useContextualRouting()
-  const authIsEnable = router.query.auth
+export function Navbar() {
+  const [companyName, setCompanyName] = useState('');
+  const [categoryId, setCategoryId] = useState('');
+  const [showSidebar, setHideSidebar] = useState(true);
+  const router = useRouter();
+  const { makeContextualHref, returnHref } = useContextualRouting();
+  const authIsEnable = router.query.auth;
   const {
     get: getCategories,
     [EndpointsAndEntityStateKeys.BY_COMPANY]: companyCategories,
-  } = handleEntityHook<CategoryEntity>('categories')
+  } = handleEntityHook<CategoryEntity>('categories');
 
-  const { data: companies } = handleEntityHook<CompanyEntity>('companies', true)
-  const [navbarOptions, setNavbarOptions] = useState<MenuItemType[]>([])
-  const { client } = useAuthClientHook()
+  const { data: companies } = handleEntityHook<CompanyEntity>('companies', true);
+  const [navbarOptions, setNavbarOptions] = useState<MenuItemType[]>([]);
+  const { client } = useAuthClientHook();
   const [selectedCompanies, setSelectedCompanies] = useState<CompanyEntity[]>(
-    []
-  )
-  const salesQuantityData = useAppStore((state) => {
-    return state.currentOrder?.sales.reduce((acc, sale) => {
-      return acc + sale.quantity
-    }, 0)
-  })
+    [],
+  );
+  const salesQuantityData = useAppStore((state) => state.currentOrder?.sales.reduce((acc, sale) => acc + sale.quantity, 0));
 
-  const [salesQuantity, setSalesQuantity] = useState(0)
+  const [salesQuantity, setSalesQuantity] = useState(0);
 
   useEffect(() => {
     if (salesQuantityData) {
-      setSalesQuantity(salesQuantityData)
+      setSalesQuantity(salesQuantityData);
     }
-  }, [salesQuantityData])
+  }, [salesQuantityData]);
 
-  const { cartIsOpen, toggleCart } = useOrderContext()
+  const { cartIsOpen, toggleCart } = useOrderContext();
 
   useEffect(() => {
-    const company = router.query.company as string
-    const category = router.query.category as string
+    const company = router.query.company as string;
+    const category = router.query.category as string;
     if (!categoryId && category) {
-      setCategoryId(category)
+      setCategoryId(category);
     }
     // getting categories per company
     if (company && !companyName) {
       getCategories({
         endpoint: EndpointsAndEntityStateKeys.BY_COMPANY,
         slug: company,
-      })
+      });
     }
-    setCompanyName(company)
-  }, [router.query])
+    setCompanyName(company);
+  }, [router.query]);
 
   useEffect(() => {
-    let data = []
+    let data = [];
     if (companyName) {
-      data = parseCatToMenuItem(companyCategories?.data || [])
+      data = parseCatToMenuItem(companyCategories?.data || []);
     } else {
-      data = parseCompaniesToMenuItem(companies || [])
+      data = parseCompaniesToMenuItem(companies || []);
     }
-    const company = companies.find((c) => c.companyId === companyName)
-    company ? setSelectedCompanies([company]) : setSelectedCompanies([])
+    const company = companies.find((c) => c.companyId === companyName);
+    company ? setSelectedCompanies([company]) : setSelectedCompanies([]);
 
-    setNavbarOptions(data)
-  }, [companies, companyCategories?.data, companyName])
+    setNavbarOptions(data);
+  }, [companies, companyCategories?.data, companyName]);
 
-  const parseCatToMenuItem = (cats: CategoryEntity[]) =>
-    cats.map((cat) => ({
-      key: cat._id,
-      title: cat.title,
-      label: cat.title,
-      icon: <DatabaseOutlined />,
-      onClick: () => {
-        router.push(`/${cat.company}/category/${cat._id}`)
-        setHideSidebar(true)
-      },
-    }))
+  const parseCatToMenuItem = (cats: CategoryEntity[]) => cats.map((cat) => ({
+    key: cat._id,
+    title: cat.title,
+    label: cat.title,
+    icon: <DatabaseOutlined />,
+    onClick: () => {
+      router.push(`/${cat.company}/category/${cat._id}`);
+      setHideSidebar(true);
+    },
+  }));
 
-  const parseCompaniesToMenuItem = (companies: CompanyEntity[]) =>
-    companies.map((company) => ({
-      key: company._id,
-      title: company.name,
-      label: company.name,
-      icon: <BankOutlined />,
-      onClick: () => {
-        router.push(`/${company.companyId}`)
-        setSelectedCompanies([company])
-        setHideSidebar(true)
-      },
-    }))
+  const parseCompaniesToMenuItem = (companies: CompanyEntity[]) => companies.map((company) => ({
+    key: company._id,
+    title: company.name,
+    label: company.name,
+    icon: <BankOutlined />,
+    onClick: () => {
+      router.push(`/${company.companyId}`);
+      setSelectedCompanies([company]);
+      setHideSidebar(true);
+    },
+  }));
 
   const authenticate = () => {
     router.push(makeContextualHref({ auth: true } as any), 'auth', {
       shallow: true,
-    })
-  }
-  const handleReturnToHref = () => router.push(returnHref)
+    });
+  };
+  const handleReturnToHref = () => router.push(returnHref);
 
   const goToCompany = (comp: CompanyEntity) => (e: any) => {
-    e.preventDefault()
-    router.push(`/${comp.companyId}`)
-    setSelectedCompanies([comp])
-  }
+    e.preventDefault();
+    router.push(`/${comp.companyId}`);
+    setSelectedCompanies([comp]);
+  };
 
   return (
     <>
@@ -196,7 +190,7 @@ export const Navbar = () => {
           <div
             className={`${styles.navbarLogoContainer} flex-start-center gap-l`}
           >
-            <Link href={`/`}>
+            <Link href="/">
               <HomeOutlined style={{ fontSize: '30px' }} />
             </Link>
             {selectedCompanies.map((company) => (
@@ -320,7 +314,7 @@ export const Navbar = () => {
         collapsedWidth={0}
         collapsed={showSidebar}
         onCollapse={(value) => setHideSidebar(value)}
-        theme={'light'}
+        theme="light"
       >
         <div className="demo-logo-vertical" />
         <Menu
@@ -331,5 +325,5 @@ export const Navbar = () => {
         />
       </Sider>
     </>
-  )
+  );
 }

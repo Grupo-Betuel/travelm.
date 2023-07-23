@@ -1,23 +1,25 @@
-import styles from './Category.module.scss'
-import { getAuthData } from 'src/utils/auth.utils'
-import { ClientEntity } from '@shared/entities/ClientEntity'
+import { getAuthData } from 'src/utils/auth.utils';
+import { ClientEntity } from '@shared/entities/ClientEntity';
 import {
   LandingCarousel,
   MainContentModal,
   ProductCard,
   ScrollView,
-} from '@shared/components'
-import { Affix, Input } from 'antd'
-import { SearchOutlined } from '@ant-design/icons'
-import { handleEntityHook } from '@shared/hooks/handleEntityHook'
-import { ProductEntity } from '@shared/entities/ProductEntity'
-import { useEffect, useState, useMemo, ChangeEvent } from 'react'
-import { useRouter } from 'next/router'
-import { EndpointsAndEntityStateKeys } from '@shared/enums/endpoints.enum'
-import { useContextualRouting } from 'next-use-contextual-routing'
-import { DetailView } from '@components/DetailView'
-import { deepMatch } from '../../utils/matching.util'
-import { layoutId, navbarOptionsHeight } from '../../utils/layout.utils'
+} from '@shared/components';
+import { Affix, Input } from 'antd';
+import { SearchOutlined } from '@ant-design/icons';
+import { handleEntityHook } from '@shared/hooks/handleEntityHook';
+import { ProductEntity } from '@shared/entities/ProductEntity';
+import {
+  useEffect, useState, useMemo, ChangeEvent,
+} from 'react';
+import { useRouter } from 'next/router';
+import { EndpointsAndEntityStateKeys } from '@shared/enums/endpoints.enum';
+import { useContextualRouting } from 'next-use-contextual-routing';
+import { DetailView } from '@components/DetailView';
+import styles from './Category.module.scss';
+import { deepMatch } from '../../utils/matching.util';
+import { layoutId, navbarOptionsHeight } from '../../utils/layout.utils';
 
 export interface CategoryProps {}
 export type ProductPerCategoryType = {
@@ -25,39 +27,38 @@ export type ProductPerCategoryType = {
     products: ProductEntity[]
     title: string
   }
-}
+};
 
-export const Category = ({}: CategoryProps) => {
-  const authClient = getAuthData('all') as ClientEntity
-  const router = useRouter()
-  const { makeContextualHref, returnHref } = useContextualRouting()
-  const [companyName, setCompanyName] = useState<string>()
-  const [categoryProducts, setCategoryProducts] = useState<ProductEntity[]>([])
-  const [showContextProductDetailModal, setShowContextProductDetailModal] =
-    useState<boolean>()
+export function Category({}: CategoryProps) {
+  const authClient = getAuthData('all') as ClientEntity;
+  const router = useRouter();
+  const { makeContextualHref, returnHref } = useContextualRouting();
+  const [companyName, setCompanyName] = useState<string>();
+  const [categoryProducts, setCategoryProducts] = useState<ProductEntity[]>([]);
+  const [showContextProductDetailModal, setShowContextProductDetailModal] = useState<boolean>();
   const {
     data: allCategories,
     get: getProducts,
     [EndpointsAndEntityStateKeys.BY_CATEGORY]: categoryProductsData,
-  } = handleEntityHook<ProductEntity>('products')
+  } = handleEntityHook<ProductEntity>('products');
 
   useEffect(() => {
-    const category = router.query.category as string
-    const productId = router.query.productId as string
+    const category = router.query.category as string;
+    const productId = router.query.productId as string;
     if (category) {
       getProducts({
         endpoint: EndpointsAndEntityStateKeys.BY_CATEGORY,
         slug: category,
-      })
-      setCompanyName(category)
+      });
+      setCompanyName(category);
     }
 
-    setShowContextProductDetailModal(!!productId)
-  }, [router.query])
+    setShowContextProductDetailModal(!!productId);
+  }, [router.query]);
 
   useEffect(() => {
-    setCategoryProducts(categoryProductsData?.data || [])
-  }, [categoryProductsData?.data])
+    setCategoryProducts(categoryProductsData?.data || []);
+  }, [categoryProductsData?.data]);
 
   const goToProductDetail = (product: ProductEntity) => {
     router.push(
@@ -65,22 +66,22 @@ export const Category = ({}: CategoryProps) => {
       `/${product.company}/detail/${product._id}`,
       {
         shallow: true,
-      }
-    )
-  }
+      },
+    );
+  };
 
   const onSearch = ({ target: { value } }: ChangeEvent<HTMLInputElement>) => {
     const results = deepMatch<ProductEntity>(
       value,
-      categoryProductsData?.data || []
-    )
-    setCategoryProducts([...results])
-  }
+      categoryProductsData?.data || [],
+    );
+    setCategoryProducts([...results]);
+  };
 
   return (
     <div className={styles.CategoryWrapper}>
       <MainContentModal show={showContextProductDetailModal}>
-        <DetailView returnHref={returnHref}></DetailView>
+        <DetailView returnHref={returnHref} />
       </MainContentModal>
       <div className={styles.CategoryContent}>
         <Affix
@@ -120,5 +121,5 @@ export const Category = ({}: CategoryProps) => {
         )}
       </div>
     </div>
-  )
+  );
 }

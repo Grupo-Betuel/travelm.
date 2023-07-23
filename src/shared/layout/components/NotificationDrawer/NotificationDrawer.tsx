@@ -1,12 +1,14 @@
-import { Avatar, Drawer, DrawerProps, List, Skeleton } from 'antd'
-import styles from './NotificationDrawer.module.scss'
-import { getAuthData } from '../../../../utils/auth.utils'
-import { ClientEntity } from '@shared/entities/ClientEntity'
+import {
+  Avatar, Drawer, DrawerProps, List, Skeleton,
+} from 'antd';
+import { ClientEntity } from '@shared/entities/ClientEntity';
+import styles from './NotificationDrawer.module.scss';
+import { getAuthData } from '../../../../utils/auth.utils';
 
 export interface INotificationDrawerProps extends DrawerProps {}
 
-export const NotificationDrawer = ({ ...props }: INotificationDrawerProps) => {
-  const authUser = getAuthData('user') as ClientEntity
+export function NotificationDrawer({ ...props }: INotificationDrawerProps) {
+  const authUser = getAuthData('user') as ClientEntity;
   const notificationList = [
     {
       loading: false,
@@ -20,12 +22,18 @@ export const NotificationDrawer = ({ ...props }: INotificationDrawerProps) => {
         'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/Cat03.jpg/640px-Cat03.jpg',
       name: 'Meeting with cat on Monday at 4:00PM',
     },
-  ]
-  const initLoading = false
+  ];
+  const initLoading = false;
 
   return (
     <div className={styles.NotificationDrawer}>
-      {authUser && <h3>{authUser.name} recuerda!</h3>}
+      {authUser && (
+      <h3>
+        {authUser.name}
+        {' '}
+        recuerda!
+      </h3>
+      )}
       <List
         className="demo-loadmore-list"
         loading={initLoading}
@@ -55,5 +63,5 @@ export const NotificationDrawer = ({ ...props }: INotificationDrawerProps) => {
         <li className={`${styles.NotificationOption}`}>Language</li>
       </ul>
     </div>
-  )
+  );
 }

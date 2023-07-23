@@ -1,6 +1,6 @@
-import { Dispatch } from 'redux'
+import { Dispatch } from 'redux';
 
-export type RESTMethodsType = 'post' | 'put' | 'get' | 'delete'
+export type RESTMethodsType = 'post' | 'put' | 'get' | 'delete';
 
 export interface IRESTEndpointStructure {
   method: RESTMethodsType
@@ -16,4 +16,4 @@ export enum StatusCode {
   BadRequest = 400,
 }
 
-export type RESTApiType<T> = (data?: T) => (dispatch: Dispatch) => () => void
+export type RESTApiType<T> = (data?: T) => (dispatch: Dispatch) => () => void;

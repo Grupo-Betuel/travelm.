@@ -1,5 +1,7 @@
-import { createContext, useContext, useEffect, useState } from 'react'
-import OrderService from '@services/orderService'
+import {
+  createContext, useContext, useEffect, useState,
+} from 'react';
+import OrderService from '@services/orderService';
 
 export interface IOrderContextValue {
   orderService: OrderService
@@ -7,18 +9,18 @@ export interface IOrderContextValue {
   cartIsOpen?: boolean
 }
 export const OrderContext = createContext<IOrderContextValue>(
-  {} as IOrderContextValue
-)
+  {} as IOrderContextValue,
+);
 
 export const useOrderContext = (): IOrderContextValue => {
-  const { orderService, toggleCart, cartIsOpen } = useContext(OrderContext)
+  const { orderService, toggleCart, cartIsOpen } = useContext(OrderContext);
   const [orderContext, setOrderContext] = useState<IOrderContextValue>(
-    {} as IOrderContextValue
-  )
+    {} as IOrderContextValue,
+  );
 
   useEffect(() => {
-    setOrderContext({ orderService, toggleCart, cartIsOpen })
-  }, [orderService, cartIsOpen])
+    setOrderContext({ orderService, toggleCart, cartIsOpen });
+  }, [orderService, cartIsOpen]);
 
-  return orderContext
-}
+  return orderContext;
+};

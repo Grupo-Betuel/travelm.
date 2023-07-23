@@ -1,18 +1,20 @@
-import React from 'react'
-import { Button, Form, Input, Spin } from 'antd'
-import { useAppStore } from '@services/store'
-import { useRouter } from 'next/router'
-import { IAuthProps } from '@screens/Auth/Auth'
-import { EndpointsAndEntityStateKeys } from '@shared/enums/endpoints.enum'
-import { MaskedInput } from 'antd-mask-input'
-import { UserOutlined } from '@ant-design/icons'
+import React from 'react';
+import {
+  Button, Form, Input, Spin,
+} from 'antd';
+import { useAppStore } from '@services/store';
+import { useRouter } from 'next/router';
+import { IAuthProps } from '@screens/Auth/Auth';
+import { EndpointsAndEntityStateKeys } from '@shared/enums/endpoints.enum';
+import { MaskedInput } from 'antd-mask-input';
+import { UserOutlined } from '@ant-design/icons';
 
-export const Login = ({ isModal }: IAuthProps) => {
-  const router = useRouter()
-  const clientEntity = useAppStore((state) => state.clients((statea) => statea))
+export function Login({ isModal }: IAuthProps) {
+  const router = useRouter();
+  const clientEntity = useAppStore((state) => state.clients((statea) => statea));
 
   const submit = async (data: any) => {
-    data.phone = Number(data.phone.toString().replace(/[- ()]/g, ''))
+    data.phone = Number(data.phone.toString().replace(/[- ()]/g, ''));
 
     if (
       await clientEntity.add(data, {
@@ -21,12 +23,12 @@ export const Login = ({ isModal }: IAuthProps) => {
     ) {
       // TODO: success Login
       if (isModal) {
-        router.back()
+        router.back();
       } else {
-        router.push('/')
+        router.push('/');
       }
     }
-  }
+  };
 
   return (
     <Form
@@ -46,7 +48,7 @@ export const Login = ({ isModal }: IAuthProps) => {
           maskOptions={{
             lazy: true,
           }}
-          mask={'+1 (000) 000-0000'}
+          mask="+1 (000) 000-0000"
           size="large"
         />
       </Form.Item>
@@ -66,5 +68,5 @@ export const Login = ({ isModal }: IAuthProps) => {
         </Button>
       </Form.Item>
     </Form>
-  )
+  );
 }

@@ -1,7 +1,7 @@
-import { IServiceMethodProperties } from '@services/BaseService'
+import { IServiceMethodProperties } from '@services/BaseService';
 
-export type CallbackType<T> = (data?: T | T[], isCached?: boolean) => void
-export type HandleErrorType = (error: string) => void
+export type CallbackType<T> = (data?: T | T[], isCached?: boolean) => void;
+export type HandleErrorType = (error: string) => void;
 export interface AbstractBaseService<T> {
   get: (
     properties: IServiceMethodProperties<T>,

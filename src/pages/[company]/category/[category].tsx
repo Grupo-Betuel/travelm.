@@ -1,5 +1,5 @@
-import { Category } from '@screens/Category'
+import { Category } from '@screens/Category';
 
 export default function CompanyProducts() {
-  return <Category />
+  return <Category />;
 }

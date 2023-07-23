@@ -1,20 +1,22 @@
-import { Button, Form, Input, Select, Spin } from 'antd'
-import { useAppStore } from '@services/store'
-import { ClientEntity } from '@shared/entities/ClientEntity'
-import { MaskedInput } from 'antd-mask-input'
-import { useRouter } from 'next/router'
-import { IAuthProps } from '@screens/Auth/Auth'
-import { EndpointsAndEntityStateKeys } from '@shared/enums/endpoints.enum'
-import React from 'react'
-import { SendOutlined, UserAddOutlined } from '@ant-design/icons'
+import {
+  Button, Form, Input, Select, Spin,
+} from 'antd';
+import { useAppStore } from '@services/store';
+import { ClientEntity } from '@shared/entities/ClientEntity';
+import { MaskedInput } from 'antd-mask-input';
+import { useRouter } from 'next/router';
+import { IAuthProps } from '@screens/Auth/Auth';
+import { EndpointsAndEntityStateKeys } from '@shared/enums/endpoints.enum';
+import React from 'react';
+import { SendOutlined, UserAddOutlined } from '@ant-design/icons';
 
-export const Register = ({ isModal, onSubmit }: IAuthProps) => {
-  const clientEntity = useAppStore((state) => state.clients((stateu) => stateu))
-  const router = useRouter()
+export function Register({ isModal, onSubmit }: IAuthProps) {
+  const clientEntity = useAppStore((state) => state.clients((stateu) => stateu));
+  const router = useRouter();
 
   const createClient = async (data: ClientEntity) => {
-    data.phone = Number(data.phone.toString().replace(/[- ()]/g, ''))
-    console.log('create client', data)
+    data.phone = Number(data.phone.toString().replace(/[- ()]/g, ''));
+    console.log('create client', data);
     if (
       await clientEntity.add(data, {
         endpoint: EndpointsAndEntityStateKeys.REGISTER,
@@ -26,20 +28,20 @@ export const Register = ({ isModal, onSubmit }: IAuthProps) => {
             phone: data.phone,
             password: data.password,
           },
-          { endpoint: EndpointsAndEntityStateKeys.LOGIN }
+          { endpoint: EndpointsAndEntityStateKeys.LOGIN },
         )
       ) {
-        if (onSubmit) return onSubmit(data)
+        if (onSubmit) return onSubmit(data);
         if (isModal) {
-          router.back()
+          router.back();
         } else {
-          router.push('/')
+          router.push('/');
         }
       }
     } else {
       // router.push('/auth')
     }
-  }
+  };
 
   return (
     <Form
@@ -67,8 +69,8 @@ export const Register = ({ isModal, onSubmit }: IAuthProps) => {
       >
         <MaskedInput
           type="text"
-          value={''}
-          mask={'+1 (000) 000-0000'}
+          value=""
+          mask="+1 (000) 000-0000"
           maskOptions={{
             lazy: true,
           }}
@@ -91,5 +93,5 @@ export const Register = ({ isModal, onSubmit }: IAuthProps) => {
         </Button>
       </Form.Item>
     </Form>
-  )
+  );
 }

@@ -1,102 +1,100 @@
-import { Button, Drawer, DrawerProps, Spin, Steps } from 'antd'
-import styles from './ShoppingCartDrawer.module.scss'
-import React, { FC, useEffect, useMemo, useState } from 'react'
+import {
+  Button, Drawer, DrawerProps, Spin, Steps,
+} from 'antd';
+import React, {
+  FC, useEffect, useMemo, useState,
+} from 'react';
 import {
   DeleteOutlined,
   EditOutlined,
   PlusOutlined,
   SendOutlined,
   ShoppingCartOutlined,
-} from '@ant-design/icons'
-import { useRouter } from 'next/router'
-import { useAppStore } from '@services/store'
-import { handleEntityHook } from '@shared/hooks/handleEntityHook'
-import OrderEntity from '@shared/entities/OrderEntity'
-import { useAuthClientHook } from '@shared/hooks/useAuthClientHook'
-import { ShoppingCart } from '@components/ShoppingCart'
-import { Register } from '@screens/Auth/components/Register'
-import { ProductEntity } from '@shared/entities/ProductEntity'
-import { toast } from 'react-toastify'
-import { StickyFooter } from '@shared/layout/components/StickyFooter/StickyFooter'
-import Title from 'antd/lib/typography/Title'
-import { useOrderContext } from '@shared/contexts/OrderContext'
+} from '@ant-design/icons';
+import { useRouter } from 'next/router';
+import { useAppStore } from '@services/store';
+import { handleEntityHook } from '@shared/hooks/handleEntityHook';
+import OrderEntity from '@shared/entities/OrderEntity';
+import { useAuthClientHook } from '@shared/hooks/useAuthClientHook';
+import { ShoppingCart } from '@components/ShoppingCart';
+import { Register } from '@screens/Auth/components/Register';
+import { ProductEntity } from '@shared/entities/ProductEntity';
+import { toast } from 'react-toastify';
+import { StickyFooter } from '@shared/layout/components/StickyFooter/StickyFooter';
+import Title from 'antd/lib/typography/Title';
+import { useOrderContext } from '@shared/contexts/OrderContext';
+import styles from './ShoppingCartDrawer.module.scss';
 
 export interface IShoppingCartDrawerProps extends DrawerProps {}
 
 const data = Array.from({ length: 2 }).map((_, i) => ({
-  title: `Alas de Danza`,
+  title: 'Alas de Danza',
   description: 'Cantidad: 5',
   content: <h1>RD$400</h1>,
-}))
+}));
 
-export const ShoppingCartDrawer = ({
+export function ShoppingCartDrawer({
   open,
   onClose,
-}: IShoppingCartDrawerProps) => {
-  const router = useRouter()
-  const order = useAppStore((state) => state.currentOrder)
-  const { client } = useAuthClientHook()
+}: IShoppingCartDrawerProps) {
+  const router = useRouter();
+  const order = useAppStore((state) => state.currentOrder);
+  const { client } = useAuthClientHook();
   const {
     add: sendOrder,
     update: updateOrder,
     loading,
-  } = handleEntityHook<OrderEntity>('orders')
-  const [current, setCurrent] = useState(0)
-  const substotal = useMemo(() => {
-    return order?.sales?.reduce((acc, sale) => {
-      return acc + sale.product.price * sale.quantity
-    }, 0)
-  }, [order])
-  const { orderService } = useOrderContext()
+  } = handleEntityHook<OrderEntity>('orders');
+  const [current, setCurrent] = useState(0);
+  const substotal = useMemo(() => order?.sales?.reduce((acc, sale) => acc + sale.product.price * sale.quantity, 0), [order]);
+  const { orderService } = useOrderContext();
 
   useEffect(() => {
     if (client) {
-      setCurrent(0)
+      setCurrent(0);
     }
-  }, [client])
+  }, [client]);
   const next = () => {
-    setCurrent(current + 1)
-  }
+    setCurrent(current + 1);
+  };
 
   const prev = () => {
-    setCurrent(current - 1)
-  }
+    setCurrent(current - 1);
+  };
 
   const editSale = (product: ProductEntity) => {
-    router.push(`/${product.company}/detail/${product?._id}`)
-    onClose && onClose({} as any)
-  }
+    router.push(`/${product.company}/detail/${product?._id}`);
+    onClose && onClose({} as any);
+  };
 
   const removeSale = (product: ProductEntity) => {
-    orderService.removeSale(product._id)
+    orderService.removeSale(product._id);
     // router.push(`/${product.company}/detail/${product?._id}`)
     // onClose && onClose({} as any)
-  }
+  };
 
   const handleSendOrder = async () => {
     if (order?._id) {
-      await updateOrder({ _id: order._id, ...order })
+      await updateOrder({ _id: order._id, ...order });
+    } else if (client || current === 1) {
+      await sendOrder({ ...order, client });
     } else {
-      if (client || current === 1) {
-        await sendOrder({ ...order, client })
-      } else {
-        next()
-      }
+      next();
     }
     // TODO: Success
-  }
+  };
   const onChangeStep = (value: number) => {
-    setCurrent(value)
-  }
+    setCurrent(value);
+  };
   const goToProfile = () => {
-    router.push('/client/profile')
-    onClose && onClose()
-  }
+    router.push('/client/profile');
+    onClose && onClose();
+  };
 
   const goToHome = () => {
-    router.push('/')
-    onClose && onClose()
-  }
+    router.push('/');
+    onClose && onClose();
+  };
 
   return (
     <Drawer
@@ -127,7 +125,8 @@ export const ShoppingCartDrawer = ({
         ) : (
           <>
             <h3 className="flex-between-center">
-              Datos del Cliente{' '}
+              Datos del Cliente
+              {' '}
               <div onClick={goToProfile} className="cursor-pointer">
                 <a>Editar Datos</a>
               </div>
@@ -170,7 +169,9 @@ export const ShoppingCartDrawer = ({
                 Subtotal
               </Title>
               <Title className="m-0" level={2}>
-                RD$ {(substotal || '0').toLocaleString()}
+                RD$
+                {' '}
+                {(substotal || '0').toLocaleString()}
               </Title>
             </div>
             {order?._id && (
@@ -186,7 +187,7 @@ export const ShoppingCartDrawer = ({
               </Button>
             )}
             <Button
-              type={'primary'}
+              type="primary"
               shape="round"
               block
               size="large"
@@ -197,8 +198,8 @@ export const ShoppingCartDrawer = ({
               {order?._id
                 ? 'Actualizar Order'
                 : client
-                ? 'Realizar Orden'
-                : 'Siguiente'}
+                  ? 'Realizar Orden'
+                  : 'Siguiente'}
             </Button>
           </StickyFooter>
         </>
@@ -219,5 +220,5 @@ export const ShoppingCartDrawer = ({
         </div>
       )}
     </Drawer>
-  )
+  );
 }
