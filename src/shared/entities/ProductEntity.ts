@@ -4,11 +4,11 @@ import { BaseEntity } from './BaseEntity';
 export class ProductEntity extends BaseEntity {
   name: string = '';
 
-  price: number = '';
+  price: number = 0;
 
   wholeSale?: string = '';
 
-  cost?: number = '';
+  cost?: number = 0;
 
   commission?: number = 0;
 

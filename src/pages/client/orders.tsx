@@ -16,18 +16,18 @@ export default function ClientOrders() {
   const {
     get: getOrders,
     update: updateOrder,
-    loading,
     fetching,
     [EndpointsAndEntityStateKeys.BY_CLIENT]: clientOrders,
   } = handleEntityHook<OrderEntity>('orders');
   const { client } = useAuthClientHook();
   const handleCurrentOrder = useAppStore((state) => state.handleCurrentOrder);
-  const { orderService, toggleCart } = useOrderContext();
+  const { toggleCart } = useOrderContext();
 
   const getOrdersByClient = async () => {
+    if (!client) return;
     await getOrders({
       endpoint: EndpointsAndEntityStateKeys.BY_CLIENT,
-      slug: client._id.toString(),
+      slug: client._id?.toString(),
     });
   };
   useEffect(() => {
@@ -49,7 +49,7 @@ export default function ClientOrders() {
   const attemptCancelOrder = (order: OrderEntity) => async () => {
     confirm({
       title: '¿Estas seguro de cancelar esta orden?',
-      icon: <ExclamationCircleFilled />,
+      icon: <ExclamationCircleFilled rev />,
       content: 'Una vez cancelada no podras revertir esta acción',
       closable: true,
       maskClosable: true,
@@ -116,7 +116,7 @@ export default function ClientOrders() {
     {
       title: 'Aciones',
       key: 'action',
-      render: (_, order: OrderEntity) => (
+      render: (text: string, order: OrderEntity) => (
         <Space size="middle">
           {order.status !== 'completed'
             && order.status !== 'canceled'

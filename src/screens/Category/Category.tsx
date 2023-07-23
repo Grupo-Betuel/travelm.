@@ -93,7 +93,7 @@ export function Category({}: CategoryProps) {
             <Input
               className={styles.CategoryInputSearch}
               placeholder="Buscar"
-              suffix={<SearchOutlined className="site-form-item-icon" />}
+              suffix={<SearchOutlined rev className="site-form-item-icon" />}
               bordered={false}
               onChange={onSearch}
               size="large"

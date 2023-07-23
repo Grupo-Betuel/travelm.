@@ -8,8 +8,15 @@ export const isNotEmptyObject = (obj: any) => {
 
 export function deepMatch<T>(value: any, values: T[] = []): T[] {
   if (!values || typeof values.filter !== 'function') return [];
-  const results = values.filter((item) => cleanText(JSON.stringify(item)).includes(cleanText(value)));
+  const results = values.filter((item) => cleanText(
+    JSON.stringify(item),
+  ).includes(cleanText(value)));
   return results;
 }
 
-export const filterOptions = (inputValue: string, option: IOption) => !!deepMatch(inputValue, [option]).length;
+const filterOptions = (inputValue: string, option: IOption) => !!deepMatch(
+  inputValue,
+  [option],
+).length;
+
+export { filterOptions };

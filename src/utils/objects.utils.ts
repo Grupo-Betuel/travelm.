@@ -1,6 +1,5 @@
 import { IPaginatedResponse } from '@interfaces/pagination.interface';
 import { IOption } from '@interfaces/common.intefacce';
-import queryString from 'query-string';
 import { ProductEntity } from '@shared/entities/ProductEntity';
 import { ISale } from '@shared/entities/OrderEntity';
 
@@ -49,8 +48,8 @@ export function parseQueryToObject<T>(path: string): T {
 export const getSaleDataFromProduct = (
   product: ProductEntity,
 ): Partial<ISale> => ({
-  productId: product._id,
   product,
+  productId: product._id,
   company: product.company,
   unitPrice: product.price,
   unitCost: product.cost,

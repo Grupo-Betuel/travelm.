@@ -13,10 +13,10 @@ import OrderEntity from '@shared/entities/OrderEntity';
 
 /// APP STORE
 export interface IAppStore extends AppEntitiesStoreType {
-  count: number
-  handleCount: (isSubs?: boolean) => () => void
-  handleCurrentOrder: (order: OrderEntity) => void
-  currentOrder: OrderEntity
+  count: number;
+  handleCount: (isSubs?: boolean) => () => void;
+  handleCurrentOrder: (order: OrderEntity) => void;
+  currentOrder: OrderEntity;
 }
 
 export const appStore = (set: SetState<IAppStore>) => {
@@ -36,7 +36,9 @@ export const appStore = (set: SetState<IAppStore>) => {
     },
   } as IAppStore;
   (Object.keys(appEntitiesWithService) as EntityNamesType[]).forEach(
-    (k: EntityNamesType) => ((appStoreInit as any)[k] = createEntityStore<BaseEntity>(
+    (k: EntityNamesType) => ((
+      appStoreInit as any
+    )[k] = createEntityStore<BaseEntity>(
       [appEntitiesWithService[k].entity],
       appEntitiesWithService[k].service,
     )),
@@ -47,7 +49,7 @@ export const appStore = (set: SetState<IAppStore>) => {
 
 /// PERSIST DATA
 export interface IPersistStore {
-  name: string
+  name: string;
 }
 
 const persistStore = persist<IPersistStore>(

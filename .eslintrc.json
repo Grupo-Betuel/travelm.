@@ -7,10 +7,14 @@
   "parserOptions": {
     "project": "./tsconfig.json"
   },
-  "overrides": [
-  ],
+  "overrides": [],
   "rules": {
-    "semi": "off"
+    "semi": "off",
+    "no-underscore-dangle": "off",
+    "no-restricted-globals": "off",
+    "no-console": "off",
+    "no-return-assign": "off",
+    "no-param-reassign": "off",
   },
   "plugins": ["react"]
 }

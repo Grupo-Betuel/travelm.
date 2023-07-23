@@ -9,7 +9,9 @@ import { useForm } from 'antd/lib/form/Form';
 import { toast } from 'react-toastify';
 
 export default function ClientProfile() {
-  const clientEntity = useAppStore((state) => state.clients((stateu) => stateu));
+  const clientEntity = useAppStore((state) =>
+    state.clients((stateu) => stateu)
+  );
   const { client } = useAuthClientHook();
   const [profileForm] = useForm();
 
@@ -84,7 +86,7 @@ export default function ClientProfile() {
           shape="round"
           block
           size="large"
-          icon={<UserOutlined />}
+          icon={<UserOutlined rev />}
         >
           Actualizar Usuario
         </Button>

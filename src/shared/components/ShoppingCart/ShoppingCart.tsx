@@ -8,15 +8,17 @@ import { ProductEntity } from '@shared/entities/ProductEntity';
 import styles from './ShoppingCart.module.scss';
 
 export interface IShoppingCartAction {
-  key: string
-  icon: React.FC
-  text: string
-  onClick?: (sale: ProductEntity) => void
+  key: string;
+  icon: any;
+  text: string;
+  onClick: (product: ProductEntity) => void;
 }
 export interface IShoppingCartProps {
-  itemActions: IShoppingCartAction[]
-  submitButtonLabel?: string
-  sales?: ISale[]
+  itemActions: IShoppingCartAction[];
+  // eslint-disable-next-line react/require-default-props
+  submitButtonLabel?: string;
+  // eslint-disable-next-line react/require-default-props
+  sales?: ISale[];
 }
 const data = Array.from({ length: 2 }).map((_, i) => ({
   title: 'Alas de Danza',
@@ -24,15 +26,7 @@ const data = Array.from({ length: 2 }).map((_, i) => ({
   content: <h1>RD$400</h1>,
 }));
 
-const IconText: FC<IShoppingCartAction> = ({
-  icon,
-  text,
-  onClick,
-}: {
-  icon: React.FC
-  text: string
-  onClick?: () => void
-}) => (
+const IconText: FC<IShoppingCartAction> = ({ icon, text, onClick }: any) => (
   <Space className={styles.ShoppingCartListItemAction} onClick={onClick}>
     {React.createElement(icon)}
     {text}

@@ -1,3 +1,3 @@
-export function asLiterals<T>(arr: T[]): T[] {
+export default function asLiterals<T>(arr: T[]): T[] {
   return arr;
 }

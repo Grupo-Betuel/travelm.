@@ -1,4 +1,4 @@
-import { ITrip } from './tripModels';
+// import { ITrip } from './tripModels';
 
 export type MessengerStatusTypes = 'available' | 'unavailable' | 'on-trip-to-office' | 'on-trip-to-client' | 'quoting';
 export interface IMessenger {
@@ -6,7 +6,7 @@ export interface IMessenger {
   firstName: string
   lastName: string
   phone: string
-  trips: ITrip[];
+  trips: any[];
   status: MessengerStatusTypes;
   activeOrder?: string | null;
 }

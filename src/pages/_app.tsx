@@ -5,31 +5,28 @@ import { Affix, ConfigProvider, Spin } from 'antd';
 import {
   createContext, useEffect, useMemo, useState,
 } from 'react';
-import { ClientEntity } from '@shared/entities/ClientEntity';
 import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer } from 'react-toastify';
 import { useAppStore } from '@services/store';
-import { IPostFilters } from '@interfaces/posts.interface';
 import { layoutId, navbarOptionsHeight } from 'src/utils/layout.utils';
 import { AppLoadingContext } from '@shared/contexts/AppLoadingContext';
 import { AppViewportHeightContext } from '@shared/contexts/AppViewportHeightContext';
 import { OrderContext } from '@shared/contexts/OrderContext';
 import OrderService from '@services/orderService';
 import { useAuthClientHook } from '@shared/hooks/useAuthClientHook';
-import { getAuthData } from '../utils/auth.utils';
 import { defaultTheme } from '../config/theme.config';
 import { defaultValidateMessages as validateMessages } from '../config/form-validation.config';
 
 export interface IAppProps {
-  protected?: boolean
+  protected?: boolean;
 }
 
 {
   /* TODO: Check if global posts filters is neccesarry */
 }
+
 export interface IAppPostsFiltersContextValue {
-  appPostsFilters: IPostFilters
-  setAppPostsFilters: (data: IPostFilters) => void
+  setAppPostsFilters: (data: any) => void;
 }
 
 {
@@ -38,6 +35,7 @@ export interface IAppPostsFiltersContextValue {
 export const appPostsFiltersContext = createContext<IAppPostsFiltersContextValue>(
   {} as IAppPostsFiltersContextValue,
 );
+
 export enum AppViewportHeightClassNames {
   WITH_NAVBAR = 'FullAppViewPortHeight',
   WITH_NAVBAR_OPTION = 'FullAppViewPortHeightNavbarOptions',

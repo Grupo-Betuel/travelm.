@@ -119,7 +119,7 @@ export function Company({ hideCarousel }: CompanyProps) {
             <Input
               className={styles.CompanyInputSearch}
               placeholder="Buscar"
-              suffix={<SearchOutlined className="site-form-item-icon" />}
+              suffix={<SearchOutlined rev className="site-form-item-icon" />}
               bordered={false}
               onChange={onSearch}
               size="large"

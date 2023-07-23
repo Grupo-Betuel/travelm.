@@ -1,6 +1,5 @@
 import { isExpired } from 'react-jwt';
 import { ClientEntity } from '@shared/entities/ClientEntity';
-import { BaseService } from '@services/BaseService';
 import { ClientService } from '@services/clientService';
 
 const clientService = new ClientService();

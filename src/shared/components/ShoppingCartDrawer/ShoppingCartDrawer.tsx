@@ -1,9 +1,5 @@
-import {
-  Button, Drawer, DrawerProps, Spin, Steps,
-} from 'antd';
-import React, {
-  FC, useEffect, useMemo, useState,
-} from 'react';
+import { Button, Drawer, DrawerProps, Spin, Steps } from 'antd';
+import React, { FC, useEffect, useMemo, useState } from 'react';
 import {
   DeleteOutlined,
   EditOutlined,
@@ -25,7 +21,9 @@ import Title from 'antd/lib/typography/Title';
 import { useOrderContext } from '@shared/contexts/OrderContext';
 import styles from './ShoppingCartDrawer.module.scss';
 
-export interface IShoppingCartDrawerProps extends DrawerProps {}
+export interface IShoppingCartDrawerProps extends DrawerProps {
+  onClose: () => void;
+}
 
 const data = Array.from({ length: 2 }).map((_, i) => ({
   title: 'Alas de Danza',
@@ -46,7 +44,14 @@ export function ShoppingCartDrawer({
     loading,
   } = handleEntityHook<OrderEntity>('orders');
   const [current, setCurrent] = useState(0);
-  const substotal = useMemo(() => order?.sales?.reduce((acc, sale) => acc + sale.product.price * sale.quantity, 0), [order]);
+  const substotal = useMemo(
+    () =>
+      order?.sales?.reduce(
+        (acc, sale) => acc + sale.product.price * sale.quantity,
+        0
+      ),
+    [order]
+  );
   const { orderService } = useOrderContext();
 
   useEffect(() => {
@@ -64,7 +69,7 @@ export function ShoppingCartDrawer({
 
   const editSale = (product: ProductEntity) => {
     router.push(`/${product.company}/detail/${product?._id}`);
-    onClose && onClose({} as any);
+    onClose && onClose();
   };
 
   const removeSale = (product: ProductEntity) => {
@@ -75,7 +80,7 @@ export function ShoppingCartDrawer({
 
   const handleSendOrder = async () => {
     if (order?._id) {
-      await updateOrder({ _id: order._id, ...order });
+      await updateOrder(order);
     } else if (client || current === 1) {
       await sendOrder({ ...order, client });
     } else {
@@ -125,8 +130,7 @@ export function ShoppingCartDrawer({
         ) : (
           <>
             <h3 className="flex-between-center">
-              Datos del Cliente
-              {' '}
+              Datos del Cliente{' '}
               <div onClick={goToProfile} className="cursor-pointer">
                 <a>Editar Datos</a>
               </div>
@@ -169,9 +173,7 @@ export function ShoppingCartDrawer({
                 Subtotal
               </Title>
               <Title className="m-0" level={2}>
-                RD$
-                {' '}
-                {(substotal || '0').toLocaleString()}
+                RD$ {(substotal || '0').toLocaleString()}
               </Title>
             </div>
             {order?._id && (
@@ -180,7 +182,7 @@ export function ShoppingCartDrawer({
                 shape="round"
                 block
                 size="large"
-                icon={client ? <PlusOutlined /> : null}
+                icon={client ? <PlusOutlined rev /> : null}
                 onClick={goToHome}
               >
                 Agregar más productos
@@ -191,15 +193,15 @@ export function ShoppingCartDrawer({
               shape="round"
               block
               size="large"
-              icon={client ? <ShoppingCartOutlined /> : null}
+              icon={client ? <ShoppingCartOutlined rev /> : null}
               onClick={!order?.sales?.length ? undefined : handleSendOrder}
               disabled={order?.sales?.length === 0}
             >
               {order?._id
                 ? 'Actualizar Order'
                 : client
-                  ? 'Realizar Orden'
-                  : 'Siguiente'}
+                ? 'Realizar Orden'
+                : 'Siguiente'}
             </Button>
           </StickyFooter>
         </>

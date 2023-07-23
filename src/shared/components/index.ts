@@ -1,4 +1,3 @@
-export { DynamicParams } from './DynamicParams/DynamicParams';
 export { HandleAuthVisibility } from './HandleAuthVisibility/HandleAuthVisibility';
 export { LandingCarousel } from './LandingCarousel/LandingCarousel';
 export { MainContentModal } from './MainContentModal/MainContentModal';

@@ -2,16 +2,13 @@ import { Header } from 'antd/lib/layout/layout';
 import {
   Avatar,
   Badge,
-  Button,
   Dropdown,
   Menu,
   MenuProps,
   Modal,
-  Select,
   Space,
 } from 'antd';
 import {
-  ArrowLeftOutlined,
   BankOutlined,
   CloseOutlined,
   DatabaseOutlined,
@@ -20,7 +17,6 @@ import {
   FileOutlined,
   HomeOutlined,
   PieChartOutlined,
-  RollbackOutlined,
   ShoppingCartOutlined,
   TeamOutlined,
   UserOutlined,
@@ -28,11 +24,9 @@ import {
 import { HandleAuthVisibility } from '@shared/components';
 import { useContextualRouting } from 'next-use-contextual-routing';
 import { Auth } from '@screens/Auth/Auth';
-import { ClientEntity } from '@shared/entities/ClientEntity';
 import { ShoppingCartDrawer } from 'src/shared/components/ShoppingCartDrawer';
 import React, { useEffect, useMemo, useState } from 'react';
 import { handleEntityHook } from '@shared/hooks/handleEntityHook';
-import { ProductEntity } from '@shared/entities/ProductEntity';
 import { EndpointsAndEntityStateKeys } from '@shared/enums/endpoints.enum';
 import { CategoryEntity } from '@shared/entities/CategoryEntity';
 import { MenuItemType } from 'antd/es/menu/hooks/useItems';
@@ -45,8 +39,6 @@ import { useAppStore } from '@services/store';
 import Sider from 'antd/lib/layout/Sider';
 import {
   appLogOut,
-  getAuthData,
-  resetAuthData,
 } from '../../../../utils/auth.utils';
 import styles from './Navbar.module.scss';
 
@@ -67,18 +59,18 @@ function getItem(
 }
 
 const items: MenuItem[] = [
-  getItem('Option 1', '1', <PieChartOutlined />),
-  getItem('Option 2', '2', <DesktopOutlined />),
-  getItem('User', 'sub1', <UserOutlined />, [
+  getItem('Option 1', '1', <PieChartOutlined rev />),
+  getItem('Option 2', '2', <DesktopOutlined rev />),
+  getItem('User', 'sub1', <UserOutlined rev />, [
     getItem('Tom', '3'),
     getItem('Bill', '4'),
     getItem('Alex', '5'),
   ]),
-  getItem('Team', 'sub2', <TeamOutlined />, [
+  getItem('Team', 'sub2', <TeamOutlined rev />, [
     getItem('Team 1', '6'),
     getItem('Team 2', '8'),
   ]),
-  getItem('Files', '9', <FileOutlined />),
+  getItem('Files', '9', <FileOutlined rev />),
 ];
 
 export interface ICategorySelect {
@@ -149,7 +141,7 @@ export function Navbar() {
     key: cat._id,
     title: cat.title,
     label: cat.title,
-    icon: <DatabaseOutlined />,
+    icon: <DatabaseOutlined rev />,
     onClick: () => {
       router.push(`/${cat.company}/category/${cat._id}`);
       setHideSidebar(true);
@@ -160,7 +152,7 @@ export function Navbar() {
     key: company._id,
     title: company.name,
     label: company.name,
-    icon: <BankOutlined />,
+    icon: <BankOutlined rev />,
     onClick: () => {
       router.push(`/${company.companyId}`);
       setSelectedCompanies([company]);
@@ -191,7 +183,7 @@ export function Navbar() {
             className={`${styles.navbarLogoContainer} flex-start-center gap-l`}
           >
             <Link href="/">
-              <HomeOutlined style={{ fontSize: '30px' }} />
+              <HomeOutlined rev style={{ fontSize: '30px' }} />
             </Link>
             {selectedCompanies.map((company) => (
               <div
@@ -233,7 +225,7 @@ export function Navbar() {
                 >
                   <Space>
                     Click me
-                    <DownOutlined />
+                    <DownOutlined rev />
                   </Space>
                 </Dropdown>
               </div>
@@ -288,9 +280,9 @@ export function Navbar() {
             <div className={styles.navbarOptionsListItem} onClick={toggleCart}>
               <Badge count={!cartIsOpen ? salesQuantity : 0}>
                 {cartIsOpen ? (
-                  <CloseOutlined style={{ fontSize: '24px' }} />
+                  <CloseOutlined rev style={{ fontSize: '24px' }} />
                 ) : (
-                  <ShoppingCartOutlined style={{ fontSize: '24px' }} />
+                  <ShoppingCartOutlined rev style={{ fontSize: '24px' }} />
                 )}
               </Badge>
             </div>

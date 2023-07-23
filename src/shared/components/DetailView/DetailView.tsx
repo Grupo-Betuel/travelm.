@@ -55,7 +55,7 @@ export interface IDetailViewProps {
   returnHref?: string
 }
 
-function IconText({ icon, text }: { icon: React.FC; text: string }) {
+function IconText({ icon, text }: { icon: any; text: string }) {
   return (
     <Space>
       {createElement(icon)}
@@ -292,16 +292,16 @@ export function DetailView({ previewPost, returnHref }: IDetailViewProps) {
         <div className={`grid-column-1 ${styles.GalleryWrapper}`}>
           {!previewPost && (
             <div className={styles.DetailViewBackButton} onClick={back}>
-              <ArrowLeftOutlined />
+              <ArrowLeftOutlined rev />
             </div>
           )}
           {hasMultipleImages && (
             <>
               <div className={styles.DetailViewPrevButton}>
-                <ArrowLeftOutlined onClick={navigate('prev')} />
+                <ArrowLeftOutlined rev onClick={navigate('prev')} />
               </div>
               <div className={styles.DetailViewNextButton}>
-                <ArrowRightOutlined onClick={navigate('next')} />
+                <ArrowRightOutlined rev onClick={navigate('next')} />
               </div>
             </>
           )}
@@ -310,7 +310,7 @@ export function DetailView({ previewPost, returnHref }: IDetailViewProps) {
               ref={carouselRef}
               nextArrow={(
                 <div className={styles.DetailViewButton}>
-                  <ArrowRightOutlined />
+                  <ArrowRightOutlined rev />
                 </div>
               )}
             >
@@ -430,6 +430,7 @@ export function DetailView({ previewPost, returnHref }: IDetailViewProps) {
                                   )}
                                   addonAfter={(
                                     <CloseOutlined
+                                      rev
                                       onClick={resetSaleProductParam(
                                         param._id,
                                         variant._id,
@@ -467,6 +468,7 @@ export function DetailView({ previewPost, returnHref }: IDetailViewProps) {
                             min={0}
                             addonAfter={(
                               <CloseOutlined
+                                rev
                                 onClick={resetSaleProductParam(param._id)}
                               />
                             )}
@@ -492,7 +494,7 @@ export function DetailView({ previewPost, returnHref }: IDetailViewProps) {
                   <InputNumber
                     type="number"
                     addonAfter={
-                      <CloseOutlined onClick={() => handleSaleQuantity(0)} />
+                      <CloseOutlined rev onClick={() => handleSaleQuantity(0)} />
                     }
                     onChange={handleSaleQuantity}
                     value={sale.quantity}
@@ -529,9 +531,9 @@ export function DetailView({ previewPost, returnHref }: IDetailViewProps) {
               <div className="flex-between-center p-m gap-s">
                 <Input
                   placeholder="Escribir comentario"
-                  suffix={<UploadOutlined />}
+                  suffix={<UploadOutlined rev />}
                 />
-                <Button icon={<MessageOutlined />}>Enviar</Button>
+                <Button icon={<MessageOutlined rev />}>Enviar</Button>
               </div>
               <List
                 itemLayout="vertical"
@@ -578,7 +580,7 @@ export function DetailView({ previewPost, returnHref }: IDetailViewProps) {
           </div>
           <StickyFooter className={styles.DetailViewPostDetailsActions}>
             <Button
-              icon={<ShoppingCartOutlined />}
+              icon={<ShoppingCartOutlined rev />}
               size="large"
               className="me-m"
               type="primary"
