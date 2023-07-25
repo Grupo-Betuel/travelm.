@@ -83,7 +83,7 @@ export function ShoppingCartDrawer({
     // onClose && onClose({} as any)
   };
 
-  const handleSendOrder = async (newClient?: ClientEntity) => {
+  const handleSendOrder = async (newClient?: ClientEntity | any) => {
     if (order?._id) {
       await updateOrder(order);
       handleCurrentOrder(orderService.localOrder);

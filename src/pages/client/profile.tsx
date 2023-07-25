@@ -24,7 +24,7 @@ export default function ClientProfile() {
 
   const updateClient = async (data: ClientEntity) => {
     data._id = client?._id || '';
-    data.phone = Number(data.phone.toString().replace(/[- ()]/g, ''));
+    data.phone = data.phone.toString().replace(/[- ()+]/g, '');
     if (await clientEntity.update(data)) {
       toast.success('Perfil actualizado');
     }
