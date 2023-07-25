@@ -159,7 +159,7 @@ export function Navbar() {
     }));
 
   const authenticate = () => {
-    router.push(makeContextualHref({ auth: true } as any), 'auth', {
+    router.push(makeContextualHref({ auth: true } as any), '/client/auth', {
       shallow: true,
     });
   };
@@ -304,11 +304,11 @@ export function Navbar() {
         collapsedWidth={0}
         collapsed={showSidebar}
         onCollapse={(value) => setHideSidebar(value)}
-        theme="light"
+        theme="dark"
       >
         <div className="demo-logo-vertical" />
         <Menu
-          theme="light"
+          theme="dark"
           defaultSelectedKeys={['1']}
           mode="inline"
           items={navbarOptions}

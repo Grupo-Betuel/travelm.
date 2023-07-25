@@ -43,7 +43,7 @@ export function Home({ hideCarousel }: HomeProps) {
   const { makeContextualHref, returnHref } = useContextualRouting();
   const [products, setProducts] = useState<ProductEntity[]>([]);
   const [showContextProductDetailModal, setShowContextProductDetailModal] = useState<boolean>();
-  const { data: productsData, get: getProducts } = handleEntityHook<ProductEntity>('products', true);
+  const {  data: productsData, get: getProducts } = handleEntityHook<ProductEntity>('products', true);
 
   const productsPerCompanies = useMemo<ProductPerCategoryType>(() => {
     const data = products.reduce<ProductPerCategoryType>((acc, product) => {

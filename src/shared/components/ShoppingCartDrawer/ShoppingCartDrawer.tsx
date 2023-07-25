@@ -20,6 +20,7 @@ import { StickyFooter } from '@shared/layout/components/StickyFooter/StickyFoote
 import Title from 'antd/lib/typography/Title';
 import { useOrderContext } from '@shared/contexts/OrderContext';
 import styles from './ShoppingCartDrawer.module.scss';
+import { ClientEntity } from '@shared/entities/ClientEntity';
 
 export interface IShoppingCartDrawerProps extends DrawerProps {
   onClose: () => void;
@@ -82,17 +83,20 @@ export function ShoppingCartDrawer({
     // onClose && onClose({} as any)
   };
 
-  const handleSendOrder = async () => {
+  const handleSendOrder = async (newClient?: ClientEntity) => {
     if (order?._id) {
       await updateOrder(order);
       handleCurrentOrder(orderService.localOrder);
       onClose && onClose();
       toast.success('Orden enviada con éxito');
-    } else if (client || current === 1) {
-      await sendOrder({ ...order, client });
+    } else if (client || (newClient && current === 1)) {
+      const clientData = newClient?._id ? newClient : client;
+      await sendOrder({ ...order, client: clientData });
       orderService.resetOrder();
       toggleSuccessOrderModal();
       toast.success('Orden enviada con éxito');
+    } else if (!newClient && current === 1) {
+      toast('Error al crear usuario');
     } else {
       next();
     }

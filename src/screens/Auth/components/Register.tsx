@@ -15,7 +15,7 @@ export function Register({ isModal, onSubmit }: IAuthProps) {
   const router = useRouter();
 
   const createClient = async (data: ClientEntity) => {
-    data.phone = Number(data.phone.toString().replace(/[- ()]/g, ''));
+    data.phone = data.phone.toString().replace(/[- ()+]/g, '');
     console.log('create client', data);
     if (
       await clientEntity.add(data, {

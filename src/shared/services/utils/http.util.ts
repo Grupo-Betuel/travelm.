@@ -100,8 +100,8 @@ class Http {
   // We can handle generic app errors depending on the status code
   // eslint-disable-next-line
   private handleError(error: IResponseError) {
-    const { status } = error;
-    const errorMessage = error.data.message || (error.data as any).error;
+    const status = (error || {}).status;
+    const errorMessage = error?.data?.message || (error?.data as any)?.error;
     switch (status) {
       case StatusCode.InternalServerError: {
         console.log('error', error);

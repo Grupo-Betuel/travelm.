@@ -98,16 +98,18 @@ export class BaseService<T> implements AbstractBaseService<T> {
     cacheLifeTime: number = 60 * 1000 * 5
   ): Promise<T | undefined> {
     try {
+
       if ((data as any)._id || (data as any)._id === '') {
         delete (data as any)._id;
       }
       const extraPath = this.handleServiceMethodPathProperties(properties);
       const res = await http.post<T>(`${this.api}${extraPath}`, data);
+
       enableCache && this.cacheData(res.data, 'add', cacheLifeTime);
-      return res as T;
+      return res.data as T;
     } catch (err: IResponseError | any) {
       console.log('error!', err);
-      handleError && handleError(err.data ? err?.data?.message : err?.message);
+      handleError && handleError(err?.data ? err?.data?.message : err?.message);
     }
   }
 

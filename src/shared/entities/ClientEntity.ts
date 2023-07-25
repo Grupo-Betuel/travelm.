@@ -9,7 +9,7 @@ export class ClientEntity extends BaseEntity {
 
   userName: string = '';
 
-  phone: number = 0;
+  phone: string = '';
 
   password: string = '';
 

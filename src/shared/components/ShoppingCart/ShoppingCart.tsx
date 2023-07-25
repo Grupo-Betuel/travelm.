@@ -26,8 +26,17 @@ const data = Array.from({ length: 2 }).map((_, i) => ({
   content: <h1>RD$400</h1>,
 }));
 
-const IconText: FC<IShoppingCartAction> = ({ icon, text, onClick }: any) => (
-  <Space className={styles.ShoppingCartListItemAction} onClick={onClick}>
+const IconText: FC<IShoppingCartAction> = ({
+  icon,
+  text,
+  onClick,
+  key,
+}: any) => (
+  <Space
+    key={key}
+    className={styles.ShoppingCartListItemAction}
+    onClick={onClick}
+  >
     {React.createElement(icon)}
     {text}
   </Space>
@@ -47,7 +56,7 @@ export function ShoppingCart({ itemActions, sales }: IShoppingCartProps) {
         <List.Item
           className={styles.ShoppingCartListItem}
           key={`sale-${i}`}
-          actions={itemActions.map((action) => (
+          actions={itemActions.map((action, i) => (
             <IconText
               {...action}
               onClick={() => action.onClick && action.onClick(sale.product)}

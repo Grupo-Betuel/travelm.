@@ -39,7 +39,7 @@ export default class OrderService extends BaseService<OrderEntity> {
     }
   }
 
-  private initLocalOrder() {
+  public initLocalOrder() {
     this.authClient = getAuthData('all') as ClientEntity;
     this.localOrderKey = `${this.localOrderKeyPrefix}${
       this.authClient?._id || ''
