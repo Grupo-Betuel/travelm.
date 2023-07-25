@@ -98,7 +98,7 @@ export class BaseService<T> implements AbstractBaseService<T> {
     cacheLifeTime: number = 60 * 1000 * 5
   ): Promise<T | undefined> {
     try {
-      if ((data as any)._id) {
+      if ((data as any)._id || (data as any)._id === '') {
         delete (data as any)._id;
       }
       const extraPath = this.handleServiceMethodPathProperties(properties);

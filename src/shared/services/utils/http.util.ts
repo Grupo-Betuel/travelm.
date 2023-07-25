@@ -4,7 +4,7 @@ import { StatusCode } from '@interfaces/REST.interface';
 import { toast } from 'react-toastify';
 import { IResponseError } from '@interfaces/error.interface';
 import { ClientEntity } from '@shared/entities/ClientEntity';
-import { ClientService } from "@services/clientService";
+import { ClientService } from '@services/clientService';
 
 const headers: Readonly<Record<string, string | boolean>> = {
   // Accept: 'application/json',
@@ -20,7 +20,7 @@ const injectToken = (config: AxiosRequestConfig): AxiosRequestConfig => {
     const authService = new ClientService();
     const authString = localStorage.getItem(authService.localStorageKey.add);
     const authData = JSON.parse(authString || '{}') as ClientEntity;
-    const token = authData.token
+    const token = authData.token;
 
     if (token != null) {
       if (config.headers) config.headers.Authorization = `Bearer ${token}`;
@@ -101,10 +101,11 @@ class Http {
   // eslint-disable-next-line
   private handleError(error: IResponseError) {
     const { status } = error;
-
+    const errorMessage = error.data.message || (error.data as any).error;
     switch (status) {
       case StatusCode.InternalServerError: {
-        toast(`Server: ${error.data.message}`, {
+        console.log('error', error);
+        toast(`Server: ${errorMessage}`, {
           autoClose: false,
           type: 'error',
         });
@@ -120,7 +121,7 @@ class Http {
         break;
       }
       case StatusCode.BadRequest: {
-        toast(`${error.data.message}`, {
+        toast(`Bad Request: ${errorMessage}`, {
           autoClose: false,
           type: 'error',
         });
@@ -128,23 +129,23 @@ class Http {
         break;
       }
       case StatusCode.Forbidden: {
-        // toast(`Forbidden: ${error.data.message}`, {
-        //   autoClose: false,
-        //   type: 'error',
-        // })
+        toast(`Forbidden: ${errorMessage}`, {
+          autoClose: false,
+          type: 'error',
+        });
         // Handle Forbidden
         break;
       }
       case StatusCode.Unauthorized: {
         // Handle Unauthorized
-        toast(`Unauthorized: ${error.data.message}`, {
+        toast(`Unauthorized: ${errorMessage}`, {
           autoClose: false,
           type: 'error',
         });
         break;
       }
       case StatusCode.TooManyRequests:
-        toast(`Too many requests: ${error.data.message}`, {
+        toast(`Too many requests: ${errorMessage}`, {
           autoClose: false,
           type: 'error',
         });
@@ -152,7 +153,7 @@ class Http {
         break;
     }
 
-    return Promise.reject(error);
+    return Promise.reject(errorMessage);
   }
 }
 

@@ -1,4 +1,4 @@
-import { Button, Drawer, DrawerProps, Spin, Steps } from 'antd';
+import { Button, Drawer, DrawerProps, Modal, Result, Spin, Steps } from 'antd';
 import React, { FC, useEffect, useMemo, useState } from 'react';
 import {
   DeleteOutlined,
@@ -35,13 +35,16 @@ export function ShoppingCartDrawer({
   open,
   onClose,
 }: IShoppingCartDrawerProps) {
+  const [successOrderOpen, setSuccessOrderOpen] = useState(false);
   const router = useRouter();
   const order = useAppStore((state) => state.currentOrder);
+  const handleCurrentOrder = useAppStore((state) => state.handleCurrentOrder);
   const { client } = useAuthClientHook();
   const {
     add: sendOrder,
     update: updateOrder,
     loading,
+    error,
   } = handleEntityHook<OrderEntity>('orders');
   const [current, setCurrent] = useState(0);
   const substotal = useMemo(
@@ -54,6 +57,7 @@ export function ShoppingCartDrawer({
   );
   const { orderService } = useOrderContext();
 
+  const toggleSuccessOrderModal = () => setSuccessOrderOpen(!successOrderOpen);
   useEffect(() => {
     if (client) {
       setCurrent(0);
@@ -81,12 +85,17 @@ export function ShoppingCartDrawer({
   const handleSendOrder = async () => {
     if (order?._id) {
       await updateOrder(order);
+      handleCurrentOrder(orderService.localOrder);
+      onClose && onClose();
+      toast.success('Orden enviada con éxito');
     } else if (client || current === 1) {
       await sendOrder({ ...order, client });
+      orderService.resetOrder();
+      toggleSuccessOrderModal();
+      toast.success('Orden enviada con éxito');
     } else {
       next();
     }
-    // TODO: Success
   };
   const onChangeStep = (value: number) => {
     setCurrent(value);
@@ -98,6 +107,12 @@ export function ShoppingCartDrawer({
 
   const goToHome = () => {
     router.push('/');
+    onClose && onClose();
+  };
+
+  const goToOrders = () => {
+    router.push('/client/orders');
+    toggleSuccessOrderModal();
     onClose && onClose();
   };
 
@@ -221,6 +236,39 @@ export function ShoppingCartDrawer({
           </Button>
         </div>
       )}
+      <Modal
+        footer={[]}
+        open={successOrderOpen}
+        onOk={toggleSuccessOrderModal}
+        onCancel={toggleSuccessOrderModal}
+      >
+        <Result
+          status="success"
+          subTitle={
+            <span>
+              Orden enviada con exito. Te estaremos escribiendo por Whatsapp, si
+              no nos comunicamos contigo, puedes escribirnos al{' '}
+              <a target="_blank" href="https://wa.me/message/KNV3Z5CLAVHDK1">
+                (829) 893-7075
+              </a>
+            </span>
+          }
+          extra={[
+            <Button
+              type="primary"
+              onClick={() => {
+                toggleSuccessOrderModal();
+                onClose && onClose();
+              }}
+            >
+              Seguir comprando
+            </Button>,
+            <Button key="buy" onClick={goToOrders}>
+              Ver mis ordenes
+            </Button>,
+          ]}
+        />
+      </Modal>
     </Drawer>
   );
 }

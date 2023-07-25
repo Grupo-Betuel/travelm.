@@ -19,7 +19,7 @@ export default class OrderService extends BaseService<OrderEntity> {
   public get localOrder(): OrderEntity {
     // if (typeof window === 'undefined') return new OrderEntity()
     const localOrder = JSON.parse(
-      localStorage.getItem(this.localOrderKey) || '{}',
+      localStorage.getItem(this.localOrderKey) || '{}'
     );
     const currentOrder = useAppStore?.getState().currentOrder;
     return currentOrder?._id ? currentOrder : localOrder;
@@ -28,6 +28,7 @@ export default class OrderService extends BaseService<OrderEntity> {
   private set localOrder(order: OrderEntity) {
     const currentOrder = useAppStore?.getState().currentOrder;
     if (currentOrder?._id) {
+      console.log('current order not updated', currentOrder);
       order._id && useAppStore?.getState().handleCurrentOrder(order);
     } else {
       useAppStore?.getState().handleCurrentOrder(order);
@@ -53,7 +54,7 @@ export default class OrderService extends BaseService<OrderEntity> {
 
     if (!!this.authClient && !local?.sales?.length) {
       const oldOrder = JSON.parse(
-        localStorage.getItem(this.localOrderKeyPrefix) || '{}',
+        localStorage.getItem(this.localOrderKeyPrefix) || '{}'
       );
       localStorage.removeItem(this.localOrderKeyPrefix);
       if (oldOrder.sales?.length) {
@@ -67,7 +68,7 @@ export default class OrderService extends BaseService<OrderEntity> {
   handleLocalOrderSales(sale: Partial<ISale>) {
     const newLocalOrder = this.localOrder;
     const exist = !!newLocalOrder.sales.find(
-      (s) => s.product._id === sale.product?._id,
+      (s) => s.product._id === sale.product?._id
     );
 
     if (exist) {
@@ -79,18 +80,26 @@ export default class OrderService extends BaseService<OrderEntity> {
       newLocalOrder.sales.push(sale as ISale);
     }
 
+    newLocalOrder.company = newLocalOrder.sales
+      .map((s) => s.company)
+      .join(', ');
     this.localOrder = newLocalOrder;
   }
 
   removeSale(productId: string) {
     const newLocalOrder = this.localOrder;
     newLocalOrder.sales = newLocalOrder.sales.filter(
-      (s) => s.product._id !== productId,
+      (s) => s.product._id !== productId
     );
     this.localOrder = newLocalOrder;
   }
 
   getSaleByProductId(productId: string) {
     return this.localOrder.sales.find((s) => s.product._id === productId);
+  }
+
+  resetOrder() {
+    console.log('reseting order', new OrderEntity());
+    this.localOrder = new OrderEntity();
   }
 }

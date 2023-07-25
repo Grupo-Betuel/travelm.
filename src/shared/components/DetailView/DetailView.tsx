@@ -50,9 +50,9 @@ import styles from './DetailView.module.scss';
 import { getSaleDataFromProduct } from '../../../utils/objects.utils';
 
 export interface IDetailViewProps {
-  previewPost?: any
-  selectedPost?: any
-  returnHref?: string
+  previewPost?: any;
+  selectedPost?: any;
+  returnHref?: string;
 }
 
 function IconText({ icon, text }: { icon: any; text: string }) {
@@ -103,7 +103,7 @@ export function DetailView({ previewPost, returnHref }: IDetailViewProps) {
     if (product._id && currentOrder) {
       // const savedSale = orderService.getSaleByProductId(product._id) || {}
       const savedSale = currentOrder.sales.find(
-        (s) => s.product._id === product._id,
+        (s) => s.product._id === product._id
       );
       setSale({
         ...getSaleDataFromProduct(product),
@@ -119,14 +119,15 @@ export function DetailView({ previewPost, returnHref }: IDetailViewProps) {
         returnHref,
         {
           shallow: true,
-        },
+        }
       );
     } else {
       router.push(`/${product.company}`);
     }
   };
 
-  const navigate = (to: 'prev' | 'next') => () => carouselRef.current && carouselRef.current[to]();
+  const navigate = (to: 'prev' | 'next') => () =>
+    carouselRef.current && carouselRef.current[to]();
   const hasImages = product.images && !!product.images.length;
   const hasMultipleImages = hasImages && product.images.length > 1;
 
@@ -166,84 +167,89 @@ export function DetailView({ previewPost, returnHref }: IDetailViewProps) {
     }
   };
 
-  const resetSaleProductParam = (parentId: string, variantId?: string) => () => handleSaleProductParamsChange(parentId, variantId)(0);
+  const resetSaleProductParam = (parentId: string, variantId?: string) => () =>
+    handleSaleProductParamsChange(parentId, variantId)(0);
 
-  const handleSaleProductParamsChange = (parentId: string, variantId?: string) => async (value?: any) => {
-    let newSale = structuredClone(sale);
-    let total = 0;
-    const productData = structuredClone(product);
-    const quantity = Number(value || 0);
-    const exist = newSale?.productParams?.find((p) => p._id === parentId);
+  const handleSaleProductParamsChange =
+    (parentId: string, variantId?: string) => async (value?: any) => {
+      let newSale = structuredClone(sale);
+      let total = 0;
+      const productData = structuredClone(product);
+      const quantity = Number(value || 0);
+      const exist = newSale?.productParams?.find((p) => p._id === parentId);
 
-    let productParam = exist;
-    if (!productParam) {
-      productParam = productData.productParams.find((p) => p._id === parentId)
-          || ({} as IProductParam);
-    }
-
-    const variant = productParam?.relatedParams?.find(
-      (v) => v._id === variantId,
-    );
-    if (variant) {
-      variant.quantity = quantity;
-      total = productParam?.relatedParams?.reduce(
-        (acc, v) => acc + (v.quantity || 0),
-        0,
-      ) || 0;
-    } else {
-      total = quantity;
-    }
-    productParam.quantity = total;
-
-    if (exist) {
-      const newParams = newSale?.productParams?.map((p) => {
-        if (p._id === parentId) {
-          return productParam;
-        }
-        return p;
-      }) as IProductParam[];
-      newSale = {
-        ...newSale,
-        productParams: newParams.filter((item) => !!item),
-      };
-    } else {
-      const newParams = [...(newSale?.productParams || [])];
-      newParams.push(productParam);
-      newSale = {
-        ...newSale,
-        productParams: newParams,
-      };
-    }
-
-    const saleTotal = newSale.productParams?.reduce((acc, p) => acc + (p.quantity || 0), 0)
-        || 0;
-    newSale.quantity = saleTotal;
-
-    const paramId = variantId || parentId;
-    const controlName = `${controlNamePrefix}${paramId}`;
-    const controlIsValid = await productOptionsForm
-      .validateFields([controlName])
-      .then(
-        () => true,
-        () => false,
-      );
-
-    if (controlIsValid) {
-      setSale({ ...newSale });
-
-      if (saleTotal <= 0) {
-        orderService?.removeSale(product._id);
-      } else {
-        if (quantity <= 0) {
-          newSale.productParams = newSale?.productParams?.filter(
-            (item) => item._id !== parentId,
-          );
-        }
-
-        orderService?.handleLocalOrderSales(newSale);
+      let productParam = exist;
+      if (!productParam) {
+        productParam =
+          productData.productParams.find((p) => p._id === parentId) ||
+          ({} as IProductParam);
       }
-    }
-  };
+
+      const variant = productParam?.relatedParams?.find(
+        (v) => v._id === variantId
+      );
+      if (variant) {
+        variant.quantity = quantity;
+        total =
+          productParam?.relatedParams?.reduce(
+            (acc, v) => acc + (v.quantity || 0),
+            0
+          ) || 0;
+      } else {
+        total = quantity;
+      }
+      productParam.quantity = total;
+
+      if (exist) {
+        const newParams = newSale?.productParams?.map((p) => {
+          if (p._id === parentId) {
+            return productParam;
+          }
+          return p;
+        }) as IProductParam[];
+        newSale = {
+          ...newSale,
+          productParams: newParams.filter((item) => !!item),
+        };
+      } else {
+        const newParams = [...(newSale?.productParams || [])];
+        newParams.push(productParam);
+        newSale = {
+          ...newSale,
+          productParams: newParams,
+        };
+      }
+
+      const saleTotal =
+        newSale.productParams?.reduce((acc, p) => acc + (p.quantity || 0), 0) ||
+        0;
+      newSale.quantity = saleTotal;
+
+      const paramId = variantId || parentId;
+      const controlName = `${controlNamePrefix}${paramId}`;
+      const controlIsValid = await productOptionsForm
+        .validateFields([controlName])
+        .then(
+          () => true,
+          () => false
+        );
+
+      if (controlIsValid) {
+        setSale({ ...newSale });
+
+        if (saleTotal <= 0) {
+          orderService?.removeSale(product._id);
+        } else {
+          if (quantity <= 0) {
+            newSale.productParams = newSale?.productParams?.filter(
+              (item) => item._id !== parentId
+            );
+          }
+
+          orderService?.handleLocalOrderSales(newSale);
+        }
+      }
+    };
 
   const getQuantityValue = (parentId: string, variantId?: string) => {
     const param = sale?.productParams?.find((p) => p._id === parentId);
@@ -257,10 +263,11 @@ export function DetailView({ previewPost, returnHref }: IDetailViewProps) {
   };
 
   const maxQuantityError = useCallback(
-    (quantity: number = 0) => (!quantity
-      ? 'No quedan unidades disponibles'
-      : `Solo quedan ${quantity} unidades`),
-    [],
+    (quantity: number = 0) =>
+      !quantity
+        ? 'No quedan unidades disponibles'
+        : `Solo quedan ${quantity} unidades`,
+    []
   );
 
   const productOptionFormValues = useMemo(() => {
@@ -308,11 +315,11 @@ export function DetailView({ previewPost, returnHref }: IDetailViewProps) {
           <Image.PreviewGroup>
             <Carousel
               ref={carouselRef}
-              nextArrow={(
+              nextArrow={
                 <div className={styles.DetailViewButton}>
                   <ArrowRightOutlined rev />
                 </div>
-              )}
+              }
             >
               {hasImages ? (
                 product.images.map((img, i) => (
@@ -332,15 +339,9 @@ export function DetailView({ previewPost, returnHref }: IDetailViewProps) {
           <div className={styles.DetailViewPostDetailsHeader}>
             <span className="title">{product.name}</span>
             <span className="subtitle">
-              RD$
-              {' '}
-              {product.price?.toLocaleString()}
+              RD$ {product.price?.toLocaleString()}
             </span>
-            <span className="label">
-              {product.stock}
-              {' '}
-              unidades disponibles
-            </span>
+            <span className="label">{product.stock} unidades disponibles</span>
           </div>
           <div className={styles.DetailViewPostDetailsContent}>
             <span className="subtitle mb-m">Cantidades</span>
@@ -352,7 +353,7 @@ export function DetailView({ previewPost, returnHref }: IDetailViewProps) {
               {product?.productParams && product?.productParams.length ? (
                 product?.productParams?.map((param, i) => {
                   const isActive = sale?.productParams?.find(
-                    (item) => item._id === param._id,
+                    (item) => item._id === param._id
                   );
                   return (
                     <div
@@ -361,8 +362,8 @@ export function DetailView({ previewPost, returnHref }: IDetailViewProps) {
                       } ${
                         isActive
                           ? `${styles.active} ${
-                            param.relatedParams?.length ? ' w-100' : ''
-                          }`
+                              param.relatedParams?.length ? ' w-100' : ''
+                            }`
                           : ''
                       }`}
                       key={`detailViewOption${i}`}
@@ -399,10 +400,7 @@ export function DetailView({ previewPost, returnHref }: IDetailViewProps) {
                               key={`detailViewOptionVariant${i}`}
                             >
                               <Tag>
-                                {variant.label}
-                                {' '}
-                                -
-                                {variant.value}
+                                {variant.label} -{variant.value}
                               </Tag>
                               <Form.Item
                                 name={`${controlNamePrefix}${variant._id}`}
@@ -421,22 +419,22 @@ export function DetailView({ previewPost, returnHref }: IDetailViewProps) {
                                   placeholder="Cantidad"
                                   value={getQuantityValue(
                                     param._id,
-                                    variant._id,
+                                    variant._id
                                   )}
                                   defaultValue={0}
                                   onChange={handleSaleProductParamsChange(
                                     param._id,
-                                    variant._id,
+                                    variant._id
                                   )}
-                                  addonAfter={(
+                                  addonAfter={
                                     <CloseOutlined
                                       rev
                                       onClick={resetSaleProductParam(
                                         param._id,
-                                        variant._id,
+                                        variant._id
                                       )}
                                     />
-                                  )}
+                                  }
                                   min={0}
                                 />
                               </Form.Item>
@@ -466,12 +464,12 @@ export function DetailView({ previewPost, returnHref }: IDetailViewProps) {
                             value={getQuantityValue(param._id)}
                             defaultValue={0}
                             min={0}
-                            addonAfter={(
+                            addonAfter={
                               <CloseOutlined
                                 rev
                                 onClick={resetSaleProductParam(param._id)}
                               />
-                            )}
+                            }
                           />
                         </Form.Item>
                       )}
@@ -494,7 +492,10 @@ export function DetailView({ previewPost, returnHref }: IDetailViewProps) {
                   <InputNumber
                     type="number"
                     addonAfter={
-                      <CloseOutlined rev onClick={() => handleSaleQuantity(0)} />
+                      <CloseOutlined
+                        rev
+                        onClick={() => handleSaleQuantity(0)}
+                      />
                     }
                     onChange={handleSaleQuantity}
                     value={sale.quantity}
@@ -539,13 +540,11 @@ export function DetailView({ previewPost, returnHref }: IDetailViewProps) {
                 itemLayout="vertical"
                 size="large"
                 dataSource={data}
-                footer={(
+                footer={
                   <div>
-                    <b>ant design</b>
-                    {' '}
-                    footer part
+                    <b>ant design</b> footer part
                   </div>
-                )}
+                }
                 renderItem={(item) => (
                   <List.Item
                     key={item.title}

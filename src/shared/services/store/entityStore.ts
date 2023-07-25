@@ -39,7 +39,7 @@ export interface IEntityStore<T> {
 export const stateHandlerError = (set: SetState<IEntityStore<any>>) => (error: string) => {
   console.error('application error', error);
   if (process.env.NODE_ENV === 'development') {
-    toast(`Forbidden: ${error?.toString()}`, {
+    toast(`App Error: ${error?.toString()}`, {
       autoClose: false,
       type: 'error',
     });

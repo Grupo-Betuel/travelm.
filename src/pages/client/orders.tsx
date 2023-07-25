@@ -1,7 +1,5 @@
 import React, { useEffect, useMemo } from 'react';
-import {
-  Space, Table, Tag, Modal, Button, Spin,
-} from 'antd';
+import { Space, Table, Tag, Modal, Button, Spin } from 'antd';
 import { handleEntityHook } from '@shared/hooks/handleEntityHook';
 import { EndpointsAndEntityStateKeys } from '@shared/enums/endpoints.enum';
 import OrderEntity, { OrderStatusTypes } from '@shared/entities/OrderEntity';
@@ -17,6 +15,7 @@ export default function ClientOrders() {
     get: getOrders,
     update: updateOrder,
     fetching,
+    loading,
     [EndpointsAndEntityStateKeys.BY_CLIENT]: clientOrders,
   } = handleEntityHook<OrderEntity>('orders');
   const { client } = useAuthClientHook();
@@ -118,11 +117,11 @@ export default function ClientOrders() {
       key: 'action',
       render: (text: string, order: OrderEntity) => (
         <Space size="middle">
-          {order.status !== 'completed'
-            && order.status !== 'canceled'
-            && order.status !== 'checking-transfer'
-            && order.status !== 'delivering'
-            && order.status !== 'delivered' && (
+          {order.status !== 'completed' &&
+            order.status !== 'canceled' &&
+            order.status !== 'checking-transfer' &&
+            order.status !== 'delivering' &&
+            order.status !== 'delivered' && (
               <>
                 <Button type="link" onClick={attemptCancelOrder(order)}>
                   Cancelar
@@ -133,7 +132,7 @@ export default function ClientOrders() {
                   </Button>
                 )}
               </>
-          )}
+            )}
         </Space>
       ),
     },
