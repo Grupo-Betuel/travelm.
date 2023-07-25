@@ -87,7 +87,7 @@ export function Register({ isModal, onSubmit }: IAuthProps) {
           shape="round"
           block
           size="large"
-          icon={<UserAddOutlined rev />}
+          icon={<UserAddOutlined rev="" />}
         >
           Registrarse
         </Button>

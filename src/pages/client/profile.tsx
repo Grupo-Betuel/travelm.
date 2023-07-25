@@ -86,7 +86,7 @@ export default function ClientProfile() {
           shape="round"
           block
           size="large"
-          icon={<UserOutlined rev />}
+          icon={<UserOutlined rev="" />}
         >
           Actualizar Usuario
         </Button>

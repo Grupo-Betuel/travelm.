@@ -201,7 +201,7 @@ export function ShoppingCartDrawer({
                 shape="round"
                 block
                 size="large"
-                icon={client ? <PlusOutlined rev /> : null}
+                icon={client ? <PlusOutlined rev="" /> : null}
                 onClick={goToHome}
               >
                 Agregar más productos
@@ -212,7 +212,7 @@ export function ShoppingCartDrawer({
               shape="round"
               block
               size="large"
-              icon={client ? <ShoppingCartOutlined rev /> : null}
+              icon={client ? <ShoppingCartOutlined rev="" /> : null}
               onClick={!order?.sales?.length ? undefined : handleSendOrder}
               disabled={order?.sales?.length === 0}
             >

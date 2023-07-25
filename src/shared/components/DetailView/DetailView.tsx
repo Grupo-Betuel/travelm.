@@ -299,16 +299,16 @@ export function DetailView({ previewPost, returnHref }: IDetailViewProps) {
         <div className={`grid-column-1 ${styles.GalleryWrapper}`}>
           {!previewPost && (
             <div className={styles.DetailViewBackButton} onClick={back}>
-              <ArrowLeftOutlined rev />
+              <ArrowLeftOutlined rev="" />
             </div>
           )}
           {hasMultipleImages && (
             <>
               <div className={styles.DetailViewPrevButton}>
-                <ArrowLeftOutlined rev onClick={navigate('prev')} />
+                <ArrowLeftOutlined rev="" onClick={navigate('prev')} />
               </div>
               <div className={styles.DetailViewNextButton}>
-                <ArrowRightOutlined rev onClick={navigate('next')} />
+                <ArrowRightOutlined rev="" onClick={navigate('next')} />
               </div>
             </>
           )}
@@ -317,7 +317,7 @@ export function DetailView({ previewPost, returnHref }: IDetailViewProps) {
               ref={carouselRef}
               nextArrow={
                 <div className={styles.DetailViewButton}>
-                  <ArrowRightOutlined rev />
+                  <ArrowRightOutlined rev="" />
                 </div>
               }
             >
@@ -532,9 +532,9 @@ export function DetailView({ previewPost, returnHref }: IDetailViewProps) {
               <div className="flex-between-center p-m gap-s">
                 <Input
                   placeholder="Escribir comentario"
-                  suffix={<UploadOutlined rev />}
+                  suffix={<UploadOutlined rev="" />}
                 />
-                <Button icon={<MessageOutlined rev />}>Enviar</Button>
+                <Button icon={<MessageOutlined rev="" />}>Enviar</Button>
               </div>
               <List
                 itemLayout="vertical"
@@ -579,7 +579,7 @@ export function DetailView({ previewPost, returnHref }: IDetailViewProps) {
           </div>
           <StickyFooter className={styles.DetailViewPostDetailsActions}>
             <Button
-              icon={<ShoppingCartOutlined rev />}
+              icon={<ShoppingCartOutlined rev="" />}
               size="large"
               className="me-m"
               type="primary"

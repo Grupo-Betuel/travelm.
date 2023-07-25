@@ -48,7 +48,7 @@ export default function ClientOrders() {
   const attemptCancelOrder = (order: OrderEntity) => async () => {
     confirm({
       title: '¿Estas seguro de cancelar esta orden?',
-      icon: <ExclamationCircleFilled rev />,
+      icon: <ExclamationCircleFilled rev="" />,
       content: 'Una vez cancelada no podras revertir esta acción',
       closable: true,
       maskClosable: true,

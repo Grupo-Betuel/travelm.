@@ -65,7 +65,7 @@ export function Login({ isModal }: IAuthProps) {
           shape="round"
           block
           size="large"
-          icon={<UserOutlined rev />}
+          icon={<UserOutlined rev="" />}
         >
           Iniciar Sesión
         </Button>

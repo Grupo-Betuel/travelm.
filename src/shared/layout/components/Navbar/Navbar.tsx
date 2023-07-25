@@ -49,18 +49,18 @@ function getItem(
 }
 
 const items: MenuItem[] = [
-  getItem('Option 1', '1', <PieChartOutlined rev />),
-  getItem('Option 2', '2', <DesktopOutlined rev />),
-  getItem('User', 'sub1', <UserOutlined rev />, [
+  getItem('Option 1', '1', <PieChartOutlined rev="" />),
+  getItem('Option 2', '2', <DesktopOutlined rev="" />),
+  getItem('User', 'sub1', <UserOutlined rev="" />, [
     getItem('Tom', '3'),
     getItem('Bill', '4'),
     getItem('Alex', '5'),
   ]),
-  getItem('Team', 'sub2', <TeamOutlined rev />, [
+  getItem('Team', 'sub2', <TeamOutlined rev="" />, [
     getItem('Team 1', '6'),
     getItem('Team 2', '8'),
   ]),
-  getItem('Files', '9', <FileOutlined rev />),
+  getItem('Files', '9', <FileOutlined rev="" />),
 ];
 
 export interface ICategorySelect {
@@ -138,7 +138,7 @@ export function Navbar() {
       key: cat._id,
       title: cat.title,
       label: cat.title,
-      icon: <DatabaseOutlined rev />,
+      icon: <DatabaseOutlined rev="" />,
       onClick: () => {
         router.push(`/${cat.company}/category/${cat._id}`);
         setHideSidebar(true);
@@ -150,7 +150,7 @@ export function Navbar() {
       key: company._id,
       title: company.name,
       label: company.name,
-      icon: <BankOutlined rev />,
+      icon: <BankOutlined rev="" />,
       onClick: () => {
         router.push(`/${company.companyId}`);
         setSelectedCompanies([company]);
@@ -181,7 +181,7 @@ export function Navbar() {
             className={`${styles.navbarLogoContainer} flex-start-center gap-l`}
           >
             <Link href="/">
-              <HomeOutlined rev style={{ fontSize: '30px' }} />
+              <HomeOutlined rev="" style={{ fontSize: '30px' }} />
             </Link>
             {selectedCompanies.map((company) => (
               <div
@@ -223,7 +223,7 @@ export function Navbar() {
                 >
                   <Space>
                     Click me
-                    <DownOutlined rev />
+                    <DownOutlined rev="" />
                   </Space>
                 </Dropdown>
               </div>
@@ -278,9 +278,9 @@ export function Navbar() {
             <div className={styles.navbarOptionsListItem} onClick={toggleCart}>
               <Badge count={!cartIsOpen ? salesQuantity : 0}>
                 {cartIsOpen ? (
-                  <CloseOutlined rev style={{ fontSize: '24px' }} />
+                  <CloseOutlined rev="" style={{ fontSize: '24px' }} />
                 ) : (
-                  <ShoppingCartOutlined rev style={{ fontSize: '24px' }} />
+                  <ShoppingCartOutlined rev="" style={{ fontSize: '24px' }} />
                 )}
               </Badge>
             </div>

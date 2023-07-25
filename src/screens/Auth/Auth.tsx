@@ -6,23 +6,21 @@ import { Register } from '@screens/Auth/components/Register';
 import { ClientEntity } from '@shared/entities/ClientEntity';
 
 export interface IAuthProps {
-  isModal?: boolean
-  onSubmit?: (data: ClientEntity) => void
+  isModal?: boolean;
+  onSubmit?: (data: ClientEntity) => void;
 }
 
 export interface TabItem {
-  key: string
-  label: React.ReactNode
-  children: React.ReactNode
+  key: string;
+  label: React.ReactNode;
+  children: React.ReactNode;
 }
 
 const authItems: (isModal?: boolean) => TabItem[] = (isModal?: boolean) => [
   {
     label: (
       <span>
-        <UserOutlined rev />
-        {' '}
-        Login
+        <UserOutlined rev="" /> Login
       </span>
     ),
     key: '1',
@@ -31,9 +29,7 @@ const authItems: (isModal?: boolean) => TabItem[] = (isModal?: boolean) => [
   {
     label: (
       <span>
-        <UserAddOutlined rev />
-        {' '}
-        Registrate
+        <UserAddOutlined rev="" /> Registrate
       </span>
     ),
     key: '2',

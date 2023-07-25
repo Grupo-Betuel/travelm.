@@ -108,7 +108,7 @@ export function Home({ hideCarousel }: HomeProps) {
             <Input
               className={styles.HomeInputSearch}
               placeholder="Buscar"
-              suffix={<SearchOutlined rev className="site-form-item-icon" />}
+              suffix={<SearchOutlined rev="" className="site-form-item-icon" />}
               bordered={false}
               onChange={onSearch}
               size="large"
