@@ -39,7 +39,6 @@ export default function ClientProfile() {
       // initialValues={client}
       onFinish={updateClient}
       // onChange={(e) => {}}
-      onValuesChange={(e) => console.log('values', e)}
     >
       <Form.Item label="Nombre" name="firstName" rules={[{ required: true }]}>
         <Input size="large" />

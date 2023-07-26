@@ -137,7 +137,6 @@ export function DetailView({ previewPost, returnHref }: IDetailViewProps) {
 
   const handleSaleProductParams =
     (productParam: IProductParam | IProductSaleParam) => () => {
-      console.log('hi', productParam);
       let saleParam: IProductSaleParam | undefined = (
         productParam as IProductSaleParam
       ).productParam
@@ -165,7 +164,6 @@ export function DetailView({ previewPost, returnHref }: IDetailViewProps) {
       };
 
       const exist = sale?.params?.find((p) => p.productParam === param.productParam);
-      console.log(param, exist, 'data');
       if (exist) {
         const newParams = sale?.params?.filter((p) => p.productParam !== param.productParam);
         setSale({ ...sale, params: newParams });

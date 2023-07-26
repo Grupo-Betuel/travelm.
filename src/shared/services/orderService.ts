@@ -28,7 +28,6 @@ export default class OrderService extends BaseService<OrderEntity> {
   private set localOrder(order: OrderEntity) {
     const currentOrder = useAppStore?.getState().currentOrder;
     if (currentOrder?._id) {
-      console.log('current order not updated', currentOrder);
       order._id && useAppStore?.getState().handleCurrentOrder(order);
     } else {
       useAppStore?.getState().handleCurrentOrder(order);
@@ -99,7 +98,6 @@ export default class OrderService extends BaseService<OrderEntity> {
   }
 
   resetOrder() {
-    console.log('reseting order', new OrderEntity());
     this.localOrder = new OrderEntity();
   }
 }

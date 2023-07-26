@@ -33,7 +33,6 @@ export function parseQueryToObject<T>(path: string): T {
   //   parseNumbers: true,
   // }) as T
 
-  console.log('res filters', res, path);
   Object.keys(res as any).forEach((K: any) => {
     const v = (res as any)[K];
     if (v.includes('{') || v.includes('[')) {
@@ -41,7 +40,6 @@ export function parseQueryToObject<T>(path: string): T {
     }
   });
 
-  console.log('results', res);
   return res;
 }
 

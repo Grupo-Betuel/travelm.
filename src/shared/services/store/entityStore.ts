@@ -184,7 +184,6 @@ export function createEntityStore<T extends BaseEntity>(
       cacheLifeTime: number = 60 * 1000 * 5
     ) => {
       set((state) => ({ ...state, loading: true, fetching: true }));
-      console.log('klk men!');
 
       const res = await service.get(
         properties,
