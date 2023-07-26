@@ -37,7 +37,11 @@ import { StickyFooter } from '@shared/layout/components/StickyFooter/StickyFoote
 import { useContextualRouting } from 'next-use-contextual-routing';
 import { EndpointsAndEntityStateKeys } from '@shared/enums/endpoints.enum';
 import { ImageBackground } from '@components/DetailView/components/ImageBackground/ImageBackground';
-import { IProductParam, ProductEntity } from '@shared/entities/ProductEntity';
+import {
+  IProductParam,
+  IProductSaleParam,
+  ProductEntity,
+} from '@shared/entities/ProductEntity';
 import { ClientEntity } from '@shared/entities/ClientEntity';
 import { ISale } from '@shared/entities/OrderEntity';
 import OrderService from '@services/orderService';
@@ -131,25 +135,46 @@ export function DetailView({ previewPost, returnHref }: IDetailViewProps) {
   const hasImages = product.images && !!product.images.length;
   const hasMultipleImages = hasImages && product.images.length > 1;
 
-  const handleSaleProductParams = (param: IProductParam) => () => {
-    param = {
-      ...param,
-      quantity: 0,
-      relatedParams: param.relatedParams?.map((item) => ({
+  const handleSaleProductParams =
+    (productParam: IProductParam | IProductSaleParam) => () => {
+      console.log('hi', productParam);
+      let saleParam: IProductSaleParam | undefined = (
+        productParam as IProductSaleParam
+      ).productParam
+        ? (productParam as IProductSaleParam)
+        : ({} as IProductSaleParam);
+
+      const relatedParams = productParam.relatedParams?.map((item) => ({
         ...item,
+        _id: undefined,
+        productParam: item._id,
+        productQuantity: item.quantity,
         quantity: 0,
-      })),
+      }));
+
+      const param: IProductSaleParam = {
+        // locator: Date.now().toString(),
+        label: productParam.label,
+        value: productParam.value,
+        type: productParam.type,
+        productQuantity: productParam.quantity,
+        quantity: 0,
+        relatedParams: relatedParams || ([] as any),
+        productParam: productParam._id,
+        ...saleParam,
+      };
+
+      const exist = sale?.params?.find((p) => p.productParam === param.productParam);
+      console.log(param, exist, 'data');
+      if (exist) {
+        const newParams = sale?.params?.filter((p) => p.productParam !== param.productParam);
+        setSale({ ...sale, params: newParams });
+      } else {
+        const newParams = [...(sale?.params || [])];
+        newParams.push(param);
+        setSale({ ...sale, params: newParams });
+      }
     };
-    const exist = sale?.productParams?.find((p) => p._id === param._id);
-    if (exist) {
-      const newParams = sale?.productParams?.filter((p) => p._id !== param._id);
-      setSale({ ...sale, productParams: newParams });
-    } else {
-      const newParams = [...(sale?.productParams || [])];
-      newParams.push(param);
-      setSale({ ...sale, productParams: newParams });
-    }
-  };
 
   const handleSaleQuantity = (value?: any) => {
     const quantity = Number(value || 0);
@@ -176,17 +201,20 @@ export function DetailView({ previewPost, returnHref }: IDetailViewProps) {
       let total = 0;
       const productData = structuredClone(product);
       const quantity = Number(value || 0);
-      const exist = newSale?.productParams?.find((p) => p._id === parentId);
+      const exist = newSale?.params?.find((p) => p.productParam === parentId);
 
       let productParam = exist;
       if (!productParam) {
-        productParam =
-          productData.productParams.find((p) => p._id === parentId) ||
-          ({} as IProductParam);
+        // productParam =
+        //   productData.productParams.find((p) => p._id === parentId) ||
+        //   ({} as IProductParam);
+        console.log('no product param');
+        return;
+
       }
 
       const variant = productParam?.relatedParams?.find(
-        (v) => v._id === variantId
+        (v) => v.productParam === variantId
       );
       if (variant) {
         variant.quantity = quantity;
@@ -201,28 +229,27 @@ export function DetailView({ previewPost, returnHref }: IDetailViewProps) {
       productParam.quantity = total;
 
       if (exist) {
-        const newParams = newSale?.productParams?.map((p) => {
-          if (p._id === parentId) {
+        const newParams = newSale?.params?.map((p) => {
+          if (p.productParam === parentId) {
             return productParam;
           }
           return p;
         }) as IProductParam[];
         newSale = {
           ...newSale,
-          productParams: newParams.filter((item) => !!item),
+          params: newParams.filter((item) => !!item),
         };
       } else {
-        const newParams = [...(newSale?.productParams || [])];
+        const newParams = [...(newSale?.params || [])];
         newParams.push(productParam);
         newSale = {
           ...newSale,
-          productParams: newParams,
+          params: newParams,
         };
       }
 
       const saleTotal =
-        newSale.productParams?.reduce((acc, p) => acc + (p.quantity || 0), 0) ||
-        0;
+        newSale.params?.reduce((acc, p) => acc + (p.quantity || 0), 0) || 0;
       newSale.quantity = saleTotal;
 
       const paramId = variantId || parentId;
@@ -241,7 +268,7 @@ export function DetailView({ previewPost, returnHref }: IDetailViewProps) {
           orderService?.removeSale(product._id);
         } else {
           if (quantity <= 0) {
-            newSale.productParams = newSale?.productParams?.filter(
+            newSale.params = newSale?.params?.filter(
               (item) => item._id !== parentId
             );
           }
@@ -252,7 +279,7 @@ export function DetailView({ previewPost, returnHref }: IDetailViewProps) {
     };
 
   const getQuantityValue = (parentId: string, variantId?: string) => {
-    const param = sale?.productParams?.find((p) => p._id === parentId);
+    const param = sale?.params?.find((p) => p._id === parentId);
 
     if (variantId) {
       return (
@@ -272,10 +299,10 @@ export function DetailView({ previewPost, returnHref }: IDetailViewProps) {
 
   const productOptionFormValues = useMemo(() => {
     const initialValues: any = {};
-    (sale?.productParams || []).forEach((param) => {
-      initialValues[`${controlNamePrefix}${param._id}`] = param.quantity;
+    (sale?.params || []).forEach((param) => {
+      initialValues[`${controlNamePrefix}${param.productParam}`] = param.quantity;
       (param?.relatedParams || []).forEach((variant) => {
-        initialValues[`${controlNamePrefix}${variant._id}`] = variant.quantity;
+        initialValues[`${controlNamePrefix}${variant.productParam}`] = variant.quantity;
       });
     });
     initialValues.quantity = sale?.quantity;
@@ -352,8 +379,8 @@ export function DetailView({ previewPost, returnHref }: IDetailViewProps) {
             >
               {product?.productParams && product?.productParams.length ? (
                 product?.productParams?.map((param, i) => {
-                  const isActive = sale?.productParams?.find(
-                    (item) => item._id === param._id
+                  const isActive = sale?.params?.find(
+                    (saleParam) => saleParam.productParam === param._id
                   );
                   return (
                     <div

@@ -2,7 +2,7 @@
 import { IMessenger } from '@interfaces/messenger.interface';
 import { ClientEntity } from '@shared/entities/ClientEntity';
 import { BaseEntity } from '@shared/entities/BaseEntity';
-import { IProductParam, ProductEntity } from '@shared/entities/ProductEntity';
+import { IProductParam, IProductSaleParam, ProductEntity } from "@shared/entities/ProductEntity";
 
 export interface ProductId {
   _id: string;
@@ -39,7 +39,7 @@ export interface ISale {
   createDate: string;
   quantity: number;
   status: string;
-  productParams: IProductParam[];
+  params: IProductSaleParam[];
   company: string;
   __v: number;
 }

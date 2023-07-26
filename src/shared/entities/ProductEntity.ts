@@ -44,3 +44,17 @@ export interface IProductParam {
   isRelated?: boolean
   relatedParams?: IProductParam[]
 }
+export interface IProductSaleParam {
+  _id: string
+  quantity?: number
+  productQuantity?: number
+  value?: string
+  label?: string
+  locator?: string // this is not in the db
+  productParam?: string
+  type: ProductParamTypes
+  productId?: string
+  isRelated?: boolean
+  isChild?: boolean
+  relatedParams?: IProductSaleParam[]
+}
