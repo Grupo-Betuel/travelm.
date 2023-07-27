@@ -1,6 +1,8 @@
 @use '../../styles/sizing-variables' as s;
 @use 'src/shared/styles/text-variables' as text;
 @use 'src/shared/styles/color-variables' as colors;
+@use 'src/shared/styles/sizing-variables' as sizes;
+@use 'src/shared/styles/breakpoints' as breakpoints;
 @import 'src/shared/styles/box-shadow-utils';
 @import 'src/shared/styles/border-utils';
 
@@ -17,6 +19,9 @@
       gap: s.$size-xxx-large * 2;
       align-items: center;
       padding: 0 s.$size-medium;
+      @include breakpoints.only-on(('m', 'xs')) {
+        padding:0 .5rem;
+      }
 
       &::-webkit-scrollbar {
         display: none;
@@ -41,16 +46,27 @@
       top: 50%;
       margin-top: calc(text.$font-size-15 / 2 * -1);
       z-index: 9;
+      @include breakpoints.only-on(('m', 'xs')) {
+        font-size: text.$font-size-12;
+      }
+
     }
 
     .ScrollViewLeftArrow {
       @extend .Arrow;
       left: -3.5rem;
+      @include breakpoints.only-on(('m', 'xs')) {
+        left: -2rem;
+
+      }
     }
 
     .ScrollViewRightArrow {
       @extend .Arrow;
       right: -3.5rem;
+      @include breakpoints.only-on(('m', 'xs')) {
+        right: -2rem;
+      }
     }
   }
 }

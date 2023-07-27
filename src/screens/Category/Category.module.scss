@@ -17,7 +17,7 @@
     position: relative;
     z-index: 1;
     @include breakpoints.only-on(('m', 'xs')) {
-      padding: sizes.$size-x-large;
+      padding: sizes.$size-xxx-large;
     }
 
     .CategoryContentProducts {

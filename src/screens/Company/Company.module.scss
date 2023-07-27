@@ -18,7 +18,7 @@
     z-index: 1;
     min-height: 110vh;
     @include breakpoints.only-on(('m', 'xs')) {
-      padding: sizes.$size-x-large;
+      padding: sizes.$size-xxx-large;
     }
 
     .CompanyContentProducts {

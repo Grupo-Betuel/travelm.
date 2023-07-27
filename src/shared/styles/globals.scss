@@ -40,3 +40,7 @@
   height: calc(100vh - $navbarOptionsHeight) !important;
   top: $navbarOptionsHeight !important;
 }
+
+.ant-menu-title-content {
+  opacity: 1 !important;
+}
