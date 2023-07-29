@@ -604,10 +604,12 @@ export function DetailView({ previewPost, returnHref }: IDetailViewProps) {
           </div>
           <StickyFooter className={styles.DetailViewPostDetailsActions}>
             <Button
-              icon={<ShoppingCartOutlined rev="" />}
-              size="large"
-              className="me-m"
               type="primary"
+              shape="round"
+              block
+              size="large"
+              icon={<ShoppingCartOutlined rev="" />}
+              className="me-m"
               onClick={toggleCart}
             >
               Realizar orden
