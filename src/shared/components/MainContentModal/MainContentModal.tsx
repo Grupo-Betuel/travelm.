@@ -1,7 +1,5 @@
 import { AppViewportHeightContext } from '@shared/contexts/AppViewportHeightContext';
-import { Affix } from 'antd';
-import { useContext, useState } from 'react';
-import { layoutId, navbarOptionsHeight } from 'src/utils/layout.utils';
+import { useContext } from 'react';
 import styles from './MainContentModal.module.scss';
 
 export interface IMainContentModalProps {
@@ -14,15 +12,13 @@ export function MainContentModal({
   show,
   transparent,
 }: IMainContentModalProps) {
-  const [top, setTop] = useState(navbarOptionsHeight);
-  const [enableSidebarOptionHiddenHeight, setEnableSidebarOptionHiddenHeight] = useState<boolean>();
-
   const appViewportHeight = useContext(AppViewportHeightContext);
 
   return show ? (
     <div
       className={`${styles.MainContentModal} ${
         transparent ? styles.Transparent : ''
+        // eslint-disable-next-line react/destructuring-assignment
       } ${appViewportHeight.appViewportHeightClassName}`}
     >
       {children}

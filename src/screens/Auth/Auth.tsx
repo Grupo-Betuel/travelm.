@@ -20,7 +20,9 @@ const authItems: (isModal?: boolean) => TabItem[] = (isModal?: boolean) => [
   {
     label: (
       <span>
-        <UserOutlined rev="" /> Login
+        <UserOutlined rev="" />
+        {' '}
+        Login
       </span>
     ),
     key: '1',
@@ -29,7 +31,9 @@ const authItems: (isModal?: boolean) => TabItem[] = (isModal?: boolean) => [
   {
     label: (
       <span>
-        <UserAddOutlined rev="" /> Registrate
+        <UserAddOutlined rev="" />
+        {' '}
+        Registrate
       </span>
     ),
     key: '2',

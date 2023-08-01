@@ -1,5 +1,4 @@
 import {
-  IPaginatedResponse,
   IPagination,
 } from '@interfaces/pagination.interface';
 import { EndpointsAndEntityStateKeys } from '@shared/enums/endpoints.enum';

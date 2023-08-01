@@ -1,6 +1,7 @@
 import { ClientEntity } from '@shared/entities/ClientEntity';
 import { Button, Form, Input } from 'antd';
 import { MaskedInput } from 'antd-mask-input';
+// eslint-disable-next-line import/no-extraneous-dependencies
 import { UserOutlined } from '@ant-design/icons';
 import React, { useEffect } from 'react';
 import { useAuthClientHook } from '@shared/hooks/useAuthClientHook';
@@ -9,9 +10,7 @@ import { useForm } from 'antd/lib/form/Form';
 import { toast } from 'react-toastify';
 
 export default function ClientProfile() {
-  const clientEntity = useAppStore((state) =>
-    state.clients((stateu) => stateu)
-  );
+  const clientEntity = useAppStore((state) => state.clients((stateu) => stateu));
   const { client } = useAuthClientHook();
   const [profileForm] = useForm();
 

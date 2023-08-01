@@ -22,5 +22,6 @@ export function HandleAuthVisibility({
     }
   }, [children]);
 
+  // eslint-disable-next-line react/jsx-no-useless-fragment
   return <>{mustBeRendered && <div className={className}>{children}</div>}</>;
 }

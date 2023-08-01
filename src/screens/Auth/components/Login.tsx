@@ -1,18 +1,19 @@
 import React from 'react';
-import { Button, Form, Input, Spin } from 'antd';
+import {
+  Button, Form, Input, Spin,
+} from 'antd';
 import { useAppStore } from '@services/store';
 import { useRouter } from 'next/router';
 import { IAuthProps } from '@screens/Auth/Auth';
 import { EndpointsAndEntityStateKeys } from '@shared/enums/endpoints.enum';
 import { MaskedInput } from 'antd-mask-input';
+// eslint-disable-next-line import/no-extraneous-dependencies
 import { UserOutlined } from '@ant-design/icons';
 import { useOrderContext } from '@shared/contexts/OrderContext';
 
 export function Login({ isModal }: IAuthProps) {
   const router = useRouter();
-  const clientEntity = useAppStore((state) =>
-    state.clients((statea) => statea)
-  );
+  const clientEntity = useAppStore((state) => state.clients((statea) => statea));
   const { orderService } = useOrderContext();
 
   const submit = async (data: any) => {

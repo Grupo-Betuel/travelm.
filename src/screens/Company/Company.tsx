@@ -1,7 +1,4 @@
-import { getAuthData } from 'src/utils/auth.utils';
-import { ClientEntity } from '@shared/entities/ClientEntity';
 import {
-  LandingCarousel,
   MainContentModal,
   ProductCard,
   ScrollView,
@@ -15,7 +12,6 @@ import {
 } from 'react';
 import { useRouter } from 'next/router';
 import { EndpointsAndEntityStateKeys } from '@shared/enums/endpoints.enum';
-import Link from 'next/link';
 import { useContextualRouting } from 'next-use-contextual-routing';
 import { DetailView } from '@components/DetailView';
 import styles from './Company.module.scss';
@@ -32,8 +28,7 @@ export type ProductPerCategoryType = {
   }
 };
 
-export function Company({ hideCarousel }: CompanyProps) {
-  const authClient = getAuthData('all') as ClientEntity;
+export function Company({}: CompanyProps) {
   const router = useRouter();
   const { makeContextualHref, returnHref } = useContextualRouting();
   const [companyName, setCompanyName] = useState<string>();

@@ -23,11 +23,9 @@ import {
 } from '@ant-design/icons';
 import { useRouter } from 'next/router';
 import React, {
-  ChangeEvent,
   createElement,
   useCallback,
   useEffect,
-  useMemo,
   useRef,
   useState,
 } from 'react';
@@ -42,13 +40,10 @@ import {
   IProductSaleParam,
   ProductEntity,
 } from '@shared/entities/ProductEntity';
-import { ClientEntity } from '@shared/entities/ClientEntity';
 import { ISale } from '@shared/entities/OrderEntity';
-import OrderService from '@services/orderService';
 import { structuredClone } from 'next/dist/compiled/@edge-runtime/primitives/structured-clone';
 import { useOrderContext } from '@shared/contexts/OrderContext';
 import { useAppStore } from '@services/store';
-import { getAuthData } from '../../../utils/auth.utils';
 import { sidebarWidth } from '../../../utils/layout.utils';
 import styles from './DetailView.module.scss';
 import { getSaleDataFromProduct } from '../../../utils/objects.utils';
@@ -189,12 +184,15 @@ export function DetailView({ previewPost, returnHref }: IDetailViewProps) {
     }
   };
 
+  // eslint-disable-next-line
   const resetSaleProductParam = (parentId: string, variantId?: string) => () => handleSaleProductParamsChange(parentId, variantId)(0);
 
-  const handleSaleProductParamsChange = (parentId: string, variantId?: string) => async (value?: any) => {
+  const handleSaleProductParamsChange = (
+    parentId: string,
+    variantId?: string,
+  ) => async (value?: any) => {
     let newSale = structuredClone(sale);
     let total = 0;
-    const productData = structuredClone(product);
     const quantity = Number(value || 0);
     const exist = newSale?.params?.find((p) => p.productParam === parentId);
 
@@ -230,7 +228,7 @@ export function DetailView({ previewPost, returnHref }: IDetailViewProps) {
       }) as IProductParam[];
       newSale = {
         ...newSale,
-        params: newParams.filter((item) => !!item),
+        params: newParams.filter((item: IProductSaleParam) => !!item),
       };
     } else {
       const newParams = [...(newSale?.params || [])];
@@ -288,7 +286,7 @@ export function DetailView({ previewPost, returnHref }: IDetailViewProps) {
     [],
   );
 
-  const productOptionFormValues = useMemo(() => {
+  useEffect(() => {
     const initialValues: any = {};
     (sale?.params || []).forEach((param) => {
       initialValues[`${controlNamePrefix}${param.productParam}`] = param.quantity;
@@ -298,7 +296,7 @@ export function DetailView({ previewPost, returnHref }: IDetailViewProps) {
     });
     initialValues.quantity = sale?.quantity;
     productOptionsForm.setFieldsValue(initialValues);
-    return initialValues;
+    // return initialValues;
   }, [sale]);
 
   const { toggleCart } = useOrderContext();

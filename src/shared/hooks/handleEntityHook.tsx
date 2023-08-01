@@ -17,7 +17,7 @@ export interface HandleEntityProps<T> extends IServiceMethodProperties<T> {
 
 export interface IGetEntityDataHookReturn<T>
   extends Omit<IEntityStore<T>, 'data'>,
-    Partial<EntityEndpointsDataType<T>> {
+  Partial<EntityEndpointsDataType<T>> {
   data: T[];
   pagination?: Omit<IPaginatedResponse<T>, 'content'>;
 }
@@ -25,12 +25,12 @@ export interface IGetEntityDataHookReturn<T>
 export function handleEntityHook<T>(
   entityName: EntityNamesType,
   loadDataAutomatically?: boolean,
-  properties?: HandleEntityProps<T>
+  properties?: HandleEntityProps<T>,
 ): IGetEntityDataHookReturn<T> {
   const entity = useAppStore((state) => state[entityName]((statep) => statep));
   const { setAppLoading } = useContext(AppLoadingContext);
   const entityDataRef = useRef<EntityEndpointsDataType<T>>(
-    {} as EntityEndpointsDataType<T>
+    {} as EntityEndpointsDataType<T>,
   );
   const getDataMethod = (props: IServiceMethodProperties<T> = {}) => {
     entity.get({ ...properties, ...props });
@@ -38,7 +38,7 @@ export function handleEntityHook<T>(
   const getData = useRef(
     properties?.debounceTime
       ? debounce(getDataMethod, properties.debounceTime)
-      : getDataMethod
+      : getDataMethod,
   ).current;
 
   useEffect(() => {
@@ -49,11 +49,13 @@ export function handleEntityHook<T>(
     setAppLoading && setAppLoading(entity.loading);
   }, [entity.loading]);
 
-  /* divideDataAndPagination, all data from the api can has pagination, this method dived the data from the pagination
+  /* divideDataAndPagination, all
+   data from the api can has pagination, this
+    method dived the data from the pagination
    * key: key according the endpoint data returned from api
    * */
   const divideDataAndPagination = (
-    key: keyof EntityDataType<T>
+    key: keyof EntityDataType<T>,
   ): IEntityEndpointDataValue<T> => {
     const value = entity.data[key] || [];
 
@@ -69,12 +71,11 @@ export function handleEntityHook<T>(
   };
 
   const getAllEntityData = () => {
-    const endpointsData: EntityEndpointsDataType<T> =
-      {} as EntityEndpointsDataType<T>;
+    const endpointsData: EntityEndpointsDataType<T> = {} as EntityEndpointsDataType<T>;
     Object.keys(entity.data).forEach(
       (key: keyof EntityEndpointsDataType<T> | any) => {
         (endpointsData as any)[key] = divideDataAndPagination(key);
-      }
+      },
     );
 
     return endpointsData;

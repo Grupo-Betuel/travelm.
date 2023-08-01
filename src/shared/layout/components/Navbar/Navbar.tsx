@@ -1,23 +1,20 @@
 import { Header } from 'antd/lib/layout/layout';
-import { Avatar, Badge, Dropdown, Menu, MenuProps, Modal, Space } from 'antd';
+import {
+  Avatar, Badge, Dropdown, Menu, Modal, Space,
+} from 'antd';
 import {
   BankOutlined,
   CloseOutlined,
   DatabaseOutlined,
-  DesktopOutlined,
   DownOutlined,
-  FileOutlined,
   HomeOutlined,
-  PieChartOutlined,
   ShoppingCartOutlined,
-  TeamOutlined,
-  UserOutlined,
 } from '@ant-design/icons';
 import { HandleAuthVisibility } from '@shared/components';
 import { useContextualRouting } from 'next-use-contextual-routing';
 import { Auth } from '@screens/Auth/Auth';
 import { ShoppingCartDrawer } from 'src/shared/components/ShoppingCartDrawer';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { handleEntityHook } from '@shared/hooks/handleEntityHook';
 import { EndpointsAndEntityStateKeys } from '@shared/enums/endpoints.enum';
 import { CategoryEntity } from '@shared/entities/CategoryEntity';
@@ -32,40 +29,6 @@ import Sider from 'antd/lib/layout/Sider';
 import { appLogOut } from '../../../../utils/auth.utils';
 import styles from './Navbar.module.scss';
 
-type MenuItem = Required<MenuProps>['items'][number];
-
-function getItem(
-  label: React.ReactNode,
-  key: React.Key,
-  icon?: React.ReactNode,
-  children?: MenuItem[]
-): MenuItem {
-  return {
-    key,
-    icon,
-    children,
-    label,
-  } as MenuItem;
-}
-
-const items: MenuItem[] = [
-  getItem('Option 1', '1', <PieChartOutlined rev="" />),
-  getItem('Option 2', '2', <DesktopOutlined rev="" />),
-  getItem('User', 'sub1', <UserOutlined rev="" />, [
-    getItem('Tom', '3'),
-    getItem('Bill', '4'),
-    getItem('Alex', '5'),
-  ]),
-  getItem('Team', 'sub2', <TeamOutlined rev="" />, [
-    getItem('Team 1', '6'),
-    getItem('Team 2', '8'),
-  ]),
-  getItem('Files', '9', <FileOutlined rev="" />),
-];
-
-export interface ICategorySelect {
-  onSelect: (slug: string) => void;
-}
 const navbarOptionsLimit = 4;
 
 export function Navbar() {
@@ -82,17 +45,16 @@ export function Navbar() {
 
   const { data: companies } = handleEntityHook<CompanyEntity>(
     'companies',
-    true
+    true,
   );
   const [navbarOptions, setNavbarOptions] = useState<MenuItemType[]>([]);
   const { client } = useAuthClientHook();
   const [selectedCompanies, setSelectedCompanies] = useState<CompanyEntity[]>(
-    []
+    [],
   );
-  const salesQuantityData = useAppStore((state) =>
-    state.currentOrder?.sales.reduce((acc, sale) => acc + sale.quantity, 0)
-  );
-  const currentOrder = useAppStore((state) => state.currentOrder);
+  const salesQuantityData = useAppStore((
+    state,
+  ) => state.currentOrder?.sales.reduce((acc, sale) => acc + sale.quantity, 0));
 
   const [salesQuantity, setSalesQuantity] = useState(0);
 
@@ -133,30 +95,28 @@ export function Navbar() {
     setNavbarOptions(data);
   }, [companies, companyCategories?.data, companyName]);
 
-  const parseCatToMenuItem = (cats: CategoryEntity[]) =>
-    cats.map((cat) => ({
-      key: cat._id,
-      title: cat.title,
-      label: cat.title,
-      icon: <DatabaseOutlined rev="" />,
-      onClick: () => {
-        router.push(`/${cat.company}/category/${cat._id}`);
-        setHideSidebar(true);
-      },
-    }));
+  const parseCatToMenuItem = (cats: CategoryEntity[]) => cats.map((cat) => ({
+    key: cat._id,
+    title: cat.title,
+    label: cat.title,
+    icon: <DatabaseOutlined rev="" />,
+    onClick: () => {
+      router.push(`/${cat.company}/category/${cat._id}`);
+      setHideSidebar(true);
+    },
+  }));
 
-  const parseCompaniesToMenuItem = (companies: CompanyEntity[]) =>
-    companies.map((company) => ({
-      key: company._id,
-      title: company.name,
-      label: company.name,
-      icon: <BankOutlined rev="" />,
-      onClick: () => {
-        router.push(`/${company.companyId}`);
-        setSelectedCompanies([company]);
-        setHideSidebar(true);
-      },
-    }));
+  const parseCompaniesToMenuItem = (companies: CompanyEntity[]) => companies.map((company) => ({
+    key: company._id,
+    title: company.name,
+    label: company.name,
+    icon: <BankOutlined rev="" />,
+    onClick: () => {
+      router.push(`/${company.companyId}`);
+      setSelectedCompanies([company]);
+      setHideSidebar(true);
+    },
+  }));
 
   const authenticate = () => {
     router.push(makeContextualHref({ auth: true } as any), '/client/auth', {
@@ -189,7 +149,7 @@ export function Navbar() {
                 className="cursor-pointer"
                 key={company._id}
               >
-                <img className={styles.navbarLogo} src={company.logo} />
+                <img className={styles.navbarLogo} src={company.logo} alt="logo" />
               </div>
             ))}
           </div>

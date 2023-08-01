@@ -1,7 +1,8 @@
-import type { NextPage } from 'next';
 import { Home } from '@screens/Home';
 
-const Index: NextPage = () => <Home />;
+function Index() {
+  return <Home />;
+}
 
 export async function getStaticProps() {
   return {

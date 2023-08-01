@@ -19,7 +19,7 @@ export default class OrderService extends BaseService<OrderEntity> {
   public get localOrder(): OrderEntity {
     // if (typeof window === 'undefined') return new OrderEntity()
     const localOrder = JSON.parse(
-      localStorage.getItem(this.localOrderKey) || '{}'
+      localStorage.getItem(this.localOrderKey) || '{}',
     );
     const currentOrder = useAppStore?.getState().currentOrder;
     return currentOrder?._id ? currentOrder : localOrder;
@@ -53,7 +53,7 @@ export default class OrderService extends BaseService<OrderEntity> {
 
     if (!!this.authClient && !local?.sales?.length) {
       const oldOrder = JSON.parse(
-        localStorage.getItem(this.localOrderKeyPrefix) || '{}'
+        localStorage.getItem(this.localOrderKeyPrefix) || '{}',
       );
       localStorage.removeItem(this.localOrderKeyPrefix);
       if (oldOrder.sales?.length) {
@@ -67,7 +67,7 @@ export default class OrderService extends BaseService<OrderEntity> {
   handleLocalOrderSales(sale: Partial<ISale>) {
     const newLocalOrder = this.localOrder;
     const exist = !!newLocalOrder.sales.find(
-      (s) => s.product._id === sale.product?._id
+      (s) => s.product._id === sale.product?._id,
     );
 
     if (exist) {
@@ -88,7 +88,7 @@ export default class OrderService extends BaseService<OrderEntity> {
   removeSale(productId: string) {
     const newLocalOrder = this.localOrder;
     newLocalOrder.sales = newLocalOrder.sales.filter(
-      (s) => s.product._id !== productId
+      (s) => s.product._id !== productId,
     );
     this.localOrder = newLocalOrder;
   }

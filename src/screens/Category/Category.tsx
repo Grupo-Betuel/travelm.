@@ -1,17 +1,13 @@
-import { getAuthData } from 'src/utils/auth.utils';
-import { ClientEntity } from '@shared/entities/ClientEntity';
 import {
-  LandingCarousel,
   MainContentModal,
   ProductCard,
-  ScrollView,
 } from '@shared/components';
 import { Affix, Input } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
 import { handleEntityHook } from '@shared/hooks/handleEntityHook';
 import { ProductEntity } from '@shared/entities/ProductEntity';
 import {
-  useEffect, useState, useMemo, ChangeEvent,
+  useEffect, useState, ChangeEvent,
 } from 'react';
 import { useRouter } from 'next/router';
 import { EndpointsAndEntityStateKeys } from '@shared/enums/endpoints.enum';
@@ -29,15 +25,13 @@ export type ProductPerCategoryType = {
   }
 };
 
+// eslint-disable-next-line no-empty-pattern
 export function Category({}: CategoryProps) {
-  const authClient = getAuthData('all') as ClientEntity;
   const router = useRouter();
   const { makeContextualHref, returnHref } = useContextualRouting();
-  const [companyName, setCompanyName] = useState<string>();
   const [categoryProducts, setCategoryProducts] = useState<ProductEntity[]>([]);
   const [showContextProductDetailModal, setShowContextProductDetailModal] = useState<boolean>();
   const {
-    data: allCategories,
     get: getProducts,
     [EndpointsAndEntityStateKeys.BY_CATEGORY]: categoryProductsData,
   } = handleEntityHook<ProductEntity>('products');
@@ -50,7 +44,6 @@ export function Category({}: CategoryProps) {
         endpoint: EndpointsAndEntityStateKeys.BY_CATEGORY,
         slug: category,
       });
-      setCompanyName(category);
     }
 
     setShowContextProductDetailModal(!!productId);

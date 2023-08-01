@@ -2,7 +2,6 @@
 import {
   Dispatch,
   SetStateAction,
-  useCallback,
   useEffect,
   useRef,
   useState,
@@ -49,55 +48,51 @@ export function useInfiniteScroll<T>(
     }
   }, [entity.infinityScrollData]);
 
-  const handleObserver =
-    // useCallback(
-    (entries: any[]) => {
-      const target = entries[0];
-      if (target.isIntersecting && !isLastPage) {
-        clearTimeout(loadMoreTimeoutRef.current);
+  const handleObserver = (entries: any[]) => {
+    const target = entries[0];
+    if (target.isIntersecting && !isLastPage) {
+      clearTimeout(loadMoreTimeoutRef.current);
 
-        // this timeout debounces the intersection events
-        loadMoreTimeoutRef.current = setTimeout(() => {
-          if (
-            !entity.infinityScrollData
+      // this timeout debounces the intersection events
+      loadMoreTimeoutRef.current = setTimeout(() => {
+        if (
+          !entity.infinityScrollData
             || !entity.infinityScrollData.pagination
             || (entity.infinityScrollData.pagination
               && page <= entity.infinityScrollData.pagination.totalPages)
-          ) {
-            entity.get({
-              ...fetchProperties,
-              queryParams: {
-                ...fetchProperties.queryParams,
-                page,
-              },
-              storeDataInStateKey:
+        ) {
+          entity.get({
+            ...fetchProperties,
+            queryParams: {
+              ...fetchProperties.queryParams,
+              page,
+            },
+            storeDataInStateKey:
                 EndpointsAndEntityStateKeys.INFINITE_SCROLL_DATA,
-            });
-            const nextPage = page + 1;
-            setPage(nextPage);
-          }
-        }, debounceTime);
-      }
-    };
+          });
+          const nextPage = page + 1;
+          setPage(nextPage);
+        }
+      }, debounceTime);
+    }
+  };
   // ,
   //   [loadMoreTimeoutRef, page, isLastPage, fetchProperties]
   // )
 
-  const loadMoreCallback =
-    // useCallback(
-    (el: HTMLDivElement) => {
-      if (entity.fetching || entity.loading) return;
-      if (observerRef.current) observerRef.current.disconnect();
+  const loadMoreCallback = (el: HTMLDivElement) => {
+    if (entity.fetching || entity.loading) return;
+    if (observerRef.current) observerRef.current.disconnect();
 
-      const option: IntersectionObserverInit = {
-        root: null,
-        rootMargin: '0px',
-        threshold: 1.0,
-      };
-      observerRef.current = new IntersectionObserver(handleObserver, option);
-
-      if (el) observerRef.current.observe(el);
+    const option: IntersectionObserverInit = {
+      root: null,
+      rootMargin: '0px',
+      threshold: 1.0,
     };
+    observerRef.current = new IntersectionObserver(handleObserver, option);
+
+    if (el) observerRef.current.observe(el);
+  };
   // ,
   // [entity.fetching, isLastPage]
   // )

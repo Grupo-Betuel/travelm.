@@ -1,4 +1,6 @@
-import { SetState, StoreApi, UseBoundStore, create } from 'zustand';
+import {
+  SetState, StoreApi, UseBoundStore, create,
+} from 'zustand';
 import { BaseService, IServiceMethodProperties } from '@services/BaseService';
 import { BaseEntity } from '@shared/entities/BaseEntity';
 import { IPaginatedResponse } from '@interfaces/pagination.interface';
@@ -34,29 +36,28 @@ export interface IEntityStore<T> {
   error?: string;
 }
 
-export const stateHandlerError =
-  (set: SetState<IEntityStore<any>>) => (error: string) => {
-    console.error('application error', error);
-    if (process.env.NODE_ENV === 'development') {
-      toast(`App Error: ${error?.toString()}`, {
-        autoClose: false,
-        type: 'error',
-      });
-    }
+export const stateHandlerError = (set: SetState<IEntityStore<any>>) => (error: string) => {
+  console.error('application error', error);
+  if (process.env.NODE_ENV === 'development') {
+    toast(`App Error: ${error?.toString()}`, {
+      autoClose: false,
+      type: 'error',
+    });
+  }
 
-    set((state: any) => ({
-      ...state,
-      error,
-      loading: false,
-    }));
-  };
+  set((state: any) => ({
+    ...state,
+    error,
+    loading: false,
+  }));
+};
 
 export function stateHandlerSuccess<T extends BaseEntity>(
   key: keyof IEntityStore<T>,
   data: T | T[],
   set: SetState<IEntityStore<any>>,
   properties?: IServiceMethodProperties<T>,
-  isCached?: boolean
+  isCached?: boolean,
 ) {
   let endpointData = {};
   let item: T;
@@ -66,8 +67,7 @@ export function stateHandlerSuccess<T extends BaseEntity>(
   if (!(data as any).content && !Array.isArray(content)) {
     item = !(content as T[]).length ? (data as T) : content[0];
   } else {
-    const stateDataKey =
-      properties?.storeDataInStateKey || properties?.endpoint;
+    const stateDataKey = properties?.storeDataInStateKey || properties?.endpoint;
     endpointData = stateDataKey
       ? { [stateDataKey]: data }
       : ({ content: data } as EntityDataType<T>);
@@ -113,12 +113,14 @@ export function stateHandlerSuccess<T extends BaseEntity>(
         error: undefined,
       }));
       break;
+    default:
+      break;
   }
 }
 
 export function createEntityStore<T extends BaseEntity>(
   initData: T[],
-  service: BaseService<T>
+  service: BaseService<T>,
 ): UseBoundStore<StoreApi<IEntityStore<T>>> {
   return create<IEntityStore<T>>((set: SetState<IEntityStore<T>>): any => ({
     data: initData,
@@ -127,7 +129,7 @@ export function createEntityStore<T extends BaseEntity>(
       entityData: T,
       properties: IServiceMethodProperties<T>,
       enableCache = true,
-      cacheLifeTime: number = 60 * 1000 * 5
+      cacheLifeTime: number = 60 * 1000 * 5,
     ) => {
       set((state) => ({ ...state, loading: true }));
       const res = await service.add(
@@ -135,7 +137,7 @@ export function createEntityStore<T extends BaseEntity>(
         properties,
         stateHandlerError(set),
         enableCache,
-        cacheLifeTime
+        cacheLifeTime,
       );
       if (res) stateHandlerSuccess<T>('add', res, set);
 
@@ -144,20 +146,20 @@ export function createEntityStore<T extends BaseEntity>(
     update: async (
       entityData: { _id: string } & Partial<T>,
       enableCache: boolean = true,
-      cacheLifeTime: number = 60 * 1000 * 5
+      cacheLifeTime: number = 60 * 1000 * 5,
     ) => {
       set((state) => ({ ...state, loading: true }));
       const res = await service.update(
         entityData,
         stateHandlerError(set),
         enableCache,
-        cacheLifeTime
+        cacheLifeTime,
       );
       if (res) {
         stateHandlerSuccess<{ _id: string } & Partial<T>>(
           'update',
           entityData,
-          set
+          set,
         );
       }
 
@@ -166,14 +168,14 @@ export function createEntityStore<T extends BaseEntity>(
     remove: async (
       id: string,
       enableCache?: boolean,
-      cacheLifeTime: number = 60 * 1000 * 5
+      cacheLifeTime: number = 60 * 1000 * 5,
     ) => {
       set((state) => ({ ...state, loading: true }));
       const res = await service.remove(
         id,
         stateHandlerError(set),
         enableCache,
-        cacheLifeTime
+        cacheLifeTime,
       );
       if (res) stateHandlerSuccess<BaseEntity>('remove', { _id: id }, set);
       return !!res;
@@ -181,7 +183,7 @@ export function createEntityStore<T extends BaseEntity>(
     get: async (
       properties: IServiceMethodProperties<T>,
       enableCache = true,
-      cacheLifeTime: number = 60 * 1000 * 5
+      cacheLifeTime: number = 60 * 1000 * 5,
     ) => {
       set((state) => ({ ...state, loading: true, fetching: true }));
 
@@ -192,7 +194,7 @@ export function createEntityStore<T extends BaseEntity>(
         },
         stateHandlerError(set),
         enableCache,
-        cacheLifeTime
+        cacheLifeTime,
       );
       return !!res;
     },

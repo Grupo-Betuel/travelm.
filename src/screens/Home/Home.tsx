@@ -1,7 +1,4 @@
-import { getAuthData } from 'src/utils/auth.utils';
-import { ClientEntity } from '@shared/entities/ClientEntity';
 import {
-  LandingCarousel,
   MainContentModal,
   ProductCard,
   ScrollView,
@@ -37,13 +34,12 @@ export type ProductPerCategoryType = {
   }
 };
 
-export function Home({ hideCarousel }: HomeProps) {
-  const authClient = getAuthData('all') as ClientEntity;
+export function Home({}: HomeProps) {
   const router = useRouter();
   const { makeContextualHref, returnHref } = useContextualRouting();
   const [products, setProducts] = useState<ProductEntity[]>([]);
   const [showContextProductDetailModal, setShowContextProductDetailModal] = useState<boolean>();
-  const {  data: productsData, get: getProducts } = handleEntityHook<ProductEntity>('products', true);
+  const { data: productsData } = handleEntityHook<ProductEntity>('products', true);
 
   const productsPerCompanies = useMemo<ProductPerCategoryType>(() => {
     const data = products.reduce<ProductPerCategoryType>((acc, product) => {
@@ -118,7 +114,7 @@ export function Home({ hideCarousel }: HomeProps) {
         </Affix>
         {products.length > 0 && (
           <div className={styles.HomeContentProducts}>
-            {Object.keys(productsPerCompanies).map((categoryId, i) => {
+            {Object.keys(productsPerCompanies).map((categoryId) => {
               const category = productsPerCompanies[categoryId];
               return (
                 <ScrollView

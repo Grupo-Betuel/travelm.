@@ -19,11 +19,12 @@ export function Sidebar({ children, className, expanded }: ISidebarProps = { chi
   const sidebarRef = useRef<HTMLDivElement>();
   const [enableSidebarOptionHiddenHeight, setEnableSidebarOptionHiddenHeight] = useState<boolean>();
 
+  // eslint-disable-next-line react/no-unstable-nested-components
   function SidebarFooter() {
     return (
       <>
         {children?.find
-        && children?.find((item: any, i: number) => {
+        && children?.find((item: any) => {
           const found = item.type.name === footerName;
           return found;
         })}

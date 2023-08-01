@@ -1,9 +1,7 @@
 import { Image, List, Space } from 'antd';
 import React, { FC } from 'react';
 import Title from 'antd/lib/typography/Title';
-import { useAppStore } from '@services/store';
-import { handleEntityHook } from '@shared/hooks/handleEntityHook';
-import OrderEntity, { ISale } from '@shared/entities/OrderEntity';
+import { ISale } from '@shared/entities/OrderEntity';
 import { ProductEntity } from '@shared/entities/ProductEntity';
 import styles from './ShoppingCart.module.scss';
 
@@ -20,11 +18,6 @@ export interface IShoppingCartProps {
   // eslint-disable-next-line react/require-default-props
   sales?: ISale[];
 }
-const data = Array.from({ length: 2 }).map((_, i) => ({
-  title: 'Alas de Danza',
-  description: 'Cantidad: 5',
-  content: <h1>RD$400</h1>,
-}));
 
 const IconText: FC<IShoppingCartAction> = ({
   icon,
@@ -56,7 +49,7 @@ export function ShoppingCart({ itemActions, sales }: IShoppingCartProps) {
         <List.Item
           className={styles.ShoppingCartListItem}
           key={`sale-${i}`}
-          actions={itemActions.map((action, i) => (
+          actions={itemActions.map((action) => (
             <IconText
               {...action}
               onClick={() => action.onClick && action.onClick(sale.product)}

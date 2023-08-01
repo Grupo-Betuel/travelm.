@@ -1,8 +1,12 @@
 import '@styles/globals.scss';
 import type { AppProps } from 'next/app';
 import AppLayout from '@shared/layout';
-import { Affix, Button, ConfigProvider, Result, Spin } from 'antd';
-import { createContext, useEffect, useMemo, useState } from 'react';
+import {
+  Affix, Button, ConfigProvider, Result, Spin,
+} from 'antd';
+import {
+  createContext, useEffect, useMemo, useState,
+} from 'react';
 import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer } from 'react-toastify';
 import { useAppStore } from '@services/store';
@@ -12,31 +16,20 @@ import { AppViewportHeightContext } from '@shared/contexts/AppViewportHeightCont
 import { OrderContext } from '@shared/contexts/OrderContext';
 import OrderService from '@services/orderService';
 import { useAuthClientHook } from '@shared/hooks/useAuthClientHook';
-import { defaultTheme } from '../config/theme.config';
-import { defaultValidateMessages as validateMessages } from '../config/form-validation.config';
 import Link from 'next/link';
-import { handleEntityHook } from '@shared/hooks/handleEntityHook';
-import { ProductEntity } from '@shared/entities/ProductEntity';
+import { defaultValidateMessages as validateMessages } from '../config/form-validation.config';
+import { defaultTheme } from '../config/theme.config';
 
 export interface IAppProps {
   protected?: boolean;
 }
-
-{
-  /* TODO: Check if global posts filters is neccesarry */
-}
-
 export interface IAppPostsFiltersContextValue {
   setAppPostsFilters: (data: any) => void;
 }
 
-{
-  /* TODO: Check if global posts filters is neccesarry */
-}
-export const appPostsFiltersContext =
-  createContext<IAppPostsFiltersContextValue>(
-    {} as IAppPostsFiltersContextValue
-  );
+export const appPostsFiltersContext = createContext<IAppPostsFiltersContextValue>(
+  {} as IAppPostsFiltersContextValue,
+);
 
 export enum AppViewportHeightClassNames {
   WITH_NAVBAR = 'FullAppViewPortHeight',
@@ -47,10 +40,10 @@ function MyApp({ Component, pageProps }: AppProps<IAppProps>) {
   const clientEntity = useAppStore((state) => state.clients((s) => s));
   const productEntity = useAppStore((state) => state.products((s) => s));
   const [appLoading, setAppLoading] = useState<boolean>();
-  const [appViewportHeightClassName, setAppViewportHeightClassName] =
-    useState<AppViewportHeightClassNames>(
-      AppViewportHeightClassNames.WITH_NAVBAR_OPTION
-    );
+  const [appViewportHeightClassName,
+    setAppViewportHeightClassName] = useState<AppViewportHeightClassNames>(
+    AppViewportHeightClassNames.WITH_NAVBAR_OPTION,
+  );
   const orderService = useMemo(() => new OrderService(), []);
   const [cartIsOpen, setCartIsOpen] = useState(false);
   const { client } = useAuthClientHook();
@@ -65,7 +58,7 @@ function MyApp({ Component, pageProps }: AppProps<IAppProps>) {
         status="403"
         title="403"
         subTitle="Lo sentimos, No estas autorizado para entrar a esta pagina."
-        extra={
+        extra={(
           <>
             <Link href="/client/auth">
               <a>
@@ -78,7 +71,7 @@ function MyApp({ Component, pageProps }: AppProps<IAppProps>) {
               </a>
             </Link>
           </>
-        }
+        )}
       />
     );
   }

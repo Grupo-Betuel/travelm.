@@ -1,5 +1,6 @@
-import { Badge, Button, Card, Rate } from 'antd';
-import Link from 'next/link';
+import {
+  Badge, Button, Card,
+} from 'antd';
 import { ProductEntity } from '@shared/entities/ProductEntity';
 import { ProductsConstants } from '@shared/constants/products.constants';
 import { useMemo } from 'react';
@@ -15,9 +16,8 @@ export interface IProductProps {
 export function ProductCard({ product, onClick }: IProductProps) {
   const order = useAppStore((state) => state.currentOrder);
   const img = product && product.images ? product.images[0] : '';
-  const isAlmostSoldOut =
-    product.stock <= ProductsConstants.ALMOST_SOLD_OUT_QUANTITY &&
-    product.stock > 0;
+  const isAlmostSoldOut = product.stock <= ProductsConstants.ALMOST_SOLD_OUT_QUANTITY
+    && product.stock > 0;
   const { orderService, toggleCart } = useOrderContext();
   const handleProductAction = (ev: any) => {
     ev.stopPropagation();
@@ -46,7 +46,7 @@ export function ProductCard({ product, onClick }: IProductProps) {
 
   const isOnCart = useMemo(
     () => order?.sales.some((sale) => sale.product._id === product._id),
-    [order?.sales]
+    [order?.sales],
   );
 
   const handleClick = () => {
@@ -61,20 +61,24 @@ export function ProductCard({ product, onClick }: IProductProps) {
       <Card
         className={styles.ProductCard}
         bodyStyle={{ padding: '10px 0' }}
-        cover={<img src={img} className={styles.ProductImage} />}
+        cover={<img src={img} className={styles.ProductImage} alt={product.name} />}
         onClick={handleClick}
       >
         <div className={styles.ProductCardContent}>
           <div className={styles.ProductCardContentHeader}>
             <span className={styles.ProductTitle}>{product.name}</span>
             <span className={styles.ProductPrice}>
-              RD$ {product.price.toLocaleString()}
+              RD$
+              {' '}
+              {product.price.toLocaleString()}
             </span>
           </div>
           <div>
             {isAlmostSoldOut && (
               <span className="text-red">
-                Solo quedan: {product.stock || 0}
+                Solo quedan:
+                {' '}
+                {product.stock || 0}
               </span>
             )}
           </div>

@@ -1,10 +1,13 @@
-import { Button, Drawer, DrawerProps, Modal, Result, Spin, Steps } from 'antd';
-import React, { FC, useEffect, useMemo, useState } from 'react';
+import {
+  Button, Drawer, DrawerProps, Modal, Result, Spin, Steps,
+} from 'antd';
+import React, {
+  useEffect, useMemo, useState,
+} from 'react';
 import {
   DeleteOutlined,
   EditOutlined,
   PlusOutlined,
-  SendOutlined,
   ShoppingCartOutlined,
 } from '@ant-design/icons';
 import { useRouter } from 'next/router';
@@ -19,18 +22,12 @@ import { toast } from 'react-toastify';
 import { StickyFooter } from '@shared/layout/components/StickyFooter/StickyFooter';
 import Title from 'antd/lib/typography/Title';
 import { useOrderContext } from '@shared/contexts/OrderContext';
-import styles from './ShoppingCartDrawer.module.scss';
 import { ClientEntity } from '@shared/entities/ClientEntity';
+import styles from './ShoppingCartDrawer.module.scss';
 
 export interface IShoppingCartDrawerProps extends DrawerProps {
   onClose: () => void;
 }
-
-const data = Array.from({ length: 2 }).map((_, i) => ({
-  title: 'Alas de Danza',
-  description: 'Cantidad: 5',
-  content: <h1>RD$400</h1>,
-}));
 
 export function ShoppingCartDrawer({
   open,
@@ -45,16 +42,14 @@ export function ShoppingCartDrawer({
     add: sendOrder,
     update: updateOrder,
     loading,
-    error,
   } = handleEntityHook<OrderEntity>('orders');
   const [current, setCurrent] = useState(0);
   const substotal = useMemo(
-    () =>
-      order?.sales?.reduce(
-        (acc, sale) => acc + sale.product.price * sale.quantity,
-        0
-      ),
-    [order]
+    () => order?.sales?.reduce(
+      (acc, sale) => acc + sale.product.price * sale.quantity,
+      0,
+    ),
+    [order],
   );
   const { orderService } = useOrderContext();
 
@@ -149,7 +144,8 @@ export function ShoppingCartDrawer({
         ) : (
           <>
             <h3 className="flex-between-center">
-              Datos del Cliente{' '}
+              Datos del Cliente
+              {' '}
               <div onClick={goToProfile} className="cursor-pointer">
                 <a>Editar Datos</a>
               </div>
@@ -192,7 +188,9 @@ export function ShoppingCartDrawer({
                 Subtotal
               </Title>
               <Title className="m-0" level={2}>
-                RD$ {(substotal || '0').toLocaleString()}
+                RD$
+                {' '}
+                {(substotal || '0').toLocaleString()}
               </Title>
             </div>
             {order?._id && (
@@ -219,8 +217,8 @@ export function ShoppingCartDrawer({
               {order?._id
                 ? 'Actualizar Order'
                 : client
-                ? 'Realizar Orden'
-                : 'Siguiente'}
+                  ? 'Realizar Orden'
+                  : 'Siguiente'}
             </Button>
           </StickyFooter>
         </>
@@ -248,15 +246,16 @@ export function ShoppingCartDrawer({
       >
         <Result
           status="success"
-          subTitle={
+          subTitle={(
             <span>
               Orden enviada con exito. Te estaremos escribiendo por Whatsapp, si
-              no nos comunicamos contigo, puedes escribirnos al{' '}
-              <a target="_blank" href="https://wa.me/message/KNV3Z5CLAVHDK1">
+              no nos comunicamos contigo, puedes escribirnos al
+              {' '}
+              <a target="_blank" href="https://wa.me/message/KNV3Z5CLAVHDK1" rel="noreferrer">
                 (829) 893-7075
               </a>
             </span>
-          }
+          )}
           extra={[
             <Button
               type="primary"

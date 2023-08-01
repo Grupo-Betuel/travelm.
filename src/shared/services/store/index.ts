@@ -53,7 +53,7 @@ export interface IPersistStore {
 }
 
 const persistStore = persist<IPersistStore>(
-  (set) => ({
+  () => ({
     name: 'Williams',
     // order: new OrderEntity(),
   }),

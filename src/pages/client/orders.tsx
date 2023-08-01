@@ -1,5 +1,7 @@
-import React, { useEffect, useMemo } from 'react';
-import { Space, Table, Tag, Modal, Button, Spin } from 'antd';
+import React, { useEffect } from 'react';
+import {
+  Space, Table, Tag, Modal, Button, Spin,
+} from 'antd';
 import { handleEntityHook } from '@shared/hooks/handleEntityHook';
 import { EndpointsAndEntityStateKeys } from '@shared/enums/endpoints.enum';
 import OrderEntity, { OrderStatusTypes } from '@shared/entities/OrderEntity';
@@ -7,6 +9,7 @@ import { useAuthClientHook } from '@shared/hooks/useAuthClientHook';
 import { useAppStore } from '@services/store';
 import { useOrderContext } from '@shared/contexts/OrderContext';
 import { toast } from 'react-toastify';
+// eslint-disable-next-line import/no-extraneous-dependencies
 import { ExclamationCircleFilled } from '@ant-design/icons';
 
 const { confirm } = Modal;
@@ -15,7 +18,6 @@ export default function ClientOrders() {
     get: getOrders,
     update: updateOrder,
     fetching,
-    loading,
     [EndpointsAndEntityStateKeys.BY_CLIENT]: clientOrders,
   } = handleEntityHook<OrderEntity>('orders');
   const { client } = useAuthClientHook();
@@ -90,8 +92,6 @@ export default function ClientOrders() {
       key: 'status',
       dataIndex: 'status',
       render: (status: OrderStatusTypes) => {
-        // ['pending', 'pending-info', 'checking-transfer', 'confirmed', 'delivering', 'delivered', 'cancel-attempt', 'canceled', 'completed', 'personal-assistance'],
-
         let color = 'blue';
         switch (status) {
           case 'pending-info':
@@ -102,6 +102,7 @@ export default function ClientOrders() {
           case 'completed':
           case 'cancel-attempt':
             color = 'green';
+            break;
           case 'canceled':
             color = 'red';
             break;
@@ -117,11 +118,11 @@ export default function ClientOrders() {
       key: 'action',
       render: (text: string, order: OrderEntity) => (
         <Space size="middle">
-          {order.status !== 'completed' &&
-            order.status !== 'canceled' &&
-            order.status !== 'checking-transfer' &&
-            order.status !== 'delivering' &&
-            order.status !== 'delivered' && (
+          {order.status !== 'completed'
+            && order.status !== 'canceled'
+            && order.status !== 'checking-transfer'
+            && order.status !== 'delivering'
+            && order.status !== 'delivered' && (
               <>
                 <Button type="link" onClick={attemptCancelOrder(order)}>
                   Cancelar
@@ -132,7 +133,7 @@ export default function ClientOrders() {
                   </Button>
                 )}
               </>
-            )}
+          )}
         </Space>
       ),
     },

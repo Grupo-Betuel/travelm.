@@ -1,5 +1,5 @@
 import {
-  Button, Form, Input, Select, Spin,
+  Button, Form, Input, Spin,
 } from 'antd';
 import { useAppStore } from '@services/store';
 import { ClientEntity } from '@shared/entities/ClientEntity';
@@ -8,7 +8,7 @@ import { useRouter } from 'next/router';
 import { IAuthProps } from '@screens/Auth/Auth';
 import { EndpointsAndEntityStateKeys } from '@shared/enums/endpoints.enum';
 import React from 'react';
-import { SendOutlined, UserAddOutlined } from '@ant-design/icons';
+import { UserAddOutlined } from '@ant-design/icons';
 
 export function Register({ isModal, onSubmit }: IAuthProps) {
   const clientEntity = useAppStore((state) => state.clients((stateu) => stateu));
@@ -40,6 +40,7 @@ export function Register({ isModal, onSubmit }: IAuthProps) {
     } else {
       // router.push('/auth')
     }
+    return false;
   };
 
   return (
