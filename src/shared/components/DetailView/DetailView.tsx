@@ -614,7 +614,7 @@ export function DetailView({ previewPost, returnHref }: IDetailViewProps) {
               className="me-m"
               onClick={toggleCart}
             >
-              Realizar orden
+              Ver Carrito
             </Button>
           </StickyFooter>
         </Resizable>
