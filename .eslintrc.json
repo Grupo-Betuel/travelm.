@@ -14,7 +14,7 @@
     "no-restricted-globals": "off",
     "no-console": "off",
     "no-return-assign": "off",
-    "no-param-reassign": "off",
+    "no-param-reassign": "off"
   },
   "plugins": ["react"]
 }
