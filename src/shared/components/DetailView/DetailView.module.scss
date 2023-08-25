@@ -95,6 +95,19 @@ $bannerHeight: 40px;
     }
   }
 
+  .DetailViewPostDetailsActions {
+    z-index: 999;
+    &.MobileOnly {
+      display: none;
+    }
+    @include breakpoints.only-on(('m', 'xs')) {
+      display: none;
+      &.MobileOnly {
+        display: flex;
+      }
+    }
+  }
+
   .DetailViewPostDetails {
     display: flex;
     flex-direction: column;
@@ -120,11 +133,7 @@ $bannerHeight: 40px;
       padding: size.$size-small 0;
     }
 
-    .DetailViewPostDetailsActions {
-    }
-
     .DetailViewPostDetailsContent {
-      height: 100%;
       .DetailViewPostDetailsContentOptionsWrapper {
         display: flex;
         gap: 1rem;

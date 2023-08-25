@@ -92,7 +92,7 @@ function MyApp({ Component, pageProps }: AppProps<IAppProps>) {
   };
 
   return (
-    <html lang="es">
+    <>
       <Head>
         <link
           rel="apple-touch-icon"
@@ -147,7 +147,7 @@ function MyApp({ Component, pageProps }: AppProps<IAppProps>) {
         </AppLoadingContext.Provider>
         <ToastContainer />
       </ConfigProvider>
-    </html>
+    </>
   );
 }
 

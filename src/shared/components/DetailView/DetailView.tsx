@@ -618,6 +618,19 @@ export function DetailView({ previewPost, returnHref }: IDetailViewProps) {
             </Button>
           </StickyFooter>
         </Resizable>
+        <StickyFooter className={`${styles.DetailViewPostDetailsActions} ${styles.MobileOnly}`}>
+          <Button
+            type="primary"
+            shape="round"
+            block
+            size="large"
+            icon={<ShoppingCartOutlined rev="" />}
+            className="me-m"
+            onClick={toggleCart}
+          >
+            Ver Carrito
+          </Button>
+        </StickyFooter>
       </div>
     </>
   );
