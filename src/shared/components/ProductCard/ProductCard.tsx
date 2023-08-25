@@ -6,6 +6,7 @@ import { ProductsConstants } from '@shared/constants/products.constants';
 import { useMemo } from 'react';
 import { useAppStore } from '@services/store';
 import { useOrderContext } from '@shared/contexts/OrderContext';
+import Image from 'next/image';
 import styles from './ProductCard.module.scss';
 import { getSaleDataFromProduct } from '../../../utils/objects.utils';
 
@@ -61,7 +62,16 @@ export function ProductCard({ product, onClick }: IProductProps) {
       <Card
         className={styles.ProductCard}
         bodyStyle={{ padding: '10px 0' }}
-        cover={<img src={img} className={styles.ProductImage} alt={product.name} />}
+        cover={(
+          <Image
+            src={img}
+            className={styles.ProductImage}
+            width="350px"
+            height="350px"
+            alt={product.name}
+            priority
+          />
+        )}
         onClick={handleClick}
       >
         <div className={styles.ProductCardContent}>
@@ -82,13 +92,13 @@ export function ProductCard({ product, onClick }: IProductProps) {
               </span>
             )}
           </div>
-          {product.stock ? (
-            <Button className="mt-s" onClick={handleProductAction}>
-              {isOnCart
-                ? ProductsConstants.VIEW_CART
-                : ProductsConstants.ADD_CART}
-            </Button>
-          ) : null}
+          {/* {product.stock ? ( */}
+          <Button className={`mt-s ${product.stock ? '' : 'v-hidden'}`} onClick={handleProductAction}>
+            {isOnCart
+              ? ProductsConstants.VIEW_CART
+              : ProductsConstants.ADD_CART}
+          </Button>
+          {/* ) : null} */}
         </div>
       </Card>
     </Badge.Ribbon>

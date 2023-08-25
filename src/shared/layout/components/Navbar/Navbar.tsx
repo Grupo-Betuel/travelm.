@@ -264,6 +264,7 @@ export function Navbar() {
         collapsedWidth={0}
         collapsed={showSidebar}
         onCollapse={(value) => setHideSidebar(value)}
+        zeroWidthTriggerStyle={{ top: '150px' }}
         theme="dark"
       >
         <div className="demo-logo-vertical" />

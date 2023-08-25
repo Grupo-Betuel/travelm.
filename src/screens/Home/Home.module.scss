@@ -39,9 +39,16 @@
     .HomeSearchWrapper {
       padding: 0 7rem;
       background: white;
+      //width: calc(100% + $size-xxx-large * 2);
+      //position: relative;
+      //left: -$size-xxx-large * 2;
+
       @include breakpoints.only-on(('m', 'xs')) {
         padding: 0 .2rem;
+        //width: calc(100% + $size-xxx-large);
+        //left: -$size-xxx-large;
       }
+
       .HomeInputSearch {
         font-size: 2.5rem;
         color: colors.$color-white-2;

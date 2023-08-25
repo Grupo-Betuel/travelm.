@@ -1,8 +1,4 @@
-import {
-  MainContentModal,
-  ProductCard,
-  ScrollView,
-} from '@shared/components';
+import { MainContentModal, ProductCard, ScrollView } from '@shared/components';
 import { Affix, Input } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
 import { handleEntityHook } from '@shared/hooks/handleEntityHook';
@@ -13,6 +9,7 @@ import {
 import { useRouter } from 'next/router';
 import { useContextualRouting } from 'next-use-contextual-routing';
 import { DetailView } from '@components/DetailView';
+import Head from 'next/head';
 import styles from './Home.module.scss';
 import { deepMatch } from '../../utils/matching.util';
 import { layoutId, navbarOptionsHeight } from '../../utils/layout.utils';
@@ -25,13 +22,14 @@ const comanyNames: { [N in CompanyTypes]: string } = {
 };
 
 export interface HomeProps {
-  hideCarousel?: boolean
+  hideCarousel?: boolean;
 }
+
 export type ProductPerCategoryType = {
   [N in string]: {
-    products: ProductEntity[]
-    title: string
-  }
+    products: ProductEntity[];
+    title: string;
+  };
 };
 
 export function Home({}: HomeProps) {
@@ -39,7 +37,10 @@ export function Home({}: HomeProps) {
   const { makeContextualHref, returnHref } = useContextualRouting();
   const [products, setProducts] = useState<ProductEntity[]>([]);
   const [showContextProductDetailModal, setShowContextProductDetailModal] = useState<boolean>();
-  const { data: productsData } = handleEntityHook<ProductEntity>('products', true);
+  const { data: productsData } = handleEntityHook<ProductEntity>(
+    'products',
+    true,
+  );
 
   const productsPerCompanies = useMemo<ProductPerCategoryType>(() => {
     const data = products.reduce<ProductPerCategoryType>((acc, product) => {
@@ -87,6 +88,9 @@ export function Home({}: HomeProps) {
 
   return (
     <div className={styles.HomeWrapper}>
+      <Head>
+        <title>Grupo Betuel</title>
+      </Head>
       <MainContentModal show={showContextProductDetailModal}>
         <DetailView returnHref={returnHref} />
       </MainContentModal>

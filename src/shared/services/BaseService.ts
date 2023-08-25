@@ -87,7 +87,7 @@ export class BaseService<T> implements AbstractBaseService<T> {
       callback((data as T[]) || []);
       return data;
     } catch (err: any) {
-      handleError && handleError(err.data ? err.data.message : err.message);
+      handleError && handleError(err?.data ? err.data.message : err?.message);
       // nothing
     }
   }

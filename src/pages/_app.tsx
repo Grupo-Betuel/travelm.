@@ -17,12 +17,14 @@ import { OrderContext } from '@shared/contexts/OrderContext';
 import OrderService from '@services/orderService';
 import { useAuthClientHook } from '@shared/hooks/useAuthClientHook';
 import Link from 'next/link';
+import Head from 'next/head';
 import { defaultValidateMessages as validateMessages } from '../config/form-validation.config';
 import { defaultTheme } from '../config/theme.config';
 
 export interface IAppProps {
   protected?: boolean;
 }
+
 export interface IAppPostsFiltersContextValue {
   setAppPostsFilters: (data: any) => void;
 }
@@ -40,8 +42,7 @@ function MyApp({ Component, pageProps }: AppProps<IAppProps>) {
   const clientEntity = useAppStore((state) => state.clients((s) => s));
   const productEntity = useAppStore((state) => state.products((s) => s));
   const [appLoading, setAppLoading] = useState<boolean>();
-  const [appViewportHeightClassName,
-    setAppViewportHeightClassName] = useState<AppViewportHeightClassNames>(
+  const [appViewportHeightClassName, setAppViewportHeightClassName] = useState<AppViewportHeightClassNames>(
     AppViewportHeightClassNames.WITH_NAVBAR_OPTION,
   );
   const orderService = useMemo(() => new OrderService(), []);
@@ -89,38 +90,62 @@ function MyApp({ Component, pageProps }: AppProps<IAppProps>) {
   };
 
   return (
-    <ConfigProvider form={{ validateMessages }} theme={defaultTheme}>
-      {appLoading && (
-        <div className="loading">
-          <Spin size="large" />
-        </div>
-      )}
+    <html lang="es">
+      <Head>
+        <link
+          rel="apple-touch-icon"
+          sizes="180x180"
+          href="/betueldance/apple-touch-icon.png"
+        />
+        <link
+          rel="icon"
+          type="image/png"
+          sizes="32x32"
+          href="/betueldance/favicon-32x32.png"
+        />
+        <link
+          rel="icon"
+          type="image/png"
+          sizes="16x16"
+          href="/betueldance/favicon-16x16.png"
+        />
+        <link rel="manifest" href="/betueldance/site.webmanifest" />
+        <meta name="msapplication-TileColor" content="#da532c" />
+        <meta name="theme-color" content="#ffffff" />
+      </Head>
+      <ConfigProvider form={{ validateMessages }} theme={defaultTheme}>
+        {appLoading && (
+          <div className="loading">
+            <Spin size="large" />
+          </div>
+        )}
 
-      {/* TODO: Check if global posts filters is neccesarry */}
-      <AppLoadingContext.Provider value={{ appLoading, setAppLoading }}>
-        <OrderContext.Provider
-          value={{ orderService, toggleCart: toggleShoppingCart, cartIsOpen }}
-        >
-          <AppViewportHeightContext.Provider
-            value={{
-              appViewportHeightClassName,
-              setAppviewPortHeightClassName: setAppViewportHeightClassName,
-            }}
+        {/* TODO: Check if global posts filters is neccesarry */}
+        <AppLoadingContext.Provider value={{ appLoading, setAppLoading }}>
+          <OrderContext.Provider
+            value={{ orderService, toggleCart: toggleShoppingCart, cartIsOpen }}
           >
-            <AppLayout>
-              <Affix
-                offsetTop={navbarOptionsHeight}
-                target={() => document.getElementById(layoutId)}
-                onChange={onChangeLayoutAffix}
-                children=""
-              />
-              <Component {...pageProps} />
-            </AppLayout>
-          </AppViewportHeightContext.Provider>
-        </OrderContext.Provider>
-      </AppLoadingContext.Provider>
-      <ToastContainer />
-    </ConfigProvider>
+            <AppViewportHeightContext.Provider
+              value={{
+                appViewportHeightClassName,
+                setAppviewPortHeightClassName: setAppViewportHeightClassName,
+              }}
+            >
+              <AppLayout>
+                <Affix
+                  offsetTop={navbarOptionsHeight}
+                  target={() => document.getElementById(layoutId)}
+                  onChange={onChangeLayoutAffix}
+                  children=""
+                />
+                <Component {...pageProps} />
+              </AppLayout>
+            </AppViewportHeightContext.Provider>
+          </OrderContext.Provider>
+        </AppLoadingContext.Provider>
+        <ToastContainer />
+      </ConfigProvider>
+    </html>
   );
 }
 
