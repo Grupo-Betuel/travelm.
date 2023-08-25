@@ -1,8 +1,4 @@
-import {
-  MainContentModal,
-  ProductCard,
-  ScrollView,
-} from '@shared/components';
+import { MainContentModal, ProductCard, ScrollView } from '@shared/components';
 import { Affix, Input } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
 import { handleEntityHook } from '@shared/hooks/handleEntityHook';
@@ -14,18 +10,21 @@ import { useRouter } from 'next/router';
 import { EndpointsAndEntityStateKeys } from '@shared/enums/endpoints.enum';
 import { useContextualRouting } from 'next-use-contextual-routing';
 import { DetailView } from '@components/DetailView';
+import Head from 'next/head';
+import { CompanyEntity } from '@shared/entities/CompanyEntity';
 import styles from './Company.module.scss';
 import { deepMatch } from '../../utils/matching.util';
 import { layoutId, navbarOptionsHeight } from '../../utils/layout.utils';
 
 export interface CompanyProps {
-  hideCarousel?: boolean
+  hideCarousel?: boolean;
 }
+
 export type ProductPerCategoryType = {
   [N in string]: {
-    products: ProductEntity[]
-    title: string
-  }
+    products: ProductEntity[];
+    title: string;
+  };
 };
 
 export function Company({}: CompanyProps) {
@@ -35,6 +34,16 @@ export function Company({}: CompanyProps) {
   const [companyProducts, setCompanyProducts] = useState<ProductEntity[]>([]);
   const [showContextProductDetailModal, setShowContextProductDetailModal] = useState<boolean>();
   const { get: getProducts, 'by-company': companyProductsData } = handleEntityHook<ProductEntity>('products');
+  const { data: companies } = handleEntityHook<CompanyEntity>(
+    'companies',
+    true,
+  );
+
+  const currentCompany: CompanyEntity = useMemo(
+    () => companies.find((company) => company.companyId === companyName)
+      || ({} as CompanyEntity),
+    [companies, companyName],
+  );
 
   const productsPerCategories = useMemo<ProductPerCategoryType>(() => {
     const data = companyProducts.reduce<ProductPerCategoryType>(
@@ -98,6 +107,14 @@ export function Company({}: CompanyProps) {
 
   return (
     <div className={styles.CompanyWrapper}>
+      <Head>
+        <title>
+          {currentCompany.name}
+          {' '}
+          | Tienda Virtual
+        </title>
+        <meta name="description" content={currentCompany.description} />
+      </Head>
       <MainContentModal show={showContextProductDetailModal}>
         <DetailView returnHref={returnHref} />
       </MainContentModal>
