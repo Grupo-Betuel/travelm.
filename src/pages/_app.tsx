@@ -18,6 +18,8 @@ import OrderService from '@services/orderService';
 import { useAuthClientHook } from '@shared/hooks/useAuthClientHook';
 import Link from 'next/link';
 import Head from 'next/head';
+import LoadingBar from 'react-top-loading-bar';
+import { useRouter } from 'next/router';
 import { defaultValidateMessages as validateMessages } from '../config/form-validation.config';
 import { defaultTheme } from '../config/theme.config';
 
@@ -50,11 +52,24 @@ function MyApp({ Component, pageProps }: AppProps<IAppProps>) {
   const orderService = useMemo(() => new OrderService(), []);
   const [cartIsOpen, setCartIsOpen] = useState(false);
   const { client } = useAuthClientHook();
+  const [progress, setProgress] = useState(0);
+  const router = useRouter();
 
   useEffect(() => {
     setAppLoading(!!clientEntity.loading || !!productEntity.loading);
   }, [clientEntity.loading, productEntity.loading]);
 
+  useEffect(() => {
+    // START VALUE - WHEN LOADING WILL START
+    router.events.on('routeChangeStart', () => {
+      setProgress(40);
+    });
+
+    // COMPLETE VALUE - WHEN LOADING IS FINISHED
+    router.events.on('routeChangeComplete', () => {
+      setProgress(100);
+    });
+  }, []);
   if (pageProps.protected && !client) {
     return (
       <Result
@@ -133,6 +148,14 @@ function MyApp({ Component, pageProps }: AppProps<IAppProps>) {
                 setAppviewPortHeightClassName: setAppViewportHeightClassName,
               }}
             >
+              <LoadingBar
+                color="rgb(180, 130, 251)"
+                progress={progress}
+                onLoaderFinished={() => {
+                  setProgress(0);
+                }}
+                waitingTime={400}
+              />
               <AppLayout>
                 <Affix
                   offsetTop={navbarOptionsHeight}
