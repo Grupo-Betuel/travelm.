@@ -149,6 +149,7 @@ function MyApp({ Component, pageProps }: AppProps<IAppProps>) {
               }}
             >
               <LoadingBar
+                height={4}
                 color="rgb(180, 130, 251)"
                 progress={progress}
                 onLoaderFinished={() => {
