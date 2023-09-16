@@ -133,9 +133,11 @@ export function Company({}: CompanyProps) {
           }
         />
         <title>
-          {currentCompany.name}
-          {' '}
-          {currentCompany.title}
+          <span>
+            {currentCompany.name}
+            {' '}
+            {currentCompany.title}
+          </span>
         </title>
         <meta name="description" content={currentCompany.description} />
       </Head>
