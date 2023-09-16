@@ -29,18 +29,15 @@ export default function CompanyProducts({ metadata, currentCompany }: any) {
 }
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  console.log('app context', context.params);
   const companies = (
     await axios.get<CompanyEntity[]>(
       'https://grupo-betuel-api.click/api/companies',
     )
   ).data;
-  console.log('companies', companies);
   const companyIde = context.params?.company as string;
   const currentCompany = companies.find(
     (company) => company.companyId === companyIde,
   );
-  console.log('current', currentCompany);
 
   return {
     props: {
