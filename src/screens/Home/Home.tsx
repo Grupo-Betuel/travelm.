@@ -89,7 +89,27 @@ export function Home({}: HomeProps) {
   return (
     <div className={styles.HomeWrapper}>
       <Head>
-        <title>Grupo Betuel</title>
+        <link
+          rel="apple-touch-icon"
+          sizes="180x180"
+          href="/apple-touch-icon.png"
+        />
+        <link
+          rel="icon"
+          type="image/png"
+          sizes="32x32"
+          href="/favicon-32x32.png"
+        />
+        <link
+          rel="icon"
+          type="image/png"
+          sizes="16x16"
+          href="/favicon-16x16.png"
+        />
+        <link rel="manifest" href="/site.webmanifest" />
+        <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5" />
+        <meta name="msapplication-TileColor" content="#da532c" />
+        <meta name="theme-color" content="#ffffff" />
       </Head>
       <MainContentModal show={showContextProductDetailModal}>
         <DetailView returnHref={returnHref} />
@@ -103,18 +123,24 @@ export function Home({}: HomeProps) {
           offsetTop={navbarOptionsHeight}
           target={() => document.getElementById(layoutId)}
         >
-          <div className={styles.HomeSearchWrapper}>
-            {/* <Input placeholder="Borderless" bordered={false} /> */}
-            <Input
-              className={styles.HomeInputSearch}
-              placeholder="Buscar"
-              suffix={<SearchOutlined rev="" className="site-form-item-icon" />}
-              bordered={false}
-              onChange={onSearch}
-              size="large"
-            />
+          <div>
+            <div className={styles.HomeSearchWrapper}>
+              {/* <Input placeholder="Borderless" bordered={false} /> */}
+              <Input
+                className={styles.HomeInputSearch}
+                placeholder="Buscar"
+                suffix={
+                  <SearchOutlined rev="" className="site-form-item-icon" />
+                }
+                bordered={false}
+                onChange={onSearch}
+                size="large"
+              />
+            </div>
+            {!products?.length && (
+              <h2 className="p-xx-l">No hay resultados!</h2>
+            )}
           </div>
-          {!products?.length && <h2 className="p-xx-l">No hay resultados!</h2>}
         </Affix>
         {products.length > 0 && (
           <div className={styles.HomeContentProducts}>
@@ -129,6 +155,7 @@ export function Home({}: HomeProps) {
                   handleProductClick={goToProductDetail}
                   products={category.products}
                   title={category.title}
+                  key={`company-${categoryId}`}
                 />
               );
             })}

@@ -4,7 +4,7 @@ import AppLayout from '@shared/layout';
 import {
   Affix, Button, ConfigProvider, Result, Spin,
 } from 'antd';
-import {
+import React, {
   createContext, useEffect, useMemo, useState,
 } from 'react';
 import 'react-toastify/dist/ReactToastify.css';
@@ -44,9 +44,7 @@ function MyApp({ Component, pageProps }: AppProps<IAppProps>) {
   const clientEntity = useAppStore((state) => state.clients((s) => s));
   const productEntity = useAppStore((state) => state.products((s) => s));
   const [appLoading, setAppLoading] = useState<boolean>();
-  const [
-    appViewportHeightClassName,
-    setAppViewportHeightClassName] = useState<AppViewportHeightClassNames>(
+  const [appViewportHeightClassName, setAppViewportHeightClassName] = useState<AppViewportHeightClassNames>(
     AppViewportHeightClassNames.WITH_NAVBAR_OPTION,
   );
   const orderService = useMemo(() => new OrderService(), []);
@@ -105,6 +103,16 @@ function MyApp({ Component, pageProps }: AppProps<IAppProps>) {
       // setAppViewportHeightClassName(AppViewportHeightClassNames.WITH_NAVBAR)
     }
   };
+  const [companyId, setCompanyId] = useState<string>();
+  const [seoUrl, setSeoUrl] = useState<string>('');
+
+  useEffect(() => {
+    const companyName = location.pathname.split('/')[1];
+    if (companyName !== companyId) {
+      setCompanyId(companyName + (companyName ? '/' : ''));
+    }
+    setSeoUrl(location.href);
+  }, [router.pathname]);
 
   return (
     <>
@@ -112,24 +120,51 @@ function MyApp({ Component, pageProps }: AppProps<IAppProps>) {
         <link
           rel="apple-touch-icon"
           sizes="180x180"
-          href="/betueldance/apple-touch-icon.png"
+          href={`/images/${companyId}apple-touch-icon.png`}
         />
         <link
           rel="icon"
           type="image/png"
           sizes="32x32"
-          href="/betueldance/favicon-32x32.png"
+          href={`/images/${companyId}favicon-32x32.png`}
         />
         <link
           rel="icon"
           type="image/png"
           sizes="16x16"
-          href="/betueldance/favicon-16x16.png"
+          href={`/images/${companyId}favicon-16x16.png`}
         />
-        <link rel="manifest" href="/betueldance/site.webmanifest" />
+        <link rel="manifest" href={`/images/${companyId}site.webmanifest`} />
+        <link
+          rel="mask-icon"
+          href={`/images/${companyId}safari-pinned-tab.svg`}
+          color="#5bbad5"
+        />
         <meta name="msapplication-TileColor" content="#da532c" />
         <meta name="theme-color" content="#ffffff" />
+        <meta property="og:locale" content="es_ES" />
+
+        {/* <link rel=“canonical” href=“https://example.com/sample-page/” /> */}
+        <meta property="og:url" content={seoUrl} />
+        <meta property="fb:app_id" content="1304512236864343" />
+
+        <meta property="og:title" content="Tienda Virtual de Grupo Betuel" />
+        <meta property="og:description" content="Todo tipo de acccesorios" />
+        <meta property="og:type" content="website" />
+        {/* <meta property="og:image" content={currentCompany.wallpaper} /> */}
+        {/* <meta property="og:video" content={currentCompany.video} /> */}
+        {/* <meta property="og:video:secure_url" content={currentCompany.video} /> */}
+        {/* <meta */}
+        {/*  property="og:video:type" */}
+        {/*  content={ */}
+        {/*    currentCompany.video?.includes('mp4') ? 'video/mp4' : 'video/ogg' */}
+        {/*  } */}
+        {/* /> */}
+        <title>Grupo Betuel Ecommerce | Tienda Virtual</title>
+        <meta name="description" content="Toda clase de articulos" />
+        <meta property="og:type" content="website" />
       </Head>
+
       <ConfigProvider form={{ validateMessages }} theme={defaultTheme}>
         {appLoading && (
           <div className="loading">

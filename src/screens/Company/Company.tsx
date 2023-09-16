@@ -1,9 +1,9 @@
 import { MainContentModal, ProductCard, ScrollView } from '@shared/components';
-import { Affix, Input } from 'antd';
+import { Affix, Input, Spin } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
 import { handleEntityHook } from '@shared/hooks/handleEntityHook';
 import { ProductEntity } from '@shared/entities/ProductEntity';
-import {
+import React, {
   useEffect, useState, useMemo, ChangeEvent,
 } from 'react';
 import { useRouter } from 'next/router';
@@ -33,7 +33,11 @@ export function Company({}: CompanyProps) {
   const [companyName, setCompanyName] = useState<string>();
   const [companyProducts, setCompanyProducts] = useState<ProductEntity[]>([]);
   const [showContextProductDetailModal, setShowContextProductDetailModal] = useState<boolean>();
-  const { get: getProducts, 'by-company': companyProductsData } = handleEntityHook<ProductEntity>('products');
+  const {
+    loading,
+    get: getProducts,
+    'by-company': companyProductsData,
+  } = handleEntityHook<ProductEntity>('products');
   const { data: companies } = handleEntityHook<CompanyEntity>(
     'companies',
     true,
@@ -105,72 +109,103 @@ export function Company({}: CompanyProps) {
     setCompanyProducts([...results]);
   };
 
+  useEffect(() => {
+    console.log('logo', currentCompany?.logo);
+    if (currentCompany?.logo) {
+      const fav = document.querySelector('link[rel="icon"]');
+      fav?.setAttribute('href', currentCompany?.logo || '');
+    }
+  }, [currentCompany?.logo]);
+
   return (
-    <div className={styles.CompanyWrapper}>
+    <>
       <Head>
+        <meta property="og:title" content={currentCompany.title} />
+        <meta property="og:description" content={currentCompany.description} />
+        <meta property="og:type" content="website" />
+        <meta property="og:image" content={currentCompany.wallpaper} />
+        <meta property="og:video" content={currentCompany.video} />
+        <meta property="og:video:secure_url" content={currentCompany.video} />
+        <meta
+          property="og:video:type"
+          content={
+            currentCompany.video?.includes('mp4') ? 'video/mp4' : 'video/ogg'
+          }
+        />
         <title>
           {currentCompany.name}
           {' '}
-          | Tienda Virtual
+          {currentCompany.title}
         </title>
         <meta name="description" content={currentCompany.description} />
       </Head>
-      <MainContentModal show={showContextProductDetailModal}>
-        <DetailView returnHref={returnHref} />
-      </MainContentModal>
-      {/* <div className={styles.LandingCarouselWrapper}> */}
-      {/*  {!hideCarousel && <LandingCarousel />} */}
-      {/* </div> */}
-      <div className={styles.CompanyContent}>
-        <Affix
-          className={styles.SidebarAffix}
-          offsetTop={navbarOptionsHeight}
-          target={() => document.getElementById(layoutId)}
-        >
-          <div className={styles.CompanySearchWrapper}>
-            <Input
-              className={styles.CompanyInputSearch}
-              placeholder="Buscar"
-              suffix={<SearchOutlined rev="" className="site-form-item-icon" />}
-              bordered={false}
-              onChange={onSearch}
-              size="large"
-            />
-          </div>
-          {!companyProducts?.length && (
-            <h2 className="p-xx-l">No hay resultados!</h2>
-          )}
-        </Affix>
-        {companyProducts.length > 0 && (
-          <div className={styles.CompanyContentProducts}>
-            {Object.keys(productsPerCategories).map((categoryId, i) => {
-              const category = productsPerCategories[categoryId];
-              return (
-                <ScrollView
-                  key={`scroll-view-category-${i}`}
-                  wrapperClassName={
-                    styles.CompanyContentProductsScrollViewCategories
+      {loading && (
+        <div className="loading">
+          <Spin size="large" />
+        </div>
+      )}
+      <div className={styles.CompanyWrapper}>
+        <MainContentModal show={showContextProductDetailModal}>
+          <DetailView returnHref={returnHref} />
+        </MainContentModal>
+        {/* <div className={styles.LandingCarouselWrapper}> */}
+        {/*  {!hideCarousel && <LandingCarousel />} */}
+        {/* </div> */}
+        <div className={styles.CompanyContent}>
+          <Affix
+            className={styles.SidebarAffix}
+            offsetTop={navbarOptionsHeight}
+            target={() => document.getElementById(layoutId)}
+          >
+            <div>
+              <div className={styles.CompanySearchWrapper}>
+                <Input
+                  className={styles.CompanyInputSearch}
+                  placeholder="Buscar"
+                  suffix={
+                    <SearchOutlined rev="" className="site-form-item-icon" />
                   }
-                  handleSeeMore={handleSeeMore}
-                  handleProductClick={goToProductDetail}
-                  products={category.products}
-                  title={category.title}
+                  bordered={false}
+                  onChange={onSearch}
+                  size="large"
                 />
-              );
-            })}
-            <h2 className="mb-xx-l title">Todos los Productos</h2>
-            <div className={styles.CompanyCardsGrid}>
-              {companyProducts.map((item, i) => (
-                <ProductCard
-                  key={`product-${i}`}
-                  onClick={goToProductDetail}
-                  product={item}
-                />
-              ))}
+              </div>
+              {!companyProducts?.length && (
+                <h2 className="p-xx-l">No hay resultados!</h2>
+              )}
             </div>
-          </div>
-        )}
+          </Affix>
+          {companyProducts.length > 0 && (
+            <div className={styles.CompanyContentProducts}>
+              {Object.keys(productsPerCategories).map((categoryId, i) => {
+                const category = productsPerCategories[categoryId];
+                return (
+                  <ScrollView
+                    key={`scroll-view-category-${i}`}
+                    wrapperClassName={
+                      styles.CompanyContentProductsScrollViewCategories
+                    }
+                    handleSeeMore={handleSeeMore}
+                    handleProductClick={goToProductDetail}
+                    products={category.products}
+                    title={category.title}
+                  />
+                );
+              })}
+              <h2 className="mb-xx-l title">Todos los Productos</h2>
+              <div className={styles.CompanyCardsGrid}>
+                {companyProducts.map((item, i) => (
+                  <ProductCard
+                    key={`product-${i}`}
+                    onClick={goToProductDetail}
+                    product={item}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
       </div>
-    </div>
+    </>
   );
 }

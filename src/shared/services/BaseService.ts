@@ -56,7 +56,7 @@ export class BaseService<T> implements AbstractBaseService<T> {
     try {
       if (enableCache) {
         const cached = this.getCachedData('get', properties);
-        if (cached && cached) {
+        if (cached && (cached as any)?.length) {
           callback(cached, true);
         }
       }
@@ -111,7 +111,7 @@ export class BaseService<T> implements AbstractBaseService<T> {
       return res.data as T;
     } catch (err: IResponseError | any) {
       console.log('error!', err);
-      handleError && handleError(err?.data ? err?.data?.message : err?.message);
+      err && handleError && handleError(err);
     }
   }
 

@@ -12,6 +12,7 @@ export enum StatusCode {
   Forbidden = 403,
   TooManyRequests = 429,
   InternalServerError = 500,
+  Conflict = 409,
   NotFound = 404,
   BadRequest = 400,
 }

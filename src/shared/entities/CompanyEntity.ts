@@ -5,11 +5,17 @@ export class CompanyEntity extends BaseEntity {
 
   companyId: string = '';
 
-  description: string = '';
-
   phone: string = '';
 
   logo: string = '';
+
+  wallpaper: string = '';
+
+  title: string = '';
+
+  description: string = '';
+
+  video: string = '';
 }
 
 export const companyTitles: { [N in string]: string } = {

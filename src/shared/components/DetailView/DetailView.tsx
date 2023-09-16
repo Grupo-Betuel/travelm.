@@ -130,9 +130,7 @@ export function DetailView({ previewPost, returnHref }: IDetailViewProps) {
   const hasMultipleImages = hasImages && product.images.length > 1;
 
   const handleSaleProductParams = (productParam: IProductParam | IProductSaleParam) => () => {
-    const saleParam: any = (
-      productParam as IProductSaleParam
-    ).productParam
+    const saleParam: any = (productParam as IProductSaleParam).productParam
       ? (productParam as IProductSaleParam)
       : ({} as IProductSaleParam);
 
@@ -157,9 +155,13 @@ export function DetailView({ previewPost, returnHref }: IDetailViewProps) {
       ...saleParam,
     };
 
-    const exist = sale?.params?.find((p) => p.productParam === param.productParam);
+    const exist = sale?.params?.find(
+      (p) => p.productParam === param.productParam,
+    );
     if (exist) {
-      const newParams = sale?.params?.filter((p) => p.productParam !== param.productParam);
+      const newParams = sale?.params?.filter(
+        (p) => p.productParam !== param.productParam,
+      );
       setSale({ ...sale, params: newParams });
     } else {
       const newParams = [...(sale?.params || [])];
@@ -187,10 +189,7 @@ export function DetailView({ previewPost, returnHref }: IDetailViewProps) {
   // eslint-disable-next-line
   const resetSaleProductParam = (parentId: string, variantId?: string) => () => handleSaleProductParamsChange(parentId, variantId)(0);
 
-  const handleSaleProductParamsChange = (
-    parentId: string,
-    variantId?: string,
-  ) => async (value?: any) => {
+  const handleSaleProductParamsChange = (parentId: string, variantId?: string) => async (value?: any) => {
     let newSale = structuredClone(sale);
     let total = 0;
     const quantity = Number(value || 0);
@@ -366,7 +365,7 @@ export function DetailView({ previewPost, returnHref }: IDetailViewProps) {
             </span>
           </div>
           <div className={styles.DetailViewPostDetailsContent}>
-            <span className="subtitle mb-m">Cantidades</span>
+            <span className="subtitle mb-m">Escoge las Cantidades</span>
             <Form
               form={productOptionsForm}
               name="productOptionsForm"
@@ -618,7 +617,9 @@ export function DetailView({ previewPost, returnHref }: IDetailViewProps) {
             </Button>
           </StickyFooter>
         </Resizable>
-        <StickyFooter className={`${styles.DetailViewPostDetailsActions} ${styles.MobileOnly}`}>
+        <StickyFooter
+          className={`${styles.DetailViewPostDetailsActions} ${styles.MobileOnly}`}
+        >
           <Button
             type="primary"
             shape="round"

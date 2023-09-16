@@ -6,6 +6,7 @@ import { BaseEntity } from '@shared/entities/BaseEntity';
 import { IPaginatedResponse } from '@interfaces/pagination.interface';
 import { toast } from 'react-toastify';
 import { EndpointsAndEntityStateKeys } from '@shared/enums/endpoints.enum';
+import { IEntityError, IResponseError } from '@interfaces/error.interface';
 
 export type EntityDataType<T> = {
   [N in EndpointsAndEntityStateKeys]: T[] | IPaginatedResponse<T>;
@@ -33,13 +34,13 @@ export interface IEntityStore<T> {
   ) => void;
   loading?: boolean;
   fetching?: boolean;
-  error?: string;
+  error?: IEntityError;
 }
 
-export const stateHandlerError = (set: SetState<IEntityStore<any>>) => (error: string) => {
+export const stateHandlerError = (set: SetState<IEntityStore<any>>) => (error: IResponseError) => {
   console.error('application error', error);
   if (process.env.NODE_ENV === 'development') {
-    toast(`App Error: ${error?.toString()}`, {
+    toast(`App Error: ${error?.data?.message}`, {
       autoClose: false,
       type: 'error',
     });
@@ -47,7 +48,10 @@ export const stateHandlerError = (set: SetState<IEntityStore<any>>) => (error: s
 
   set((state: any) => ({
     ...state,
-    error,
+    error: {
+      status: error?.status,
+      message: error?.data?.message,
+    },
     loading: false,
   }));
 };

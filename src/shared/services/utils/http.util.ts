@@ -110,10 +110,10 @@ class Http {
         break;
       }
       case StatusCode.NotFound: {
-        // toast(`Not Found: ${error.data.message}`, {
-        //   autoClose: false,
-        //   type: 'error',
-        // })
+        toast(`Not Found: ${error.data.message}`, {
+          autoClose: false,
+          type: 'error',
+        });
         // Handle Not Found
         break;
       }
@@ -148,11 +148,18 @@ class Http {
         });
         // Handle TooManyRequests
         break;
+      case StatusCode.Conflict:
+        // toast(`Conflicto: ${errorMessage}`, {
+        //   autoClose: false,
+        //   type: 'error',
+        // });
+        // Handle TooManyRequests
+        break;
       default:
         break;
     }
 
-    return Promise.reject(errorMessage);
+    return Promise.reject(error);
   }
 }
 

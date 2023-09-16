@@ -1,5 +1,5 @@
 import {
-  Button, Form, Input, Spin,
+  Alert, Button, Form, Input, Spin,
 } from 'antd';
 import { useAppStore } from '@services/store';
 import { ClientEntity } from '@shared/entities/ClientEntity';
@@ -7,40 +7,87 @@ import { MaskedInput } from 'antd-mask-input';
 import { useRouter } from 'next/router';
 import { IAuthProps } from '@screens/Auth/Auth';
 import { EndpointsAndEntityStateKeys } from '@shared/enums/endpoints.enum';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { UserAddOutlined } from '@ant-design/icons';
+import { toast } from 'react-toastify';
+import { useOrderContext } from '@shared/contexts/OrderContext';
 
 export function Register({ isModal, onSubmit }: IAuthProps) {
   const clientEntity = useAppStore((state) => state.clients((stateu) => stateu));
   const router = useRouter();
+  const [clientLoginData, setClientLoginData] = useState<ClientEntity>(
+    {} as ClientEntity,
+  );
+  const { cartIsOpen, toggleCart } = useOrderContext();
+  const [failedLogin, setFailedLogin] = useState(false);
 
   const createClient = async (data: ClientEntity) => {
     data.phone = data.phone.toString().replace(/[- ()+]/g, '');
-    if (
-      await clientEntity.add(data, {
-        endpoint: EndpointsAndEntityStateKeys.REGISTER,
-      })
-    ) {
-      if (
-        await clientEntity.add(
-          {
-            phone: data.phone,
-            password: data.password,
-          },
-          { endpoint: EndpointsAndEntityStateKeys.LOGIN },
-        )
-      ) {
-        if (onSubmit) return onSubmit(data);
-        if (isModal) {
-          router.back();
-        } else {
-          router.push('/');
-        }
-      }
-    } else {
-      // router.push('/auth')
+    const loginData = {
+      ...clientLoginData,
+      phone: data.phone,
+      password: data.password,
+    };
+    setClientLoginData(loginData);
+
+    const res = await clientEntity.add(data, {
+      endpoint: EndpointsAndEntityStateKeys.REGISTER,
+    });
+    console.log('response', res, clientEntity.error);
+    if (res) {
+      await handleLogin(loginData);
     }
+
     return false;
+  };
+
+  const handleLogin = async (userData: ClientEntity = clientLoginData) => {
+    toast.info('Iniciando sesión...');
+    const data: ClientEntity = {
+      ...clientLoginData,
+      ...userData,
+    };
+
+    console.log('login', data);
+
+    const response = await clientEntity.add(data, {
+      endpoint: EndpointsAndEntityStateKeys.LOGIN,
+    });
+
+    if (!response) {
+      handleUnsuccessfulLogin();
+    } else {
+      setFailedLogin(false);
+      if (isModal) {
+        router.back();
+      } else if (!onSubmit) {
+        router.push('/');
+      }
+    }
+    return response;
+  };
+
+  const handleUnsuccessfulLogin = () => {
+    if (clientEntity.error?.status === 409) {
+      toast.error(clientEntity.error.message);
+      setFailedLogin(true);
+    }
+  };
+
+  useEffect(() => {
+    if (clientEntity.error?.status === 409) {
+      handleLogin();
+    }
+  }, [clientLoginData, clientEntity?.error]);
+
+  useEffect(() => {
+    console.log('clientEntity', clientEntity.item);
+    if (onSubmit && clientEntity.item._id) onSubmit(clientEntity.item);
+  }, [clientEntity.item]);
+
+  const goToLogin = () => {
+    cartIsOpen && toggleCart();
+    router.push('/client/auth');
   };
 
   return (
@@ -51,6 +98,18 @@ export function Register({ isModal, onSubmit }: IAuthProps) {
       initialValues={{ remember: true }}
       onFinish={createClient}
     >
+      {failedLogin && (
+        <Alert
+          showIcon
+          description="Este número de teléfono ya está registrado."
+          type="error"
+          action={(
+            <Button onClick={goToLogin} size="small" type="primary">
+              Iniciar Sesión
+            </Button>
+          )}
+        />
+      )}
       {clientEntity.loading && (
         <div className="loading">
           <Spin size="large" />
