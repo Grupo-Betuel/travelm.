@@ -10,7 +10,6 @@ import { useRouter } from 'next/router';
 import { EndpointsAndEntityStateKeys } from '@shared/enums/endpoints.enum';
 import { useContextualRouting } from 'next-use-contextual-routing';
 import { DetailView } from '@components/DetailView';
-import Head from 'next/head';
 import { CompanyEntity } from '@shared/entities/CompanyEntity';
 import styles from './Company.module.scss';
 import { deepMatch } from '../../utils/matching.util';

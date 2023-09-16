@@ -5,7 +5,7 @@ import axios from 'axios';
 import Head from 'next/head';
 import React from 'react';
 
-export default function CompanyProducts({ metadata, currentCompany }: any) {
+export default function CompanyProducts({ metadata }: any) {
   return (
     <>
       <Head>
