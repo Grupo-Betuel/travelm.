@@ -89,27 +89,25 @@ export function Home({}: HomeProps) {
   return (
     <div className={styles.HomeWrapper}>
       <Head>
-        <link
-          rel="apple-touch-icon"
-          sizes="180x180"
-          href="/apple-touch-icon.png"
-        />
-        <link
-          rel="icon"
-          type="image/png"
-          sizes="32x32"
-          href="/favicon-32x32.png"
-        />
-        <link
-          rel="icon"
-          type="image/png"
-          sizes="16x16"
-          href="/favicon-16x16.png"
-        />
-        <link rel="manifest" href="/site.webmanifest" />
-        <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5" />
-        <meta name="msapplication-TileColor" content="#da532c" />
-        <meta name="theme-color" content="#ffffff" />
+        <meta property="og:title" content="Tienda Virtual de Grupo Betuel" />
+        <meta property="og:description" content="Todo tipo de acccesorios" />
+        <meta property="og:type" content="website" />
+        {/* <meta property="og:image" content={currentCompany.wallpaper} /> */}
+        {/* <meta property="og:video" content={currentCompany.video} /> */}
+        {/* <meta property="og:video:secure_url" content={currentCompany.video} /> */}
+        {/* <meta */}
+        {/*  property="og:video:type" */}
+        {/*  content={ */}
+        {/*    currentCompany.video?.includes('mp4') ? 'video/mp4' : 'video/ogg' */}
+        {/*  } */}
+        {/* /> */}
+        <title>Grupo Betuel Ecommerce | Tienda Virtual</title>
+        <meta name="description" content="Toda clase de articulos" />
+        <meta property="og:type" content="website" />
+        <meta property="og:image" content="/images/wallpaper.png" />
+        <meta property="og:video" content="/images/video.mp4" />
+        <meta property="og:video:secure_url" content="/images/video.mp4" />
+        <meta property="og:video:type" content="video/mp4" />
       </Head>
       <MainContentModal show={showContextProductDetailModal}>
         <DetailView returnHref={returnHref} />

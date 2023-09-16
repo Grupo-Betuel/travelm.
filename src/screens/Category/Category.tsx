@@ -118,13 +118,11 @@ export function Category({}: CategoryProps) {
           }
         />
         <title>
-          <span>
-            {currentCategory.title}
-            {' | '}
-            {currentCompany.name}
-            {' | '}
-            {currentCompany.title}
-          </span>
+          {currentCategory.title}
+          {' | '}
+          {currentCompany.name}
+          {' | '}
+          {currentCompany.title}
         </title>
         <meta name="description" content={currentCompany.description} />
       </Head>

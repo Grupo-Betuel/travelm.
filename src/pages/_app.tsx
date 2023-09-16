@@ -149,22 +149,6 @@ function MyApp({ Component, pageProps }: AppProps<IAppProps>) {
         {/* <link rel=“canonical” href=“https://example.com/sample-page/” /> */}
         <meta property="og:url" content={seoUrl} />
         <meta property="fb:app_id" content="1304512236864343" />
-
-        <meta property="og:title" content="Tienda Virtual de Grupo Betuel" />
-        <meta property="og:description" content="Todo tipo de acccesorios" />
-        <meta property="og:type" content="website" />
-        {/* <meta property="og:image" content={currentCompany.wallpaper} /> */}
-        {/* <meta property="og:video" content={currentCompany.video} /> */}
-        {/* <meta property="og:video:secure_url" content={currentCompany.video} /> */}
-        {/* <meta */}
-        {/*  property="og:video:type" */}
-        {/*  content={ */}
-        {/*    currentCompany.video?.includes('mp4') ? 'video/mp4' : 'video/ogg' */}
-        {/*  } */}
-        {/* /> */}
-        <title>Grupo Betuel Ecommerce | Tienda Virtual</title>
-        <meta name="description" content="Toda clase de articulos" />
-        <meta property="og:type" content="website" />
       </Head>
 
       <ConfigProvider form={{ validateMessages }} theme={defaultTheme}>

@@ -122,7 +122,6 @@ export function Company({}: CompanyProps) {
       <Head>
         <meta property="og:title" content={currentCompany.title} />
         <meta property="og:description" content={currentCompany.description} />
-        <meta property="og:type" content="website" />
         <meta property="og:image" content={currentCompany.wallpaper} />
         <meta property="og:video" content={currentCompany.video} />
         <meta property="og:video:secure_url" content={currentCompany.video} />
@@ -132,12 +131,11 @@ export function Company({}: CompanyProps) {
             currentCompany.video?.includes('mp4') ? 'video/mp4' : 'video/ogg'
           }
         />
+        <meta property="og:type" content="website" />
         <title>
-          <span>
-            {currentCompany.name}
-            {' '}
-            {currentCompany.title}
-          </span>
+          {currentCompany.name}
+          {' '}
+          {currentCompany.title}
         </title>
         <meta name="description" content={currentCompany.description} />
       </Head>
