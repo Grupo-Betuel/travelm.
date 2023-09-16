@@ -20,6 +20,7 @@ import Link from 'next/link';
 import Head from 'next/head';
 import LoadingBar from 'react-top-loading-bar';
 import { useRouter } from 'next/router';
+import { GetServerSideProps } from 'next';
 import { defaultValidateMessages as validateMessages } from '../config/form-validation.config';
 import { defaultTheme } from '../config/theme.config';
 
@@ -44,9 +45,7 @@ function MyApp({ Component, pageProps }: AppProps<IAppProps>) {
   const clientEntity = useAppStore((state) => state.clients((s) => s));
   const productEntity = useAppStore((state) => state.products((s) => s));
   const [appLoading, setAppLoading] = useState<boolean>();
-  const [appViewportHeightClassName,
-    setAppViewportHeightClassName,
-  ] = useState<AppViewportHeightClassNames>(
+  const [appViewportHeightClassName, setAppViewportHeightClassName] = useState<AppViewportHeightClassNames>(
     AppViewportHeightClassNames.WITH_NAVBAR_OPTION,
   );
   const orderService = useMemo(() => new OrderService(), []);
@@ -195,5 +194,4 @@ function MyApp({ Component, pageProps }: AppProps<IAppProps>) {
     </>
   );
 }
-
 export default MyApp;
