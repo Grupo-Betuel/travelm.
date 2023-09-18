@@ -2,7 +2,6 @@ import { Category } from '@screens/Category';
 import { GetServerSideProps } from 'next';
 import axios from 'axios';
 import { CompanyEntity } from '@shared/entities/CompanyEntity';
-import { CategoryEntity } from '@shared/entities/CategoryEntity';
 import { IMetadata, MetaHeaders } from '@components/MetaHeaders/MetaHeaders';
 
 export interface ICompanyProductsProps {

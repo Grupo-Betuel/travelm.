@@ -15,13 +15,6 @@ import styles from './Home.module.scss';
 import { deepMatch } from '../../utils/matching.util';
 import { layoutId, navbarOptionsHeight } from '../../utils/layout.utils';
 
-export type CompanyTypes = 'betueltech' | 'betueldance';
-
-const comanyNames: { [N in CompanyTypes]: string } = {
-  betueltech: 'Betuel Tech',
-  betueldance: 'Betuel Dance Shop',
-};
-
 export interface HomeProps {
   hideCarousel?: boolean;
 }
