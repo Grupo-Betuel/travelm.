@@ -52,6 +52,7 @@ export interface IDetailViewProps {
   previewPost?: any;
   selectedPost?: any;
   returnHref?: string;
+  productId?: string;
 }
 
 function IconText({ icon, text }: { icon: any; text: string }) {
@@ -75,7 +76,11 @@ const data = Array.from({ length: 23 }).map((_, i) => ({
 
 const controlNamePrefix = 'quantity-';
 
-export function DetailView({ previewPost, returnHref }: IDetailViewProps) {
+export function DetailView({
+  previewPost,
+  returnHref,
+  productId,
+}: IDetailViewProps) {
   const [product, setProduct] = useState<ProductEntity>({} as ProductEntity);
   const [sale, setSale] = useState<Partial<ISale>>({} as ISale);
   const [showMoreDescription, setShowMoreDescription] = useState(false);
@@ -88,11 +93,12 @@ export function DetailView({ previewPost, returnHref }: IDetailViewProps) {
   const currentOrder = useAppStore((state) => state.currentOrder);
 
   useEffect(() => {
-    const productId = router.query.productId as string;
+    const productSlug = productId || (router.query.productId as string);
+    console.log('productSlug', productSlug);
     if (productId) {
-      get({ endpoint: EndpointsAndEntityStateKeys.BY_ID, slug: productId });
+      get({ endpoint: EndpointsAndEntityStateKeys.BY_ID, slug: productSlug });
     }
-  }, [router.query]);
+  }, [router.query, productId]);
 
   useEffect(() => {
     setProduct({ ...item } as ProductEntity);
@@ -189,12 +195,7 @@ export function DetailView({ previewPost, returnHref }: IDetailViewProps) {
   // eslint-disable-next-line
   const resetSaleProductParam = (parentId: string, variantId?: string) => () => handleSaleProductParamsChange(parentId, variantId)(0);
 
-  const handleSaleProductParamsChange = (
-    parentId: string,
-    variantId?: string,
-  ) => async (
-    value?: any,
-  ) => {
+  const handleSaleProductParamsChange = (parentId: string, variantId?: string) => async (value?: any) => {
     let newSale = structuredClone(sale);
     let total = 0;
     const quantity = Number(value || 0);

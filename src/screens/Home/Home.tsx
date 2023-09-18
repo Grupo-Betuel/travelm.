@@ -10,6 +10,7 @@ import { useRouter } from 'next/router';
 import { useContextualRouting } from 'next-use-contextual-routing';
 import { DetailView } from '@components/DetailView';
 import Head from 'next/head';
+import { CompanyEntity } from '@shared/entities/CompanyEntity';
 import styles from './Home.module.scss';
 import { deepMatch } from '../../utils/matching.util';
 import { layoutId, navbarOptionsHeight } from '../../utils/layout.utils';
@@ -41,26 +42,35 @@ export function Home({}: HomeProps) {
     'products',
     true,
   );
+  const { data: companies } = handleEntityHook<CompanyEntity>(
+    'companies',
+    true,
+  );
+  const [productId, setProductId] = useState('');
 
   const productsPerCompanies = useMemo<ProductPerCategoryType>(() => {
     const data = products.reduce<ProductPerCategoryType>((acc, product) => {
       const category = product.company;
+      const company = companies.find(
+        (item) => item.companyId === product.company,
+      ) || { name: 'Productos' };
 
       if (!acc[category]) {
         acc[category] = {
           products: [],
-          title: comanyNames[product.company as CompanyTypes],
+          title: company?.name,
         };
       }
       acc[category].products.push(product);
       return acc;
     }, {});
     return data || {};
-  }, [products]);
+  }, [products, companies]);
 
   useEffect(() => {
     const productId = router.query.productId as string;
     setShowContextProductDetailModal(!!productId);
+    setProductId(productId);
   }, [router.query]);
 
   useEffect(() => {
@@ -68,6 +78,7 @@ export function Home({}: HomeProps) {
   }, [productsData]);
 
   const goToProductDetail = (product: ProductEntity) => {
+    setProductId(product._id);
     router.push(
       makeContextualHref({ productId: product._id }),
       `/${product.company}/detail/${product._id}`,
@@ -92,15 +103,6 @@ export function Home({}: HomeProps) {
         <meta property="og:title" content="Tienda Virtual de Grupo Betuel" />
         <meta property="og:description" content="Todo tipo de acccesorios" />
         <meta property="og:type" content="website" />
-        {/* <meta property="og:image" content={currentCompany.wallpaper} /> */}
-        {/* <meta property="og:video" content={currentCompany.video} /> */}
-        {/* <meta property="og:video:secure_url" content={currentCompany.video} /> */}
-        {/* <meta */}
-        {/*  property="og:video:type" */}
-        {/*  content={ */}
-        {/*    currentCompany.video?.includes('mp4') ? 'video/mp4' : 'video/ogg' */}
-        {/*  } */}
-        {/* /> */}
         <title>Grupo Betuel Ecommerce | Tienda Virtual</title>
         <meta name="description" content="Toda clase de articulos" />
         <meta property="og:type" content="website" />
@@ -109,8 +111,8 @@ export function Home({}: HomeProps) {
         <meta property="og:video:secure_url" content="/images/video.mp4" />
         <meta property="og:video:type" content="video/mp4" />
       </Head>
-      <MainContentModal show={showContextProductDetailModal}>
-        <DetailView returnHref={returnHref} />
+      <MainContentModal show={!!productId || showContextProductDetailModal}>
+        <DetailView returnHref={returnHref} productId={productId} />
       </MainContentModal>
       {/* <div className={styles.LandingCarouselWrapper}> */}
       {/*  {!hideCarousel && <LandingCarousel />} */}
