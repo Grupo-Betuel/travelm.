@@ -4,15 +4,12 @@ import { SearchOutlined } from '@ant-design/icons';
 import { handleEntityHook } from '@shared/hooks/handleEntityHook';
 import { ProductEntity } from '@shared/entities/ProductEntity';
 import React, {
-  useEffect, useState, ChangeEvent, useMemo,
+  useEffect, useState, ChangeEvent,
 } from 'react';
 import { useRouter } from 'next/router';
 import { EndpointsAndEntityStateKeys } from '@shared/enums/endpoints.enum';
 import { useContextualRouting } from 'next-use-contextual-routing';
 import { DetailView } from '@components/DetailView';
-import Head from 'next/head';
-import { CompanyEntity } from '@shared/entities/CompanyEntity';
-import { CategoryEntity } from '@shared/entities/CategoryEntity';
 import styles from './Category.module.scss';
 import { deepMatch } from '../../utils/matching.util';
 import { layoutId, navbarOptionsHeight } from '../../utils/layout.utils';
@@ -35,15 +32,6 @@ export function Category({}: CategoryProps) {
     get: getProducts,
     [EndpointsAndEntityStateKeys.BY_CATEGORY]: categoryProductsData,
   } = handleEntityHook<ProductEntity>('products');
-  const { data: companies } = handleEntityHook<CompanyEntity>(
-    'companies',
-    true,
-  );
-
-  const { data: categories } = handleEntityHook<CategoryEntity>(
-    'categories',
-    true,
-  );
 
   useEffect(() => {
     const category = router.query.category as string;
@@ -61,25 +49,6 @@ export function Category({}: CategoryProps) {
   useEffect(() => {
     setCategoryProducts(categoryProductsData?.data || []);
   }, [categoryProductsData?.data]);
-
-  const currentCompany: CompanyEntity = useMemo(() => {
-    console.log('location', router.query);
-    const companyName = router.query.company as string;
-    console.log('companyName', companyName);
-    return (
-      companies.find((company) => company.companyId === companyName)
-      || ({} as CompanyEntity)
-    );
-  }, [companies]);
-
-  const currentCategory: CategoryEntity = useMemo(() => {
-    const cat = router.query.category as string;
-    console.log('cater', cat);
-    return (
-      categories.find((category) => category._id === cat)
-      || ({} as CategoryEntity)
-    );
-  }, [categories]);
 
   const goToProductDetail = (product: ProductEntity) => {
     router.push(
@@ -101,27 +70,6 @@ export function Category({}: CategoryProps) {
 
   return (
     <>
-      <Head>
-        <meta
-          property="og:title"
-          content={`${currentCategory.title} ${currentCompany.title}`}
-        />
-        <meta property="og:description" content={currentCompany.description} />
-        <meta property="og:type" content="website" />
-        <meta property="og:image" content={currentCompany.wallpaper} />
-        <meta property="og:video" content={currentCompany.video} />
-        <meta property="og:video:secure_url" content={currentCompany.video} />
-        <meta
-          property="og:video:type"
-          content={
-            currentCompany.video?.includes('mp4') ? 'video/mp4' : 'video/ogg'
-          }
-        />
-        <title>
-          {currentCategory.title}
-        </title>
-        <meta name="description" content={currentCompany.description} />
-      </Head>
       <div className={styles.CategoryWrapper}>
         <MainContentModal show={showContextProductDetailModal}>
           <DetailView returnHref={returnHref} />
