@@ -4,7 +4,6 @@ import axios from 'axios/index';
 import { CompanyEntity } from '@shared/entities/CompanyEntity';
 import { CategoryEntity } from '@shared/entities/CategoryEntity';
 import Head from 'next/head';
-import React from 'react';
 
 export default function CompanyProducts({ metadata }: any) {
   return (
