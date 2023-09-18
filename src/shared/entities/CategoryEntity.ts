@@ -4,4 +4,6 @@ export class CategoryEntity extends BaseEntity {
   title: string = '';
 
   company: string = '';
+
+  description: string = '';
 }

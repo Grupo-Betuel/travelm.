@@ -6,12 +6,13 @@ import Head from 'next/head';
 import React from 'react';
 
 export default function CompanyProducts({ metadata }: any) {
+  console.log('metadata', metadata);
   return (
     <>
       <Head>
         <meta property="og:title" content={metadata.ogTitle} />
         <meta property="og:description" content={metadata.description} />
-        <meta property="og:image" content={metadata.wallpaper} />
+        <meta property="og:image" content={metadata.image} />
         <meta property="og:video" content={metadata.video.url} />
         <meta
           property="og:video:secure_url"
@@ -31,13 +32,13 @@ export default function CompanyProducts({ metadata }: any) {
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const companies = (
     await axios.get<CompanyEntity[]>(
-      'https://grupo-betuel-api.click/api/companies',
+      `${process.env.NEXT_PUBLIC_API_URL}api/companies`,
     )
   ).data;
-  const companyIde = context.params?.company as string;
-  const currentCompany = companies.find(
-    (company) => company.companyId === companyIde,
-  );
+
+  const companyName = context.params?.company as string;
+  const currentCompany = companies.find((company) => company.companyId === companyName)
+    || ({} as CompanyEntity);
 
   return {
     props: {
@@ -59,7 +60,3 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     },
   } as any;
 };
-// export const getServerProps: GetServerSideProps = async (context) => {
-//   console.log('app context', context.params);
-//   return {} as any;
-// };
