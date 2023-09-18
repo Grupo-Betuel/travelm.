@@ -93,9 +93,8 @@ export function DetailView({
   const currentOrder = useAppStore((state) => state.currentOrder);
 
   useEffect(() => {
-    const productSlug = productId || (router.query.productId as string);
-    console.log('productSlug', productSlug);
-    if (productId) {
+    const productSlug = (router.query.productId as string);
+    if (productSlug) {
       get({ endpoint: EndpointsAndEntityStateKeys.BY_ID, slug: productSlug });
     }
   }, [router.query, productId]);

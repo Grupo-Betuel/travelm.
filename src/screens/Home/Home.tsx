@@ -39,7 +39,7 @@ export function Home({}: HomeProps) {
     'companies',
     true,
   );
-  const [productId, setProductId] = useState('');
+  // const [productId, setProductId] = useState('');
 
   const productsPerCompanies = useMemo<ProductPerCategoryType>(() => {
     const data = products.reduce<ProductPerCategoryType>((acc, product) => {
@@ -63,7 +63,7 @@ export function Home({}: HomeProps) {
   useEffect(() => {
     const productId = router.query.productId as string;
     setShowContextProductDetailModal(!!productId);
-    setProductId(productId);
+    // setProductId(productId);
   }, [router.query]);
 
   useEffect(() => {
@@ -71,7 +71,7 @@ export function Home({}: HomeProps) {
   }, [productsData]);
 
   const goToProductDetail = (product: ProductEntity) => {
-    setProductId(product._id);
+    // setProductId(product._id);
     router.push(
       makeContextualHref({ productId: product._id }),
       `/${product.company}/detail/${product._id}`,
@@ -104,8 +104,8 @@ export function Home({}: HomeProps) {
         <meta property="og:video:secure_url" content="/images/video.mp4" />
         <meta property="og:video:type" content="video/mp4" />
       </Head>
-      <MainContentModal show={!!productId || showContextProductDetailModal}>
-        <DetailView returnHref={returnHref} productId={productId} />
+      <MainContentModal show={showContextProductDetailModal}>
+        <DetailView returnHref={returnHref} />
       </MainContentModal>
       {/* <div className={styles.LandingCarouselWrapper}> */}
       {/*  {!hideCarousel && <LandingCarousel />} */}
