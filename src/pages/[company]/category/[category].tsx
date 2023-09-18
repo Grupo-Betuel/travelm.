@@ -1,6 +1,6 @@
 import { Category } from '@screens/Category';
 import { GetServerSideProps } from 'next';
-import axios from 'axios/index';
+import axios from 'axios';
 import { CompanyEntity } from '@shared/entities/CompanyEntity';
 import { CategoryEntity } from '@shared/entities/CategoryEntity';
 import Head from 'next/head';
@@ -42,12 +42,13 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
   const companyName = context.params?.company as string;
   const categoryId = context.params?.category as string;
-  const currentCompany = companies.find((company) => company.companyId === companyName)
+  const currentCompany = companies.find(
+    (company) => company.companyId === companyName,
+  )
     || ({} as CompanyEntity);
-  const currentCategory = categories
-    .find(
-      (cat) => cat._id === categoryId,
-    ) || ({} as CategoryEntity);
+  const currentCategory = categories.find(
+    (cat) => cat._id === categoryId,
+  ) || ({} as CategoryEntity);
 
   return {
     props: {
