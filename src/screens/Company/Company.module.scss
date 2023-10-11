@@ -21,6 +21,10 @@
       padding: sizes.$size-xxx-large;
     }
 
+    .SidebarAffix {
+      display: none !important;
+    }
+
     .CompanyContentProducts {
       .CompanyContentProductsScrollViewCategories {
         margin: $size-xxx-large * 3 0;

@@ -17,7 +17,6 @@ export default function CompanyProducts({ metadata }: any) {
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const companyName = context.params?.company as string;
-
   const currentCompany = (
     await axios.get<CompanyEntity>(
       `${process.env.NEXT_PUBLIC_API_URL}api/companies/by-ref-id/${companyName}`,
@@ -28,7 +27,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     props: {
       metadata: {
         title: `${currentCompany?.name} | ${currentCompany?.title}`,
-        ogTitle: currentCompany?.title,
+        ogTitle: currentCompany?.title || '',
         description: currentCompany?.description || '',
         image: currentCompany?.wallpaper || currentCompany?.logo || '',
         type: 'website',

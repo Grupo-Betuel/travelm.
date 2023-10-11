@@ -4,13 +4,16 @@ import { SearchOutlined } from '@ant-design/icons';
 import { handleEntityHook } from '@shared/hooks/handleEntityHook';
 import { ProductEntity } from '@shared/entities/ProductEntity';
 import {
-  useEffect, useState, useMemo, ChangeEvent,
+  ChangeEvent, useContext, useEffect, useMemo, useState,
 } from 'react';
 import { useRouter } from 'next/router';
 import { useContextualRouting } from 'next-use-contextual-routing';
 import { DetailView } from '@components/DetailView';
 import Head from 'next/head';
 import { CompanyEntity } from '@shared/entities/CompanyEntity';
+import { useInfiniteScroll } from '@shared/hooks/useInfiniteScrollHook';
+import { EndpointsAndEntityStateKeys } from '@shared/enums/endpoints.enum';
+import { AppLoadingContext } from '@shared/contexts/AppLoadingContext';
 import styles from './Home.module.scss';
 import { deepMatch } from '../../utils/matching.util';
 import { layoutId, navbarOptionsHeight } from '../../utils/layout.utils';
@@ -31,44 +34,64 @@ export function Home({}: HomeProps) {
   const { makeContextualHref, returnHref } = useContextualRouting();
   const [products, setProducts] = useState<ProductEntity[]>([]);
   const [showContextProductDetailModal, setShowContextProductDetailModal] = useState<boolean>();
-  const { data: productsData } = handleEntityHook<ProductEntity>(
-    'products',
-    true,
-  );
-  const { data: companies } = handleEntityHook<CompanyEntity>(
-    'companies',
-    true,
-  );
-  // const [productId, setProductId] = useState('');
+  const { setAppLoading, appLoading } = useContext(AppLoadingContext);
 
-  const productsPerCompanies = useMemo<ProductPerCategoryType>(() => {
-    const data = products.reduce<ProductPerCategoryType>((acc, product) => {
-      const category = product.company;
-      const company = companies.find(
-        (item) => item.companyId === product.company,
-      ) || { name: 'Productos' };
+  const {
+    get: getCompanies,
+    loading: loadingCompany,
+    fetching: fetchingCompany,
+    [EndpointsAndEntityStateKeys.PRODUCT_SAMPLES]: productsPerCompanies,
+  } = handleEntityHook<CompanyEntity>('companies');
 
-      if (!acc[category]) {
-        acc[category] = {
-          products: [],
-          title: company?.name,
-        };
-      }
-      acc[category].products.push(product);
-      return acc;
-    }, {});
-    return data || {};
-  }, [products, companies]);
+  useEffect(() => {
+    getCompanies({
+      endpoint: EndpointsAndEntityStateKeys.PRODUCT_SAMPLES,
+    });
+  }, []);
+
+  const {
+    infinityScrollData,
+    loadMoreCallback,
+    isLastPage,
+    fetching: fetchingProducts,
+    loading: loadingProducts,
+  } = useInfiniteScroll<ProductEntity>('products', false);
+
+  const companyIds = useMemo(() => (!productsPerCompanies?.data?.length
+    ? Object.keys((productsPerCompanies?.data as any) || {})
+      .sort(() => Math.random() - 0.5) : []), [productsPerCompanies?.data]);
+
+  useEffect(() => {
+    let maxQuantity = infinityScrollData?.data?.length;
+    if (infinityScrollData?.pagination) {
+      const pagination = infinityScrollData.pagination;
+      maxQuantity = pagination.page * pagination.perPage;
+    }
+
+    setProducts((infinityScrollData?.data || []).slice(0, maxQuantity));
+  }, [infinityScrollData?.data]);
+
+  useEffect(() => {
+    let loading = fetchingProducts || loadingCompany;
+    if (!products.length && fetchingProducts) {
+      loading = loading || fetchingProducts;
+    }
+    if (!productsPerCompanies?.data && fetchingCompany) {
+      loading = loading || fetchingCompany;
+    }
+
+    if (!companyIds?.length) {
+      loading = true;
+    }
+
+    setAppLoading(!!loading);
+  }, [loadingProducts, fetchingProducts, fetchingCompany, loadingCompany, companyIds]);
 
   useEffect(() => {
     const productId = router.query.productId as string;
     setShowContextProductDetailModal(!!productId);
     // setProductId(productId);
   }, [router.query]);
-
-  useEffect(() => {
-    setProducts(productsData || []);
-  }, [productsData]);
 
   const goToProductDetail = (product: ProductEntity) => {
     // setProductId(product._id);
@@ -86,9 +109,15 @@ export function Home({}: HomeProps) {
   };
 
   const onSearch = ({ target: { value } }: ChangeEvent<HTMLInputElement>) => {
-    const results = deepMatch<ProductEntity>(value, productsData || []);
+    const results = deepMatch<ProductEntity>(
+      value,
+      infinityScrollData?.data || [],
+    );
     setProducts([...results]);
   };
+
+  console.log(companyIds, 'ides', productsPerCompanies?.data);
+  // const returnCallback = () =>
 
   return (
     <div className={styles.HomeWrapper}>
@@ -130,15 +159,17 @@ export function Home({}: HomeProps) {
                 size="large"
               />
             </div>
-            {!products?.length && (
+            {!companyIds.length && !products?.length && (
               <h2 className="p-xx-l">No hay resultados!</h2>
             )}
           </div>
         </Affix>
-        {products.length > 0 && (
+        {companyIds.length > 0 && (
           <div className={styles.HomeContentProducts}>
-            {Object.keys(productsPerCompanies).map((categoryId) => {
-              const category = productsPerCompanies[categoryId];
+            {companyIds.map((companyId: any, index: number) => {
+              const companyProds = (productsPerCompanies as any)?.data[
+                companyId
+              ];
               return (
                 <ScrollView
                   wrapperClassName={
@@ -146,15 +177,15 @@ export function Home({}: HomeProps) {
                   }
                   handleSeeMore={handleSeeMore}
                   handleProductClick={goToProductDetail}
-                  products={category.products}
-                  title={category.title}
-                  key={`company-${categoryId}`}
+                  products={companyProds.products}
+                  title={companyProds.title}
+                  key={`company-${index}`}
                 />
               );
             })}
             <h2 className="mb-xx-l title">Todos los Productos</h2>
             <div className={styles.HomeCardsGrid}>
-              {products.map((item, i) => (
+              {products?.map((item, i) => (
                 <ProductCard
                   key={`product-${i}`}
                   onClick={goToProductDetail}
@@ -162,6 +193,15 @@ export function Home({}: HomeProps) {
                 />
               ))}
             </div>
+            {!appLoading && (
+              <div className="flex-center-center p-l">
+                {isLastPage ? (
+                  <h2>No hay mas productos</h2>
+                ) : (
+                  <h2 ref={loadMoreCallback}>Cargando Productos...</h2>
+                )}
+              </div>
+            )}
           </div>
         )}
       </div>

@@ -19,7 +19,9 @@
     @include breakpoints.only-on(('m', 'xs')) {
       padding: sizes.$size-xxx-large;
     }
-
+    .SidebarAffix {
+      display: none !important;
+    }
     .HomeContentProducts {
       .HomeContentProductsScrollViewCategories {
         margin: $size-xxx-large * 3 0;

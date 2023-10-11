@@ -52,7 +52,7 @@ export function ScrollView({
           onClick={preview(true)}
         />
         <div className={styles.ScrollView} ref={scrollViewRef}>
-          {products.map((product, i) => (
+          {products?.map((product, i) => (
             <div className={styles.ScrollViewItem} key={`scrollview-item-${i}`}>
               <ProductCard onClick={handleProductClick} product={product} />
             </div>
