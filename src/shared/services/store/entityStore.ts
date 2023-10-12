@@ -69,17 +69,14 @@ export function stateHandlerSuccess<T extends BaseEntity>(
   if (content.length === 1) item = content[0];
 
   if (!(data as any).content && !Array.isArray(content)) {
-    console.log('item', properties?.endpoint);
     item = !(content as T[]).length ? (data as T) : content[0];
   } else {
-    console.log('data', properties?.endpoint);
     const stateDataKey = properties?.storeDataInStateKey || properties?.endpoint;
     endpointData = stateDataKey
       ? { [stateDataKey]: data }
       : ({ content: data } as EntityDataType<T>);
   }
 
-  console.log('endpointData', endpointData);
 
   switch (key) {
     case 'add':

@@ -5,7 +5,6 @@ function Index() {
 }
 
 export async function getStaticProps(context: any) {
-  console.log('app context', context);
 
   return {
     props: {

@@ -54,7 +54,6 @@ export class BaseService<T> implements AbstractBaseService<T> {
     cacheLifeTime: number = 60 * 1000 * 5,
   ): Promise<T[] | IPaginatedResponse<T> | undefined> {
     try {
-      console.log('get properties', properties, enableCache);
       if (enableCache) {
         const cached = this.getCachedData('get', properties);
         if (cached && (cached as any)?.length) {
@@ -70,7 +69,6 @@ export class BaseService<T> implements AbstractBaseService<T> {
           params: { ...properties.queryParams },
         },
       );
-      console.log('get properties', properties, enableCache, data);
 
       if (enableCache && (!!(data as any)?.length || (data as any)?.content?.length)) {
         const cachedData: T[] = this.cacheData(

@@ -9,7 +9,7 @@ $bannerHeight: 40px;
 .DetailViewWrapper {
   display: flex;
   width: 100vw;
-  height: calc(100vh - layout.$navbarOptionsHeight);
+  height: calc(100dvh - layout.$navbarOptionsHeight);
   align-items: stretch;
   overflow: auto;
   gap: 0;
@@ -121,9 +121,9 @@ $bannerHeight: 40px;
     z-index: 9;
     background: white;
 
-    //@include breakpoints.only-on(('m', 'l')) {
-    //  min-width: layout.$sidebarWidth;
-    //}
+    @include breakpoints.only-on(('m', 'xs', 's')) {
+      width: 100% !important;
+    }
 
     .DetailViewPostDetailsHeader {
       position: sticky;
@@ -151,6 +151,7 @@ $bannerHeight: 40px;
             align-items: center;
             justify-content: center;
             gap: size.$size-small;
+            //font-size: 1.1rem;
             //width: auto !important;
 
             .DetailViewPostDetailsContentOptionBtnColorOption {
@@ -160,6 +161,9 @@ $bannerHeight: 40px;
               width: size.$size-large;
               height: size.$size-large;
             }
+          }
+          .DetailViewPostDetailsContentOptionBtnInput input {
+            font-size: 1.1rem;
           }
 
           .DetailViewPostDetailsContentOptionQuantity {
@@ -179,6 +183,15 @@ $bannerHeight: 40px;
               flex-direction: column;
               align-items: center;
               gap: size.$size-xx-small;
+
+              &Tag {
+                padding:5px;
+              }
+
+              &Tag, &Input input {
+                font-size: 1.1rem;
+              }
+
             }
           }
 

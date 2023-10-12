@@ -33,7 +33,6 @@ export function Register({ isModal, onSubmit }: IAuthProps) {
     const res = await clientEntity.add(data, {
       endpoint: EndpointsAndEntityStateKeys.REGISTER,
     });
-    console.log('response', res, clientEntity.error);
     if (res) {
       await handleLogin(loginData);
     }
@@ -48,7 +47,6 @@ export function Register({ isModal, onSubmit }: IAuthProps) {
       ...userData,
     };
 
-    console.log('login', data);
 
     const response = await clientEntity.add(data, {
       endpoint: EndpointsAndEntityStateKeys.LOGIN,
@@ -81,7 +79,6 @@ export function Register({ isModal, onSubmit }: IAuthProps) {
   }, [clientLoginData, clientEntity?.error]);
 
   useEffect(() => {
-    console.log('clientEntity', clientEntity.item);
     if (onSubmit && clientEntity.item._id) onSubmit(clientEntity.item);
   }, [clientEntity.item]);
 

@@ -70,7 +70,6 @@ export function useInfiniteScroll<T>(
           || (entity.infinityScrollData.pagination
             && page <= entity.infinityScrollData.pagination.totalPages)
         ) {
-          console.log('results =>', target, target.isIntersecting, entries);
 
           entity.get({
             ...fetchProperties,

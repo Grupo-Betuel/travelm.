@@ -11,6 +11,7 @@ import { EndpointsAndEntityStateKeys } from '@shared/enums/endpoints.enum';
 import { useContextualRouting } from 'next-use-contextual-routing';
 import { DetailView } from '@components/DetailView';
 import { CompanyEntity } from '@shared/entities/CompanyEntity';
+import { showProductDetailsHook } from '@shared/hooks/showProductDetailsHook';
 import styles from './Company.module.scss';
 import { deepMatch } from '../../utils/matching.util';
 import { layoutId, navbarOptionsHeight } from '../../utils/layout.utils';
@@ -28,10 +29,8 @@ export type ProductPerCategoryType = {
 
 export function Company({}: CompanyProps) {
   const router = useRouter();
-  const { makeContextualHref, returnHref } = useContextualRouting();
   const [companyName, setCompanyName] = useState<string>();
   const [companyProducts, setCompanyProducts] = useState<ProductEntity[]>([]);
-  const [showContextProductDetailModal, setShowContextProductDetailModal] = useState<boolean>();
   const {
     loading,
     get: getProducts,
@@ -41,6 +40,7 @@ export function Company({}: CompanyProps) {
     'companies',
     true,
   );
+  const { goToProductDetail, ProductDetail } = showProductDetailsHook();
 
   const currentCompany: CompanyEntity = useMemo(
     () => companies.find((company) => company.companyId === companyName)
@@ -70,7 +70,6 @@ export function Company({}: CompanyProps) {
 
   useEffect(() => {
     const company = router.query.company as string;
-    const productId = router.query.productId as string;
 
     if (company && company !== companyName) {
       getProducts({
@@ -79,23 +78,12 @@ export function Company({}: CompanyProps) {
       });
       setCompanyName(company);
     }
-
-    setShowContextProductDetailModal(!!productId);
   }, [router.query]);
 
   useEffect(() => {
     setCompanyProducts(companyProductsData?.data || []);
   }, [companyProductsData?.data]);
 
-  const goToProductDetail = (product: ProductEntity) => {
-    router.push(
-      makeContextualHref({ productId: product._id }),
-      `/${product.company}/detail/${product._id}`,
-      {
-        shallow: true,
-      },
-    );
-  };
   const handleSeeMore = (product: ProductEntity) => {
     router.push(`/${product.company}/category/${product.category._id}`);
   };
@@ -109,7 +97,6 @@ export function Company({}: CompanyProps) {
   };
 
   useEffect(() => {
-    console.log('logo', currentCompany?.logo);
     if (currentCompany?.logo) {
       const fav = document.querySelector('link[rel="icon"]');
       fav?.setAttribute('href', currentCompany?.logo || '');
@@ -124,12 +111,11 @@ export function Company({}: CompanyProps) {
         </div>
       )}
       <div className={styles.CompanyWrapper}>
-        <MainContentModal show={showContextProductDetailModal}>
-          <DetailView returnHref={returnHref} />
-        </MainContentModal>
         {/* <div className={styles.LandingCarouselWrapper}> */}
         {/*  {!hideCarousel && <LandingCarousel />} */}
         {/* </div> */}
+        {ProductDetail}
+
         <div className={styles.CompanyContent}>
           <Affix
             className={styles.SidebarAffix}

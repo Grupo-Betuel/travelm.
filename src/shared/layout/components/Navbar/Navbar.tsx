@@ -29,7 +29,7 @@ import Sider from 'antd/lib/layout/Sider';
 import { appLogOut } from '../../../../utils/auth.utils';
 import styles from './Navbar.module.scss';
 
-const navbarOptionsLimit = 4;
+const navbarOptionsLimit = 3;
 
 export function Navbar() {
   const [companyName, setCompanyName] = useState('');
@@ -182,7 +182,7 @@ export function Navbar() {
                   trigger={['click']}
                 >
                   <Space>
-                    Click me
+                    Más
                     <DownOutlined rev="" />
                   </Space>
                 </Dropdown>

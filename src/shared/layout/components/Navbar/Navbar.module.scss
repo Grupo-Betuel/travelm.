@@ -10,7 +10,7 @@
   width: 100%;
   height: layout.$navbarOptionsHeight !important;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(12.5rem, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
   align-items: center;
   justify-items: stretch;
   background: white !important;
@@ -34,6 +34,7 @@
         }
       }
       &.navbarOptionsListCenter {
+        grid-column: span 2;
         @include breakpoints.only-on(('m', 'xs')) {
           display: none !important;
         }

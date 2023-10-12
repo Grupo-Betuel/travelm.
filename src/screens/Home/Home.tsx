@@ -7,13 +7,12 @@ import {
   ChangeEvent, useContext, useEffect, useMemo, useState,
 } from 'react';
 import { useRouter } from 'next/router';
-import { useContextualRouting } from 'next-use-contextual-routing';
-import { DetailView } from '@components/DetailView';
 import Head from 'next/head';
 import { CompanyEntity } from '@shared/entities/CompanyEntity';
 import { useInfiniteScroll } from '@shared/hooks/useInfiniteScrollHook';
 import { EndpointsAndEntityStateKeys } from '@shared/enums/endpoints.enum';
 import { AppLoadingContext } from '@shared/contexts/AppLoadingContext';
+import { showProductDetailsHook } from '@shared/hooks/showProductDetailsHook';
 import styles from './Home.module.scss';
 import { deepMatch } from '../../utils/matching.util';
 import { layoutId, navbarOptionsHeight } from '../../utils/layout.utils';
@@ -31,11 +30,8 @@ export type ProductPerCategoryType = {
 
 export function Home({}: HomeProps) {
   const router = useRouter();
-  const { makeContextualHref, returnHref } = useContextualRouting();
   const [products, setProducts] = useState<ProductEntity[]>([]);
-  const [showContextProductDetailModal, setShowContextProductDetailModal] = useState<boolean>();
   const { setAppLoading, appLoading } = useContext(AppLoadingContext);
-
   const {
     get: getCompanies,
     loading: loadingCompany,
@@ -56,10 +52,16 @@ export function Home({}: HomeProps) {
     fetching: fetchingProducts,
     loading: loadingProducts,
   } = useInfiniteScroll<ProductEntity>('products', false);
+  const { goToProductDetail, ProductDetail } = showProductDetailsHook();
 
-  const companyIds = useMemo(() => (!productsPerCompanies?.data?.length
-    ? Object.keys((productsPerCompanies?.data as any) || {})
-      .sort(() => Math.random() - 0.5) : []), [productsPerCompanies?.data]);
+  const companyIds = useMemo(
+    () => (!productsPerCompanies?.data?.length
+      ? Object.keys((productsPerCompanies?.data as any) || {}).sort(
+        () => Math.random() - 0.5,
+      )
+      : []),
+    [productsPerCompanies?.data],
+  );
 
   useEffect(() => {
     let maxQuantity = infinityScrollData?.data?.length;
@@ -85,24 +87,13 @@ export function Home({}: HomeProps) {
     }
 
     setAppLoading(!!loading);
-  }, [loadingProducts, fetchingProducts, fetchingCompany, loadingCompany, companyIds]);
-
-  useEffect(() => {
-    const productId = router.query.productId as string;
-    setShowContextProductDetailModal(!!productId);
-    // setProductId(productId);
-  }, [router.query]);
-
-  const goToProductDetail = (product: ProductEntity) => {
-    // setProductId(product._id);
-    router.push(
-      makeContextualHref({ productId: product._id }),
-      `/${product.company}/detail/${product._id}`,
-      {
-        shallow: true,
-      },
-    );
-  };
+  }, [
+    loadingProducts,
+    fetchingProducts,
+    fetchingCompany,
+    loadingCompany,
+    companyIds,
+  ]);
 
   const handleSeeMore = (product: ProductEntity) => {
     router.push(`/${product.company}`);
@@ -115,9 +106,6 @@ export function Home({}: HomeProps) {
     );
     setProducts([...results]);
   };
-
-  console.log(companyIds, 'ides', productsPerCompanies?.data);
-  // const returnCallback = () =>
 
   return (
     <div className={styles.HomeWrapper}>
@@ -133,12 +121,7 @@ export function Home({}: HomeProps) {
         <meta property="og:video:secure_url" content="/images/video.mp4" />
         <meta property="og:video:type" content="video/mp4" />
       </Head>
-      <MainContentModal show={showContextProductDetailModal}>
-        <DetailView returnHref={returnHref} />
-      </MainContentModal>
-      {/* <div className={styles.LandingCarouselWrapper}> */}
-      {/*  {!hideCarousel && <LandingCarousel />} */}
-      {/* </div> */}
+      {ProductDetail}
       <div className={styles.HomeContent}>
         <Affix
           className={styles.SidebarAffix}

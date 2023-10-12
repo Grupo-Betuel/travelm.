@@ -26,6 +26,7 @@ import React, {
   createElement,
   useCallback,
   useEffect,
+  useMemo,
   useRef,
   useState,
 } from 'react';
@@ -49,7 +50,7 @@ import styles from './DetailView.module.scss';
 import { getSaleDataFromProduct } from '../../../utils/objects.utils';
 
 export interface IDetailViewProps {
-  previewPost?: any;
+  productDetails?: any;
   selectedPost?: any;
   returnHref?: string;
   productId?: string;
@@ -75,9 +76,9 @@ const data = Array.from({ length: 23 }).map((_, i) => ({
 }));
 
 const controlNamePrefix = 'quantity-';
-
+const maxDescriptionLength = 70;
 export function DetailView({
-  previewPost,
+  productDetails,
   returnHref,
   productId,
 }: IDetailViewProps) {
@@ -86,26 +87,29 @@ export function DetailView({
   const [showMoreDescription, setShowMoreDescription] = useState(false);
   const router = useRouter();
   const carouselRef = useRef<any>();
-  const { loading, get, item } = handleEntityHook<ProductEntity>('products');
+  const { fetching, get, item } = handleEntityHook<ProductEntity>('products');
   const { makeContextualHref } = useContextualRouting();
   const [productOptionsForm] = Form.useForm();
   const { orderService } = useOrderContext();
   const currentOrder = useAppStore((state) => state.currentOrder);
 
   useEffect(() => {
-    const productSlug = (router.query.productId as string);
-    if (productSlug) {
+    const productSlug = router.query.productId as string;
+    if (productSlug && !productDetails) {
       get({ endpoint: EndpointsAndEntityStateKeys.BY_ID, slug: productSlug });
     }
-  }, [router.query, productId]);
+  }, [router.query, productId, productDetails]);
 
   useEffect(() => {
-    setProduct({ ...item } as ProductEntity);
-  }, [item]);
+    let productInfo = { ...item };
+    if (productDetails) {
+      productInfo = productDetails;
+    }
+    productInfo._id && setProduct(productInfo as ProductEntity);
+  }, [item, productDetails]);
 
   useEffect(() => {
     if (product._id && currentOrder) {
-      // const savedSale = orderService.getSaleByProductId(product._id) || {}
       const savedSale = currentOrder.sales.find(
         (s) => s.product._id === product._id,
       );
@@ -115,6 +119,11 @@ export function DetailView({
       });
     }
   }, [product]);
+
+  const productExistOnShoppingCart = useMemo(
+    () => !!orderService?.getSaleByProductId(product._id),
+    [orderService?.localOrder],
+  );
 
   const back = () => {
     if (returnHref) {
@@ -182,7 +191,7 @@ export function DetailView({
       quantity,
     };
     if (quantity <= product.stock) {
-      if (quantity > 0) {
+      if (quantity > 0 && productExistOnShoppingCart) {
         orderService?.handleLocalOrderSales(newSale);
       } else {
         orderService?.removeSale(product._id);
@@ -194,10 +203,7 @@ export function DetailView({
   // eslint-disable-next-line
   const resetSaleProductParam = (parentId: string, variantId?: string) => () => handleSaleProductParamsChange(parentId, variantId)(0);
 
-  const handleSaleProductParamsChange = (
-    parentId: string,
-    variantId?: string,
-  ) => async (value?: any) => {
+  const handleSaleProductParamsChange = (parentId: string, variantId?: string) => async (value?: any) => {
     let newSale = structuredClone(sale);
     let total = 0;
     const quantity = Number(value || 0);
@@ -270,7 +276,10 @@ export function DetailView({
           );
         }
 
-        orderService?.handleLocalOrderSales(newSale);
+        // if the order exist just
+        if (productExistOnShoppingCart) {
+          orderService?.handleLocalOrderSales(newSale);
+        }
       }
     }
   };
@@ -308,23 +317,48 @@ export function DetailView({
 
   const { toggleCart } = useOrderContext();
 
+  const addSaleNewSale = () => orderService?.handleLocalOrderSales(sale);
+  const handleShoppingAction = () => {
+    if (!productExistOnShoppingCart) {
+      addSaleNewSale();
+    }
+    toggleCart();
+  };
+
+  const shoppingActionText = useMemo(
+    () => (productExistOnShoppingCart ? 'Procesar Orden' : 'Agregar al carrito'),
+    [productExistOnShoppingCart],
+  );
+  const shoppingActionDisabled = useMemo(() => {
+    return (
+      (!sale?.quantity && !productExistOnShoppingCart)
+      || sale?.quantity > product.stock
+    );
+  }, [productExistOnShoppingCart, sale, product]);
+  const ShoppingActionButton = (
+    <Button
+      type="primary"
+      shape="round"
+      block
+      size="large"
+      icon={<ShoppingCartOutlined rev="" />}
+      className="me-m"
+      onClick={handleShoppingAction}
+      disabled={shoppingActionDisabled}
+    >
+      {shoppingActionText}
+    </Button>
+  );
   return (
     <>
-      {loading && (
-        <div className="loading">
-          <Spin size="large" />
-        </div>
-      )}
       <div className={`grid-container ${styles.DetailViewWrapper}`}>
         <div className={styles.ProductDetailBanner}>
           <h1>Offerta!</h1>
         </div>
         <div className={`grid-column-1 ${styles.GalleryWrapper}`}>
-          {!previewPost && (
-            <div className={styles.DetailViewBackButton} onClick={back}>
-              <ArrowLeftOutlined rev="" />
-            </div>
-          )}
+          <div className={styles.DetailViewBackButton} onClick={back}>
+            <ArrowLeftOutlined rev="" />
+          </div>
           {hasMultipleImages && (
             <>
               <div className={styles.DetailViewPrevButton}>
@@ -400,7 +434,7 @@ export function DetailView({
                       <Button
                         className={styles.DetailViewPostDetailsContentOptionBtn}
                         shape="round"
-                        size="middle"
+                        size="large"
                         onClick={handleSaleProductParams(param)}
                       >
                         {param.label}
@@ -428,13 +462,20 @@ export function DetailView({
                               }
                               key={`detailViewOptionVariant${i}`}
                             >
-                              <Tag>
+                              <Tag
+                                className={
+                                  styles.DetailViewPostDetailsContentOptionVariantsItemTag
+                                }
+                              >
                                 {variant.label}
                                 {' '}
                                 -
                                 {variant.value}
                               </Tag>
                               <Form.Item
+                                className={
+                                  styles.DetailViewPostDetailsContentOptionVariantsItemInput
+                                }
                                 name={`${controlNamePrefix}${variant._id}`}
                                 rules={[
                                   {
@@ -475,6 +516,9 @@ export function DetailView({
                         </div>
                       ) : (
                         <Form.Item
+                          className={
+                            styles.DetailViewPostDetailsContentOptionBtnInput
+                          }
                           name={`${controlNamePrefix}${param._id}`}
                           rules={[
                             {
@@ -510,6 +554,7 @@ export function DetailView({
                 })
               ) : (
                 <Form.Item
+                  className={styles.DetailViewPostDetailsContentOptionBtnInput}
                   name="quantity"
                   rules={[
                     {
@@ -548,12 +593,17 @@ export function DetailView({
               >
                 {product.description}
               </div>
-              <a
-                className={styles.DetailViewPostDetailsContentDescriptionToggle}
-                onClick={() => setShowMoreDescription(!showMoreDescription)}
-              >
-                {!showMoreDescription ? 'Mostrar mas' : 'Mostrar menos'}
-              </a>
+              { product?.description?.length > maxDescriptionLength
+                && (
+                <a
+                  className={
+                    styles.DetailViewPostDetailsContentDescriptionToggle
+                  }
+                  onClick={() => setShowMoreDescription(!showMoreDescription)}
+                >
+                  {!showMoreDescription ? 'Mostrar mas' : 'Mostrar menos'}
+                </a>
+                )}
             </div>
 
             <div
@@ -612,35 +662,20 @@ export function DetailView({
             </div>
           </div>
           <StickyFooter className={styles.DetailViewPostDetailsActions}>
-            <Button
-              type="primary"
-              shape="round"
-              block
-              size="large"
-              icon={<ShoppingCartOutlined rev="" />}
-              className="me-m"
-              onClick={toggleCart}
-            >
-              Ver Carrito
-            </Button>
+            {ShoppingActionButton}
           </StickyFooter>
         </Resizable>
         <StickyFooter
           className={`${styles.DetailViewPostDetailsActions} ${styles.MobileOnly}`}
         >
-          <Button
-            type="primary"
-            shape="round"
-            block
-            size="large"
-            icon={<ShoppingCartOutlined rev="" />}
-            className="me-m"
-            onClick={toggleCart}
-          >
-            Ver Carrito
-          </Button>
+          {ShoppingActionButton}
         </StickyFooter>
       </div>
+      {(fetching || !product._id) && (
+        <div className="loading">
+          <Spin size="large" />
+        </div>
+      )}
     </>
   );
 }

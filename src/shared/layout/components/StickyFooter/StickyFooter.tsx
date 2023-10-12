@@ -1,3 +1,4 @@
+import React from 'react';
 import styles from './StickyFooter.module.scss';
 
 export interface IStickyFooter {
@@ -5,5 +6,9 @@ export interface IStickyFooter {
   className?: string
 }
 export function StickyFooter({ children, className }: IStickyFooter) {
-  return <div className={`${styles.StickyFooter} ${className}`}>{children}</div>;
+  return (
+    <div className={`${styles.StickyFooter} ${className}`}>
+      {children}
+    </div>
+  );
 }

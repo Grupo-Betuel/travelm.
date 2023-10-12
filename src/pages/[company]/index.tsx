@@ -6,7 +6,6 @@ import React from 'react';
 import { MetaHeaders } from '@components/MetaHeaders/MetaHeaders';
 
 export default function CompanyProducts({ metadata }: any) {
-  console.log('metadata', metadata);
   return (
     <>
       <MetaHeaders metadata={metadata} />
