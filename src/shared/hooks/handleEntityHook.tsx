@@ -66,10 +66,10 @@ export function handleEntityHook<T>(
     const pagination = (value as IPaginatedResponse<T>).content
       ? { ...(value as IPaginatedResponse<T>), content: undefined }
       : undefined;
-    let maxQuantity = data.length;
-    if (pagination) {
-      maxQuantity = pagination.page * pagination.perPage;
-    }
+    // let maxQuantity = data.length;
+    // if (pagination) {
+    //   maxQuantity = pagination.page * pagination.perPage;
+    // }
     // console.log('data =>', maxQuantity, maxQuantity ? data.slice(0, maxQuantity) : []);
     // data = maxQuantity ? data.splice(0, maxQuantity) : data;
     return { data, pagination };

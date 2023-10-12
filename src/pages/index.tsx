@@ -4,8 +4,7 @@ function Index() {
   return <Home />;
 }
 
-export async function getStaticProps(context: any) {
-
+export async function getStaticProps() {
   return {
     props: {
       protected: false,

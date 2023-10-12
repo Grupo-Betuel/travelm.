@@ -1,4 +1,4 @@
-import { MainContentModal, ProductCard } from '@shared/components';
+import { ProductCard } from '@shared/components';
 import { Affix, Input } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
 import { handleEntityHook } from '@shared/hooks/handleEntityHook';
@@ -8,8 +8,6 @@ import React, {
 } from 'react';
 import { useRouter } from 'next/router';
 import { EndpointsAndEntityStateKeys } from '@shared/enums/endpoints.enum';
-import { useContextualRouting } from 'next-use-contextual-routing';
-import { DetailView } from '@components/DetailView';
 import { showProductDetailsHook } from '@shared/hooks/showProductDetailsHook';
 import styles from './Category.module.scss';
 import { deepMatch } from '../../utils/matching.util';

@@ -77,7 +77,6 @@ export function stateHandlerSuccess<T extends BaseEntity>(
       : ({ content: data } as EntityDataType<T>);
   }
 
-
   switch (key) {
     case 'add':
       set((state: any) => ({

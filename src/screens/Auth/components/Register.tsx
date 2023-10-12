@@ -47,7 +47,6 @@ export function Register({ isModal, onSubmit }: IAuthProps) {
       ...userData,
     };
 
-
     const response = await clientEntity.add(data, {
       endpoint: EndpointsAndEntityStateKeys.LOGIN,
     });
