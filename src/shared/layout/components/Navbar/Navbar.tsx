@@ -46,6 +46,11 @@ export function Navbar() {
   const { data: companies } = handleEntityHook<CompanyEntity>(
     'companies',
     true,
+    {
+      queryParams: {
+        type: 'store',
+      },
+    },
   );
   const [navbarOptions, setNavbarOptions] = useState<MenuItemType[]>([]);
   const { client } = useAuthClientHook();
