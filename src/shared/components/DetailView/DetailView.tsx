@@ -203,7 +203,10 @@ export function DetailView({
   // eslint-disable-next-line
   const resetSaleProductParam = (parentId: string, variantId?: string) => () => handleSaleProductParamsChange(parentId, variantId)(0);
 
-  const handleSaleProductParamsChange = (parentId: string, variantId?: string) => async (value?: any) => {
+  const handleSaleProductParamsChange = (
+    parentId: string,
+    variantId?: string,
+  ) => async (value?: any) => {
     let newSale = structuredClone(sale);
     let total = 0;
     const quantity = Number(value || 0);
