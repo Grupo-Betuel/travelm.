@@ -57,6 +57,7 @@ export function Navbar() {
   const [selectedCompanies, setSelectedCompanies] = useState<CompanyEntity[]>(
     [],
   );
+
   const salesQuantityData = useAppStore((
     state,
   ) => state.currentOrder?.sales.reduce((acc, sale) => acc + sale.quantity, 0));
