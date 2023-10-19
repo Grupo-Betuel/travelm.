@@ -203,10 +203,7 @@ export function DetailView({
   // eslint-disable-next-line
   const resetSaleProductParam = (parentId: string, variantId?: string) => () => handleSaleProductParamsChange(parentId, variantId)(0);
 
-  const handleSaleProductParamsChange = (
-    parentId: string,
-    variantId?: string,
-  ) => async (value?: any) => {
+  const handleSaleProductParamsChange = (parentId: string, variantId?: string) => async (value?: any) => {
     let newSale = structuredClone(sale);
     let total = 0;
     const quantity = Number(value || 0);
@@ -332,10 +329,11 @@ export function DetailView({
     () => (productExistOnShoppingCart ? 'Procesar Orden' : 'Agregar al carrito'),
     [productExistOnShoppingCart],
   );
-  const shoppingActionDisabled = useMemo(() => (
-    (!sale?.quantity && !productExistOnShoppingCart)
-      || (sale?.quantity || 0) > product.stock
-  ), [productExistOnShoppingCart, sale, product]);
+  const shoppingActionDisabled = useMemo(
+    () => (!sale?.quantity && !productExistOnShoppingCart)
+      || (sale?.quantity || 0) > product.stock,
+    [productExistOnShoppingCart, sale, product],
+  );
   const ShoppingActionButton = (
     <Button
       type="primary"
@@ -447,7 +445,7 @@ export function DetailView({
                             style={{ backgroundColor: param.value }}
                           />
                         ) : (
-                          param.value
+                          ` - ${param.value}`
                         )}
                       </Button>
                       {param?.relatedParams && !!param?.relatedParams.length ? (
@@ -594,8 +592,7 @@ export function DetailView({
               >
                 {product.description}
               </div>
-              { product?.description?.length > maxDescriptionLength
-                && (
+              {product?.description?.length > maxDescriptionLength && (
                 <a
                   className={
                     styles.DetailViewPostDetailsContentDescriptionToggle
@@ -604,7 +601,7 @@ export function DetailView({
                 >
                   {!showMoreDescription ? 'Mostrar mas' : 'Mostrar menos'}
                 </a>
-                )}
+              )}
             </div>
 
             <div
