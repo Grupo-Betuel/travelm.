@@ -20,6 +20,7 @@ import Link from 'next/link';
 import Head from 'next/head';
 import LoadingBar from 'react-top-loading-bar';
 import { useRouter } from 'next/router';
+import { Analytics } from '@vercel/analytics/react';
 import { defaultValidateMessages as validateMessages } from '../config/form-validation.config';
 import { defaultTheme } from '../config/theme.config';
 
@@ -193,6 +194,7 @@ function MyApp({ Component, pageProps }: AppProps<IAppProps>) {
         </AppLoadingContext.Provider>
         <ToastContainer />
       </ConfigProvider>
+      <Analytics />
     </>
   );
 }
