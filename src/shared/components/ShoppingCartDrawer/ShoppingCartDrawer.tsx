@@ -8,7 +8,7 @@ import {
   DeleteOutlined,
   EditOutlined,
   PlusOutlined,
-  ShoppingCartOutlined,
+  ShoppingOutlined,
 } from '@ant-design/icons';
 import { useRouter } from 'next/router';
 import { useAppStore } from '@services/store';
@@ -210,14 +210,14 @@ export function ShoppingCartDrawer({
               shape="round"
               block
               size="large"
-              icon={client ? <ShoppingCartOutlined rev="" /> : null}
+              icon={client ? <ShoppingOutlined rev="" /> : null}
               onClick={!order?.sales?.length ? undefined : handleSendOrder}
               disabled={order?.sales?.length === 0}
             >
               {order?._id
                 ? 'Actualizar Order'
                 : client
-                  ? 'Realizar Orden'
+                  ? 'Enviar Pedido'
                   : 'Siguiente'}
             </Button>
           </StickyFooter>

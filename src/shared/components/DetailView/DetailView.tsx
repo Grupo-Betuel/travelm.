@@ -17,7 +17,7 @@ import {
   CloseOutlined,
   LikeOutlined,
   MessageOutlined,
-  ShoppingCartOutlined,
+  ShoppingOutlined,
   StarOutlined,
   UploadOutlined,
 } from '@ant-design/icons';
@@ -329,7 +329,7 @@ export function DetailView({
   };
 
   const shoppingActionText = useMemo(
-    () => (productExistOnShoppingCart ? 'Procesar Orden' : 'Agregar al carrito'),
+    () => (productExistOnShoppingCart ? 'Ver pedido' : 'Agregar al pedido'),
     [productExistOnShoppingCart],
   );
   const shoppingActionDisabled = useMemo(
@@ -343,7 +343,7 @@ export function DetailView({
       shape="round"
       block
       size="large"
-      icon={<ShoppingCartOutlined rev="" />}
+      icon={<ShoppingOutlined rev="" />}
       className="me-m"
       onClick={handleShoppingAction}
       disabled={shoppingActionDisabled}

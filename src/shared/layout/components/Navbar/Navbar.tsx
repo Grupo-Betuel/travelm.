@@ -8,7 +8,7 @@ import {
   DatabaseOutlined,
   DownOutlined,
   HomeOutlined,
-  ShoppingCartOutlined,
+  ShoppingOutlined,
 } from '@ant-design/icons';
 import { HandleAuthVisibility } from '@shared/components';
 import { useContextualRouting } from 'next-use-contextual-routing';
@@ -246,7 +246,7 @@ export function Navbar() {
                 {cartIsOpen ? (
                   <CloseOutlined rev="" style={{ fontSize: '24px' }} />
                 ) : (
-                  <ShoppingCartOutlined rev="" style={{ fontSize: '24px' }} />
+                  <ShoppingOutlined rev="" style={{ fontSize: '24px' }} />
                 )}
               </Badge>
             </div>
