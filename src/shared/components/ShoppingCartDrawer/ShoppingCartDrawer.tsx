@@ -80,6 +80,8 @@ export function ShoppingCartDrawer({
   };
 
   const handleSendOrder = async (newClient?: ClientEntity | any) => {
+    if (!!order && order.sales.length === 0) return;
+
     if (order?._id) {
       await updateOrder(order);
       handleCurrentOrder(orderService.localOrder);

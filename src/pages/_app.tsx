@@ -72,6 +72,7 @@ function MyApp({ Component, pageProps }: AppProps<IAppProps>) {
       setProgress(100);
     });
   }, []);
+
   if (pageProps.protected && !client) {
     return (
       <Result

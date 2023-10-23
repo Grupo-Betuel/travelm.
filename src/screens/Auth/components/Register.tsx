@@ -21,7 +21,6 @@ export function Register({ isModal, onSubmit, submitBtnLabel }: IAuthProps) {
   );
   const { cartIsOpen, toggleCart } = useOrderContext();
   const [failedLogin, setFailedLogin] = useState(false);
-
   const createClient = async (data: ClientEntity) => {
     data.phone = data.phone.toString().replace(/[- ()+]/g, '');
     const loginData = {
