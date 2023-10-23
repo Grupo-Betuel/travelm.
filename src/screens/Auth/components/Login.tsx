@@ -1,6 +1,6 @@
 import React from 'react';
 import {
-  Button, Form, Input, Spin,
+  Button, Form, Spin,
 } from 'antd';
 import { useAppStore } from '@services/store';
 import { useRouter } from 'next/router';

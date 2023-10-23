@@ -1,6 +1,5 @@
 import {
   Button, Drawer, DrawerProps, Modal, Result, Spin, Steps,
-  Typography,
 } from 'antd';
 import React, {
   useEffect, useMemo, useState,

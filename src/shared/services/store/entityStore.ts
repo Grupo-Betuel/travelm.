@@ -64,7 +64,7 @@ export function stateHandlerSuccess<T extends BaseEntity>(
   isCached?: boolean,
 ) {
   let endpointData = {};
-  let item: T;
+  let item: T | undefined;
   const content = data as T[];
   if (content.length === 1) item = content[0];
   if (!(data as any).content && !Array.isArray(content)) {
