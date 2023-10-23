@@ -45,6 +45,7 @@ import { ISale } from '@shared/entities/OrderEntity';
 import { structuredClone } from 'next/dist/compiled/@edge-runtime/primitives/structured-clone';
 import { useOrderContext } from '@shared/contexts/OrderContext';
 import { useAppStore } from '@services/store';
+import { ProductsConstants } from '@shared/constants/products.constants';
 import { sidebarWidth } from '../../../utils/layout.utils';
 import styles from './DetailView.module.scss';
 import { getSaleDataFromProduct } from '../../../utils/objects.utils';
@@ -329,7 +330,7 @@ export function DetailView({
   };
 
   const shoppingActionText = useMemo(
-    () => (productExistOnShoppingCart ? 'Ver pedido' : 'Agregar al pedido'),
+    () => (productExistOnShoppingCart ? ProductsConstants.VIEW_CART : ProductsConstants.ADD_CART),
     [productExistOnShoppingCart],
   );
   const shoppingActionDisabled = useMemo(

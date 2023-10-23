@@ -22,7 +22,7 @@ export function Login({ isModal }: IAuthProps) {
     if (
       await clientEntity.add(data, {
         endpoint: EndpointsAndEntityStateKeys.LOGIN,
-      })
+      }, true, 1000 * 60 * 60 * 24 * 7)
     ) {
       // TODO: success Login
       if (isModal) {
@@ -56,9 +56,9 @@ export function Login({ isModal }: IAuthProps) {
           size="large"
         />
       </Form.Item>
-      <Form.Item label="Password" name="password" rules={[{ required: true }]}>
-        <Input.Password size="large" />
-      </Form.Item>
+      {/* <Form.Item label="Password" name="password" rules={[{ required: true }]}> */}
+      {/*  <Input.Password size="large" /> */}
+      {/* </Form.Item> */}
       <Form.Item>
         <Button
           htmlType="submit"

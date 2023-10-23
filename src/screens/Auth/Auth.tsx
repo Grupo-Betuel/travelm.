@@ -8,6 +8,7 @@ import { ClientEntity } from '@shared/entities/ClientEntity';
 export interface IAuthProps {
   isModal?: boolean;
   onSubmit?: (data: ClientEntity) => void;
+  submitBtnLabel?: string;
 }
 
 export interface TabItem {

@@ -1,5 +1,6 @@
 import {
   Button, Drawer, DrawerProps, Modal, Result, Spin, Steps,
+  Typography,
 } from 'antd';
 import React, {
   useEffect, useMemo, useState,
@@ -23,6 +24,7 @@ import { StickyFooter } from '@shared/layout/components/StickyFooter/StickyFoote
 import Title from 'antd/lib/typography/Title';
 import { useOrderContext } from '@shared/contexts/OrderContext';
 import { ClientEntity } from '@shared/entities/ClientEntity';
+import { ProductsConstants } from '@shared/constants/products.constants';
 import styles from './ShoppingCartDrawer.module.scss';
 
 export interface IShoppingCartDrawerProps extends DrawerProps {
@@ -84,13 +86,13 @@ export function ShoppingCartDrawer({
       handleCurrentOrder(orderService.localOrder);
       onClose && onClose();
       toast.success('Orden enviada con éxito');
-    } else if (client || (newClient && current === 1)) {
+    } if (client || (newClient && current === 1)) {
       const clientData = newClient?._id ? newClient : client;
       await sendOrder({ ...order, client: clientData });
       orderService.resetOrder();
       toggleSuccessOrderModal();
       toast.success('Orden enviada con éxito');
-    } else if (!newClient && current === 1) {
+    } if (!newClient && current === 1) {
       toast('Error al crear usuario');
     } else {
       next();
@@ -215,17 +217,18 @@ export function ShoppingCartDrawer({
               disabled={order?.sales?.length === 0}
             >
               {order?._id
-                ? 'Actualizar Order'
+                ? ProductsConstants.UPDATE_CART
                 : client
-                  ? 'Enviar Pedido'
-                  : 'Siguiente'}
+                  ? ProductsConstants.SEND_CART
+                  : ProductsConstants.NEXT}
             </Button>
           </StickyFooter>
         </>
       )}
       {current === 1 && (
         <div className={styles.ShoppingCartDrawerRegisterWrapper}>
-          <Register onSubmit={handleSendOrder} />
+          <Register onSubmit={handleSendOrder} submitBtnLabel={ProductsConstants.SEND_CART} />
+
           <Button
             htmlType="submit"
             type="default"

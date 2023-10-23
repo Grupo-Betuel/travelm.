@@ -7,3 +7,9 @@ const authPage = () => (
 );
 
 export default authPage;
+
+export const getServerSideProps = async () => ({
+  props: {
+    protected: false,
+  },
+});

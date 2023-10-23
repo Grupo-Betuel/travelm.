@@ -67,7 +67,6 @@ export function stateHandlerSuccess<T extends BaseEntity>(
   let item: T;
   const content = data as T[];
   if (content.length === 1) item = content[0];
-
   if (!(data as any).content && !Array.isArray(content)) {
     item = !(content as T[]).length ? (data as T) : content[0];
   } else {
@@ -76,7 +75,9 @@ export function stateHandlerSuccess<T extends BaseEntity>(
       ? { [stateDataKey]: data }
       : ({ content: data } as EntityDataType<T>);
   }
-
+  if (!!item && (item as any).data) {
+    item = (item as any).data as T;
+  }
   switch (key) {
     case 'add':
       set((state: any) => ({

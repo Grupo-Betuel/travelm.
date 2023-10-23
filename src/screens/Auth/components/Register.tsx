@@ -1,5 +1,5 @@
 import {
-  Alert, Button, Form, Input, Spin,
+  Alert, Button, Form, Input, Spin, Typography,
 } from 'antd';
 import { useAppStore } from '@services/store';
 import { ClientEntity } from '@shared/entities/ClientEntity';
@@ -11,8 +11,9 @@ import React, { useEffect, useState } from 'react';
 import { UserAddOutlined } from '@ant-design/icons';
 import { toast } from 'react-toastify';
 import { useOrderContext } from '@shared/contexts/OrderContext';
+import { debounce } from 'lodash';
 
-export function Register({ isModal, onSubmit }: IAuthProps) {
+export function Register({ isModal, onSubmit, submitBtnLabel }: IAuthProps) {
   const clientEntity = useAppStore((state) => state.clients((stateu) => stateu));
   const router = useRouter();
   const [clientLoginData, setClientLoginData] = useState<ClientEntity>(
@@ -33,15 +34,12 @@ export function Register({ isModal, onSubmit }: IAuthProps) {
     const res = await clientEntity.add(data, {
       endpoint: EndpointsAndEntityStateKeys.REGISTER,
     });
-    if (res) {
-      await handleLogin(loginData);
-    }
 
-    return false;
+    return res;
   };
 
-  const handleLogin = async (userData: ClientEntity = clientLoginData) => {
-    toast.info('Iniciando sesión...');
+  const handleLogin = debounce(async (userData: ClientEntity = clientLoginData) => {
+    // toast.info('Iniciando sesión...');
     const data: ClientEntity = {
       ...clientLoginData,
       ...userData,
@@ -49,7 +47,7 @@ export function Register({ isModal, onSubmit }: IAuthProps) {
 
     const response = await clientEntity.add(data, {
       endpoint: EndpointsAndEntityStateKeys.LOGIN,
-    });
+    }, true, 1000 * 60 * 60 * 24 * 7);
 
     if (!response) {
       handleUnsuccessfulLogin();
@@ -61,8 +59,10 @@ export function Register({ isModal, onSubmit }: IAuthProps) {
         router.push('/');
       }
     }
+
+    // toast.dismiss();
     return response;
-  };
+  }, 500);
 
   const handleUnsuccessfulLogin = () => {
     if (clientEntity.error?.status === 409) {
@@ -78,8 +78,11 @@ export function Register({ isModal, onSubmit }: IAuthProps) {
   }, [clientLoginData, clientEntity?.error]);
 
   useEffect(() => {
-    if (onSubmit && clientEntity.item._id) onSubmit(clientEntity.item);
-  }, [clientEntity.item]);
+    if (clientEntity.item._id) {
+      onSubmit && onSubmit(clientEntity.item);
+      handleLogin(clientEntity.item);
+    }
+  }, [clientEntity.item?._id]);
 
   const goToLogin = () => {
     cartIsOpen && toggleCart();
@@ -114,9 +117,9 @@ export function Register({ isModal, onSubmit }: IAuthProps) {
       <Form.Item label="Nombre" name="firstName" rules={[{ required: true }]}>
         <Input size="large" />
       </Form.Item>
-      <Form.Item label="Apellido" name="lastName" rules={[{ required: true }]}>
-        <Input size="large" />
-      </Form.Item>
+      {/* <Form.Item label="Apellido" name="lastName" rules={[{ required: true }]}> */}
+      {/*  <Input size="large" /> */}
+      {/* </Form.Item> */}
       <Form.Item
         label="Whatsappp"
         name="phone"
@@ -131,10 +134,21 @@ export function Register({ isModal, onSubmit }: IAuthProps) {
           }}
           size="large"
         />
+
       </Form.Item>
-      <Form.Item label="Password" name="password" rules={[{ required: true }]}>
-        <Input.Password size="large" />
-      </Form.Item>
+      {onSubmit && (
+        <Typography.Paragraph italic>
+          Te contactaremos por
+          {' '}
+          <b>Whatsapp</b>
+          {' '}
+          para terminar de procesar la
+          orden.
+        </Typography.Paragraph>
+      )}
+      {/* <Form.Item label="Password" name="password" rules={[{ required: true }]}> */}
+      {/*  <Input.Password size="large" /> */}
+      {/* </Form.Item> */}
       <Form.Item>
         <Button
           htmlType="submit"
@@ -144,7 +158,7 @@ export function Register({ isModal, onSubmit }: IAuthProps) {
           size="large"
           icon={<UserAddOutlined rev="" />}
         >
-          Registrarse
+          {submitBtnLabel || 'Registrarse'}
         </Button>
       </Form.Item>
     </Form>
