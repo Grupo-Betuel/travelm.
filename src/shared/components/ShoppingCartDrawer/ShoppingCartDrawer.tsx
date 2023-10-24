@@ -1,5 +1,5 @@
 import {
-  Button, Drawer, DrawerProps, Modal, Result, Spin, Steps,
+  Button, Drawer, DrawerProps, Modal, Result, Spin, Steps, Tag,
 } from 'antd';
 import React, {
   useEffect, useMemo, useState,
@@ -25,6 +25,7 @@ import { useOrderContext } from '@shared/contexts/OrderContext';
 import { ClientEntity } from '@shared/entities/ClientEntity';
 import { ProductsConstants } from '@shared/constants/products.constants';
 import styles from './ShoppingCartDrawer.module.scss';
+import { orderStatusText } from '../../../utils/constants/order.constant';
 
 export interface IShoppingCartDrawerProps extends DrawerProps {
   onClose: () => void;
@@ -43,6 +44,7 @@ export function ShoppingCartDrawer({
     add: sendOrder,
     update: updateOrder,
     loading,
+    item: processedOrder,
   } = handleEntityHook<OrderEntity>('orders');
   const [current, setCurrent] = useState(0);
   const substotal = useMemo(
@@ -53,7 +55,6 @@ export function ShoppingCartDrawer({
     [order],
   );
   const { orderService } = useOrderContext();
-
   const toggleSuccessOrderModal = () => setSuccessOrderOpen(!successOrderOpen);
   useEffect(() => {
     if (client) {
@@ -79,23 +80,24 @@ export function ShoppingCartDrawer({
     // onClose && onClose({} as any)
   };
 
-  const handleSendOrder = async (newClient?: ClientEntity | any) => {
-    if (!!order && order.sales.length === 0) return;
-
-    if (order?._id) {
-      await updateOrder(order);
-      handleCurrentOrder(orderService.localOrder);
+  const handleSendOrder = async (
+    newClient?: ClientEntity | any,
+    existingOrder: OrderEntity = order,
+  ) => {
+    const orderData = existingOrder || order;
+    if (!!orderData && orderData.sales.length === 0) return;
+    if (orderData?._id) {
+      await updateOrder(orderData);
       onClose && onClose();
-      toast.success('Orden enviada con éxito');
-    } if (client || (newClient && current === 1)) {
+      toast.success('Orden actualizada con éxito');
+    } else if ((client || (newClient && current === 1)) && !orderData._id) {
       const clientData = newClient?._id ? newClient : client;
-      await sendOrder({ ...order, client: clientData });
-      orderService.resetOrder();
+      await sendOrder({ ...orderData, client: clientData });
       toggleSuccessOrderModal();
       toast.success('Orden enviada con éxito');
-    } if (!newClient && current === 1) {
+    } else if (!newClient && current === 1) {
       toast('Error al crear usuario');
-    } else {
+    } else if (!client) {
       next();
     }
   };
@@ -118,6 +120,31 @@ export function ShoppingCartDrawer({
     onClose && onClose();
   };
 
+  useEffect(() => {
+    processedOrder._id && processedOrder.status !== 'canceled' && handleCurrentOrder(processedOrder);
+  }, [processedOrder]);
+
+  const tagColor = useMemo(() => {
+    let color = 'blue';
+    switch (order?.status) {
+      case 'pending-info':
+      case 'pending':
+        color = 'orange';
+        break;
+      case 'confirmed':
+      case 'completed':
+      case 'cancel-attempt':
+        color = 'green';
+        break;
+      case 'canceled':
+        color = 'red';
+        break;
+      default:
+        color = 'blue';
+        break;
+    }
+    return color;
+  }, [order?.status]);
   return (
     <Drawer
       open={open}
@@ -137,15 +164,26 @@ export function ShoppingCartDrawer({
             current={current}
             items={[
               {
-                title: 'Articulos',
+                title: 'Productos',
               },
               {
-                title: 'Registro',
+                title: 'Enviar Orden',
               },
             ]}
           />
         ) : (
           <>
+            { order?._id
+              && (
+              <div className="flex-center-center">
+                <Tag
+                  color={tagColor}
+                  className="font-size-5 p-s mb-m w-100 text-center"
+                >
+                  {orderStatusText[order?.status]}
+                </Tag>
+              </div>
+              )}
             <h3 className="flex-between-center">
               Datos del Cliente
               {' '}
@@ -196,19 +234,8 @@ export function ShoppingCartDrawer({
                 {(substotal || '0').toLocaleString()}
               </Title>
             </div>
-            {order?._id && (
-              <Button
-                className="mb-l"
-                shape="round"
-                block
-                size="large"
-                icon={client ? <PlusOutlined rev="" /> : null}
-                onClick={goToHome}
-              >
-                Agregar más productos
-              </Button>
-            )}
             <Button
+              className="mb-l"
               type="primary"
               shape="round"
               block
@@ -223,12 +250,24 @@ export function ShoppingCartDrawer({
                   ? ProductsConstants.SEND_CART
                   : ProductsConstants.NEXT}
             </Button>
+            <Button
+              shape="round"
+              block
+              size="large"
+              icon={client ? <PlusOutlined rev="" /> : null}
+              onClick={goToHome}
+            >
+              Agregar más productos
+            </Button>
           </StickyFooter>
         </>
       )}
       {current === 1 && (
         <div className={styles.ShoppingCartDrawerRegisterWrapper}>
-          <Register onSubmit={handleSendOrder} submitBtnLabel={ProductsConstants.SEND_CART} />
+          <Register
+            onSubmit={handleSendOrder}
+            submitBtnLabel={ProductsConstants.SEND_CART}
+          />
 
           <Button
             htmlType="submit"
@@ -255,7 +294,11 @@ export function ShoppingCartDrawer({
               Orden enviada con exito. Te estaremos escribiendo por Whatsapp, si
               no nos comunicamos contigo, puedes escribirnos al
               {' '}
-              <a target="_blank" href="https://wa.me/message/KNV3Z5CLAVHDK1" rel="noreferrer">
+              <a
+                target="_blank"
+                href="https://wa.me/message/KNV3Z5CLAVHDK1"
+                rel="noreferrer"
+              >
                 (829) 893-7075
               </a>
             </span>

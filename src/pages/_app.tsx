@@ -56,6 +56,36 @@ function MyApp({ Component, pageProps }: AppProps<IAppProps>) {
   const { client } = useAuthClientHook();
   const [progress, setProgress] = useState(0);
   const router = useRouter();
+  const toggleShoppingCart = () => setCartIsOpen(!cartIsOpen);
+
+  const onChangeLayoutAffix = (affixed?: boolean) => {
+    if (affixed) {
+      // setAppViewportHeightClassName(
+      //   AppViewportHeightClassNames.WITH_NAVBAR_OPTION
+      // )
+    } else {
+      // setAppViewportHeightClassName(AppViewportHeightClassNames.WITH_NAVBAR)
+    }
+  };
+  const [companyId, setCompanyId] = useState<string>();
+  const [seoUrl, setSeoUrl] = useState<string>('');
+
+  useEffect(() => {
+    const companyName = location.pathname.split('/')[1];
+    if (companyName !== companyId) {
+      setCompanyId(companyName + (companyName ? '/' : ''));
+    }
+    setSeoUrl(location.href);
+  }, [router.pathname]);
+
+  useEffect(() => {
+    const queryString = window.location.search;
+
+    const parameters = new URLSearchParams(queryString);
+
+    const orderId = parameters.get('orderId');
+    if (!cartIsOpen && orderId) setCartIsOpen(true);
+  }, []);
 
   useEffect(() => {
     setAppLoading(!!clientEntity.loading || !!productEntity.loading);
@@ -96,28 +126,6 @@ function MyApp({ Component, pageProps }: AppProps<IAppProps>) {
       />
     );
   }
-
-  const toggleShoppingCart = () => setCartIsOpen(!cartIsOpen);
-
-  const onChangeLayoutAffix = (affixed?: boolean) => {
-    if (affixed) {
-      // setAppViewportHeightClassName(
-      //   AppViewportHeightClassNames.WITH_NAVBAR_OPTION
-      // )
-    } else {
-      // setAppViewportHeightClassName(AppViewportHeightClassNames.WITH_NAVBAR)
-    }
-  };
-  const [companyId, setCompanyId] = useState<string>();
-  const [seoUrl, setSeoUrl] = useState<string>('');
-
-  useEffect(() => {
-    const companyName = location.pathname.split('/')[1];
-    if (companyName !== companyId) {
-      setCompanyId(companyName + (companyName ? '/' : ''));
-    }
-    setSeoUrl(location.href);
-  }, [router.pathname]);
 
   return (
     <>

@@ -8,4 +8,5 @@ export enum EndpointsAndEntityStateKeys {
   PRODUCT_SAMPLES = 'product-samples',
   BY_ID = 'by-id',
   INFINITE_SCROLL_DATA = 'infinityScrollData',
+  PENDING = 'pending',
 }

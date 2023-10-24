@@ -23,6 +23,7 @@ export default function ClientOrders() {
   const { client } = useAuthClientHook();
   const handleCurrentOrder = useAppStore((state) => state.handleCurrentOrder);
   const { toggleCart } = useOrderContext();
+  const { orderService } = useOrderContext();
 
   const getOrdersByClient = async () => {
     if (!client) return;
@@ -42,7 +43,9 @@ export default function ClientOrders() {
     toggleCart();
   };
   const cancelOrder = async (order: OrderEntity) => {
-    await updateOrder({ ...order, _id: order._id || '', status: 'canceled' });
+    const orderData: OrderEntity = { ...order, _id: order._id || '', status: 'canceled' };
+    await updateOrder(orderData);
+    orderService.resetOrder();
     toast('Orden cancelada con éxito');
     getOrdersByClient();
   };

@@ -212,7 +212,7 @@ export function Navbar() {
                     items: [
                       {
                         key: 'profile',
-                        onClick: () => router.push('/client/profile'),
+                        onClick: () => location.href = '/client/profile',
                         label: 'Perfil',
                       },
                       {

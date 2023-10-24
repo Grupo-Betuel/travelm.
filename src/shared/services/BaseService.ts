@@ -48,8 +48,8 @@ export class BaseService<T> implements AbstractBaseService<T> {
   async get(
     // eslint-disable-next-line @typescript-eslint/default-param-last
     properties: IServiceMethodProperties<T> = {} as IServiceMethodProperties<T>,
-    callback: CallbackType<T>,
-    handleError: HandleErrorType,
+    callback: CallbackType<T> = () => {},
+    handleError: HandleErrorType = () => {},
     enableCache = false,
     cacheLifeTime: number = 60 * 1000 * 5,
   ): Promise<T[] | IPaginatedResponse<T> | undefined> {

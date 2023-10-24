@@ -2,6 +2,7 @@ import { BaseService } from '@services/BaseService';
 import OrderEntity, { ISale } from '@shared/entities/OrderEntity';
 import { ClientEntity } from '@shared/entities/ClientEntity';
 import { useAppStore } from '@services/store';
+import { EndpointsAndEntityStateKeys } from '@shared/enums/endpoints.enum';
 import { getAuthData } from '../../utils/auth.utils';
 
 export default class OrderService extends BaseService<OrderEntity> {
@@ -28,8 +29,37 @@ export default class OrderService extends BaseService<OrderEntity> {
   private set localOrder(order: OrderEntity) {
     const currentOrder = useAppStore?.getState().currentOrder;
     if (currentOrder?._id) {
-      order._id && useAppStore?.getState().handleCurrentOrder(order);
+      useAppStore?.getState().handleCurrentOrder(order);
     } else {
+      if (order._id && currentOrder) {
+        const currentOrderProducts = currentOrder.sales?.map(
+          (sale) => sale.product,
+        );
+        const orderProducts = order.sales?.map((sale) => sale.product);
+        const productIds = Array.from(
+          new Set([
+            ...currentOrderProducts.map((p) => p._id),
+            ...orderProducts.map((p) => p._id),
+          ]),
+        );
+
+        /// merging sales without repeating orders
+        order.sales = productIds.map((
+          pId,
+        ) => currentOrder.sales.find((
+          s,
+        ) => s.product._id === pId) || order.sales.find((
+          s,
+        ) => s.product._id === pId)) as ISale[];
+      }
+
+      useAppStore?.getState().handleCurrentOrder(order);
+    }
+
+    const invalidStatus = ['completed', 'canceled', 'checking-transfer', 'delivering', 'delivered', 'confirmed'];
+
+    if (invalidStatus.indexOf(order.status) !== -1) {
+      order = new OrderEntity();
       useAppStore?.getState().handleCurrentOrder(order);
     }
 
@@ -38,7 +68,7 @@ export default class OrderService extends BaseService<OrderEntity> {
     }
   }
 
-  public initLocalOrder() {
+  public async initLocalOrder() {
     this.authClient = getAuthData('all') as ClientEntity;
     this.localOrderKey = `${this.localOrderKeyPrefix}${
       this.authClient?._id || ''
@@ -59,6 +89,20 @@ export default class OrderService extends BaseService<OrderEntity> {
       if (oldOrder.sales?.length) {
         local = oldOrder;
       }
+    }
+    if (this.authClient?._id) {
+      // const orderId =
+      const queryString = window.location.search;
+      const parameters = new URLSearchParams(queryString);
+      const orderId = parameters.get('orderId');
+      const order = await this.get({
+        endpoint: EndpointsAndEntityStateKeys.PENDING,
+        slug: this.authClient._id,
+        queryParams: {
+          orderId,
+        },
+      });
+      local = order || local;
     }
 
     this.localOrder = local;

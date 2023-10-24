@@ -4,10 +4,11 @@ import React from 'react';
 import { Login } from '@screens/Auth/components/Login';
 import { Register } from '@screens/Auth/components/Register';
 import { ClientEntity } from '@shared/entities/ClientEntity';
+import OrderEntity from '@shared/entities/OrderEntity';
 
 export interface IAuthProps {
   isModal?: boolean;
-  onSubmit?: (data: ClientEntity) => void;
+  onSubmit?: (data: ClientEntity, order?: OrderEntity) => void;
   submitBtnLabel?: string;
 }
 

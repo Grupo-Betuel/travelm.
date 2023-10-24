@@ -21,6 +21,10 @@ export function Register({ isModal, onSubmit, submitBtnLabel }: IAuthProps) {
   );
   const { cartIsOpen, toggleCart } = useOrderContext();
   const [failedLogin, setFailedLogin] = useState(false);
+  const [failedCreating, setFailedCreating] = useState(false);
+  const [logged, setLogged] = useState(false);
+  const { orderService } = useOrderContext();
+
   const createClient = async (data: ClientEntity) => {
     data.phone = data.phone.toString().replace(/[- ()+]/g, '');
     const loginData = {
@@ -52,6 +56,7 @@ export function Register({ isModal, onSubmit, submitBtnLabel }: IAuthProps) {
       handleUnsuccessfulLogin();
     } else {
       setFailedLogin(false);
+      setLogged(true);
       if (isModal) {
         router.back();
       } else if (!onSubmit) {
@@ -72,16 +77,30 @@ export function Register({ isModal, onSubmit, submitBtnLabel }: IAuthProps) {
 
   useEffect(() => {
     if (clientEntity.error?.status === 409) {
+      setFailedCreating(true);
       handleLogin();
     }
   }, [clientLoginData, clientEntity?.error]);
 
   useEffect(() => {
     if (clientEntity.item._id) {
-      onSubmit && onSubmit(clientEntity.item);
-      handleLogin(clientEntity.item);
+      handleOnSubmit();
+      if (!logged) {
+        handleLogin(clientEntity.item);
+      }
     }
-  }, [clientEntity.item?._id]);
+  }, [clientEntity.item?._id, logged, failedCreating]);
+
+  const handleOnSubmit = async () => {
+    if (logged) {
+      await orderService.initLocalOrder();
+      const existingOrder = orderService.localOrder;
+      onSubmit && onSubmit(clientEntity.item, existingOrder);
+    }
+    if (!failedCreating) {
+      onSubmit && onSubmit(clientEntity.item);
+    }
+  };
 
   const goToLogin = () => {
     cartIsOpen && toggleCart();
