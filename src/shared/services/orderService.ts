@@ -109,7 +109,7 @@ export default class OrderService extends BaseService<OrderEntity> {
   }
 
   handleLocalOrderSales(sale: Partial<ISale>) {
-    const newLocalOrder = this.localOrder;
+    const newLocalOrder = structuredClone(this.localOrder);
     const exist = !!newLocalOrder.sales.find(
       (s) => s.product._id === sale.product?._id,
     );
@@ -123,9 +123,10 @@ export default class OrderService extends BaseService<OrderEntity> {
       newLocalOrder.sales.push(sale as ISale);
     }
 
-    newLocalOrder.company = newLocalOrder.sales
-      .map((s) => s.company)
+    newLocalOrder.company = Array.from(new Set(newLocalOrder.sales
+      .map((s) => s.company)))
       .join(', ');
+
     this.localOrder = newLocalOrder;
   }
 

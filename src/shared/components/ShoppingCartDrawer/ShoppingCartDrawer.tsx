@@ -47,13 +47,12 @@ export function ShoppingCartDrawer({
     item: processedOrder,
   } = handleEntityHook<OrderEntity>('orders');
   const [current, setCurrent] = useState(0);
-  const substotal = useMemo(
-    () => order?.sales?.reduce(
+  const subtotal = useMemo(() => {
+    return order?.sales?.reduce(
       (acc, sale) => acc + sale.product.price * sale.quantity,
       0,
-    ),
-    [order],
-  );
+    );
+  }, [order?.sales]);
   const { orderService } = useOrderContext();
   const toggleSuccessOrderModal = () => setSuccessOrderOpen(!successOrderOpen);
   useEffect(() => {
@@ -231,7 +230,7 @@ export function ShoppingCartDrawer({
               <Title className="m-0" level={2}>
                 RD$
                 {' '}
-                {(substotal || '0').toLocaleString()}
+                {(subtotal || '0').toLocaleString()}
               </Title>
             </div>
             <Button
