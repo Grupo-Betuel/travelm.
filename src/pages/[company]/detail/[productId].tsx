@@ -37,7 +37,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   return {
     props: {
       metadata: {
-        title: `${product?.name} RD$${product.price.toLocaleString()}${product?.category?.title ? ` | ${product?.category?.title}` : ''} | ${currentCompany?.title}`,
+        title: `${product?.name} RD$${product.price.toLocaleString()}${product?.category?.title ? ` | ${product?.category?.title}` : ''} | ${currentCompany?.title} ${currentCompany?.name}`,
         ogTitle: `${product?.name} RD$${product.price.toLocaleString()} | ${product?.category?.title || currentCompany?.title}`,
         description:
           product?.description || currentCompany?.description || '',

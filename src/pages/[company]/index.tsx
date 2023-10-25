@@ -26,7 +26,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     props: {
       metadata: {
         title: `${currentCompany?.name} | ${currentCompany?.title}`,
-        ogTitle: currentCompany?.title || '',
+        ogTitle: `${currentCompany?.name} | ${currentCompany?.title}`,
         description: currentCompany?.description || '',
         image: currentCompany?.wallpaper || currentCompany?.logo || '',
         type: 'website',
