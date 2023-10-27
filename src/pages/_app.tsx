@@ -21,6 +21,7 @@ import Head from 'next/head';
 import LoadingBar from 'react-top-loading-bar';
 import { useRouter } from 'next/router';
 import { Analytics } from '@vercel/analytics/react';
+import { handleLoginHook } from '@shared/hooks/handleLoginHook';
 import { defaultValidateMessages as validateMessages } from '../config/form-validation.config';
 import { defaultTheme } from '../config/theme.config';
 
@@ -56,6 +57,8 @@ function MyApp({ Component, pageProps }: AppProps<IAppProps>) {
   const { client } = useAuthClientHook();
   const [progress, setProgress] = useState(0);
   const router = useRouter();
+  const { login } = handleLoginHook();
+
   const toggleShoppingCart = () => setCartIsOpen(!cartIsOpen);
 
   const onChangeLayoutAffix = (affixed?: boolean) => {
@@ -78,13 +81,22 @@ function MyApp({ Component, pageProps }: AppProps<IAppProps>) {
     setSeoUrl(location.href);
   }, [router.pathname]);
 
-  useEffect(() => {
+  const handleQueryParams = async () => {
     const queryString = window.location.search;
-
     const parameters = new URLSearchParams(queryString);
-
     const orderId = parameters.get('orderId');
+    const phone = parameters.get('phone');
     if (!cartIsOpen && orderId) setCartIsOpen(true);
+
+    if (phone && !client) {
+      await login({ phone });
+      await orderService.initLocalOrder();
+      router.push('/');
+    }
+  };
+
+  useEffect(() => {
+    handleQueryParams();
   }, []);
 
   useEffect(() => {
