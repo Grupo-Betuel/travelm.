@@ -88,7 +88,7 @@ function MyApp({ Component, pageProps }: AppProps<IAppProps>) {
     const phone = parameters.get('phone');
     if (!cartIsOpen && orderId) setCartIsOpen(true);
 
-    if (phone && !client) {
+    if (phone) {
       await login({ phone });
       await orderService.initLocalOrder();
       router.push('/');
