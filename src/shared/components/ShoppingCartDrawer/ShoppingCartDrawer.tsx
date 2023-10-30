@@ -1,9 +1,14 @@
 import {
-  Button, Drawer, DrawerProps, Modal, Result, Spin, Steps, Tag,
+  Button,
+  Drawer,
+  DrawerProps,
+  Modal,
+  Result,
+  Spin,
+  Steps,
+  Tag,
 } from 'antd';
-import React, {
-  useEffect, useMemo, useState,
-} from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
   DeleteOutlined,
   EditOutlined,
@@ -47,10 +52,13 @@ export function ShoppingCartDrawer({
     item: processedOrder,
   } = handleEntityHook<OrderEntity>('orders');
   const [current, setCurrent] = useState(0);
-  const subtotal = useMemo(() => order?.sales?.reduce(
-    (acc, sale) => acc + sale.product.price * sale.quantity,
-    0,
-  ), [order?.sales]);
+  const subtotal = useMemo(
+    () => order?.sales?.reduce(
+      (acc, sale) => acc + sale.product.price * sale.quantity,
+      0,
+    ),
+    [order?.sales],
+  );
   const { orderService } = useOrderContext();
   const toggleSuccessOrderModal = () => setSuccessOrderOpen(!successOrderOpen);
   useEffect(() => {
@@ -118,7 +126,9 @@ export function ShoppingCartDrawer({
   };
 
   useEffect(() => {
-    processedOrder._id && processedOrder.status !== 'canceled' && handleCurrentOrder(processedOrder);
+    processedOrder._id
+      && processedOrder.status !== 'canceled'
+      && handleCurrentOrder(processedOrder);
   }, [processedOrder]);
 
   const tagColor = useMemo(() => {
@@ -170,8 +180,7 @@ export function ShoppingCartDrawer({
           />
         ) : (
           <>
-            { order?._id
-              && (
+            {order?._id && (
               <div className="flex-center-center">
                 <Tag
                   color={tagColor}
@@ -180,7 +189,7 @@ export function ShoppingCartDrawer({
                   {orderStatusText[order?.status]}
                 </Tag>
               </div>
-              )}
+            )}
             <h3 className="flex-between-center">
               Datos del Cliente
               {' '}
@@ -231,31 +240,39 @@ export function ShoppingCartDrawer({
                 {(subtotal || '0').toLocaleString()}
               </Title>
             </div>
-            <Button
-              className="mb-l"
-              type="primary"
-              shape="round"
-              block
-              size="large"
-              icon={client ? <ShoppingOutlined rev="" /> : null}
-              onClick={!order?.sales?.length ? undefined : handleSendOrder}
-              disabled={order?.sales?.length === 0}
-            >
-              {order?._id
-                ? ProductsConstants.UPDATE_CART
-                : client
-                  ? ProductsConstants.SEND_CART
-                  : ProductsConstants.NEXT}
-            </Button>
-            <Button
-              shape="round"
-              block
-              size="large"
-              icon={client ? <PlusOutlined rev="" /> : null}
-              onClick={goToHome}
-            >
-              Agregar más productos
-            </Button>
+            {(order.status === 'pending-info' || order.status === 'pending')
+              && (
+              <>
+                <Button
+                  className="mb-l"
+                  type="primary"
+                  shape="round"
+                  block
+                  size="large"
+                  icon={client ? <ShoppingOutlined rev="" /> : null}
+                  onClick={
+                      !order?.sales?.length ? undefined : handleSendOrder
+                    }
+                  disabled={order?.sales?.length === 0}
+                >
+                  {order?._id
+                    ? ProductsConstants.UPDATE_CART
+                    : client
+                      ? ProductsConstants.SEND_CART
+                      : ProductsConstants.NEXT}
+                </Button>
+
+                <Button
+                  shape="round"
+                  block
+                  size="large"
+                  icon={client ? <PlusOutlined rev="" /> : null}
+                  onClick={goToHome}
+                >
+                  Agregar más productos
+                </Button>
+              </>
+              )}
           </StickyFooter>
         </>
       )}

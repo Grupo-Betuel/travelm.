@@ -65,6 +65,8 @@ export default class OrderService extends BaseService<OrderEntity> {
 
     if (!order?._id) {
       localStorage.setItem(this.localOrderKey, JSON.stringify(order));
+    } else {
+      localStorage.removeItem(this.localOrderKey);
     }
   }
 
