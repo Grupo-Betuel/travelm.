@@ -95,11 +95,13 @@ export function ShoppingCartDrawer({
       await updateOrder(orderData);
       onClose && onClose();
       toast.success('Orden actualizada con éxito');
+      orderService.resetLocalStorageOrder();
     } else if ((client || (newClient && current === 1)) && !orderData._id) {
       const clientData = newClient?._id ? newClient : client;
       await sendOrder({ ...orderData, client: clientData });
       toggleSuccessOrderModal();
       toast.success('Orden enviada con éxito');
+      orderService.resetLocalStorageOrder();
     } else if (!newClient && current === 1) {
       toast('Error al crear usuario');
     } else if (!client) {

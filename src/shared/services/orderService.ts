@@ -147,4 +147,8 @@ export default class OrderService extends BaseService<OrderEntity> {
   resetOrder() {
     this.localOrder = new OrderEntity();
   }
+
+  resetLocalStorageOrder() {
+    localStorage.removeItem(this.localOrderKey);
+  }
 }
