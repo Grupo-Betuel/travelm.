@@ -116,8 +116,8 @@ export function ShoppingCartDrawer({
     onClose && onClose();
   };
 
-  const goToHome = () => {
-    router.push('/');
+  const handleAddMoreProducts = () => {
+    // router.push('/');
     onClose && onClose();
   };
 
@@ -269,7 +269,7 @@ export function ShoppingCartDrawer({
                   block
                   size="large"
                   icon={client ? <PlusOutlined rev="" /> : null}
-                  onClick={goToHome}
+                  onClick={handleAddMoreProducts}
                 >
                   Agregar más productos
                 </Button>
