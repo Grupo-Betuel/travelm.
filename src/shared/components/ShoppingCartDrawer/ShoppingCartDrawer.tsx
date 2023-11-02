@@ -242,7 +242,7 @@ export function ShoppingCartDrawer({
                 {(subtotal || '0').toLocaleString()}
               </Title>
             </div>
-            {(order?.status === 'pending-info' || order?.status === 'pending')
+            {(order?.status === 'pending-info' || order?.status === 'pending' || order?.status === 'personal-assistance')
               && (
               <>
                 <Button
