@@ -4,25 +4,25 @@ import { ProductEntity } from '@shared/entities/ProductEntity';
 import ProductService from '@services/productService';
 import { CategoryEntity } from '@shared/entities/CategoryEntity';
 import CategoryService from '@services/categoryService';
-import { setCachedResource } from './fs.utils';
+// import { setCachedResource } from './fs.utils';
 
 export const handleCachedCompany = async (companyId: string): Promise<CompanyEntity> => {
   const companyService = new CompanyService();
   const currentCompany = await companyService.getCompanyByRefName(companyId);
-  currentCompany && setCachedResource(currentCompany, 'companies', currentCompany.companyId);
+  // currentCompany && setCachedResource(currentCompany, 'companies', currentCompany.companyId);
   return currentCompany;
 };
 
 export const handleCachedProduct = async (productId: string): Promise<ProductEntity> => {
   const productService = new ProductService();
   const product = await productService.getProductById(productId);
-  product && setCachedResource(product, 'products');
+  // product && setCachedResource(product, 'products');
   return product;
 };
 
 export const handleCachedCategories = async (catId: string): Promise<CategoryEntity> => {
   const categoryService = new CategoryService();
   const category = await categoryService.getCategoryById(catId);
-  category && setCachedResource(category, 'categories');
+  // category && setCachedResource(category, 'categories');
   return category;
 };
