@@ -1,9 +1,9 @@
 import { Category } from '@screens/Category';
 import { GetServerSideProps } from 'next';
-import { CompanyEntity } from '@shared/entities/CompanyEntity';
+// import { CompanyEntity } from '@shared/entities/CompanyEntity';
 import { IMetadata, MetaHeaders } from '@components/MetaHeaders/MetaHeaders';
-import { CategoryEntity } from '@shared/entities/CategoryEntity';
-import { getCachedResources } from '../../../utils/fs.utils';
+// import { CategoryEntity } from '@shared/entities/CategoryEntity';
+// import { getCachedResources } from '../../../utils/fs.utils';
 import { handleCachedCategories, handleCachedCompany } from '../../../utils/server-side.utils';
 
 export interface ICompanyProductsProps {

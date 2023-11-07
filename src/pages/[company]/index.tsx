@@ -1,9 +1,9 @@
 import { Company } from 'src/screens/Company';
 import { GetServerSideProps } from 'next';
-import { CompanyEntity } from '@shared/entities/CompanyEntity';
+// import { CompanyEntity } from '@shared/entities/CompanyEntity';
 import React from 'react';
 import { MetaHeaders } from '@components/MetaHeaders/MetaHeaders';
-import { getCachedResources } from '../../utils/fs.utils';
+// import { getCachedResources } from '../../utils/fs.utils';
 import { handleCachedCompany } from '../../utils/server-side.utils';
 
 export default function CompanyProducts({ metadata }: any) {
