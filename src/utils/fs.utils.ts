@@ -1,11 +1,12 @@
 import fs from 'fs';
 import { BaseEntity } from '@shared/entities/BaseEntity';
+import * as path from 'path';
 
 export type CachedResourceType = 'companies' | 'products' | 'categories';
 export const getCachePath = (
   id: string,
   type: CachedResourceType,
-) => `./public/data/${type}/${id}.json`;
+) => path.join('./', `public/data/${type}/${id}.json`);
 export async function setCachedResource<T>(
   product: T & BaseEntity,
   type: CachedResourceType,

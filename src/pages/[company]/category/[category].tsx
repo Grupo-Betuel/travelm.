@@ -35,7 +35,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   let currentCategory: CategoryEntity | undefined = await getCachedResources<CategoryEntity>(categoryId as string, 'categories');
 
   if (currentCategory) {
-    handleCachedProduct(categoryId as string);
+    handleCachedCategories(categoryId as string);
   } else {
     currentCategory = await handleCachedCategories(categoryId as string);
   }
