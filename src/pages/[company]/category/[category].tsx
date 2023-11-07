@@ -21,24 +21,27 @@ export default function CompanyProducts({ metadata }: ICompanyProductsProps) {
 export const getServerSideProps: GetServerSideProps = async (context) => {
   /// / HANDLING COMPANY DATA
   const companyName = context.params?.company;
-  let currentCompany: CompanyEntity | undefined = await getCachedResources<CompanyEntity>(companyName as string, 'companies');
-
-  if (currentCompany) {
-    handleCachedCompany(companyName as string);
-  } else {
-    currentCompany = await handleCachedCompany(companyName as string);
-  }
+  // let currentCompany: CompanyEntity | undefined = await getCachedResources<CompanyEntity>(
+  // companyName as string, 'companies');
+  //
+  // if (currentCompany) {
+  //   handleCachedCompany(companyName as string);
+  // } else {
+  const currentCompany = await handleCachedCompany(companyName as string);
+  // }
 
   /// / HANDLING PRODUCT DATA
   const categoryId = context.params?.category as string;
-
-  let currentCategory: CategoryEntity | undefined = await getCachedResources<CategoryEntity>(categoryId as string, 'categories');
-
-  if (currentCategory) {
-    handleCachedCategories(categoryId as string);
-  } else {
-    currentCategory = await handleCachedCategories(categoryId as string);
-  }
+  //
+  // let currentCategory: CategoryEntity | undefined = await getCachedResources<CategoryEntity>(
+  // categoryId as string,
+  // 'categories');
+  //
+  // if (currentCategory) {
+  //   handleCachedCategories(categoryId as string);
+  // } else {
+  const currentCategory = await handleCachedCategories(categoryId as string);
+  // }
 
   const keywords = `${currentCategory?.tags?.join(', ') || ''} ${currentCompany?.tags?.join(', ') || ''}`;
 

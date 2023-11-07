@@ -25,23 +25,27 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   try {
     /// / HANDLING PRODUCT DATA
     const productId = context.params?.productId as string;
-    let product: ProductEntity | undefined = await getCachedResources<ProductEntity>(productId as string, 'products');
-
-    if (product) {
-      handleCachedProduct(productId as string);
-    } else {
-      product = await handleCachedProduct(productId as string);
-    }
+    // let product: ProductEntity | undefined = await getCachedResources<ProductEntity>(
+    // productId as string,
+    // 'products');
+    //
+    // if (product) {
+    //   handleCachedProduct(productId as string);
+    // } else {
+    const product = await handleCachedProduct(productId as string);
+    // }
 
     /// / HANDLING COMPANY DATA
     const companyName = context.params?.company;
-    let currentCompany: CompanyEntity | undefined = await getCachedResources<CompanyEntity>(companyName as string, 'companies');
+    // let currentCompany: CompanyEntity | undefined = await getCachedResources<CompanyEntity>(
+    // companyName as string,
+    // 'companies');
 
-    if (currentCompany) {
-      handleCachedCompany(companyName as string);
-    } else {
-      currentCompany = await handleCachedCompany(companyName as string);
-    }
+    // if (currentCompany) {
+    //   handleCachedCompany(companyName as string);
+    // } else {
+    const currentCompany = await handleCachedCompany(companyName as string);
+    // }
 
     const keywords = `${product?.tags?.join(', ') || ''} ${currentCompany?.tags?.join(', ') || ''}`;
     return {

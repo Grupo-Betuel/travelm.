@@ -16,6 +16,9 @@ export async function setCachedResource<T>(
   type: CachedResourceType,
   id?: string,
 ) {
+  // fs.writeFile(getCachePath(id || product._id, type), JSON.stringify(product), () => {
+  //   console.log('cached');
+  // });
   product && await fs.writeFileSync(getCachePath(id || product._id, type), JSON.stringify(product));
 }
 export async function getCachedResources<T>(id: string, type: CachedResourceType) {

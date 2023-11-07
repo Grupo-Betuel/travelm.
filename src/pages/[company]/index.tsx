@@ -17,13 +17,15 @@ export default function CompanyProducts({ metadata }: any) {
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const companyName = context.params?.company;
-  let currentCompany: CompanyEntity | undefined = await getCachedResources(companyName as string, 'companies');
+  // let currentCompany: CompanyEntity | undefined = await getCachedResources(
+  // companyName as string,
+  // 'companies');
 
-  if (currentCompany) {
-    handleCachedCompany(companyName as string);
-  } else {
-    currentCompany = await handleCachedCompany(companyName as string);
-  }
+  // if (currentCompany) {
+  //   handleCachedCompany(companyName as string);
+  // } else {
+  const currentCompany = await handleCachedCompany(companyName as string);
+  // }
 
   const keywords = `${currentCompany?.tags?.join(', ') || ''}`;
   return {
