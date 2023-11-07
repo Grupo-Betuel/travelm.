@@ -6,7 +6,7 @@ export type CachedResourceType = 'companies' | 'products' | 'categories';
 export const getCachePath = (
   id: string,
   type: CachedResourceType,
-) => path.join(__dirname, `../../../data/${type}/${id}.json`);
+) => path.join(__dirname, `../../../src/data/${type}/${id}.json`);
 
 export async function setCachedResource<T>(
   product: T & BaseEntity,
