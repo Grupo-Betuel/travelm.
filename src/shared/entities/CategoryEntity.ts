@@ -6,4 +6,6 @@ export class CategoryEntity extends BaseEntity {
   company: string = '';
 
   description: string = '';
+
+  tags?: string[];
 }

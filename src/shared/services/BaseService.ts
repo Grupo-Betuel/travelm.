@@ -10,6 +10,7 @@ import {
 import { IResponseError } from '@interfaces/error.interface';
 import { EndpointsAndEntityStateKeys } from '@shared/enums/endpoints.enum';
 import { IPaginatedResponse } from '@interfaces/pagination.interface';
+import { CompanyEntity } from '@shared/entities/CompanyEntity';
 import { deepMatch } from '../../utils/matching.util';
 import { extractContent } from '../../utils/objects.utils';
 
@@ -55,7 +56,7 @@ export class BaseService<T> implements AbstractBaseService<T> {
   ): Promise<T[] | IPaginatedResponse<T> | undefined> {
     try {
       if (enableCache) {
-        const cached = this.getCachedData('get', properties);
+        const cached = this.getCachedData<CompanyEntity>('get', properties);
         if (cached && (cached as any)?.length) {
           callback(cached, true);
         }

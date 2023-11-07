@@ -16,6 +16,8 @@ export class CompanyEntity extends BaseEntity {
   description: string = '';
 
   video: string = '';
+
+  tags?: string[];
 }
 
 export const companyTitles: { [N in string]: string } = {

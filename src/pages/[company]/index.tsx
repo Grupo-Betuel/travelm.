@@ -1,9 +1,10 @@
 import { Company } from 'src/screens/Company';
 import { GetServerSideProps } from 'next';
 import { CompanyEntity } from '@shared/entities/CompanyEntity';
-import axios from 'axios';
 import React from 'react';
 import { MetaHeaders } from '@components/MetaHeaders/MetaHeaders';
+import { getCachedResources } from '../../utils/fs.utils';
+import { handleCachedCompany } from '../../utils/server-side.utils';
 
 export default function CompanyProducts({ metadata }: any) {
   return (
@@ -15,16 +16,20 @@ export default function CompanyProducts({ metadata }: any) {
 }
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const companyName = context.params?.company as string;
-  const currentCompany = (
-    await axios.get<CompanyEntity>(
-      `${process.env.NEXT_PUBLIC_API_URL}api/companies/by-ref-id/${companyName}`,
-    )
-  ).data;
+  const companyName = context.params?.company;
+  let currentCompany: CompanyEntity | undefined = await getCachedResources(companyName as string, 'companies');
 
+  if (currentCompany) {
+    handleCachedCompany(companyName as string);
+  } else {
+    currentCompany = await handleCachedCompany(companyName as string);
+  }
+
+  const keywords = `${currentCompany?.tags?.join(', ') || ''}`;
   return {
     props: {
       metadata: {
+        keywords,
         title: `${currentCompany?.name} | ${currentCompany?.title}`,
         ogTitle: `${currentCompany?.name} | ${currentCompany?.title}`,
         description: currentCompany?.description || '',

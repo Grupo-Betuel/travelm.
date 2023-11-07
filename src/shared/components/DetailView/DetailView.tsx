@@ -55,6 +55,8 @@ export interface IDetailViewProps {
   selectedPost?: any;
   returnHref?: string;
   productId?: string;
+  companyLogo?: string;
+  forceLoadProduct?: boolean;
 }
 
 function IconText({ icon, text }: { icon: any; text: string }) {
@@ -82,6 +84,8 @@ export function DetailView({
   productDetails,
   returnHref,
   productId,
+  companyLogo,
+  forceLoadProduct,
 }: IDetailViewProps) {
   const [product, setProduct] = useState<ProductEntity>({} as ProductEntity);
   const [sale, setSale] = useState<Partial<ISale>>({} as ISale);
@@ -96,16 +100,14 @@ export function DetailView({
 
   useEffect(() => {
     const productSlug = router.query.productId as string;
-    if (productSlug && !productDetails) {
+    if (productSlug && (!productDetails || forceLoadProduct)) {
       get({ endpoint: EndpointsAndEntityStateKeys.BY_ID, slug: productSlug });
     }
   }, [router.query, productId, productDetails]);
 
   useEffect(() => {
-    let productInfo = { ...item };
-    if (productDetails) {
-      productInfo = productDetails;
-    }
+    const itemData = item._id ? item : {};
+    const productInfo: ProductEntity = { ...(productDetails || {}), ...itemData };
     productInfo._id && setProduct(productInfo as ProductEntity);
   }, [item, productDetails]);
 
@@ -386,7 +388,7 @@ export function DetailView({
                   <ImageBackground image={img} key={`detailViewImage${i}`} />
                 ))
               ) : (
-                <ImageBackground />
+                <ImageBackground image={companyLogo} />
               )}
             </Carousel>
           </Image.PreviewGroup>
@@ -673,7 +675,7 @@ export function DetailView({
           {ShoppingActionButton}
         </StickyFooter>
       </div>
-      {(fetching || !product._id) && (
+      {(fetching && !product._id) && (
         <div className="loading">
           <Spin size="large" />
         </div>

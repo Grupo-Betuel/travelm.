@@ -31,6 +31,8 @@ export class ProductEntity extends BaseEntity {
   productParams: IProductParam[] = [];
 
   category: CategoryEntity = new CategoryEntity();
+
+  tags?: string[];
 }
 
 export type ProductParamTypes = 'color' | 'size';

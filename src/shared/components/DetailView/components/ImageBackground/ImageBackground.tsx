@@ -1,5 +1,4 @@
 import { FC } from 'react';
-import logo from '@assets/images/logo.png';
 import Image from 'next/image';
 import { Image as AntdImage } from 'antd';
 import styles from './ImageBackground.module.scss';
@@ -27,7 +26,7 @@ export const ImageBackground: FC<ImageBackgroundProps> = ({ image }) => (
         rootClassName={styles.ImageWrapper}
       />
     ) : (
-      <Image priority alt="" src={logo} />
+      <Image priority alt="" src={image} />
     )}
   </div>
 );
