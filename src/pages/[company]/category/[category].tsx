@@ -4,7 +4,7 @@ import { CompanyEntity } from '@shared/entities/CompanyEntity';
 import { IMetadata, MetaHeaders } from '@components/MetaHeaders/MetaHeaders';
 import { CategoryEntity } from '@shared/entities/CategoryEntity';
 import { getCachedResources } from '../../../utils/fs.utils';
-import { handleCachedCategories, handleCachedCompany, handleCachedProduct } from '../../../utils/server-side.utils';
+import { handleCachedCategories, handleCachedCompany } from '../../../utils/server-side.utils';
 
 export interface ICompanyProductsProps {
   metadata: IMetadata;
