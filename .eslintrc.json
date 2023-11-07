@@ -36,7 +36,8 @@
     "react/jsx-no-useless-fragment": "off",
     "react/function-component-definition": "off",
     "no-nested-ternary": "off",
-    "consistent-return": "off"
+    "consistent-return": "off",
+    "class-methods-use-this": "off"
   },
   "plugins": ["react"]
 }

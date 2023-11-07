@@ -4,7 +4,7 @@ import { ProductEntity } from '@shared/entities/ProductEntity';
 import ProductService from '@services/productService';
 import { CategoryEntity } from '@shared/entities/CategoryEntity';
 import CategoryService from '@services/categoryService';
-import { CachedResourceType, setCachedResource } from './fs.utils';
+import { setCachedResource } from './fs.utils';
 
 export const handleCachedCompany = async (companyId: string): Promise<CompanyEntity> => {
   const companyService = new CompanyService();

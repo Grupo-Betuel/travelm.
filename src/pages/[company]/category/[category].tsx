@@ -1,9 +1,7 @@
 import { Category } from '@screens/Category';
 import { GetServerSideProps } from 'next';
-import axios from 'axios';
 import { CompanyEntity } from '@shared/entities/CompanyEntity';
 import { IMetadata, MetaHeaders } from '@components/MetaHeaders/MetaHeaders';
-import { ProductEntity } from '@shared/entities/ProductEntity';
 import { CategoryEntity } from '@shared/entities/CategoryEntity';
 import { getCachedResources } from '../../../utils/fs.utils';
 import { handleCachedCategories, handleCachedCompany, handleCachedProduct } from '../../../utils/server-side.utils';
