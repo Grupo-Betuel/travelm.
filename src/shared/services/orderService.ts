@@ -127,7 +127,7 @@ export default class OrderService extends BaseService<OrderEntity> {
 
     newLocalOrder.company = Array.from(new Set(newLocalOrder.sales
       .map((s) => s.company)))
-      .join(', ');
+      .join(',');
 
     this.localOrder = newLocalOrder;
   }
