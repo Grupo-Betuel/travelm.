@@ -1,0 +1,40 @@
+# Allow all crawlers
+User-agent: *
+Allow: /
+
+User-agent: *
+Allow: /betueldance
+
+
+User-agent: *
+Allow: /betueltech
+
+
+User-agent: *
+Allow: /dixybaby
+
+User-agent: *
+Allow: /betueldance/detail
+
+User-agent: *
+Allow: /betueltech/detail
+
+
+User-agent: *
+Allow: /dixybaby/detail
+
+
+User-agent: *
+Allow: /betueldance/category
+
+User-agent: *
+Allow: /betueltech/category
+
+
+User-agent: *
+Allow: /dixybaby/category
+
+
+# Block all crawlers for /accounts
+User-agent: *
+Disallow: /client/orders
