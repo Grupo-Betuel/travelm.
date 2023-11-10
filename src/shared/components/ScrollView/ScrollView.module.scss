@@ -21,6 +21,7 @@
       padding: 0 s.$size-medium;
       @include breakpoints.only-on(('m', 'xs')) {
         padding:0 .5rem;
+        gap: s.$size-xxx-large;
       }
 
       &::-webkit-scrollbar {
@@ -33,7 +34,10 @@
       }
 
       .ScrollViewItem {
-        min-width: 300px;
+        min-width: 250px;
+        @include breakpoints.only-on(('m', 'xs')) {
+          min-width: 160px;
+        }
       }
     }
 
@@ -42,12 +46,35 @@
       font-size: text.$font-size-15;
       font-weight: bold;
       cursor: pointer;
-      color: colors.$color-gray-1;
-      top: 50%;
+      color: colors.$color-blue-1;
+      top: 0;
+      display: flex;
+      align-items: center;
       margin-top: calc(text.$font-size-15 / 2 * -1);
       z-index: 9;
+      height: 100%;
+
+      &.disabled {
+        cursor: not-allowed;
+        color: colors.$color-gray-1;
+      }
+
+      &:hover {
+        background: unset;
+        filter: unset;
+      }
+
       @include breakpoints.only-on(('m', 'xs')) {
         font-size: text.$font-size-12;
+        &::before {
+          width: text.$font-size-12 * 1.2;
+          height: text.$font-size-12 * 1.2;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background: white;
+          border-radius:  text.$font-size-14;
+        }
       }
 
     }
@@ -56,7 +83,7 @@
       @extend .Arrow;
       left: -3.5rem;
       @include breakpoints.only-on(('m', 'xs')) {
-        left: -2rem;
+        left: -1rem;
 
       }
     }
@@ -65,8 +92,9 @@
       @extend .Arrow;
       right: -3.5rem;
       @include breakpoints.only-on(('m', 'xs')) {
-        right: -2rem;
+        right: -1rem;
       }
     }
   }
+
 }

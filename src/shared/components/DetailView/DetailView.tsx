@@ -57,6 +57,7 @@ export interface IDetailViewProps {
   productId?: string;
   companyLogo?: string;
   forceLoadProduct?: boolean;
+  goBack?: () => void;
 }
 
 function IconText({ icon, text }: { icon: any; text: string }) {
@@ -86,6 +87,7 @@ export function DetailView({
   productId,
   companyLogo,
   forceLoadProduct,
+  goBack,
 }: IDetailViewProps) {
   const [product, setProduct] = useState<ProductEntity>({} as ProductEntity);
   const [sale, setSale] = useState<Partial<ISale>>({} as ISale);
@@ -116,7 +118,7 @@ export function DetailView({
       const savedSale = currentOrder.sales.find(
         (s) => s.product._id === product._id,
       );
-      if (savedSale && product.productParams.length !== savedSale.params.length) {
+      if (savedSale && product?.productParams?.length !== savedSale?.params?.length) {
         product.productParams.forEach((productParam) => {
           const saleParamIndex = savedSale?.params.findIndex(
             (saleParam) => saleParam.productParam === productParam._id,
@@ -147,6 +149,9 @@ export function DetailView({
   );
 
   const back = () => {
+    if (goBack) {
+      return goBack();
+    }
     if (returnHref) {
       router.push(
         makeContextualHref({ return: true, productId: '' }),

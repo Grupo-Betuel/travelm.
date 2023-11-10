@@ -17,7 +17,7 @@
     z-index: 1;
     min-height: 110vh;
     @include breakpoints.only-on(('m', 'xs')) {
-      padding: sizes.$size-xxx-large;
+      padding: sizes.$size-xxx-large sizes.$size-large;
     }
     .SidebarAffix {
       display: none !important;
@@ -25,16 +25,19 @@
     .HomeContentProducts {
       .HomeContentProductsScrollViewCategories {
         margin: $size-xxx-large * 3 0;
+        @include breakpoints.only-on(('m', 'xs')) {
+          margin: $size-xxx-large * 1.2 0;
+        }
       }
     }
     .HomeCardsGrid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: $size-x-large * 2;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: $size-x-large * 1.2;
       position: relative;
       @include breakpoints.only-on(('m', 'xs')) {
         gap: $size-x-large;
-        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(145px, 1fr));
 
       }
     }

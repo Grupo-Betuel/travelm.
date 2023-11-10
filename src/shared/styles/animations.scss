@@ -8,7 +8,7 @@
 }
 
 .slide-leave {
-  transform: translateX(100%); // TODO: set to 0% and fix pestaneo
+  transform: translateX(0%); // TODO: set to 0% and fix pestaneo
 }
 
 .slide-leave.slide-leave-active {

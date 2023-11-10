@@ -17,22 +17,26 @@
     position: relative;
     z-index: 1;
     @include breakpoints.only-on(('m', 'xs')) {
-      padding: sizes.$size-xxx-large;
+      padding: sizes.$size-xxx-large sizes.$size-large;
     }
+
 
     .CategoryContentProducts {
       .CategoryContentProductsScrollViewCategories {
         margin: $size-xxx-large * 3 0;
+        @include breakpoints.only-on(('m', 'xs')) {
+          margin: $size-xxx-large * 1.2 0;
+        }
       }
     }
     .CategoryCardsGrid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
       gap: $size-x-large * 2;
       position: relative;
       @include breakpoints.only-on(('m', 'xs')) {
         gap: $size-x-large;
-        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(145px, 1fr));
       }
     }
     .CategorySearchWrapper {

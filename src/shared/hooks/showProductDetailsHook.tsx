@@ -4,7 +4,7 @@ import { MainContentModal } from '@shared/components';
 import { DetailView } from '@components/DetailView';
 import { useContextualRouting } from 'next-use-contextual-routing';
 import { useRouter } from 'next/router';
-import Animate from 'rc-animate';
+// import Animate from 'rc-animate';
 
 export interface ShowProductDetailsHookReturn {
   goToProductDetail: (product: ProductEntity) => void;
@@ -13,36 +13,65 @@ export interface ShowProductDetailsHookReturn {
 
 export const showProductDetailsHook = (): ShowProductDetailsHookReturn => {
   const [productDetail, setProductDetail] = useState<ProductEntity>();
+  const [openWrapper, setOpenWrapper] = useState(false);
   const { makeContextualHref, returnHref } = useContextualRouting();
   const router = useRouter();
   const goToProductDetail = (product: ProductEntity) => {
-    setProductDetail(product);
-    router.push(
-      makeContextualHref({ productId: product._id }),
-      `/${product.company}/detail/${product._id}`,
-      {
-        shallow: true,
-      },
-    );
+    setOpenWrapper(true);
+    setTimeout(() => {
+      setProductDetail(product);
+      router.push(
+        makeContextualHref({ productId: product._id }),
+        `/${product.company}/detail/${product._id}`,
+        {
+          shallow: true,
+        },
+      );
+    });
+  };
+
+  const goBack = () => {
+    setProductDetail(undefined);
+    setOpenWrapper(false);
+    setTimeout(() => {
+      router.push(
+        makeContextualHref({ return: true, productId: '' }),
+        returnHref,
+        {
+          shallow: true,
+        },
+      );
+    });
   };
 
   useEffect(() => {
     const productId = router.query.productId as string;
     if (!productId) {
       setProductDetail(undefined);
+      setOpenWrapper(false);
     }
   }, [router.query]);
 
-  const isMobile = typeof window === 'undefined' ? false : window?.innerWidth < 768;
+  // const isMobile = typeof window === 'undefined' ? false : window?.innerWidth < 768;
 
   return {
     goToProductDetail,
     ProductDetail: (
-      <Animate showProp="show" transitionName={isMobile ? 'slide' : 'none'} transitionAppear>
-        <MainContentModal show={!!productDetail?._id}>
-          <DetailView returnHref={returnHref} productDetails={productDetail} />
-        </MainContentModal>
-      </Animate>
+    // <Animate
+    //   showProp="show"
+    //   transitionName={isMobile ? 'slide' : 'none'}
+    //   transitionAppear
+    // >
+      <MainContentModal show={openWrapper}>
+        {productDetail && (
+        <DetailView
+          goBack={goBack}
+          returnHref={returnHref}
+          productDetails={productDetail}
+        />
+        )}
+      </MainContentModal>
+    // </Animate>
     ),
   };
 };

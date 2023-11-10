@@ -20,8 +20,7 @@ export function ScrollView({
 }: IScrollViewProps) {
   const preview = (back?: boolean) => () => {
     const scrollView = scrollViewRef.current as HTMLDivElement;
-    const progress = 280 + 85;
-
+    const progress = 280;
     if (scrollView) {
       scrollView.scrollTo({
         left: back

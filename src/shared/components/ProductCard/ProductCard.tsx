@@ -66,8 +66,8 @@ export function ProductCard({ product, onClick }: IProductProps) {
           <Image
             src={img}
             className={styles.ProductImage}
-            width="350px"
-            height="350px"
+            width="250px"
+            height="250px"
             alt={product.name}
             priority
           />
