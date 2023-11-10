@@ -9,4 +9,5 @@ export enum EndpointsAndEntityStateKeys {
   BY_ID = 'by-id',
   INFINITE_SCROLL_DATA = 'infinityScrollData',
   PENDING = 'pending',
+  BY_REF_ID = 'by-ref-id',
 }

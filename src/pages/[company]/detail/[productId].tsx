@@ -3,20 +3,28 @@ import { GetServerSideProps } from 'next';
 import { CompanyEntity } from '@shared/entities/CompanyEntity';
 import { IMetadata, MetaHeaders } from '@components/MetaHeaders/MetaHeaders';
 import { ProductEntity } from '@shared/entities/ProductEntity';
-import { ICompanyProductsProps } from '../category/[category]';
+import { handleCachedResourceHook } from '@shared/hooks/handleCachedResourceHook';
 // import { getCachedResources } from '../../../utils/fs.utils';
-import { handleCachedCompany, handleCachedProduct } from '../../../utils/server-side.utils';
+import { handleCachedCompany, handleCachedProduct, ICachedResourceResponse } from '../../../utils/server-side.utils';
 
 export interface IProductDetailsProps {
   metadata: IMetadata;
   currentCompany?: CompanyEntity;
-  product?: ProductEntity;
+  cachedResources: ICachedResourceResponse<ProductEntity>;
 }
-export default function ProductDetail({ metadata, currentCompany, product }: IProductDetailsProps) {
+
+export default function ProductDetail({
+  metadata, currentCompany, cachedResources,
+}: IProductDetailsProps) {
+  handleCachedResourceHook(cachedResources);
   return (
     <div>
       <MetaHeaders metadata={metadata} />
-      <DetailView companyLogo={currentCompany?.logo} productDetails={product} forceLoadProduct />
+      <DetailView
+        companyLogo={currentCompany?.logo}
+        productDetails={cachedResources?.data}
+        forceLoadProduct
+      />
     </div>
   );
 }
@@ -32,7 +40,8 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     // if (product) {
     //   handleCachedProduct(productId as string);
     // } else {
-    const product = await handleCachedProduct(productId as string);
+    const cachedProductResource = await handleCachedProduct(productId as string);
+    const product = cachedProductResource.data;
     // }
 
     /// / HANDLING COMPANY DATA
@@ -44,14 +53,16 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     // if (currentCompany) {
     //   handleCachedCompany(companyName as string);
     // } else {
-    const currentCompany = await handleCachedCompany(companyName as string);
+
+    const cachedCompanyResource = await handleCachedCompany(companyName as string);
+    const { data: currentCompany } = cachedCompanyResource;
     // }
 
     const keywords = `${product?.tags?.join(', ') || ''} ${currentCompany?.tags?.join(', ') || ''}`;
     return {
       props: {
         currentCompany,
-        product,
+        cachedResources: cachedProductResource,
         metadata: {
           keywords,
           title: `${product?.name} RD$${product?.price.toLocaleString()}${product?.category?.title ? ` | ${product?.category?.title}` : ''} | ${currentCompany?.title} ${currentCompany?.name}`,
@@ -68,7 +79,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
               : 'video/ogg',
           },
         },
-      } as ICompanyProductsProps,
+      } as IProductDetailsProps,
     };
   } catch (error) {
     console.log('error while getting product detail', error);

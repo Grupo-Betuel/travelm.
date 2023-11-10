@@ -4,12 +4,17 @@ import { GetServerSideProps } from 'next';
 import { IMetadata, MetaHeaders } from '@components/MetaHeaders/MetaHeaders';
 // import { CategoryEntity } from '@shared/entities/CategoryEntity';
 // import { getCachedResources } from '../../../utils/fs.utils';
-import { handleCachedCategories, handleCachedCompany } from '../../../utils/server-side.utils';
+import { handleCachedResourceHook } from '@shared/hooks/handleCachedResourceHook';
+import { CategoryEntity } from '@shared/entities/CategoryEntity';
+import { handleCachedCategories, handleCachedCompany, ICachedResourceResponse } from '../../../utils/server-side.utils';
 
-export interface ICompanyProductsProps {
+export interface ICategoryProductsProps {
   metadata: IMetadata;
+  cachedResources: ICachedResourceResponse<CategoryEntity>;
 }
-export default function CompanyProducts({ metadata }: ICompanyProductsProps) {
+export default function CategoryProducts({ metadata, cachedResources }: ICategoryProductsProps) {
+  handleCachedResourceHook(cachedResources);
+
   return (
     <>
       <MetaHeaders metadata={metadata} />
@@ -27,32 +32,34 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   // if (currentCompany) {
   //   handleCachedCompany(companyName as string);
   // } else {
-  const currentCompany = await handleCachedCompany(companyName as string);
+  const { data: currentCompany } = await handleCachedCompany(companyName as string);
   // }
 
   /// / HANDLING PRODUCT DATA
   const categoryId = context.params?.category as string;
   //
-  // let currentCategory: CategoryEntity | undefined = await getCachedResources<CategoryEntity>(
+  // let currentCategory?: CategoryEntity | undefined = await getCachedResources<CategoryEntity>(
   // categoryId as string,
   // 'categories');
   //
-  // if (currentCategory) {
+  // if (currentCategory?) {
   //   handleCachedCategories(categoryId as string);
   // } else {
-  const currentCategory = await handleCachedCategories(categoryId as string);
+  const cachedResources = await handleCachedCategories(categoryId as string);
+  const currentCategory = cachedResources.data;
   // }
 
   const keywords = `${currentCategory?.tags?.join(', ') || ''} ${currentCompany?.tags?.join(', ') || ''}`;
 
   return {
     props: {
+      cachedResources,
       metadata: {
         keywords,
-        title: `${currentCategory.title} | ${currentCompany?.name} ${currentCompany?.title}`,
-        ogTitle: `${currentCategory.title} | ${currentCompany?.name} ${currentCompany?.title}`,
+        title: `${currentCategory?.title} | ${currentCompany?.name} ${currentCompany?.title}`,
+        ogTitle: `${currentCategory?.title} | ${currentCompany?.name} ${currentCompany?.title}`,
         description:
-          currentCategory.description || currentCompany?.description || '',
+          currentCategory?.description || currentCompany?.description || '',
         image: currentCompany?.wallpaper || currentCompany?.logo || '',
         type: 'website',
         video: {
@@ -63,6 +70,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
             : 'video/ogg',
         },
       },
-    } as ICompanyProductsProps,
+    } as ICategoryProductsProps,
   };
 };

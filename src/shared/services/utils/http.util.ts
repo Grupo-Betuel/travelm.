@@ -110,7 +110,7 @@ export class Http {
         break;
       }
       case StatusCode.NotFound: {
-        toast(`Not Found: ${error.data.message}`, {
+        toast(`Not Found: ${error.data.message || error.data}`, {
           autoClose: false,
           type: 'error',
         });

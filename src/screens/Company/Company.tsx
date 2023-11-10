@@ -16,6 +16,7 @@ import { layoutId, navbarOptionsHeight } from '../../utils/layout.utils';
 
 export interface CompanyProps {
   hideCarousel?: boolean;
+  company?: CompanyEntity;
 }
 
 export type ProductPerCategoryType = {
@@ -25,25 +26,37 @@ export type ProductPerCategoryType = {
   };
 };
 
-export function Company({}: CompanyProps) {
+export function Company({ company }: CompanyProps) {
   const router = useRouter();
   const [companyName, setCompanyName] = useState<string>();
+  const [searchValue, setSearchValue] = useState<string>();
   const [companyProducts, setCompanyProducts] = useState<ProductEntity[]>([]);
   const {
     loading,
     get: getProducts,
     'by-company': companyProductsData,
   } = handleEntityHook<ProductEntity>('products');
-  const { data: companies } = handleEntityHook<CompanyEntity>(
-    'companies',
-    true,
-  );
+  const {
+    get: getCompany,
+    [EndpointsAndEntityStateKeys.BY_REF_ID]: currentCompanyRes,
+  } = handleEntityHook<CompanyEntity>('companies');
   const { goToProductDetail, ProductDetail } = showProductDetailsHook();
+  // const [currentCompany, setCurrentCompany] = useState<CompanyEntity>(new CompanyEntity());
 
   const currentCompany: CompanyEntity = useMemo(
-    () => companies.find((company) => company.companyId === companyName)
-      || ({} as CompanyEntity),
-    [companies, companyName],
+    () => currentCompanyRes?.data[0] || company || {} as CompanyEntity,
+    [currentCompanyRes?.data, company],
+  );
+
+  useEffect(
+    () => {
+      if (!companyName || company?._id) return;
+      getCompany({
+        endpoint: EndpointsAndEntityStateKeys.BY_REF_ID,
+        slug: companyName,
+      });
+    },
+    [companyName],
   );
 
   const productsPerCategories = useMemo<ProductPerCategoryType>(() => {
@@ -87,6 +100,7 @@ export function Company({}: CompanyProps) {
   };
 
   const onSearch = ({ target: { value } }: ChangeEvent<HTMLInputElement>) => {
+    setSearchValue(value);
     const results = deepMatch<ProductEntity>(
       value,
       companyProductsData?.data || [],
@@ -103,7 +117,7 @@ export function Company({}: CompanyProps) {
 
   return (
     <>
-      {loading && (
+      {(loading || (!companyProducts.length && !searchValue)) && (
         <div className="loading">
           <Spin size="large" />
         </div>
@@ -123,6 +137,7 @@ export function Company({}: CompanyProps) {
             <div>
               <div className={styles.CompanySearchWrapper}>
                 <Input
+                  value={searchValue}
                   className={styles.CompanyInputSearch}
                   placeholder="Buscar"
                   suffix={

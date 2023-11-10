@@ -1,5 +1,5 @@
 import { ProductCard } from '@shared/components';
-import { Affix, Input } from 'antd';
+import { Affix, Input, Spin } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
 import { handleEntityHook } from '@shared/hooks/handleEntityHook';
 import { ProductEntity } from '@shared/entities/ProductEntity';
@@ -24,8 +24,10 @@ export type ProductPerCategoryType = {
 // eslint-disable-next-line no-empty-pattern
 export function Category({}: CategoryProps) {
   const router = useRouter();
+  const [searchValue, setSearchValue] = useState<string>();
   const [categoryProducts, setCategoryProducts] = useState<ProductEntity[]>([]);
   const {
+    loading,
     get: getProducts,
     [EndpointsAndEntityStateKeys.BY_CATEGORY]: categoryProductsData,
   } = handleEntityHook<ProductEntity>('products');
@@ -46,6 +48,7 @@ export function Category({}: CategoryProps) {
   }, [categoryProductsData?.data]);
 
   const onSearch = ({ target: { value } }: ChangeEvent<HTMLInputElement>) => {
+    setSearchValue(value);
     const results = deepMatch<ProductEntity>(
       value,
       categoryProductsData?.data || [],
@@ -55,6 +58,12 @@ export function Category({}: CategoryProps) {
 
   return (
     <>
+      {(loading || (!categoryProducts.length && !searchValue)) && (
+        <div className="loading">
+          <Spin size="large" />
+          spe
+        </div>
+      )}
       <div className={styles.CategoryWrapper}>
         {ProductDetail}
         <div className={styles.CategoryContent}>
@@ -66,6 +75,7 @@ export function Category({}: CategoryProps) {
             <div>
               <div className={styles.CategorySearchWrapper}>
                 <Input
+                  value={searchValue}
                   className={styles.CategoryInputSearch}
                   placeholder="Buscar"
                   suffix={

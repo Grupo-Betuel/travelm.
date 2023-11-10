@@ -11,7 +11,7 @@ import {
 import React, { useEffect, useMemo, useState } from 'react';
 import {
   DeleteOutlined,
-  EditOutlined,
+  EditOutlined, ExclamationCircleFilled,
   PlusOutlined,
   ShoppingOutlined,
 } from '@ant-design/icons';
@@ -31,6 +31,8 @@ import { ClientEntity } from '@shared/entities/ClientEntity';
 import { ProductsConstants } from '@shared/constants/products.constants';
 import styles from './ShoppingCartDrawer.module.scss';
 import { orderStatusText } from '../../../utils/constants/order.constant';
+
+const { confirm } = Modal;
 
 export interface IShoppingCartDrawerProps extends DrawerProps {
   onClose: () => void;
@@ -154,6 +156,23 @@ export function ShoppingCartDrawer({
     }
     return color;
   }, [order?.status]);
+
+  const attemptRemoveItem = (product: ProductEntity) => {
+    confirm({
+      title: '¿Estas seguro de eliminar este producto?',
+      icon: <ExclamationCircleFilled rev="" />,
+      content: 'Si quieres revertir el cambio solo recarga la pagina sin actualizar la orden.',
+      closable: true,
+      maskClosable: true,
+      onOk() {
+        removeSale(product);
+      },
+      onCancel() {
+        // console.log('Cancel')
+      },
+    });
+  };
+
   return (
     <Drawer
       open={open}
@@ -221,7 +240,7 @@ export function ShoppingCartDrawer({
                 icon: DeleteOutlined,
                 text: 'Eliminar',
                 key: 'list-vertical-star-o',
-                onClick: removeSale,
+                onClick: attemptRemoveItem,
               },
               {
                 icon: EditOutlined,

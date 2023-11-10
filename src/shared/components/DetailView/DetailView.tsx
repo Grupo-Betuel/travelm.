@@ -90,6 +90,7 @@ export function DetailView({
   goBack,
 }: IDetailViewProps) {
   const [product, setProduct] = useState<ProductEntity>({} as ProductEntity);
+  const [oldSale, setOldSale] = useState<Partial<ISale>>({} as ISale);
   const [sale, setSale] = useState<Partial<ISale>>({} as ISale);
   const [showMoreDescription, setShowMoreDescription] = useState(false);
   const router = useRouter();
@@ -142,15 +143,44 @@ export function DetailView({
       // savedSale?.params.forEach((param) => handleSaleProductParams(param)());
     }
   }, [product, currentOrder]);
+  useEffect(() => {
+    const handleBeforeHistoryChange = () => {
+      back();
+    };
+
+    // Event listener for beforeHistoryChange
+    router.events.on('beforeHistoryChange', handleBeforeHistoryChange);
+
+    // Clean up the event listener when the component is unmounted
+    return () => {
+      router.events.off('beforeHistoryChange', handleBeforeHistoryChange);
+    };
+  }, [router.events]);
+
+  const handleEscKeyPress = (event: KeyboardEvent) => {
+    if (event.key === 'Escape') {
+      back();
+    }
+  };
+
+  useEffect(() => {
+    // Attach the event listener when the component mounts
+    document.addEventListener('keydown', handleEscKeyPress);
+    // Detach the event listener when the component unmounts
+    return () => {
+      document.removeEventListener('keydown', handleEscKeyPress);
+    };
+  }, []); // Empty dependency array ensures the effect runs once on mount and cleans up on unmount
 
   const productExistOnShoppingCart = useMemo(
     () => !!orderService?.getSaleByProductId(product._id),
-    [orderService?.localOrder],
+    [orderService?.localOrder, sale.params],
   );
 
   const back = () => {
     if (goBack) {
-      return goBack();
+      goBack();
+      return;
     }
     if (returnHref) {
       router.push(
@@ -161,6 +191,7 @@ export function DetailView({
         },
       );
     } else {
+      if (!product?.company) return;
       router.push(`/${product.company}`);
     }
   };
@@ -364,6 +395,10 @@ export function DetailView({
     });
     initialValues.quantity = sale?.quantity;
     productOptionsForm.setFieldsValue(initialValues);
+    // store the old sale
+    if (!oldSale._id) {
+      setOldSale(sale);
+    }
     // return initialValues;
   }, [sale]);
 
@@ -377,15 +412,25 @@ export function DetailView({
     toggleCart();
   };
 
+  const saleNeedUpdate = useMemo(() => {
+    const paramChanged = JSON.stringify(sale.params) !== JSON.stringify(oldSale.params);
+    const hasChanges = sale.params?.length ? paramChanged : sale.quantity !== oldSale.quantity;
+    return oldSale._id && hasChanges;
+  }, [sale.params]);
+
   const shoppingActionText = useMemo(
-    () => (productExistOnShoppingCart ? ProductsConstants.VIEW_CART : ProductsConstants.ADD_CART),
-    [productExistOnShoppingCart],
+    () => (productExistOnShoppingCart
+      ? saleNeedUpdate ? ProductsConstants.UPDATE_ORDER_IN_CART : ProductsConstants.VIEW_CART
+      : ProductsConstants.ADD_CART),
+    [productExistOnShoppingCart, saleNeedUpdate],
   );
+
   const shoppingActionDisabled = useMemo(
     () => (!sale?.quantity && !productExistOnShoppingCart)
       || (sale?.quantity || 0) > product.stock,
     [productExistOnShoppingCart, sale, product],
   );
+
   const ShoppingActionButton = (
     <Button
       type="primary"
@@ -539,6 +584,7 @@ export function DetailView({
                                 ]}
                               >
                                 <InputNumber
+                                  onWheel={(e) => e.currentTarget.blur()}
                                   type="number"
                                   placeholder="Cantidad"
                                   value={getQuantityValue(
@@ -582,6 +628,7 @@ export function DetailView({
                           ]}
                         >
                           <InputNumber
+                            onWheel={(e) => e.currentTarget.blur()}
                             type="number"
                             className={
                               styles.DetailViewPostDetailsContentOptionQuantity
@@ -618,6 +665,7 @@ export function DetailView({
                   ]}
                 >
                   <InputNumber
+                    onWheel={(e) => e.currentTarget.blur()}
                     type="number"
                     addonAfter={(
                       <CloseOutlined

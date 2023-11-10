@@ -5,6 +5,7 @@ export const ProductsConstants = {
   ALMOST_SOLD_OUT_QUANTITY: 10,
   ADD_CART: 'Agregar a la Orden',
   VIEW_CART: 'Ver Orden',
+  UPDATE_ORDER_IN_CART: 'Ir a Actualizar Orden',
   UPDATE_CART: 'Atualizar Orden',
   SEND_CART: 'Enviar Orden',
   NEXT: 'Siguiente',
