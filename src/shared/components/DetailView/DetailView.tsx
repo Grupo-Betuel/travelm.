@@ -116,12 +116,30 @@ export function DetailView({
       const savedSale = currentOrder.sales.find(
         (s) => s.product._id === product._id,
       );
+      if (savedSale && product.productParams.length !== savedSale.params.length) {
+        product.productParams.forEach((productParam) => {
+          const saleParamIndex = savedSale?.params.findIndex(
+            (saleParam) => saleParam.productParam === productParam._id,
+          );
+
+          if (saleParamIndex && saleParamIndex !== -1 && !!savedSale?.params) {
+            const saleParamData = savedSale.params[saleParamIndex];
+            const param = parseProductParamToSaleParams(
+              productParam,
+              saleParamData as IProductSaleParam,
+            );
+            savedSale.params[saleParamIndex] = param;
+          }
+        });
+      }
+
       setSale({
         ...getSaleDataFromProduct(product),
         ...savedSale,
       });
+      // savedSale?.params.forEach((param) => handleSaleProductParams(param)());
     }
-  }, [product]);
+  }, [product, currentOrder]);
 
   const productExistOnShoppingCart = useMemo(
     () => !!orderService?.getSaleByProductId(product._id),
@@ -146,18 +164,29 @@ export function DetailView({
   const hasImages = product.images && !!product.images.length;
   const hasMultipleImages = hasImages && product.images.length > 1;
 
-  const handleSaleProductParams = (productParam: IProductParam | IProductSaleParam) => () => {
-    const saleParam: any = (productParam as IProductSaleParam).productParam
-      ? (productParam as IProductSaleParam)
-      : ({} as IProductSaleParam);
+  const parseProductParamToSaleParams = (
+    productParam: IProductParam,
+    saleParam: Partial<IProductSaleParam>,
+  ) => {
+    const relatedParamsData = productParam.relatedParams?.map((item) => {
+      const newRelParam = ({
+        ...item,
+        _id: undefined,
+        productParam: item._id,
+        productQuantity: item.quantity,
+        quantity: 0,
+      });
+      const existingRelParam = saleParam.relatedParams?.find(
+        (relParam) => relParam.productParam === item._id,
+      );
+      return existingRelParam || newRelParam;
+    });
 
-    const relatedParams = productParam.relatedParams?.map((item) => ({
-      ...item,
-      _id: undefined,
-      productParam: item._id,
-      productQuantity: item.quantity,
-      quantity: 0,
-    }));
+    const relatedParams = Array.from(new Set([
+      ...(relatedParamsData || []),
+      ...(saleParam.relatedParams || [])]
+      .map((item) => JSON.stringify(item))))
+      .map((item) => JSON.parse(item));
 
     // @ts-ignore
     const param: IProductSaleParam = {
@@ -167,24 +196,34 @@ export function DetailView({
       type: productParam.type,
       productQuantity: productParam.quantity,
       quantity: 0,
-      relatedParams: relatedParams || ([] as any),
       productParam: productParam._id,
       ...saleParam,
+      relatedParams,
     };
 
+    return param;
+  };
+
+  const handleSaleProductParams = (productParam: IProductParam | IProductSaleParam) => () => {
+    const saleParam: any = (productParam as IProductSaleParam).productParam
+      ? (productParam as IProductSaleParam)
+      : ({} as IProductSaleParam);
+
+    const param = parseProductParamToSaleParams(productParam as IProductParam, saleParam);
     const exist = sale?.params?.find(
       (p) => p.productParam === param.productParam,
     );
+    let newParams: IProductSaleParam[] | undefined = [];
     if (exist) {
-      const newParams = sale?.params?.filter(
+      newParams = sale?.params?.filter(
         (p) => p.productParam !== param.productParam,
       );
-      setSale({ ...sale, params: newParams });
+      // setSale({ ...sale, params: newParams });
     } else {
-      const newParams = [...(sale?.params || [])];
+      newParams = [...(sale?.params || [])];
       newParams.push(param);
-      setSale({ ...sale, params: newParams });
     }
+    setSale({ ...sale, params: newParams });
   };
 
   const handleSaleQuantity = (value?: any) => {
@@ -215,33 +254,35 @@ export function DetailView({
     const quantity = Number(value || 0);
     const exist = newSale?.params?.find((p) => p.productParam === parentId);
 
-    const productParam = exist;
-    if (!productParam) {
+    const saleParam = exist;
+    if (!saleParam) {
       // productParam =
       //   productData.productParams.find((p) => p._id === parentId) ||
       //   ({} as IProductParam);
-      console.log('no product param');
       return;
     }
 
-    const variant = productParam?.relatedParams?.find(
+    const variant = saleParam?.relatedParams?.find(
       (v) => v.productParam === variantId,
     );
     if (variant) {
       variant.quantity = quantity;
-      total = productParam?.relatedParams?.reduce(
+      total = saleParam?.relatedParams?.reduce(
         (acc, v) => acc + (v.quantity || 0),
         0,
       ) || 0;
+      saleParam.relatedParams = saleParam?.relatedParams?.map(
+        (v) => (variant.productParam === v.productParam ? variant : v),
+      );
     } else {
       total = quantity;
     }
-    productParam.quantity = total;
+    saleParam.quantity = total;
 
     if (exist) {
       const newParams = newSale?.params?.map((p) => {
         if (p.productParam === parentId) {
-          return productParam;
+          return saleParam;
         }
         return p;
       }) as IProductParam[];
@@ -251,7 +292,7 @@ export function DetailView({
       };
     } else {
       const newParams = [...(newSale?.params || [])];
-      newParams.push(productParam);
+      newParams.push(saleParam);
       newSale = {
         ...newSale,
         params: newParams,
@@ -269,23 +310,23 @@ export function DetailView({
         () => true,
         () => false,
       );
-
     if (controlIsValid) {
-      setSale({ ...newSale });
-
-      if (saleTotal <= 0) {
-        orderService?.removeSale(product._id);
-      } else {
+      if (saleTotal > 0) {
         if (quantity <= 0) {
           newSale.params = newSale?.params?.filter(
             (item) => item._id !== parentId,
           );
         }
-
         // if the order exist just
         if (productExistOnShoppingCart) {
           orderService?.handleLocalOrderSales(newSale);
         }
+      }
+
+      setSale({ ...newSale });
+
+      if (saleTotal <= 0) {
+        orderService?.removeSale(product._id);
       }
     }
   };

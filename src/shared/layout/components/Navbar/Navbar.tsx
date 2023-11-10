@@ -65,9 +65,9 @@ export function Navbar() {
   const [salesQuantity, setSalesQuantity] = useState(0);
 
   useEffect(() => {
-    if (salesQuantityData || salesQuantityData === 0) {
-      setSalesQuantity(salesQuantityData);
-    }
+    // if (salesQuantityData || salesQuantityData === 0) {
+    setSalesQuantity(salesQuantityData);
+    // }
   }, [salesQuantityData]);
 
   const { cartIsOpen, toggleCart } = useOrderContext();
