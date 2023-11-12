@@ -52,7 +52,7 @@ export const getStaticPaths: GetStaticPaths<{ slug: string }> = async () => {
 
   return ({
     paths: allProductSlugs, // indicates that no page needs be created at build time
-    fallback: 'blocking', // indicates the type of fallback
+    fallback: false, // indicates the type of fallback
   });
 };
 

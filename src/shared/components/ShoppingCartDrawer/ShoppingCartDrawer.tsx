@@ -77,7 +77,7 @@ export function ShoppingCartDrawer({
   };
 
   const editSale = (product: ProductEntity) => {
-    router.push(`/${product.company}/detail/${product?._id}`);
+    router.push(`/${product.company}/detail/${product?.slug}`);
     onClose && onClose();
   };
 
