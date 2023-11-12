@@ -24,6 +24,7 @@ const injectToken = (config: AxiosRequestConfig): AxiosRequestConfig => {
     if (token != null) {
       if (config.headers) config.headers.Authorization = `Bearer ${token}`;
     }
+
     return config;
     // eslint-disable-next-line
   } catch (error: any) {

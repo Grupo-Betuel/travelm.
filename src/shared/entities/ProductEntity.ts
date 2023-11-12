@@ -4,6 +4,8 @@ import { BaseEntity } from './BaseEntity';
 export class ProductEntity extends BaseEntity {
   name: string = '';
 
+  slug: string = '';
+
   price: number = 0;
 
   wholeSale?: string = '';

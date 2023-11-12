@@ -1,5 +1,5 @@
 import { Category } from '@screens/Category';
-import { GetServerSideProps } from 'next';
+import { GetServerSideProps, GetStaticPaths } from 'next';
 // import { CompanyEntity } from '@shared/entities/CompanyEntity';
 import { IMetadata, MetaHeaders } from '@components/MetaHeaders/MetaHeaders';
 // import { CategoryEntity } from '@shared/entities/CategoryEntity';
@@ -23,7 +23,11 @@ export default function CategoryProducts({ metadata, cachedResources }: ICategor
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
+export const getStaticPaths: GetStaticPaths<{ company: string }> = async () => ({
+  paths: [], // indicates that no page needs be created at build time
+  fallback: 'blocking', // indicates the type of fallback
+});
+export const getStaticProps: GetServerSideProps = async (context) => {
   /// / HANDLING COMPANY DATA
   const companyName = context.params?.company;
   // let currentCompany: CompanyEntity | undefined = await getCachedResources<CompanyEntity>(

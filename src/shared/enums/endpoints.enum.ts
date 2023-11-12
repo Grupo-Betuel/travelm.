@@ -7,6 +7,7 @@ export enum EndpointsAndEntityStateKeys {
   BY_CLIENT = 'by-client',
   PRODUCT_SAMPLES = 'product-samples',
   BY_ID = 'by-id',
+  BY_SLUG = 'by-slug',
   INFINITE_SCROLL_DATA = 'infinityScrollData',
   PENDING = 'pending',
   BY_REF_ID = 'by-ref-id',

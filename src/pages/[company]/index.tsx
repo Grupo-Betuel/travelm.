@@ -1,10 +1,12 @@
 import { Company } from 'src/screens/Company';
-import { GetServerSideProps } from 'next';
+import { GetServerSideProps, GetStaticPaths } from 'next';
 // import { CompanyEntity } from '@shared/entities/CompanyEntity';
 import React from 'react';
 import { MetaHeaders } from '@components/MetaHeaders/MetaHeaders';
 // import { getCachedResources } from '../../utils/fs.utils';
 import { handleCachedResourceHook } from '@shared/hooks/handleCachedResourceHook';
+import { CompanyEntity } from '@shared/entities/CompanyEntity';
+import axios from 'axios';
 import { handleCachedCompany } from '../../utils/server-side.utils';
 
 export default function CompanyProducts({ metadata, cachedResources }: any) {
@@ -17,7 +19,22 @@ export default function CompanyProducts({ metadata, cachedResources }: any) {
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
+export const getStaticPaths: GetStaticPaths<{ company: string }> = async () => {
+  const url = `${process.env.NEXT_PUBLIC_API_URL}api/companies`;
+  const companies: CompanyEntity[] = (await axios.get<CompanyEntity[]>(url)).data;
+  const companyPaths = companies.map((company) => ({
+    params: {
+      company: company.companyId,
+    },
+  }));
+
+  return ({
+    paths: companyPaths, // indicates that no page needs be created at build time
+    fallback: false, // indicates the type of fallback
+  });
+};
+
+export const getStaticProps: GetServerSideProps = async (context) => {
   const companyName = context.params?.company;
   // let currentCompany: CompanyEntity | undefined = await getCachedResources(
   // companyName as string,
@@ -33,7 +50,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   } = cachedResources;
 
   // }
-
   const keywords = `${currentCompany?.tags?.join(', ') || ''}`;
   return {
     props: {

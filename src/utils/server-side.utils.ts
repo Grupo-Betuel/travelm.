@@ -4,6 +4,7 @@ import { ProductEntity } from '@shared/entities/ProductEntity';
 import ProductService from '@services/productService';
 import { CategoryEntity } from '@shared/entities/CategoryEntity';
 import CategoryService from '@services/categoryService';
+
 // import { setCachedResource } from './fs.utils';
 export interface IErrorResponse {
   status: number;
@@ -34,11 +35,15 @@ export async function handleCachedCompany(
 }
 
 export const handleCachedProduct = async (
-  productId: string,
+  slug: string,
 ): Promise<ICachedResourceResponse<ProductEntity>> => {
   try {
     const productService = new ProductService();
-    const product = await productService.getProductById(productId);
+    const product = await productService.getProductBySlug(slug);
+    // const product = await productService.get({
+    //   endpoint: EndpointsAndEntityStateKeys.BY_SLUG,
+    //   slug,
+    // }) as any;
     // product && setCachedResource(product, 'products');
     return { data: product };
   } catch (res: any) {

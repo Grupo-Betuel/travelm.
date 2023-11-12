@@ -102,9 +102,9 @@ export function DetailView({
   const currentOrder = useAppStore((state) => state.currentOrder);
 
   useEffect(() => {
-    const productSlug = router.query.productId as string;
+    const productSlug = router.query.slug as string;
     if (productSlug && (!productDetails || forceLoadProduct)) {
-      get({ endpoint: EndpointsAndEntityStateKeys.BY_ID, slug: productSlug });
+      get({ endpoint: EndpointsAndEntityStateKeys.BY_SLUG, slug: productSlug });
     }
   }, [router.query, productId, productDetails]);
 

@@ -7,9 +7,9 @@ export default class ProductService extends BaseService<ProductEntity> {
     super('products');
   }
 
-  async getProductById(productId: string) {
+  async getProductBySlug(slug: string) {
     return (await axios.get<ProductEntity>(
-      `${process.env.NEXT_PUBLIC_API_URL}api/products/by-id/${productId}`,
+      `${process.env.NEXT_PUBLIC_API_URL}api/products/by-slug/${slug}`,
     )).data;
   }
 }
