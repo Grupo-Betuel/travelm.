@@ -20,7 +20,6 @@ export const showProductDetailsHook = (): ShowProductDetailsHookReturn => {
     setOpenWrapper(true);
     setTimeout(() => {
       setProductDetail(product);
-      console.log('product', product);
       router.push(
         makeContextualHref({ productId: product._id }),
         `/${product.company}/products/${product.slug}`,

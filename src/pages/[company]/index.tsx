@@ -11,7 +11,6 @@ import { handleCachedCompany } from '../../utils/server-side.utils';
 
 export default function CompanyProducts({ metadata, cachedResources }: any) {
   const { sitemap } = handleCachedResourceHook(cachedResources);
-  console.log('xml sitmap', sitemap);
   return (
     <>
       <MetaHeaders metadata={metadata} />

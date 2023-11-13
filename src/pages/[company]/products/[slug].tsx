@@ -22,7 +22,6 @@ export default function ProductDetail({
   metadata, currentCompany, cachedResources,
 }: IProductDetailsProps) {
   const { sitemap, jsonld } = handleCachedResourceHook(cachedResources);
-  console.log('jsonld =>', jsonld);
   return (
     <div>
       <MetaHeaders metadata={{ ...metadata, jsonld }} />
@@ -69,7 +68,6 @@ export const getStaticProps: GetServerSideProps = async (context) => {
     //   handleCachedProduct(productSlug as string);
     // } else {
     const cachedProductResource = await handleCachedProduct(productSlug as string);
-    console.log('cache=>', cachedProductResource);
     const product = cachedProductResource.data;
     // }
 

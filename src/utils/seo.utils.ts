@@ -140,7 +140,6 @@ export const generateCompanyJsonLd = (company: CompanyEntity) => {
 export function generateProductJSONLD(product: ProductEntity) {
   const productUrl = getProductUrl(product);
   const productName = `${product.name} ${product?.category?.title || ''}`;
-  console.log('category ?', product.category);
   const jsonLD: any = {
     '@context': 'https://schema.org/',
     '@type': 'Product',
@@ -225,7 +224,6 @@ export function generateProductJSONLD(product: ProductEntity) {
       value: param.relatedParams?.map((relatedParam) => `${relatedParam.label} ${relatedParam.value}`),
     }));
 
-  console.log('jsonld', jsonLD);
   return JSON.stringify(jsonLD, null, 2);
 }
 
