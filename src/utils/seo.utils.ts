@@ -1,5 +1,5 @@
 import {
-  IProductParam, IProductSaleParam, ProductEntity, ProductParamTypes,
+  IProductSaleParam, ProductEntity, ProductParamTypes,
 } from '@shared/entities/ProductEntity';
 import { CompanyEntity } from '@shared/entities/CompanyEntity';
 import { CategoryEntity } from '@shared/entities/CategoryEntity';
