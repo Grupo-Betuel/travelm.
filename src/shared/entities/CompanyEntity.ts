@@ -18,6 +18,10 @@ export class CompanyEntity extends BaseEntity {
   video: string = '';
 
   tags?: string[];
+
+  facebook?: any;
+
+  instagram?: any;
 }
 
 export const companyTitles: { [N in string]: string } = {

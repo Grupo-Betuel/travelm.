@@ -14,14 +14,14 @@ User-agent: *
 Allow: /dixybaby
 
 User-agent: *
-Allow: /betueldance/detail
+Allow: /betueldance/products
 
 User-agent: *
-Allow: /betueltech/detail
+Allow: /betueltech/products
 
 
 User-agent: *
-Allow: /dixybaby/detail
+Allow: /dixybaby/products
 
 
 User-agent: *

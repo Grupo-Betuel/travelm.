@@ -7,6 +7,10 @@ export class CategoryEntity extends BaseEntity {
 
   description: string = '';
 
+  wallpaper: string = '';
+
+  video: string = '';
+
   slug: string = '';
 
   tags?: string[];

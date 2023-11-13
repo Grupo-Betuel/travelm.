@@ -77,13 +77,13 @@ export function ShoppingCartDrawer({
   };
 
   const editSale = (product: ProductEntity) => {
-    router.push(`/${product.company}/detail/${product?.slug}`);
+    router.push(`/${product.company}/products/${product?.slug}`);
     onClose && onClose();
   };
 
   const removeSale = (product: ProductEntity) => {
     orderService.removeSale(product._id);
-    // router.push(`/${product.company}/detail/${product?._id}`)
+    // router.push(`/${product.company}/products/${product?._id}`)
     // onClose && onClose({} as any)
   };
 

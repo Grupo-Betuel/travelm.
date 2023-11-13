@@ -21,10 +21,12 @@ export interface IProductDetailsProps {
 export default function ProductDetail({
   metadata, currentCompany, cachedResources,
 }: IProductDetailsProps) {
-  handleCachedResourceHook(cachedResources);
+  const { sitemap, jsonld } = handleCachedResourceHook(cachedResources);
+  console.log('jsonld =>', jsonld);
   return (
     <div>
-      <MetaHeaders metadata={metadata} />
+      <MetaHeaders metadata={{ ...metadata, jsonld }} />
+      {sitemap}
       <DetailView
         companyLogo={currentCompany?.logo}
         productDetails={cachedResources?.data}
@@ -33,7 +35,6 @@ export default function ProductDetail({
     </div>
   );
 }
-
 export const getStaticPaths: GetStaticPaths<{ slug: string }> = async () => {
   const companyUrl = `${process.env.NEXT_PUBLIC_API_URL}api/companies`;
   const companies: CompanyEntity[] = (await axios.get<CompanyEntity[]>(companyUrl)).data;
@@ -68,6 +69,7 @@ export const getStaticProps: GetServerSideProps = async (context) => {
     //   handleCachedProduct(productSlug as string);
     // } else {
     const cachedProductResource = await handleCachedProduct(productSlug as string);
+    console.log('cache=>', cachedProductResource);
     const product = cachedProductResource.data;
     // }
 
@@ -109,7 +111,7 @@ export const getStaticProps: GetServerSideProps = async (context) => {
       } as IProductDetailsProps,
     };
   } catch (error) {
-    console.log('error while getting product detail', error);
+    console.log('error while getting product products', error);
     throw error;
   }
 };

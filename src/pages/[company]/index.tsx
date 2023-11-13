@@ -10,10 +10,12 @@ import axios from 'axios';
 import { handleCachedCompany } from '../../utils/server-side.utils';
 
 export default function CompanyProducts({ metadata, cachedResources }: any) {
-  handleCachedResourceHook(cachedResources);
+  const { sitemap } = handleCachedResourceHook(cachedResources);
+  console.log('xml sitmap', sitemap);
   return (
     <>
       <MetaHeaders metadata={metadata} />
+      {sitemap}
       <Company company={cachedResources?.data} />
     </>
   );

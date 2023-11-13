@@ -23,7 +23,7 @@ export const showProductDetailsHook = (): ShowProductDetailsHookReturn => {
       console.log('product', product);
       router.push(
         makeContextualHref({ productId: product._id }),
-        `/${product.company}/detail/${product.slug}`,
+        `/${product.company}/products/${product.slug}`,
         {
           shallow: true,
         },

@@ -3,6 +3,7 @@ import Head from 'next/head';
 export interface IMetadata {
   ogTitle?: string;
   description?: string;
+  jsonld?: string;
   keywords?: string;
   type?: 'article' | 'website';
   image?: string;
@@ -30,7 +31,13 @@ export const MetaHeaders = ({ metadata }: IMetaHeadersProps) => (
     <meta property="og:video:type" content={metadata?.video?.type || ''} />
     <meta property="og:type" content={metadata?.type || ''} />
     <title>{metadata?.title || ''}</title>
-    <meta name="description" content={metadata?.description || ''} />
+    <meta name="description" key="desc" content={metadata?.description || ''} />
     <meta name="keywords" content={metadata?.keywords || ''} />
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{
+        __html: metadata?.jsonld || '',
+      }}
+    />
   </Head>
 );
