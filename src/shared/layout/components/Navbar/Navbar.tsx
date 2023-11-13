@@ -107,7 +107,7 @@ export function Navbar() {
     label: cat.title,
     icon: <DatabaseOutlined rev="" />,
     onClick: () => {
-      router.push(`/${cat.company}/category/${cat._id}`);
+      router.push(`/${cat.company}/category/${cat.slug}`);
       setHideSidebar(true);
     },
   }));

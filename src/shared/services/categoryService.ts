@@ -7,9 +7,9 @@ export default class CategoryService extends BaseService<CategoryEntity> {
     super('categories');
   }
 
-  async getCategoryById(catId: string) {
+  async getCategoryBySlug(slug: string) {
     return (await axios.get<CategoryEntity>(
-      `${process.env.NEXT_PUBLIC_API_URL}api/categories/${catId}`,
+      `${process.env.NEXT_PUBLIC_API_URL}api/categories/by-slug/${slug}`,
     )).data;
   }
 }

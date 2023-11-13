@@ -6,6 +6,7 @@ import { IMetadata, MetaHeaders } from '@components/MetaHeaders/MetaHeaders';
 // import { getCachedResources } from '../../../utils/fs.utils';
 import { handleCachedResourceHook } from '@shared/hooks/handleCachedResourceHook';
 import { CategoryEntity } from '@shared/entities/CategoryEntity';
+import axios from 'axios';
 import { handleCachedCategories, handleCachedCompany, ICachedResourceResponse } from '../../../utils/server-side.utils';
 
 export interface ICategoryProductsProps {
@@ -23,10 +24,21 @@ export default function CategoryProducts({ metadata, cachedResources }: ICategor
   );
 }
 
-export const getStaticPaths: GetStaticPaths<{ company: string }> = async () => ({
-  paths: [], // indicates that no page needs be created at build time
-  fallback: 'blocking', // indicates the type of fallback
-});
+export const getStaticPaths: GetStaticPaths<{ company: string, category: string }> = async () => {
+  const url = `${process.env.NEXT_PUBLIC_API_URL}api/categories/slugs`;
+  const { data: categorySlugs } = await axios.get<CategoryEntity[]>(url);
+  const categorySlugsPaths = categorySlugs.map((cat) => ({
+    params: {
+      category: cat.slug,
+      company: cat.company,
+    },
+  }));
+  console.log('cat slugs', categorySlugsPaths);
+  return ({
+    paths: categorySlugsPaths, // indicates that no page needs be created at build time
+    fallback: true, // indicates the type of fallback
+  });
+};
 export const getStaticProps: GetServerSideProps = async (context) => {
   /// / HANDLING COMPANY DATA
   const companyName = context.params?.company;
@@ -40,16 +52,16 @@ export const getStaticProps: GetServerSideProps = async (context) => {
   // }
 
   /// / HANDLING PRODUCT DATA
-  const categoryId = context.params?.category as string;
+  const categorySlug = context.params?.category as string;
   //
   // let currentCategory?: CategoryEntity | undefined = await getCachedResources<CategoryEntity>(
-  // categoryId as string,
+  // categorySlug as string,
   // 'categories');
   //
   // if (currentCategory?) {
-  //   handleCachedCategories(categoryId as string);
+  //   handleCachedCategories(categorySlug as string);
   // } else {
-  const cachedResources = await handleCachedCategories(categoryId as string);
+  const cachedResources = await handleCachedCategories(categorySlug as string);
   const currentCategory = cachedResources.data;
   // }
 

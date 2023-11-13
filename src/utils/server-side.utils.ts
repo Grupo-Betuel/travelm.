@@ -52,11 +52,11 @@ export const handleCachedProduct = async (
 };
 
 export const handleCachedCategories = async (
-  catId: string,
+  catSlug: string,
 ): Promise<ICachedResourceResponse<CategoryEntity>> => {
   try {
     const categoryService = new CategoryService();
-    const category = await categoryService.getCategoryById(catId);
+    const category = await categoryService.getCategoryBySlug(catSlug);
     // category && setCachedResource(category, 'categories');
     return { data: category };
   } catch (res: any) {

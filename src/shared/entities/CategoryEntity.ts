@@ -7,5 +7,7 @@ export class CategoryEntity extends BaseEntity {
 
   description: string = '';
 
+  slug: string = '';
+
   tags?: string[];
 }
