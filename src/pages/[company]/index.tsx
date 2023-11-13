@@ -14,14 +14,14 @@ export default function CompanyProducts({ metadata, cachedResources }: any) {
   return (
     <>
       <MetaHeaders metadata={metadata} />
-      <Company company={cachedResources.data} />
+      <Company company={cachedResources?.data} />
     </>
   );
 }
 
 export const getStaticPaths: GetStaticPaths<{ company: string }> = async () => {
   const url = `${process.env.NEXT_PUBLIC_API_URL}api/companies`;
-  const companies: CompanyEntity[] = (await axios.get<CompanyEntity[]>(url)).data;
+  const companies: CompanyEntity[] = (await axios.get<CompanyEntity[]>(url))?.data;
   const companyPaths = companies.map((company) => ({
     params: {
       company: company.companyId,

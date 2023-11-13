@@ -33,7 +33,6 @@ export const getStaticPaths: GetStaticPaths<{ company: string, category: string 
       company: cat.company,
     },
   }));
-  console.log('cat slugs', categorySlugsPaths);
   return ({
     paths: categorySlugsPaths, // indicates that no page needs be created at build time
     fallback: true, // indicates the type of fallback
