@@ -55,7 +55,7 @@ export function ShoppingCart({ itemActions, sales }: IShoppingCartProps) {
               onClick={() => action.onClick && action.onClick(sale.product)}
             />
           ))}
-          extra={<Image width={100} alt="logo" src={sale.product.image} />}
+          extra={<Image width={100} alt={sale.product.slug} src={sale.product.image} />}
         >
           <List.Item.Meta
             title={sale.product.name}

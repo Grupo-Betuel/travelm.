@@ -490,12 +490,12 @@ export function DetailView({
           className={styles.DetailViewPostDetails}
         >
           <div className={styles.DetailViewPostDetailsHeader}>
-            <span className="title">{product.name}</span>
-            <span className="subtitle">
+            <h1 className="title m-0">{product.name}</h1>
+            <h2 className="subtitle m-0">
               RD$
               {' '}
               {product.price?.toLocaleString()}
-            </span>
+            </h2>
             <span className="label">
               {product.stock}
               {' '}

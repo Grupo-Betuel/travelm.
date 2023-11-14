@@ -33,6 +33,7 @@ export const MetaHeaders = ({ metadata }: IMetaHeadersProps) => (
     <title>{metadata?.title || ''}</title>
     <meta name="description" key="desc" content={metadata?.description || ''} />
     <meta name="keywords" content={metadata?.keywords || ''} />
+    <meta charSet="utf-8" />
     <script
       type="application/ld+json"
       dangerouslySetInnerHTML={{

@@ -96,7 +96,7 @@ export function Home({}: HomeProps) {
   ]);
 
   const handleSeeMore = (product: ProductEntity) => {
-    router.push(`/${product.company}`);
+    // router.push(`/${product.company}`);
   };
 
   const onSearch = ({ target: { value } }: ChangeEvent<HTMLInputElement>) => {
@@ -120,6 +120,7 @@ export function Home({}: HomeProps) {
         <meta property="og:video" content="/images/video.mp4" />
         <meta property="og:video:secure_url" content="/images/video.mp4" />
         <meta property="og:video:type" content="video/mp4" />
+        <meta charSet="utf-8" />
       </Head>
       {ProductDetail}
       <div className={styles.HomeContent}>
@@ -158,7 +159,7 @@ export function Home({}: HomeProps) {
                   wrapperClassName={
                     styles.HomeContentProductsScrollViewCategories
                   }
-                  handleSeeMore={handleSeeMore}
+                  seeMoreRoute={`/${companyId}`}
                   handleProductClick={goToProductDetail}
                   products={companyProds.products}
                   title={companyProds.title}

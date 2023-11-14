@@ -12,21 +12,22 @@ export const ImageBackground: FC<ImageBackgroundProps> = ({ image }) => (
     <div
       className={styles.ImageBackground}
       style={
-          image
-            ? {
-              backgroundImage: `url(${image})`,
-            }
-            : {}
-        }
+        image
+          ? {
+            backgroundImage: `url(${image})`,
+          }
+          : {}
+      }
     />
     {image ? (
       <AntdImage
         preview={{ mask: false }}
         src={image}
         rootClassName={styles.ImageWrapper}
+        alt={image}
       />
     ) : (
-      <Image priority alt="" src={image} />
+      <Image priority alt={image} src={image} />
     )}
   </div>
 );

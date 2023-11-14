@@ -5,7 +5,8 @@ import ProductService from '@services/productService';
 import { CategoryEntity } from '@shared/entities/CategoryEntity';
 import CategoryService from '@services/categoryService';
 import {
-  generateCategorySitemapXml,
+  generateCategoryJSONLD,
+  generateCategorySitemapXml, generateCompanyJSONLD,
   generateCompanySitemapXml,
   generateProductJSONLD,
   generateProductSitemapXML,
@@ -40,8 +41,9 @@ export async function handleCachedCompany(
     const currentCompany = await companyService.getCompanyByRefName(companyId);
     // currentCompany && setCachedResource(currentCompany, 'companies', currentCompany.companyId);
     const companyXML = currentCompany && generateCompanySitemapXml(currentCompany);
+    const jsonld = currentCompany && generateCompanyJSONLD(currentCompany);
 
-    return { data: currentCompany, sitemapXML: companyXML };
+    return { data: currentCompany, sitemapXML: companyXML, jsonld };
   } catch (res: any) {
     return handleCachedCatch(res);
   }
@@ -74,9 +76,10 @@ export const handleCachedCategories = async (
     const categoryService = new CategoryService();
     const category = await categoryService.getCategoryBySlug(catSlug);
     const catXML = category && generateCategorySitemapXml(category);
+    const jsonld = category && generateCategoryJSONLD(category);
 
     // category && setCachedResource(category, 'categories');
-    return { data: category, sitemapXML: catXML };
+    return { data: category, sitemapXML: catXML, jsonld };
   } catch (res: any) {
     return handleCachedCatch(res);
   }

@@ -102,23 +102,24 @@ export function Navbar() {
   }, [companies, companyCategories?.data, companyName]);
 
   const parseCatToMenuItem = (cats: CategoryEntity[]) => cats.map((cat) => ({
-    key: cat._id,
-    title: cat.title,
-    label: cat.title,
+    key: cat.slug,
+    title: <Link href={`/${cat.company}/category/${cat.slug}`}><a className="text-black">{ cat.title }</a></Link>,
+    label: <Link href={`/${cat.company}/category/${cat.slug}`}><a className="text-black">{ cat.title }</a></Link>,
     icon: <DatabaseOutlined rev="" />,
-    onClick: () => {
-      router.push(`/${cat.company}/category/${cat.slug}`);
+    onClick: (event: any) => {
+      if (event.ctrlKey || event.metaKey) return;
       setHideSidebar(true);
     },
   }));
 
   const parseCompaniesToMenuItem = (companies: CompanyEntity[]) => companies.map((company) => ({
-    key: company._id,
-    title: company.name,
-    label: company.name,
+    key: company.companyId,
+    title: <Link href={`/${company.companyId}`}><a className="text-black">{ company.name }</a></Link>,
+    // label: company.name,
+    label: <Link href={`/${company.companyId}`}><a className="text-black">{ company.name }</a></Link>,
     icon: <BankOutlined rev="" />,
-    onClick: () => {
-      router.push(`/${company.companyId}`);
+    onClick: (event: any) => {
+      if (event.ctrlKey || event.metaKey) return;
       setSelectedCompanies([company]);
       setHideSidebar(true);
     },
@@ -131,12 +132,6 @@ export function Navbar() {
   };
   const handleReturnToHref = () => router.push(returnHref);
 
-  const goToCompany = (comp: CompanyEntity) => (e: any) => {
-    e.preventDefault();
-    router.push(`/${comp.companyId}`);
-    setSelectedCompanies([comp]);
-  };
-
   return (
     <>
       <Header className={styles.navbar}>
@@ -147,16 +142,20 @@ export function Navbar() {
             className={`${styles.navbarLogoContainer} flex-start-center gap-l`}
           >
             <Link href="/">
-              <HomeOutlined rev="" style={{ fontSize: '30px' }} />
+              <a className="text-black d-flex">
+                <HomeOutlined rev="" style={{ fontSize: '30px' }} />
+              </a>
             </Link>
             {selectedCompanies.map((company) => (
-              <div
-                onClick={goToCompany(company)}
+              <Link
+                href={`/${company.companyId}`}
                 className="cursor-pointer"
                 key={company._id}
               >
-                <img className={styles.navbarLogo} src={company.logo} alt="logo" />
-              </div>
+                <a className="d-flex">
+                  <img className={styles.navbarLogo} src={company.logo} alt="logo" />
+                </a>
+              </Link>
             ))}
           </div>
           <div

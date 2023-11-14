@@ -23,6 +23,8 @@ export type ProductPerCategoryType = {
   [N in string]: {
     products: ProductEntity[];
     title: string;
+    slug: string;
+    company: string
   };
 };
 
@@ -69,6 +71,8 @@ export function Company({ company }: CompanyProps) {
           acc[category] = {
             products: [],
             title: product.category?.title || 'Mas Productos',
+            slug: product.category?.slug || 'mas-productos',
+            company: product.company,
           };
         }
         acc[category].products.push(product);
@@ -157,13 +161,17 @@ export function Company({ company }: CompanyProps) {
             <div className={styles.CompanyContentProducts}>
               {Object.keys(productsPerCategories).map((categoryId, i) => {
                 const category = productsPerCategories[categoryId];
+                if (category.products
+                  .map((item) => item.stock)
+                  .reduce((a, b) => a + b, 0) <= 0) return;
+
                 return (
                   <ScrollView
                     key={`scroll-view-category-${i}`}
                     wrapperClassName={
                       styles.CompanyContentProductsScrollViewCategories
                     }
-                    handleSeeMore={handleSeeMore}
+                    seeMoreRoute={`/${category.company}/category/${category.slug}`}
                     handleProductClick={goToProductDetail}
                     products={category.products}
                     title={category.title}

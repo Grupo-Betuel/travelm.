@@ -1,6 +1,7 @@
 import { useRef } from 'react';
 import { ProductCard } from '@shared/components';
 import { ProductEntity } from '@shared/entities/ProductEntity';
+import Link from 'next/link';
 import styles from './ScrollView.module.scss';
 
 export interface IScrollViewProps {
@@ -8,7 +9,7 @@ export interface IScrollViewProps {
   title: string
   handleProductClick?: (product: ProductEntity) => void
   wrapperClassName?: string
-  handleSeeMore?: (product: ProductEntity) => void
+  seeMoreRoute: string
 }
 
 export function ScrollView({
@@ -16,7 +17,7 @@ export function ScrollView({
   title,
   handleProductClick,
   wrapperClassName,
-  handleSeeMore,
+  seeMoreRoute,
 }: IScrollViewProps) {
   const preview = (back?: boolean) => () => {
     const scrollView = scrollViewRef.current as HTMLDivElement;
@@ -31,8 +32,9 @@ export function ScrollView({
     }
   };
 
-  const onSeeMore = () => {
-    handleSeeMore && handleSeeMore(products[0]);
+  const onSeeMore = (e: any) => {
+    e.preventDefault();
+    // seeMoreRoute && seeMoreRoute(products[0]);
   };
 
   const scrollViewRef = useRef({} as any);
@@ -41,9 +43,9 @@ export function ScrollView({
     <div className={`${styles.ScrollViewContainer} ${wrapperClassName}`}>
       <div className="flex-between-end mb-l">
         <h2 className="title m-0">{title}</h2>
-        <span className="cursor-pointer subtitle text-blue" onClick={onSeeMore}>
-          Ver mas
-        </span>
+        <Link href={seeMoreRoute} onClick={onSeeMore}>
+          <a className="subtitle">Ver mas</a>
+        </Link>
       </div>
       <div className={styles.ScrollViewWrapper}>
         <i
@@ -51,7 +53,7 @@ export function ScrollView({
           onClick={preview(true)}
         />
         <div className={styles.ScrollView} ref={scrollViewRef}>
-          {products?.map((product, i) => (
+          {products?.map((product, i) => !!product.stock && (
             <div className={styles.ScrollViewItem} key={`scrollview-item-${i}`}>
               <ProductCard onClick={handleProductClick} product={product} />
             </div>

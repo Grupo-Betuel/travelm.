@@ -93,9 +93,9 @@ export function Category({}: CategoryProps) {
           </Affix>
           {categoryProducts.length > 0 && (
             <div className={styles.CategoryContentProducts}>
-              <h2 className="mb-xx-l title">
+              <h1 className="mb-xx-l title">
                 {categoryProducts[0].category.title}
-              </h2>
+              </h1>
               <div className={styles.CategoryCardsGrid}>
                 {categoryProducts.map((item, i) => (
                   <ProductCard

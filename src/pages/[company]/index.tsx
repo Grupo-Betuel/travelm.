@@ -8,12 +8,13 @@ import { handleCachedResourceHook } from '@shared/hooks/handleCachedResourceHook
 import { CompanyEntity } from '@shared/entities/CompanyEntity';
 import axios from 'axios';
 import { handleCachedCompany } from '../../utils/server-side.utils';
+import { saveCompanySitemap } from '../../utils/fs.utils';
 
 export default function CompanyProducts({ metadata, cachedResources }: any) {
-  const { sitemap } = handleCachedResourceHook(cachedResources);
+  const { sitemap, jsonld } = handleCachedResourceHook(cachedResources);
   return (
     <>
-      <MetaHeaders metadata={metadata} />
+      <MetaHeaders metadata={{ ...metadata, jsonld }} />
       {sitemap}
       <Company company={cachedResources?.data} />
     </>
@@ -23,11 +24,14 @@ export default function CompanyProducts({ metadata, cachedResources }: any) {
 export const getStaticPaths: GetStaticPaths<{ company: string }> = async () => {
   const url = `${process.env.NEXT_PUBLIC_API_URL}api/companies`;
   const companies: CompanyEntity[] = (await axios.get<CompanyEntity[]>(url))?.data;
-  const companyPaths = companies.map((company) => ({
-    params: {
-      company: company.companyId,
-    },
-  }));
+  const companyPaths = companies.map((company) => {
+    saveCompanySitemap(company);
+    return {
+      params: {
+        company: company.companyId,
+      },
+    };
+  });
 
   return ({
     paths: companyPaths, // indicates that no page needs be created at build time

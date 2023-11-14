@@ -1,12 +1,11 @@
-import {
-  Badge, Button, Card,
-} from 'antd';
+import { Badge, Button, Card } from 'antd';
 import { ProductEntity } from '@shared/entities/ProductEntity';
 import { ProductsConstants } from '@shared/constants/products.constants';
 import { useMemo } from 'react';
 import { useAppStore } from '@services/store';
 import { useOrderContext } from '@shared/contexts/OrderContext';
 import Image from 'next/image';
+import Link from 'next/link';
 import styles from './ProductCard.module.scss';
 import { getSaleDataFromProduct } from '../../../utils/objects.utils';
 
@@ -14,6 +13,7 @@ export interface IProductProps {
   product: ProductEntity;
   onClick?: (post: ProductEntity) => void;
 }
+
 export function ProductCard({ product, onClick }: IProductProps) {
   const order = useAppStore((state) => state.currentOrder);
   const img = product && product.images ? product.images[0] : '';
@@ -50,57 +50,66 @@ export function ProductCard({ product, onClick }: IProductProps) {
     [order?.sales],
   );
 
-  const handleClick = () => {
+  const handleClick = (event: any) => {
+    if (event.ctrlKey || event.metaKey) return;
     onClick && onClick(product);
   };
+
   return (
     <Badge.Ribbon
       text={ribbonText}
-      style={{ display: ribbonText ? 'block' : 'none' }}
+      style={{ display: ribbonText ? 'none' : 'none' }}
       color={isAlmostSoldOut ? 'gold' : 'red'}
     >
-      <Card
-        className={styles.ProductCard}
-        bodyStyle={{ padding: '10px 0' }}
-        cover={(
-          <Image
-            src={img}
-            className={styles.ProductImage}
-            width="250px"
-            height="250px"
-            alt={product.name}
-            priority
-          />
+      <Link href={`/${product.company}/products/${product.slug}`}>
+        <a>
+          <Card
+            className={styles.ProductCard}
+            bodyStyle={{ padding: '10px 0' }}
+            cover={(
+              <Image
+                src={img}
+                className={styles.ProductImage}
+                width="250px"
+                height="250px"
+                alt={product.slug}
+                priority
+              />
         )}
-        onClick={handleClick}
-      >
-        <div className={styles.ProductCardContent}>
-          <div className={styles.ProductCardContentHeader}>
-            <span className={styles.ProductTitle}>{product.name}</span>
-            <span className={styles.ProductPrice}>
-              RD$
-              {' '}
-              {product.price.toLocaleString()}
-            </span>
-          </div>
-          <div>
-            {isAlmostSoldOut && (
-              <span className="text-red">
-                Solo quedan:
-                {' '}
-                {product.stock || 0}
-              </span>
-            )}
-          </div>
-          {/* {product.stock ? ( */}
-          <Button className={`mt-s ${product.stock ? '' : 'v-hidden'}`} onClick={handleProductAction}>
-            {isOnCart
-              ? ProductsConstants.VIEW_CART
-              : ProductsConstants.ADD_CART}
-          </Button>
-          {/* ) : null} */}
-        </div>
-      </Card>
+            onClick={handleClick}
+          >
+            <div className={styles.ProductCardContent}>
+              <div className={styles.ProductCardContentHeader}>
+                <span className={styles.ProductTitle}>{product.name}</span>
+                <span className={styles.ProductPrice}>
+                  RD$
+                  {' '}
+                  {product.price.toLocaleString()}
+                </span>
+              </div>
+              <div>
+                {isAlmostSoldOut && (
+                <span className="text-red">
+                  Solo quedan:
+                    {' '}
+                  {product.stock || 0}
+                </span>
+                )}
+              </div>
+              {/* {product.stock ? ( */}
+              <Button
+                className={`mt-s ${product.stock ? '' : 'v-hidden'}`}
+                onClick={handleProductAction}
+              >
+                {isOnCart
+                  ? ProductsConstants.VIEW_CART
+                  : ProductsConstants.ADD_CART}
+              </Button>
+              {/* ) : null} */}
+            </div>
+          </Card>
+        </a>
+      </Link>
     </Badge.Ribbon>
   );
 }

@@ -7,18 +7,18 @@ import { BETUEL_GROUP_ECOMMERCE_URL } from './constants/url.constants';
 
 export const getProductUrl = (product: ProductEntity) => `${BETUEL_GROUP_ECOMMERCE_URL}${product.company}/products/${product.slug}`;
 export const getCompanyUrl = (company: CompanyEntity) => `${BETUEL_GROUP_ECOMMERCE_URL}${company.companyId}`;
+export const getCategoryUrl = (category: CategoryEntity) => `${BETUEL_GROUP_ECOMMERCE_URL}${category.company}/category/${category.slug}`;
+
 export function generateProductSitemapXML(product: ProductEntity): string {
   const productUrl = getProductUrl(product);
   let xml = '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1" xmlns:video="http://www.google.com/schemas/sitemap-video/1.1">\n';
-  xml += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n';
-
   xml += '<url>\n';
   xml += `<loc>${encodeURI(productUrl)}</loc>\n`;
   xml += `<lastmod>${new Date().toISOString()}</lastmod>\n`;
   xml += '<changefreq>weekly</changefreq>\n';
   xml += '<priority>0.8</priority>\n';
   xml += `<image:image>
-${product.images.map((image) => `<image:loc>${image}</image:loc>\n`)}
+<image:loc>${product.image}</image:loc>
 </image:image>\n`;
   xml += '</url>\n';
 
@@ -82,7 +82,7 @@ export const generateCompanySitemapXml = (company: CompanyEntity): string => {
 export const generateCategorySitemapXml = (
   category: CategoryEntity,
 ): string => {
-  const categoryUrl = `${BETUEL_GROUP_ECOMMERCE_URL}${category.company}/category/${category.slug}`;
+  const categoryUrl = getCategoryUrl(category);
   const urlsetHeader = '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1" xmlns:video="http://www.google.com/schemas/sitemap-video/1.1">';
   const urlsetFooter = '</urlset>';
   const categoryUrlElement = `<url>
@@ -103,7 +103,7 @@ export const generateCategorySitemapXml = (
   return sitemapXml;
 };
 
-export const generateCompanyJsonLd = (company: CompanyEntity) => {
+export const generateCompanyJSONLD = (company: CompanyEntity) => {
   const companyURl = `${BETUEL_GROUP_ECOMMERCE_URL}${company.companyId}`;
   const name = `${company.name} ${company?.title || ''}`;
   const jsonLd = {
@@ -134,7 +134,7 @@ export const generateCompanyJsonLd = (company: CompanyEntity) => {
     ], // Add other social media URLs as needed
   };
 
-  return JSON.stringify(jsonLd);
+  return JSON.stringify(jsonLd, null, 2);
 };
 
 export function generateProductJSONLD(product: ProductEntity) {
@@ -261,3 +261,21 @@ export function mergeParamsAndRelatedParams(
 
   return mergedParams;
 }
+
+export const generateCategoryJSONLD = (category: CategoryEntity) => {
+  const categoryURl = getCategoryUrl(category);
+  const name = `${category.title} ${category?.company || ''}`;
+  const jsonLd = {
+    '@context': 'http://schema.org',
+    '@type': 'Store',
+    '@id': category.slug,
+    name,
+    alternateName: category?.title || '',
+    description: category.description || '',
+    url: categoryURl, // Replace with your actual website URL
+    image: category.wallpaper,
+    video: category.video,
+  };
+
+  return JSON.stringify(jsonLd, null, 2);
+};

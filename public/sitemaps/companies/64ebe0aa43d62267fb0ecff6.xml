@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1" xmlns:video="http://www.google.com/schemas/sitemap-video/1.1"><url>
+<loc>https://www.grupobetuel.store/betueltravel</loc>
+<lastmod>2023-11-14T15:28:41.634Z</lastmod>
+<changefreq>weekly</changefreq>
+<priority>0.9</priority>
+<image:image>
+  <image:loc>https://betuel-group-management.vercel.app/static/media/betueltravel.c2713c66.png</image:loc>
+</image:image>
+<image:image>
+  <image:loc>https://storage.googleapis.com/download/storage/v1/b/betuel-tech-photos/o/etueltravel-wallaer-1699110124404.png?alt=media</image:loc>
+</image:image>
+<video:video>
+  <video:content_loc>undefined</video:content_loc>
+</video:video>
+</url><url><loc>https://www.facebook.com/betueltravel</loc></url><url><loc>https://www.instagram.com/betueltravel/</loc></url></urlset>

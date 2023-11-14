@@ -6,11 +6,15 @@ import { ProductEntity } from '@shared/entities/ProductEntity';
 import { handleCachedResourceHook } from '@shared/hooks/handleCachedResourceHook';
 // import { getCachedResources } from '../../../utils/fs.utils';
 import axios from 'axios';
+import * as path from 'path';
+import fs from 'fs';
 import {
   handleCachedCompany,
   handleCachedProduct,
   ICachedResourceResponse,
 } from '../../../utils/server-side.utils';
+import { generateProductSitemapXML } from '../../../utils/seo.utils';
+import { saveProductSitemap } from '../../../utils/fs.utils';
 
 export interface IProductDetailsProps {
   metadata: IMetadata;
@@ -41,14 +45,47 @@ export const getStaticPaths: GetStaticPaths<{ slug: string }> = async () => {
   await Promise.all(companies.map(async (company) => {
     const url = `${process.env.NEXT_PUBLIC_API_URL}api/products/slugs/${company.companyId}`;
     const { data: productSlugs } = await axios.get<ProductEntity[]>(url);
-    const productSlugsPaths = productSlugs.map((product) => ({
-      params: {
-        slug: product.slug,
-        company: company.companyId,
-      },
-    }));
+    const productSlugsPaths = productSlugs.map((product) => {
+      // const productSitemapPath = path.join(
+      // process.cwd(), 'public/sitemaps/products', `${product._id}.xml`);
+      // const productSitemapContent = generateProductSitemapXML(product);
+      // fs.writeFile(productSitemapPath, productSitemapContent, (err) => {
+      //   if (err) {
+      //     console.error(`Error writing to file ${productSitemapPath}:`, err);
+      //   } else {
+      //     console.log(`File ${productSitemapPath} has been written.`);
+      //   }
+      // });
+      saveProductSitemap(product);
+
+      return {
+        params: {
+          slug: product.slug,
+          company: company.companyId,
+        },
+      };
+    });
     allProductSlugs = [...allProductSlugs, ...productSlugsPaths];
   }));
+
+  // Reading a file
+  // fs.readFile(filePath, 'utf8', (err, data) => {
+  //   if (err) {
+  //     console.error(`Error reading file ${filePath}:`, err);
+  //   } else {
+  //     console.log(`File content for ${filePath}:`, data);
+  //   }
+  // });
+
+  // Writing to a file
+  // const contentToWrite = 'This is a sample content.';
+  // fs.writeFile(filePath, contentToWrite, (err) => {
+  //   if (err) {
+  //     console.error(`Error writing to file ${filePath}:`, err);
+  //   } else {
+  //     console.log(`File ${filePath} has been written.`);
+  //   }
+  // });
 
   return ({
     paths: allProductSlugs, // indicates that no page needs be created at build time

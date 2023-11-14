@@ -29,6 +29,7 @@ export function LandingCarousel(props: IAppMainPromotionCarouselProps) {
           <div>
             <div className={styles.HomeCarouselItemWrapper}>
               <Image
+                alt="carousel"
                 className={styles.HomeCarouselItemImage}
                 rootClassName={styles.HomeCarouselItemImageWrapper}
                 src="https://i.pinimg.com/originals/eb/a7/60/eba760e4d470d2de478d26038e5fc9a9.jpg"
