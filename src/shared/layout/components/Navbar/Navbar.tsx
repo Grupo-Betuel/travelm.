@@ -58,7 +58,12 @@ export default function Navbar() {
     [],
   );
 
-  const salesQuantityData = useAppStore((state) => state.currentOrder?.sales.reduce((acc, sale) => acc + sale.quantity, 0));
+  const salesQuantityData = useAppStore((
+    state,
+  ) => state.currentOrder?.sales.reduce((
+    acc,
+    sale,
+  ) => acc + sale.quantity, 0));
 
   const [salesQuantity, setSalesQuantity] = useState(0);
 
