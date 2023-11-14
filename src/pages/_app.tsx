@@ -2,15 +2,14 @@ import '@styles/globals.scss';
 import type { AppProps } from 'next/app';
 import AppLayout from '@shared/layout';
 import {
-  Affix, Button, ConfigProvider, Result, Spin,
+  Button, ConfigProvider, Result, Spin,
 } from 'antd';
 import React, {
-  createContext, useEffect, useMemo, useState,
+  useEffect, useMemo, useState,
 } from 'react';
 import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer } from 'react-toastify';
 import { useAppStore } from '@services/store';
-import { layoutId, navbarOptionsHeight } from 'src/utils/layout.utils';
 import { AppLoadingContext } from '@shared/contexts/AppLoadingContext';
 import { AppViewportHeightContext } from '@shared/contexts/AppViewportHeightContext';
 import { OrderContext } from '@shared/contexts/OrderContext';
@@ -28,15 +27,6 @@ import { defaultTheme } from '../config/theme.config';
 export interface IAppProps {
   protected?: boolean;
 }
-
-export interface IAppPostsFiltersContextValue {
-  setAppPostsFilters: (data: any) => void;
-}
-
-export const appPostsFiltersContext = createContext<IAppPostsFiltersContextValue>(
-  {} as IAppPostsFiltersContextValue,
-);
-
 export enum AppViewportHeightClassNames {
   WITH_NAVBAR = 'FullAppViewPortHeight',
   WITH_NAVBAR_OPTION = 'FullAppViewPortHeightNavbarOptions',
@@ -61,15 +51,15 @@ function MyApp({ Component, pageProps }: AppProps<IAppProps>) {
 
   const toggleShoppingCart = () => setCartIsOpen(!cartIsOpen);
 
-  const onChangeLayoutAffix = (affixed?: boolean) => {
-    if (affixed) {
-      // setAppViewportHeightClassName(
-      //   AppViewportHeightClassNames.WITH_NAVBAR_OPTION
-      // )
-    } else {
-      // setAppViewportHeightClassName(AppViewportHeightClassNames.WITH_NAVBAR)
-    }
-  };
+  // const onChangeLayoutAffix = (affixed?: boolean) => {
+  //   if (affixed) {
+  //     // setAppViewportHeightClassName(
+  //     //   AppViewportHeightClassNames.WITH_NAVBAR_OPTION
+  //     // )
+  //   } else {
+  //     // setAppViewportHeightClassName(AppViewportHeightClassNames.WITH_NAVBAR)
+  //   }
+  // };
   const [companyId, setCompanyId] = useState<string>();
   const [seoUrl, setSeoUrl] = useState<string>('');
 
@@ -202,12 +192,12 @@ function MyApp({ Component, pageProps }: AppProps<IAppProps>) {
                 waitingTime={400}
               />
               <AppLayout>
-                <Affix
-                  offsetTop={navbarOptionsHeight}
-                  target={() => document.getElementById(layoutId)}
-                  onChange={onChangeLayoutAffix}
-                  children=""
-                />
+                {/* <Affix */}
+                {/*  offsetTop={navbarOptionsHeight} */}
+                {/*  target={() => document.getElementById(layoutId)} */}
+                {/*  onChange={onChangeLayoutAffix} */}
+                {/*  children="" */}
+                {/* /> */}
                 <Component {...pageProps} />
               </AppLayout>
             </AppViewportHeightContext.Provider>

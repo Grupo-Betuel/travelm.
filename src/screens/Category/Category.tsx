@@ -10,7 +10,6 @@ import { useRouter } from 'next/router';
 import { EndpointsAndEntityStateKeys } from '@shared/enums/endpoints.enum';
 import { showProductDetailsHook } from '@shared/hooks/showProductDetailsHook';
 import styles from './Category.module.scss';
-import { deepMatch } from '../../utils/matching.util';
 import { layoutId, navbarOptionsHeight } from '../../utils/layout.utils';
 
 export interface CategoryProps {}
@@ -47,7 +46,9 @@ export function Category({}: CategoryProps) {
     setCategoryProducts(categoryProductsData?.data || []);
   }, [categoryProductsData?.data]);
 
-  const onSearch = ({ target: { value } }: ChangeEvent<HTMLInputElement>) => {
+  const onSearch = async ({ target: { value } }: ChangeEvent<HTMLInputElement>) => {
+    const deepMatch = (await import('../../utils/matching.util')).deepMatch;
+
     setSearchValue(value);
     const results = deepMatch<ProductEntity>(
       value,

@@ -44,7 +44,7 @@ $bannerHeight: 40px;
 
   .GalleryWrapper {
     position: relative;
-    flex-grow: 1;
+    flex-grow: 12;
     min-width: 200px;
 
     @include breakpoints.only-on(('xs')) {
@@ -171,9 +171,9 @@ $bannerHeight: 40px;
           }
 
           .DetailViewPostDetailsContentOptionVariants {
+            display: none;
             margin-left: 2rem;
             padding-right: 1rem;
-            display: none;
             grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
             gap: 1rem;
             margin-bottom: size.$size-small;

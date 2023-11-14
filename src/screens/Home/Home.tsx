@@ -1,10 +1,8 @@
 import { ProductCard, ScrollView } from '@shared/components';
-import { Affix, Input } from 'antd';
-import { SearchOutlined } from '@ant-design/icons';
 import { handleEntityHook } from '@shared/hooks/handleEntityHook';
 import { ProductEntity } from '@shared/entities/ProductEntity';
 import {
-  ChangeEvent, useContext, useEffect, useMemo, useState,
+  useContext, useEffect, useMemo, useState,
 } from 'react';
 import Head from 'next/head';
 import { CompanyEntity } from '@shared/entities/CompanyEntity';
@@ -13,19 +11,10 @@ import { EndpointsAndEntityStateKeys } from '@shared/enums/endpoints.enum';
 import { AppLoadingContext } from '@shared/contexts/AppLoadingContext';
 import { showProductDetailsHook } from '@shared/hooks/showProductDetailsHook';
 import styles from './Home.module.scss';
-import { deepMatch } from '../../utils/matching.util';
-import { layoutId, navbarOptionsHeight } from '../../utils/layout.utils';
 
 export interface HomeProps {
   hideCarousel?: boolean;
 }
-
-export type ProductPerCategoryType = {
-  [N in string]: {
-    products: ProductEntity[];
-    title: string;
-  };
-};
 
 export function Home({}: HomeProps) {
   const [products, setProducts] = useState<ProductEntity[]>([]);
@@ -93,13 +82,14 @@ export function Home({}: HomeProps) {
     companyIds,
   ]);
 
-  const onSearch = ({ target: { value } }: ChangeEvent<HTMLInputElement>) => {
-    const results = deepMatch<ProductEntity>(
-      value,
-      infinityScrollData?.data || [],
-    );
-    setProducts([...results]);
-  };
+  // const onSearch = async ({ target: { value } }: ChangeEvent<HTMLInputElement>) => {
+  //   const deepMatch = (await import('../../utils/matching.util')).deepMatch;
+  //   const results = deepMatch<ProductEntity>(
+  //     value,
+  //     infinityScrollData?.data || [],
+  //   );
+  //   setProducts([...results]);
+  // };
 
   return (
     <div className={styles.HomeWrapper}>
@@ -118,30 +108,30 @@ export function Home({}: HomeProps) {
       </Head>
       {ProductDetail}
       <div className={styles.HomeContent}>
-        <Affix
-          className={styles.SidebarAffix}
-          offsetTop={navbarOptionsHeight}
-          target={() => document.getElementById(layoutId)}
-        >
-          <div>
-            <div className={styles.HomeSearchWrapper}>
-              {/* <Input placeholder="Borderless" bordered={false} /> */}
-              <Input
-                className={styles.HomeInputSearch}
-                placeholder="Buscar"
-                suffix={
-                  <SearchOutlined rev="" className="site-form-item-icon" />
-                }
-                bordered={false}
-                onChange={onSearch}
-                size="large"
-              />
-            </div>
-            {!companyIds.length && !products?.length && (
-              <h2 className="p-xx-l">No hay resultados!</h2>
-            )}
-          </div>
-        </Affix>
+        {/* <Affix */}
+        {/*  className={styles.SidebarAffix} */}
+        {/*  offsetTop={navbarOptionsHeight} */}
+        {/*  target={() => document.getElementById(layoutId)} */}
+        {/* > */}
+        {/*  <div> */}
+        {/*    <div className={styles.HomeSearchWrapper}> */}
+        {/*      /!* <Input placeholder="Borderless" bordered={false} /> *!/ */}
+        {/*      <Input */}
+        {/*        className={styles.HomeInputSearch} */}
+        {/*        placeholder="Buscar" */}
+        {/*        suffix={ */}
+        {/*          <SearchOutlined rev="" className="site-form-item-icon" /> */}
+        {/*        } */}
+        {/*        bordered={false} */}
+        {/*        onChange={onSearch} */}
+        {/*        size="large" */}
+        {/*      /> */}
+        {/*    </div> */}
+        {/*    {!companyIds.length && !products?.length && ( */}
+        {/*      <h2 className="p-xx-l">No hay resultados!</h2> */}
+        {/*    )} */}
+        {/*  </div> */}
+        {/* </Affix> */}
         {companyIds.length > 0 && (
           <div className={styles.HomeContentProducts}>
             {companyIds.map((companyId: any, index: number) => {

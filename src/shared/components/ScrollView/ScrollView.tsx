@@ -32,18 +32,13 @@ export function ScrollView({
     }
   };
 
-  const onSeeMore = (e: any) => {
-    e.preventDefault();
-    // seeMoreRoute && seeMoreRoute(products[0]);
-  };
-
   const scrollViewRef = useRef({} as any);
 
   return (
     <div className={`${styles.ScrollViewContainer} ${wrapperClassName}`}>
       <div className="flex-between-end mb-l">
         <h2 className="title m-0">{title}</h2>
-        <Link href={seeMoreRoute} onClick={onSeeMore}>
+        <Link href={seeMoreRoute}>
           <a className="subtitle">Ver mas</a>
         </Link>
       </div>

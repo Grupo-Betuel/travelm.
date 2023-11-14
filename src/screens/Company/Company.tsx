@@ -11,7 +11,6 @@ import { EndpointsAndEntityStateKeys } from '@shared/enums/endpoints.enum';
 import { CompanyEntity } from '@shared/entities/CompanyEntity';
 import { showProductDetailsHook } from '@shared/hooks/showProductDetailsHook';
 import styles from './Company.module.scss';
-import { deepMatch } from '../../utils/matching.util';
 import { layoutId, navbarOptionsHeight } from '../../utils/layout.utils';
 
 export interface CompanyProps {
@@ -99,7 +98,8 @@ export function Company({ company }: CompanyProps) {
     setCompanyProducts(companyProductsData?.data || []);
   }, [companyProductsData?.data]);
 
-  const onSearch = ({ target: { value } }: ChangeEvent<HTMLInputElement>) => {
+  const onSearch = async ({ target: { value } }: ChangeEvent<HTMLInputElement>) => {
+    const deepMatch = (await import('../../utils/matching.util')).deepMatch;
     setSearchValue(value);
     const results = deepMatch<ProductEntity>(
       value,
@@ -157,9 +157,11 @@ export function Company({ company }: CompanyProps) {
             <div className={styles.CompanyContentProducts}>
               {Object.keys(productsPerCategories).map((categoryId, i) => {
                 const category = productsPerCategories[categoryId];
-                if (category.products
+                const categoryStock = category.products
                   .map((item) => item.stock)
-                  .reduce((a, b) => a + b, 0) <= 0) return;
+                  .reduce((a, b) => a + b, 0) || 0;
+
+                if (categoryStock <= 0 || category.products.length <= 0) return;
 
                 return (
                   <ScrollView

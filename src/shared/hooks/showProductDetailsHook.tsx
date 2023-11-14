@@ -8,7 +8,7 @@ import { useRouter } from 'next/router';
 
 export interface ShowProductDetailsHookReturn {
   goToProductDetail: (product: ProductEntity) => void;
-  ProductDetail: JSX.Element;
+  ProductDetail: JSX.Element | null;
 }
 
 export const showProductDetailsHook = (): ShowProductDetailsHookReturn => {
@@ -56,7 +56,7 @@ export const showProductDetailsHook = (): ShowProductDetailsHookReturn => {
 
   return {
     goToProductDetail,
-    ProductDetail: (
+    ProductDetail: openWrapper ? (
     // <Animate
     //   showProp="show"
     //   transitionName={isMobile ? 'slide' : 'none'}
@@ -72,6 +72,6 @@ export const showProductDetailsHook = (): ShowProductDetailsHookReturn => {
         )}
       </MainContentModal>
     // </Animate>
-    ),
+    ) : null,
   };
 };

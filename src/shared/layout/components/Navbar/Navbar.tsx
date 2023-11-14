@@ -58,9 +58,7 @@ export function Navbar() {
     [],
   );
 
-  const salesQuantityData = useAppStore((
-    state,
-  ) => state.currentOrder?.sales.reduce((acc, sale) => acc + sale.quantity, 0));
+  const salesQuantityData = useAppStore((state) => state.currentOrder?.sales.reduce((acc, sale) => acc + sale.quantity, 0));
 
   const [salesQuantity, setSalesQuantity] = useState(0);
 
@@ -103,8 +101,16 @@ export function Navbar() {
 
   const parseCatToMenuItem = (cats: CategoryEntity[]) => cats.map((cat) => ({
     key: cat.slug,
-    title: <Link href={`/${cat.company}/category/${cat.slug}`}><a className="text-black">{ cat.title }</a></Link>,
-    label: <Link href={`/${cat.company}/category/${cat.slug}`}><a className="text-black">{ cat.title }</a></Link>,
+    title: (
+      <Link href={`/${cat.company}/category/${cat.slug}`}>
+        <a className="text-black">{cat.title}</a>
+      </Link>
+    ),
+    label: (
+      <Link href={`/${cat.company}/category/${cat.slug}`}>
+        <a className="text-black">{cat.title}</a>
+      </Link>
+    ),
     icon: <DatabaseOutlined rev="" />,
     onClick: (event: any) => {
       if (event.ctrlKey || event.metaKey) return;
@@ -114,9 +120,17 @@ export function Navbar() {
 
   const parseCompaniesToMenuItem = (companies: CompanyEntity[]) => companies.map((company) => ({
     key: company.companyId,
-    title: <Link href={`/${company.companyId}`}><a className="text-black">{ company.name }</a></Link>,
+    title: (
+      <Link href={`/${company.companyId}`}>
+        <a className="text-black">{company.name}</a>
+      </Link>
+    ),
     // label: company.name,
-    label: <Link href={`/${company.companyId}`}><a className="text-black">{ company.name }</a></Link>,
+    label: (
+      <Link href={`/${company.companyId}`}>
+        <a className="text-black">{company.name}</a>
+      </Link>
+    ),
     icon: <BankOutlined rev="" />,
     onClick: (event: any) => {
       if (event.ctrlKey || event.metaKey) return;
@@ -153,7 +167,11 @@ export function Navbar() {
                 key={company._id}
               >
                 <a className="d-flex">
-                  <img className={styles.navbarLogo} src={company.logo} alt="logo" />
+                  <img
+                    className={styles.navbarLogo}
+                    src={company.logo}
+                    alt="logo"
+                  />
                 </a>
               </Link>
             ))}
@@ -211,7 +229,7 @@ export function Navbar() {
                     items: [
                       {
                         key: 'profile',
-                        onClick: () => location.href = '/client/profile',
+                        onClick: () => (location.href = '/client/profile'),
                         label: 'Perfil',
                       },
                       {
@@ -252,17 +270,21 @@ export function Navbar() {
           </div>
         </div>
       </Header>
-      <Modal
-        title=""
-        open={!!authIsEnable}
-        afterClose={handleReturnToHref}
-        onCancel={handleReturnToHref}
-        footer={[]}
-      >
-        <Auth isModal />
-      </Modal>
+      {!!authIsEnable && (
+        <Modal
+          title=""
+          open={!!authIsEnable}
+          afterClose={handleReturnToHref}
+          onCancel={handleReturnToHref}
+          footer={[]}
+        >
+          <Auth isModal />
+        </Modal>
+      )}
+      {cartIsOpen && (
+        <ShoppingCartDrawer open={cartIsOpen} onClose={toggleCart} />
+      )}
 
-      <ShoppingCartDrawer open={cartIsOpen} onClose={toggleCart} />
       <Sider
         className={styles.navbarSidebar}
         collapsible
@@ -270,16 +292,22 @@ export function Navbar() {
         collapsed={showSidebar}
         onCollapse={(value) => setHideSidebar(value)}
         zeroWidthTriggerStyle={{ top: '150px' }}
-        theme="dark"
+        theme="light"
       >
-        <div className="demo-logo-vertical" />
-        <Menu
-          theme="dark"
-          defaultSelectedKeys={['1']}
-          mode="inline"
-          items={navbarOptions}
-        />
+        {!showSidebar
+            && (
+            <>
+              <div className="demo-logo-vertical" />
+              <Menu
+                theme="light"
+                defaultSelectedKeys={['1']}
+                mode="inline"
+                items={navbarOptions}
+              />
+            </>
+            )}
       </Sider>
+
     </>
   );
 }

@@ -1,9 +1,7 @@
 import {
   Avatar,
   Button,
-  Carousel,
   Form,
-  Image,
   Input,
   InputNumber,
   List,
@@ -468,24 +466,25 @@ export function DetailView({
               </div>
             </>
           )}
-          <Image.PreviewGroup>
-            <Carousel
-              ref={carouselRef}
-              nextArrow={(
-                <div className={styles.DetailViewButton}>
-                  <ArrowRightOutlined rev="" />
-                </div>
-              )}
-            >
-              {hasImages ? (
-                product.images.map((img, i) => (
-                  <ImageBackground image={img} key={`detailViewImage${i}`} />
-                ))
-              ) : (
-                <ImageBackground image={companyLogo} />
-              )}
-            </Carousel>
-          </Image.PreviewGroup>
+          <ImageBackground image={product.image || companyLogo} />
+          {/* <Image.PreviewGroup> */}
+          {/*  <Carousel */}
+          {/*    ref={carouselRef} */}
+          {/*    nextArrow={( */}
+          {/*      <div className={styles.DetailViewButton}> */}
+          {/*        <ArrowRightOutlined rev="" /> */}
+          {/*      </div> */}
+          {/*    )} */}
+          {/*  > */}
+          {/*    {hasImages ? ( */}
+          {/*      product.images.map((img, i) => ( */}
+          {/*        <ImageBackground image={img} key={`detailViewImage${i}`} /> */}
+          {/*      )) */}
+          {/*    ) : ( */}
+          {/*      <ImageBackground image={companyLogo} /> */}
+          {/*    )} */}
+          {/*  </Carousel> */}
+          {/* </Image.PreviewGroup> */}
         </div>
         <Resizable
           defaultSize={{ width: sidebarWidth, height: 'auto' }}
@@ -548,7 +547,7 @@ export function DetailView({
                           ` - ${param.value}`
                         )}
                       </Button>
-                      {param?.relatedParams && !!param?.relatedParams.length ? (
+                      {isActive && param?.relatedParams && !!param?.relatedParams.length ? (
                         <div
                           className={
                             styles.DetailViewPostDetailsContentOptionVariants
