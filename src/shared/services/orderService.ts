@@ -141,7 +141,7 @@ export default class OrderService extends BaseService<OrderEntity> {
   }
 
   getSaleByProductId(productId: string) {
-    return this.localOrder.sales.find((s) => s.product._id === productId);
+    return this.localOrder.sales?.find((s) => s.product._id === productId);
   }
 
   resetOrder() {

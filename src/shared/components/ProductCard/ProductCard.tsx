@@ -52,6 +52,8 @@ export function ProductCard({ product, onClick }: IProductProps) {
   );
 
   const handleClick = (event: any) => {
+    event.stopPropagation();
+    // event.preventDefault();
     if (event.ctrlKey || event.metaKey) return;
     onClick && onClick(product);
   };
