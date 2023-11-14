@@ -6,14 +6,11 @@ import { ProductEntity } from '@shared/entities/ProductEntity';
 import { handleCachedResourceHook } from '@shared/hooks/handleCachedResourceHook';
 // import { getCachedResources } from '../../../utils/fs.utils';
 import axios from 'axios';
-import * as path from 'path';
-import fs from 'fs';
 import {
   handleCachedCompany,
   handleCachedProduct,
   ICachedResourceResponse,
 } from '../../../utils/server-side.utils';
-import { generateProductSitemapXML } from '../../../utils/seo.utils';
 import { saveProductSitemap } from '../../../utils/fs.utils';
 
 export interface IProductDetailsProps {

@@ -99,10 +99,6 @@ export function Company({ company }: CompanyProps) {
     setCompanyProducts(companyProductsData?.data || []);
   }, [companyProductsData?.data]);
 
-  const handleSeeMore = (product: ProductEntity) => {
-    router.push(`/${product.company}/category/${product.category.slug}`);
-  };
-
   const onSearch = ({ target: { value } }: ChangeEvent<HTMLInputElement>) => {
     setSearchValue(value);
     const results = deepMatch<ProductEntity>(

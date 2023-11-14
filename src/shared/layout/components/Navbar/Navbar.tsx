@@ -98,7 +98,7 @@ export function Navbar() {
     const company = companies.find((c) => c.companyId === companyName);
     company ? setSelectedCompanies([company]) : setSelectedCompanies([]);
 
-    setNavbarOptions(data);
+    setNavbarOptions(data as any);
   }, [companies, companyCategories?.data, companyName]);
 
   const parseCatToMenuItem = (cats: CategoryEntity[]) => cats.map((cat) => ({

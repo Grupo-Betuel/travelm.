@@ -6,7 +6,6 @@ import { ProductEntity } from '@shared/entities/ProductEntity';
 import {
   ChangeEvent, useContext, useEffect, useMemo, useState,
 } from 'react';
-import { useRouter } from 'next/router';
 import Head from 'next/head';
 import { CompanyEntity } from '@shared/entities/CompanyEntity';
 import { useInfiniteScroll } from '@shared/hooks/useInfiniteScrollHook';
@@ -29,7 +28,6 @@ export type ProductPerCategoryType = {
 };
 
 export function Home({}: HomeProps) {
-  const router = useRouter();
   const [products, setProducts] = useState<ProductEntity[]>([]);
   const { setAppLoading, appLoading } = useContext(AppLoadingContext);
   const {
@@ -94,10 +92,6 @@ export function Home({}: HomeProps) {
     loadingCompany,
     companyIds,
   ]);
-
-  const handleSeeMore = (product: ProductEntity) => {
-    // router.push(`/${product.company}`);
-  };
 
   const onSearch = ({ target: { value } }: ChangeEvent<HTMLInputElement>) => {
     const results = deepMatch<ProductEntity>(
