@@ -22,11 +22,10 @@ export interface IProductDetailsProps {
 export default function ProductDetail({
   metadata, currentCompany, cachedResources,
 }: IProductDetailsProps) {
-  const { sitemap, jsonld } = handleCachedResourceHook(cachedResources);
+  const { sitemapURL, jsonld } = handleCachedResourceHook(cachedResources);
   return (
     <div>
-      <MetaHeaders metadata={{ ...metadata, jsonld }} />
-      {sitemap}
+      <MetaHeaders metadata={{ ...metadata, jsonld, sitemapURL }} />
       <DetailView
         companyLogo={currentCompany?.logo}
         productDetails={cachedResources?.data}

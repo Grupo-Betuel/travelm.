@@ -21,6 +21,7 @@ export function ProductCard({ product, onClick }: IProductProps) {
     && product.stock > 0;
   const { orderService, toggleCart } = useOrderContext();
   const handleProductAction = (ev: any) => {
+    ev.preventDefault();
     ev.stopPropagation();
     if (isOnCart) {
       toggleCart();

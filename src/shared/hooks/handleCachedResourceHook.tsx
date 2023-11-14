@@ -10,15 +10,15 @@ export function handleCachedResourceHook<T>(cachedResources: ICachedResourceResp
     }
   }, [cachedResources?.error]);
 
-  const sitemap = cachedResources?.sitemapXML && (
-    <div
-      style={{ display: 'none' }}
-      dangerouslySetInnerHTML={{ __html: cachedResources.sitemapXML }}
-    />
-  );
+  // const sitemap = cachedResources?.sitemapURL && (
+  //   <div
+  //     style={{ display: 'none' }}
+  //     dangerouslySetInnerHTML={{ __html: cachedResources.sitemapURL }}
+  //   />
+  // );
 
   return {
-    sitemap,
+    sitemapURL: cachedResources?.sitemapURL,
     jsonld: cachedResources?.jsonld,
   };
 }

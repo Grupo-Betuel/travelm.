@@ -7,6 +7,10 @@ import { CompanyEntity } from '@shared/entities/CompanyEntity';
 import { CategoryEntity } from '@shared/entities/CategoryEntity';
 import { generateCategorySitemapXml, generateCompanySitemapXml, generateProductSitemapXML } from './seo.utils';
 
+export const getProductSitemapFilePath = (product: ProductEntity) => path.join(process.cwd(), 'public/sitemaps/products', `${product._id}.xml`);
+export const getCompanySitemapFilePath = (company: CompanyEntity) => path.join(process.cwd(), 'public/sitemaps/companies', `${company._id}.xml`);
+export const getCategorySitemapFilePath = (category: CategoryEntity) => path.join(process.cwd(), 'public/sitemaps/categories', `${category._id}.xml`);
+
 const tmpDir = os.tmpdir();
 
 export type CachedResourceType = 'companies' | 'products' | 'categories';
@@ -34,7 +38,7 @@ export async function getCachedResources<T>(id: string, type: CachedResourceType
 }
 
 export function saveProductSitemap(product: ProductEntity) {
-  const productSitemapPath = path.join(process.cwd(), 'public/sitemaps/products', `${product._id}.xml`);
+  const productSitemapPath = getProductSitemapFilePath(product);
   const productSitemapContent = generateProductSitemapXML(product);
   fs.writeFile(productSitemapPath, productSitemapContent, (err) => {
     if (err) {
@@ -46,7 +50,7 @@ export function saveProductSitemap(product: ProductEntity) {
 }
 
 export function saveCompanySitemap(company: CompanyEntity) {
-  const companySitemapPath = path.join(process.cwd(), 'public/sitemaps/companies', `${company._id}.xml`);
+  const companySitemapPath = getCompanySitemapFilePath(company);
   const companySitemapContent = generateCompanySitemapXml(company);
   fs.writeFile(companySitemapPath, companySitemapContent, (err) => {
     if (err) {
@@ -58,7 +62,7 @@ export function saveCompanySitemap(company: CompanyEntity) {
 }
 
 export function saveCategorySitemap(category: CategoryEntity) {
-  const categorySitemapPath = path.join(process.cwd(), 'public/sitemaps/categories', `${category._id}.xml`);
+  const categorySitemapPath = getCategorySitemapFilePath(category);
   const categorySitemapContent = generateCategorySitemapXml(category);
   fs.writeFile(categorySitemapPath, categorySitemapContent, (err) => {
     if (err) {

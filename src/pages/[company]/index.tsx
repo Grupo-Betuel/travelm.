@@ -11,11 +11,10 @@ import { handleCachedCompany } from '../../utils/server-side.utils';
 import { saveCompanySitemap } from '../../utils/fs.utils';
 
 export default function CompanyProducts({ metadata, cachedResources }: any) {
-  const { sitemap, jsonld } = handleCachedResourceHook(cachedResources);
+  const { sitemapURL, jsonld } = handleCachedResourceHook(cachedResources);
   return (
     <>
-      <MetaHeaders metadata={{ ...metadata, jsonld }} />
-      {sitemap}
+      <MetaHeaders metadata={{ ...metadata, jsonld, sitemapURL }} />
       <Company company={cachedResources?.data} />
     </>
   );

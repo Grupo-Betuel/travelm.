@@ -6,10 +6,8 @@ import { CategoryEntity } from '@shared/entities/CategoryEntity';
 import CategoryService from '@services/categoryService';
 import {
   generateCategoryJSONLD,
-  generateCategorySitemapXml, generateCompanyJSONLD,
-  generateCompanySitemapXml,
+  generateCompanyJSONLD,
   generateProductJSONLD,
-  generateProductSitemapXML,
 } from './seo.utils';
 
 // import { setCachedResource } from './fs.utils';
@@ -21,7 +19,7 @@ export interface IErrorResponse {
 export interface ICachedResourceResponse<T> {
   data?: T;
   error?: IErrorResponse | null;
-  sitemapXML?: string;
+  sitemapURL?: string;
   jsonld?: string;
 }
 
@@ -40,10 +38,10 @@ export async function handleCachedCompany(
     const companyService = new CompanyService();
     const currentCompany = await companyService.getCompanyByRefName(companyId);
     // currentCompany && setCachedResource(currentCompany, 'companies', currentCompany.companyId);
-    const companyXML = currentCompany && generateCompanySitemapXml(currentCompany);
+    const sitemapURL = `sitemaps/companies/${currentCompany._id}.xml`;
     const jsonld = currentCompany && generateCompanyJSONLD(currentCompany);
 
-    return { data: currentCompany, sitemapXML: companyXML, jsonld };
+    return { data: currentCompany, sitemapURL, jsonld };
   } catch (res: any) {
     return handleCachedCatch(res);
   }
@@ -60,10 +58,10 @@ export const handleCachedProduct = async (
     //   slug,
     // }) as any;
     // product && setCachedResource(product, 'products');
-    const sitemapXML = product && generateProductSitemapXML(product);
+    const sitemapURL = `sitemaps/products/${product._id}.xml`;
     const jsonld = product && generateProductJSONLD(product);
 
-    return { data: product, sitemapXML, jsonld };
+    return { data: product, sitemapURL, jsonld };
   } catch (res: any) {
     return handleCachedCatch(res);
   }
@@ -75,11 +73,11 @@ export const handleCachedCategories = async (
   try {
     const categoryService = new CategoryService();
     const category = await categoryService.getCategoryBySlug(catSlug);
-    const catXML = category && generateCategorySitemapXml(category);
+    const sitemapURL = `sitemaps/categories/${category._id}.xml`;
     const jsonld = category && generateCategoryJSONLD(category);
 
     // category && setCachedResource(category, 'categories');
-    return { data: category, sitemapXML: catXML, jsonld };
+    return { data: category, sitemapURL, jsonld };
   } catch (res: any) {
     return handleCachedCatch(res);
   }

@@ -15,12 +15,11 @@ export interface ICategoryProductsProps {
   cachedResources: ICachedResourceResponse<CategoryEntity>;
 }
 export default function CategoryProducts({ metadata, cachedResources }: ICategoryProductsProps) {
-  const { sitemap, jsonld } = handleCachedResourceHook(cachedResources);
+  const { sitemapURL, jsonld } = handleCachedResourceHook(cachedResources);
 
   return (
     <>
-      <MetaHeaders metadata={{ ...metadata, jsonld }} />
-      {sitemap}
+      <MetaHeaders metadata={{ ...metadata, jsonld, sitemapURL }} />
       <Category />
     </>
   );

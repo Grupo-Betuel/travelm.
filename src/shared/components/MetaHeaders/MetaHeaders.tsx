@@ -4,6 +4,7 @@ export interface IMetadata {
   ogTitle?: string;
   description?: string;
   jsonld?: string;
+  sitemapURL?: string;
   keywords?: string;
   type?: 'article' | 'website';
   image?: string;
@@ -34,6 +35,12 @@ export const MetaHeaders = ({ metadata }: IMetaHeadersProps) => (
     <meta name="description" key="desc" content={metadata?.description || ''} />
     <meta name="keywords" content={metadata?.keywords || ''} />
     <meta charSet="utf-8" />
+    <link
+      rel={'sitemap' as any}
+      type="application/xml"
+      title="Sitemap"
+      href={metadata?.sitemapURL}
+    />
     <script
       type="application/ld+json"
       dangerouslySetInnerHTML={{
