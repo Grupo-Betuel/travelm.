@@ -31,7 +31,7 @@ import styles from './Navbar.module.scss';
 
 const navbarOptionsLimit = 3;
 
-export function Navbar() {
+export default function Navbar() {
   const [companyName, setCompanyName] = useState('');
   const [categoryId, setCategoryId] = useState('');
   const [showSidebar, setHideSidebar] = useState(true);
@@ -118,7 +118,11 @@ export function Navbar() {
     },
   }));
 
-  const parseCompaniesToMenuItem = (companies: CompanyEntity[]) => companies.map((company) => ({
+  const parseCompaniesToMenuItem = (
+    companies: CompanyEntity[],
+  ) => companies.map((
+    company,
+  ) => ({
     key: company.companyId,
     title: (
       <Link href={`/${company.companyId}`}>
