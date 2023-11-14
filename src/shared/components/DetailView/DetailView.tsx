@@ -110,7 +110,10 @@ export function DetailView({
 
   useEffect(() => {
     const itemData = item._id ? item : {};
-    const productInfo: ProductEntity = { ...itemData, ...(productDetails || {}) };
+    let productInfo: ProductEntity = { ...itemData, ...(productDetails || {}) };
+    if (forceLoadProduct) {
+      productInfo = { ...(productDetails || {}), ...itemData };
+    }
     productInfo._id && setProduct(productInfo as ProductEntity);
   }, [item, productDetails]);
 
