@@ -62,7 +62,6 @@ export function Category({}: CategoryProps) {
       {(loading || (!categoryProducts.length && !searchValue)) && (
         <div className="loading">
           <Spin size="large" />
-          spe
         </div>
       )}
       <div className={styles.CategoryWrapper}>
