@@ -28,15 +28,14 @@ export default function CategoryProducts({ metadata, cachedResources }: ICategor
 export const getStaticPaths: GetStaticPaths<{ company: string, category: string }> = async () => {
   const url = `${process.env.NEXT_PUBLIC_API_URL}api/categories`;
   const { data: categorySlugs } = await axios.get<CategoryEntity[]>(url);
-  const categorySlugsPaths = categorySlugs.map((cat) => {
-    saveCategorySitemap(cat);
-    return {
-      params: {
-        category: cat.slug,
-        company: cat.company,
-      },
-    };
-  });
+  // saveCategorySitemap(cat);
+
+  const categorySlugsPaths = categorySlugs.map((cat) => ({
+    params: {
+      category: cat.slug,
+      company: cat.company,
+    },
+  }));
   return ({
     paths: categorySlugsPaths, // indicates that no page needs be created at build time
     fallback: true, // indicates the type of fallback

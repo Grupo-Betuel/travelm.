@@ -11,7 +11,7 @@ import {
   handleCachedProduct,
   ICachedResourceResponse,
 } from '../../../utils/server-side.utils';
-import { saveProductSitemap } from '../../../utils/fs.utils';
+import { getProductSiteMapUrL, handleSitemapsOnRobotFile, saveProductSitemap } from '../../../utils/fs.utils';
 
 export interface IProductDetailsProps {
   metadata: IMetadata;
@@ -38,6 +38,7 @@ export const getStaticPaths: GetStaticPaths<{ slug: string }> = async () => {
   const companyUrl = `${process.env.NEXT_PUBLIC_API_URL}api/companies`;
   const companies: CompanyEntity[] = (await axios.get<CompanyEntity[]>(companyUrl)).data;
   let allProductSlugs: any[] = [];
+  const productSitemaps: string[] = [];
   await Promise.all(companies.map(async (company) => {
     const url = `${process.env.NEXT_PUBLIC_API_URL}api/products/slugs/${company.companyId}`;
     const { data: productSlugs } = await axios.get<ProductEntity[]>(url);
@@ -53,7 +54,7 @@ export const getStaticPaths: GetStaticPaths<{ slug: string }> = async () => {
       //   }
       // });
       saveProductSitemap(product);
-
+      productSitemaps.push(getProductSiteMapUrL(product));
       return {
         params: {
           slug: product.slug,
@@ -61,6 +62,9 @@ export const getStaticPaths: GetStaticPaths<{ slug: string }> = async () => {
         },
       };
     });
+
+    // this will add all product sitemap to robots.txt
+    handleSitemapsOnRobotFile(productSitemaps);
     allProductSlugs = [...allProductSlugs, ...productSlugsPaths];
   }));
 

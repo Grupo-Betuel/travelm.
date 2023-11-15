@@ -6,10 +6,13 @@ import { ProductEntity } from '@shared/entities/ProductEntity';
 import { CompanyEntity } from '@shared/entities/CompanyEntity';
 import { CategoryEntity } from '@shared/entities/CategoryEntity';
 import { generateCategorySitemapXml, generateCompanySitemapXml, generateProductSitemapXML } from './seo.utils';
+import { BETUEL_GROUP_ECOMMERCE_URL } from './constants/url.constants';
 
+export const getProductSiteMapUrL = (product: ProductEntity) => `${BETUEL_GROUP_ECOMMERCE_URL}sitemaps/products/${product._id}.xml`;
 export const getProductSitemapFilePath = (product: ProductEntity) => path.join(process.cwd(), 'public/sitemaps/products', `${product._id}.xml`);
 export const getCompanySitemapFilePath = (company: CompanyEntity) => path.join(process.cwd(), 'public/sitemaps/companies', `${company._id}.xml`);
 export const getCategorySitemapFilePath = (category: CategoryEntity) => path.join(process.cwd(), 'public/sitemaps/categories', `${category._id}.xml`);
+export const robotsPath = path.join(process.cwd(), 'public', 'robots.txt');
 
 const tmpDir = os.tmpdir();
 
@@ -72,3 +75,62 @@ export function saveCategorySitemap(category: CategoryEntity) {
     }
   });
 }
+
+export const handleSitemapsOnRobotFile = (sitemapsUrls: string[]) => {
+  const initRobot = `# Allow all crawlers
+User-agent: *
+Allow: /
+
+User-agent: *
+Allow: /betueldance
+
+
+User-agent: *
+Allow: /betueltech
+
+
+User-agent: *
+Allow: /dixybaby
+
+User-agent: *
+Allow: /betueldance/products
+
+User-agent: *
+Allow: /betueltech/products
+
+
+User-agent: *
+Allow: /dixybaby/products
+
+
+User-agent: *
+Allow: /betueldance/category
+
+User-agent: *
+Allow: /betueltech/category
+
+
+User-agent: *
+Allow: /dixybaby/category
+
+
+# Block all crawlers for /accounts
+User-agent: *
+Disallow: /client/orders
+
+# Companies Sitemaps
+Sitemap: https://www.grupobetuel.store/sitemaps/companies/64b1face11f4e040457b7cc7.xml
+Sitemap: https://www.grupobetuel.store/sitemaps/companies/64b1fb876fa96313c2cf6d56.xml
+Sitemap: https://www.grupobetuel.store/sitemaps/companies/64ebe0aa43d62267fb0ecff6.xml
+Sitemap: https://www.grupobetuel.store/sitemaps/companies/64ec04e0014f86812d4ad9ab.xml`;
+
+  const robotContent = `${initRobot}\n\nSitemap: ${sitemapsUrls.join('\nSitemap: ')}`;
+
+  fs.writeFile(robotsPath, robotContent, (err) => {
+    if (err) {
+      console.error('Error writing robots.txt:', err);
+    } else {
+      // console.log(`File ${companySitemapPath} has been written.`);
+    }
+  });
+};

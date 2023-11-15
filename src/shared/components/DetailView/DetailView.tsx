@@ -600,7 +600,7 @@ export function DetailView({
                                   )}
                                   addonAfter={(
                                     <CloseOutlined
-                                      rev
+                                      rev=""
                                       onClick={resetSaleProductParam(
                                         param._id,
                                         variant._id,
@@ -642,7 +642,7 @@ export function DetailView({
                             min={0}
                             addonAfter={(
                               <CloseOutlined
-                                rev
+                                rev=""
                                 onClick={resetSaleProductParam(param._id)}
                               />
                             )}
@@ -671,7 +671,7 @@ export function DetailView({
                     type="number"
                     addonAfter={(
                       <CloseOutlined
-                        rev
+                        rev=""
                         onClick={() => handleSaleQuantity(0)}
                       />
                     )}

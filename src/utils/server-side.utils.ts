@@ -9,6 +9,7 @@ import {
   generateCompanyJSONLD,
   generateProductJSONLD,
 } from './seo.utils';
+import { BETUEL_GROUP_ECOMMERCE_URL } from './constants/url.constants';
 
 // import { setCachedResource } from './fs.utils';
 export interface IErrorResponse {
@@ -38,7 +39,7 @@ export async function handleCachedCompany(
     const companyService = new CompanyService();
     const currentCompany = await companyService.getCompanyByRefName(companyId);
     // currentCompany && setCachedResource(currentCompany, 'companies', currentCompany.companyId);
-    const sitemapURL = `sitemaps/companies/${currentCompany._id}.xml`;
+    const sitemapURL = `${BETUEL_GROUP_ECOMMERCE_URL}sitemaps/companies/${currentCompany._id}.xml`;
     const jsonld = currentCompany && generateCompanyJSONLD(currentCompany);
 
     return { data: currentCompany, sitemapURL, jsonld };
@@ -58,7 +59,7 @@ export const handleCachedProduct = async (
     //   slug,
     // }) as any;
     // product && setCachedResource(product, 'products');
-    const sitemapURL = `sitemaps/products/${product._id}.xml`;
+    const sitemapURL = `${BETUEL_GROUP_ECOMMERCE_URL}sitemaps/products/${product._id}.xml`;
     const jsonld = product && generateProductJSONLD(product);
 
     return { data: product, sitemapURL, jsonld };
@@ -73,7 +74,7 @@ export const handleCachedCategories = async (
   try {
     const categoryService = new CategoryService();
     const category = await categoryService.getCategoryBySlug(catSlug);
-    const sitemapURL = `sitemaps/categories/${category._id}.xml`;
+    const sitemapURL = `${BETUEL_GROUP_ECOMMERCE_URL}sitemaps/categories/${category._id}.xml`;
     const jsonld = category && generateCategoryJSONLD(category);
 
     // category && setCachedResource(category, 'categories');
