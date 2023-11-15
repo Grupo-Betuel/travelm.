@@ -8,7 +8,6 @@ import { handleCachedResourceHook } from '@shared/hooks/handleCachedResourceHook
 import { CategoryEntity } from '@shared/entities/CategoryEntity';
 import axios from 'axios';
 import { handleCachedCategories, handleCachedCompany, ICachedResourceResponse } from '../../../utils/server-side.utils';
-import { saveCategorySitemap } from '../../../utils/fs.utils';
 
 export interface ICategoryProductsProps {
   metadata: IMetadata;
