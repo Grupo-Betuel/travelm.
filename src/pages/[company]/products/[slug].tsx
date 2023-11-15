@@ -12,6 +12,7 @@ import {
   ICachedResourceResponse,
 } from '../../../utils/server-side.utils';
 import { getProductSiteMapUrL, handleSitemapsOnRobotFile, saveProductSitemap } from '../../../utils/fs.utils';
+import { generateProductDescriptionFromParams } from '../../../utils/params.utils';
 
 export interface IProductDetailsProps {
   metadata: IMetadata;
@@ -22,10 +23,17 @@ export interface IProductDetailsProps {
 export default function ProductDetail({
   metadata, currentCompany, cachedResources,
 }: IProductDetailsProps) {
-  const { sitemapURL, jsonld } = handleCachedResourceHook(cachedResources);
+  const {
+    sitemapURL,
+    jsonld,
+    canonical,
+  } = handleCachedResourceHook(cachedResources);
   return (
     <div>
-      <MetaHeaders metadata={{ ...metadata, jsonld, sitemapURL }} />
+      <MetaHeaders metadata={{
+        ...metadata, jsonld, sitemapURL, canonical,
+      }}
+      />
       <DetailView
         companyLogo={currentCompany?.logo}
         productDetails={cachedResources?.data}
@@ -123,6 +131,13 @@ export const getStaticProps: GetServerSideProps = async (context) => {
     // }
 
     const keywords = `${product?.tags?.join(', ') || ''} ${currentCompany?.tags?.join(', ') || ''}`;
+    const description = `${
+      product?.description || ''
+    } ${
+      product?.productParams
+        ? `\n${generateProductDescriptionFromParams(product?.productParams)}\n`
+        : ''
+    }${currentCompany?.description || ''}`;
     return {
       props: {
         currentCompany,
@@ -131,8 +146,7 @@ export const getStaticProps: GetServerSideProps = async (context) => {
           keywords,
           title: `${product?.name} RD$${product?.price.toLocaleString()}${product?.category?.title ? ` | ${product?.category?.title}` : ''} | ${currentCompany?.title} ${currentCompany?.name}`,
           ogTitle: `${product?.name} RD$${product?.price.toLocaleString()} | ${product?.category?.title || currentCompany?.title}`,
-          description:
-          product?.description || currentCompany?.description || '',
+          description,
           image: product?.image || currentCompany?.logo || '',
           type: 'article',
           video: {

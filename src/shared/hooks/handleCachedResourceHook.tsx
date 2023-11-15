@@ -20,5 +20,6 @@ export function handleCachedResourceHook<T>(cachedResources: ICachedResourceResp
   return {
     sitemapURL: cachedResources?.sitemapURL,
     jsonld: cachedResources?.jsonld,
+    canonical: cachedResources?.canonical,
   };
 }

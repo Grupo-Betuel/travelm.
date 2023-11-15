@@ -5,6 +5,7 @@ export interface IMetadata {
   description?: string;
   jsonld?: string;
   sitemapURL?: string;
+  canonical?: string;
   keywords?: string;
   type?: 'article' | 'website';
   image?: string;
@@ -47,5 +48,6 @@ export const MetaHeaders = ({ metadata }: IMetaHeadersProps) => (
         __html: metadata?.jsonld || '',
       }}
     />
+    <link rel="canonical" href={metadata.canonical} />
   </Head>
 );

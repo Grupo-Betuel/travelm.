@@ -7,7 +7,7 @@ import CategoryService from '@services/categoryService';
 import {
   generateCategoryJSONLD,
   generateCompanyJSONLD,
-  generateProductJSONLD,
+  generateProductJSONLD, getCategoryUrl, getCompanyUrl, getProductUrl,
 } from './seo.utils';
 import { BETUEL_GROUP_ECOMMERCE_URL } from './constants/url.constants';
 
@@ -22,6 +22,7 @@ export interface ICachedResourceResponse<T> {
   error?: IErrorResponse | null;
   sitemapURL?: string;
   jsonld?: string;
+  canonical?: string;
 }
 
 export const handleCachedCatch = (res: any) => {
@@ -41,8 +42,10 @@ export async function handleCachedCompany(
     // currentCompany && setCachedResource(currentCompany, 'companies', currentCompany.companyId);
     const sitemapURL = `${BETUEL_GROUP_ECOMMERCE_URL}sitemaps/companies/${currentCompany._id}.xml`;
     const jsonld = currentCompany && generateCompanyJSONLD(currentCompany);
-
-    return { data: currentCompany, sitemapURL, jsonld };
+    const canonical = getCompanyUrl(currentCompany);
+    return {
+      data: currentCompany, sitemapURL, jsonld, canonical,
+    };
   } catch (res: any) {
     return handleCachedCatch(res);
   }
@@ -59,10 +62,13 @@ export const handleCachedProduct = async (
     //   slug,
     // }) as any;
     // product && setCachedResource(product, 'products');
+    const canonical = getProductUrl(product);
     const sitemapURL = `${BETUEL_GROUP_ECOMMERCE_URL}sitemaps/products/${product._id}.xml`;
     const jsonld = product && generateProductJSONLD(product);
 
-    return { data: product, sitemapURL, jsonld };
+    return {
+      data: product, sitemapURL, jsonld, canonical,
+    };
   } catch (res: any) {
     return handleCachedCatch(res);
   }
@@ -76,9 +82,12 @@ export const handleCachedCategories = async (
     const category = await categoryService.getCategoryBySlug(catSlug);
     const sitemapURL = `${BETUEL_GROUP_ECOMMERCE_URL}sitemaps/categories/${category._id}.xml`;
     const jsonld = category && generateCategoryJSONLD(category);
+    const canonical = getCategoryUrl(category);
 
     // category && setCachedResource(category, 'categories');
-    return { data: category, sitemapURL, jsonld };
+    return {
+      data: category, sitemapURL, jsonld, canonical,
+    };
   } catch (res: any) {
     return handleCachedCatch(res);
   }
