@@ -8,6 +8,7 @@ export function generateProductDescriptionFromParams(params: IProductParam[]): s
   // Agrupar los parámetros relacionados por productId
   const groupedParams: { [productId: string]: IProductParam[] } = {};
 
+  // eslint-disable-next-line no-restricted-syntax
   for (const param of params) {
     if (!groupedParams[param.productId]) {
       groupedParams[param.productId] = [];
