@@ -80,12 +80,12 @@ export const getStaticProps: GetServerSideProps = async (context) => {
         ogTitle: `${currentCategory?.title} | ${currentCompany?.name} ${currentCompany?.title}`,
         description:
           currentCategory?.description || currentCompany?.description || '',
-        image: currentCompany?.wallpaper || currentCompany?.logo || '',
+        image: currentCategory?.wallpaper || currentCompany?.wallpaper || currentCompany?.logo || '',
         type: 'website',
         video: {
-          url: currentCompany?.video || '',
-          secureUrl: currentCompany?.video || '',
-          type: currentCompany?.video?.includes('mp4')
+          url: currentCategory?.video || currentCompany?.video || '',
+          secureUrl: currentCategory?.video || currentCompany?.video || '',
+          type: (currentCategory?.video || currentCompany?.video || '').includes('mp4')
             ? 'video/mp4'
             : 'video/ogg',
         },
