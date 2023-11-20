@@ -61,8 +61,11 @@ export const getStaticPaths: GetStaticPaths<{ slug: string }> = async () => {
       //     console.log(`File ${productSitemapPath} has been written.`);
       //   }
       // });
-      saveProductSitemap(product);
-      productSitemaps.push(getProductSiteMapUrL(product));
+      if (process.env.NODE_ENV === 'production') {
+        saveProductSitemap(product);
+        productSitemaps.push(getProductSiteMapUrL(product));
+      }
+
       return {
         params: {
           slug: product.slug,
@@ -71,8 +74,11 @@ export const getStaticPaths: GetStaticPaths<{ slug: string }> = async () => {
       };
     });
 
-    // this will add all product sitemap to robots.txt
-    handleSitemapsOnRobotFile(productSitemaps);
+    if (process.env.NODE_ENV === 'production') {
+      // this will add all product sitemap to robots.txt
+      handleSitemapsOnRobotFile(productSitemaps);
+    }
+
     allProductSlugs = [...allProductSlugs, ...productSlugsPaths];
   }));
 
