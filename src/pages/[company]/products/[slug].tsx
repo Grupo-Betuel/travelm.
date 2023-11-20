@@ -74,6 +74,7 @@ export const getStaticPaths: GetStaticPaths<{ slug: string }> = async () => {
       };
     });
 
+
     if (process.env.NODE_ENV === 'production') {
       // this will add all product sitemap to robots.txt
       handleSitemapsOnRobotFile(productSitemaps);
