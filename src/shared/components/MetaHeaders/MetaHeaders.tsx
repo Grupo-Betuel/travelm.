@@ -24,7 +24,6 @@ export interface IMetaHeadersProps {
 
 export const MetaHeaders = ({ metadata }: IMetaHeadersProps) => {
   const image = metadata?.image;
-  console.log(image, 'klk image', metadata?.image);
   return (
     <Head>
       <meta property="og:title" content={metadata?.ogTitle || ''} />
