@@ -1,5 +1,4 @@
 import Head from 'next/head';
-import { parseGcloudUrlToImageKit } from '../../../utils/image.utils';
 
 export interface IMetadata {
   ogTitle?: string;
