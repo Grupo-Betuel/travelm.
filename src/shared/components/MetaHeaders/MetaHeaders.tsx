@@ -25,6 +25,7 @@ export const MetaHeaders = ({ metadata }: IMetaHeadersProps) => (
     <meta property="og:title" content={metadata?.ogTitle || ''} />
     <meta property="og:description" content={metadata?.description || ''} />
     <meta property="og:image" content={metadata?.image || ''} />
+    <meta property="og:image:alt" content={metadata?.ogTitle || ''} />
     <meta property="og:video" content={metadata?.video?.url || ''} />
     <meta
       property="og:video:secure_url"
