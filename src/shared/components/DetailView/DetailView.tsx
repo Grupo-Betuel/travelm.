@@ -272,7 +272,7 @@ export function DetailView({
     if (quantity <= product.stock) {
       if (quantity > 0 && productExistOnShoppingCart) {
         orderService?.handleLocalOrderSales(newSale);
-      } else {
+      } else if (productExistOnShoppingCart) {
         orderService?.removeSale(product._id);
       }
       setSale(newSale);

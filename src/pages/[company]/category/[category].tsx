@@ -68,7 +68,6 @@ export const getStaticProps: GetServerSideProps = async (context) => {
   const cachedResources = await handleCachedCategories(categorySlug as string);
   const currentCategory = cachedResources.data;
   // }
-
   const keywords = `${currentCategory?.tags?.join(', ') || ''} ${currentCompany?.tags?.join(', ') || ''}`;
 
   return {
