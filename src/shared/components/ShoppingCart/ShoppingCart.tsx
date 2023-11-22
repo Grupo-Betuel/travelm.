@@ -26,7 +26,7 @@ const IconText: FC<IShoppingCartAction> = ({
   key,
 }: any) => (
   <Space
-    key={key}
+    key={`${key}-${Math.random()}`}
     className={styles.ShoppingCartListItemAction}
     onClick={onClick}
   >
@@ -52,6 +52,7 @@ export function ShoppingCart({ itemActions, sales }: IShoppingCartProps) {
           actions={itemActions.map((action) => (
             <IconText
               {...action}
+              key={`action-${i}`}
               onClick={() => action.onClick && action.onClick(sale.product)}
             />
           ))}

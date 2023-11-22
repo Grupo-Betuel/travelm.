@@ -118,4 +118,8 @@ export default class OrderEntity extends BaseEntity {
   shippingPrice?: number;
 
   shippingTime?: string;
+
+  updateDate?: string = '';
+
+  createDate?: string = '';
 }

@@ -130,7 +130,8 @@ export function ShoppingCartDrawer({
   };
 
   useEffect(() => {
-    processedOrder._id
+    const currentOrderConditional = !order?._id || processedOrder.updateDate !== order.updateDate;
+    processedOrder._id && currentOrderConditional
       && processedOrder.status !== 'canceled'
       && handleCurrentOrder(processedOrder);
   }, [processedOrder]);

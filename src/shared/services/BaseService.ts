@@ -125,6 +125,7 @@ export class BaseService<T> implements AbstractBaseService<T> {
   ): Promise<T | undefined> {
     try {
       const res = await http.put(`${this.api}`, data);
+      console.log('res', res.data);
       enableCache && this.cacheData(res.data as T, 'add', cacheLifeTime);
       return res as T;
     } catch (err: IResponseError | any) {
