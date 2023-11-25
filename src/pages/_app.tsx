@@ -4,9 +4,7 @@ import AppLayout from '@shared/layout';
 import {
   Button, ConfigProvider, Result, Spin,
 } from 'antd';
-import React, {
-  useEffect, useMemo, useState,
-} from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer } from 'react-toastify';
 import { useAppStore } from '@services/store';
@@ -27,6 +25,7 @@ import { defaultTheme } from '../config/theme.config';
 export interface IAppProps {
   protected?: boolean;
 }
+
 export enum AppViewportHeightClassNames {
   WITH_NAVBAR = 'FullAppViewPortHeight',
   WITH_NAVBAR_OPTION = 'FullAppViewPortHeightNavbarOptions',
@@ -36,10 +35,7 @@ function MyApp({ Component, pageProps }: AppProps<IAppProps>) {
   const clientEntity = useAppStore((state) => state.clients((s) => s));
   const productEntity = useAppStore((state) => state.products((s) => s));
   const [appLoading, setAppLoading] = useState<boolean>();
-  const [
-    appViewportHeightClassName,
-    setAppViewportHeightClassName,
-  ] = useState<AppViewportHeightClassNames>(
+  const [appViewportHeightClassName, setAppViewportHeightClassName] = useState<AppViewportHeightClassNames>(
     AppViewportHeightClassNames.WITH_NAVBAR_OPTION,
   );
   const orderService = useMemo(() => new OrderService(), []);
@@ -130,6 +126,9 @@ function MyApp({ Component, pageProps }: AppProps<IAppProps>) {
   }
 
   // @ts-ignore
+  // @ts-ignore
+  // @ts-ignore
+  // @ts-ignore
   return (
     <>
       <Head>
@@ -163,17 +162,23 @@ function MyApp({ Component, pageProps }: AppProps<IAppProps>) {
         {/* <link rel=“canonical” href=“https://example.com/sample-page/” /> */}
         <meta property="og:url" content={seoUrl} />
         <meta property="fb:app_id" content="1304512236864343" />
-
-        <!-- Google tag (gtag.js) -->
-        <script async src="https://www.googletagmanager.com/gtag/js?id=AW-11423261608"></script>
-        <script>
-          window.dataLayer = window.dataLayer || [];
-          function gtag(){
-            dataLayer.push(arguments);
-          }
-          gtag('js', new Date());
-          gtag('config', 'AW-11423261608');
-        </script>
+        {/* Google tag (gtag.js) */}
+        <script
+          async
+          src="https://www.googletagmanager.com/gtag/js?id=AW-11423261608"
+        />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+       window.dataLayer = window.dataLayer || [];
+        function gtag()
+        {
+          dataLayer.push(arguments)
+        }
+        gtag('js', new Date());
+        gtag('config', 'AW-11423261608');`,
+          }}
+        />
       </Head>
 
       <ConfigProvider form={{ validateMessages }} theme={defaultTheme}>
@@ -221,4 +226,5 @@ function MyApp({ Component, pageProps }: AppProps<IAppProps>) {
     </>
   );
 }
+
 export default MyApp;
