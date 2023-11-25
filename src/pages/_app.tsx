@@ -129,6 +129,7 @@ function MyApp({ Component, pageProps }: AppProps<IAppProps>) {
     );
   }
 
+  // @ts-ignore
   return (
     <>
       <Head>
@@ -162,6 +163,17 @@ function MyApp({ Component, pageProps }: AppProps<IAppProps>) {
         {/* <link rel=“canonical” href=“https://example.com/sample-page/” /> */}
         <meta property="og:url" content={seoUrl} />
         <meta property="fb:app_id" content="1304512236864343" />
+
+        <!-- Google tag (gtag.js) -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id=AW-11423261608"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){
+            dataLayer.push(arguments);
+          }
+          gtag('js', new Date());
+          gtag('config', 'AW-11423261608');
+        </script>
       </Head>
 
       <ConfigProvider form={{ validateMessages }} theme={defaultTheme}>
