@@ -94,6 +94,9 @@ export function ShoppingCartDrawer({
     const orderData = existingOrder || order;
     if (!!orderData && orderData.sales.length === 0) return;
     if (orderData?._id) {
+      if (orderData.status === 'pending-info') {
+        orderData.status = 'pending-info';
+      }
       await updateOrder(orderData);
       onClose && onClose();
       toast.success('Orden actualizada con éxito');
@@ -262,7 +265,7 @@ export function ShoppingCartDrawer({
                 {(subtotal || '0').toLocaleString()}
               </Title>
             </div>
-            {(order?.status === 'pending-info' || order?.status === 'pending' || order?.status === 'personal-assistance')
+            {(order?.status === 'pending-confirm' || order?.status === 'pending-info' || order?.status === 'pending' || order?.status === 'personal-assistance')
               && (
               <>
                 <Button
@@ -278,7 +281,9 @@ export function ShoppingCartDrawer({
                   disabled={order?.sales?.length === 0}
                 >
                   {order?._id
-                    ? ProductsConstants.UPDATE_CART
+                    ? order?.status === 'pending-confirm'
+                      ? ProductsConstants.CONFIRM_CART_ORDER
+                      : ProductsConstants.UPDATE_CART
                     : client
                       ? ProductsConstants.SEND_CART
                       : ProductsConstants.NEXT}

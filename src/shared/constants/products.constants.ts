@@ -7,6 +7,7 @@ export const ProductsConstants = {
   VIEW_CART: 'Ver Orden',
   UPDATE_ORDER_IN_CART: 'Ir a Actualizar Orden',
   UPDATE_CART: 'Atualizar Orden',
+  CONFIRM_CART_ORDER: 'Confirmar Orden',
   SEND_CART: 'Enviar Orden',
   NEXT: 'Siguiente',
 };

@@ -50,6 +50,7 @@ export type OrderStatusTypes =
   | 'pending'
   | 'personal-assistance'
   | 'confirmed'
+  | 'pending-confirm'
   | 'checking-transfer'
   | 'pending-info'
   | 'delivering'
