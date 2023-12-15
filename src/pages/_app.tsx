@@ -78,8 +78,10 @@ function MyApp({ Component, pageProps }: AppProps<IAppProps>) {
     if (!cartIsOpen && orderId) setCartIsOpen(true);
 
     if (phone) {
+      setAppLoading(true);
       await login({ phone });
       await orderService.initLocalOrder();
+      setAppLoading(false);
       router.push('/');
     }
   };

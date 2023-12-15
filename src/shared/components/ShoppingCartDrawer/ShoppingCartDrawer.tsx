@@ -8,7 +8,9 @@ import {
   Steps,
   Tag,
 } from 'antd';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, {
+  useContext, useEffect, useMemo, useState,
+} from 'react';
 import {
   DeleteOutlined,
   EditOutlined, ExclamationCircleFilled,
@@ -29,6 +31,7 @@ import Title from 'antd/lib/typography/Title';
 import { useOrderContext } from '@shared/contexts/OrderContext';
 import { ClientEntity } from '@shared/entities/ClientEntity';
 import { ProductsConstants } from '@shared/constants/products.constants';
+import { AppLoadingContext } from '@shared/contexts/AppLoadingContext';
 import styles from './ShoppingCartDrawer.module.scss';
 import { orderStatusText } from '../../../utils/constants/order.constant';
 
@@ -46,6 +49,8 @@ export function ShoppingCartDrawer({
   const router = useRouter();
   const order = useAppStore((state) => state.currentOrder);
   const handleCurrentOrder = useAppStore((state) => state.handleCurrentOrder);
+  const { appLoading } = useContext(AppLoadingContext);
+
   const { client } = useAuthClientHook();
   const {
     add: sendOrder,
@@ -184,7 +189,7 @@ export function ShoppingCartDrawer({
       bodyStyle={{ paddingBottom: 0, paddingTop: 0 }}
       className={styles.ShoppingCartDrawer}
     >
-      {loading && (
+      {(loading || appLoading) && (
         <div className="loading">
           <Spin size="large" />
         </div>
