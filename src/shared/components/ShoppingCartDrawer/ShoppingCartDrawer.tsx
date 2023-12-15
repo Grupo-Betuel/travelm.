@@ -94,7 +94,7 @@ export function ShoppingCartDrawer({
     const orderData = existingOrder || order;
     if (!!orderData && orderData.sales.length === 0) return;
     if (orderData?._id) {
-      if (orderData.status === 'pending-info') {
+      if (orderData.status === 'pending-confirm') {
         orderData.status = 'pending-info';
       }
       await updateOrder(orderData);
