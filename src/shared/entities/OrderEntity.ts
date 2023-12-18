@@ -95,7 +95,7 @@ export type IOrderData = {
   [N in string]: OrderEntity[];
 };
 
-export type OrderFromTypes = 'ecommerce' | 'google' | 'fb-marketplace' | 'facebook' | 'instagram' | 'youtube' | 'tiktok';
+export type OrderFromTypes = 'ecommerce' | 'google' | 'fb-marketplace' | 'facebook' | 'instagram' | 'youtube' | 'tiktok' | 'whatsapp';
 
 export default class OrderEntity extends BaseEntity {
   client?: ClientEntity;
