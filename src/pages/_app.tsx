@@ -81,7 +81,10 @@ function MyApp({ Component, pageProps }: AppProps<IAppProps>) {
     if (phone) {
       await login({ phone });
       await orderService.initLocalOrder();
-      router.push('/');
+      router.replace({
+        pathname: router.pathname,
+        query: {},
+      }, undefined, { shallow: true });
     }
 
     setAppLoading(false);
