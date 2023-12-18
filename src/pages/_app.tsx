@@ -79,10 +79,11 @@ function MyApp({ Component, pageProps }: AppProps<IAppProps>) {
     const phone = parameters.get('phone');
     if (!cartIsOpen && orderId) setCartIsOpen(true);
     if (phone) {
+      const pathname = window.location.pathname;
       await login({ phone });
       await orderService.initLocalOrder();
       router.replace({
-        pathname: router.pathname,
+        pathname: pathname || '',
         query: {},
       }, undefined, { shallow: true });
     }
