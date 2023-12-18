@@ -20,7 +20,7 @@ import {
 import { useRouter } from 'next/router';
 import { useAppStore } from '@services/store';
 import { handleEntityHook } from '@shared/hooks/handleEntityHook';
-import OrderEntity from '@shared/entities/OrderEntity';
+import OrderEntity, { OrderFromTypes } from '@shared/entities/OrderEntity';
 import { useAuthClientHook } from '@shared/hooks/useAuthClientHook';
 import { ShoppingCart } from '@components/ShoppingCart';
 import { Register } from '@screens/Auth/components/Register';
@@ -108,7 +108,8 @@ export function ShoppingCartDrawer({
       orderService.resetLocalStorageOrder();
     } else if ((client || (newClient && current === 1)) && !orderData._id) {
       const clientData = newClient?._id ? newClient : client;
-      await sendOrder({ ...orderData, client: clientData });
+      const from = (router.query?.from || 'ecommerce') as OrderFromTypes;
+      await sendOrder({ ...orderData, from, client: clientData });
       toggleSuccessOrderModal();
       toast.success('Orden enviada con éxito');
       orderService.resetLocalStorageOrder();
