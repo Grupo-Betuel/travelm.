@@ -71,19 +71,20 @@ function MyApp({ Component, pageProps }: AppProps<IAppProps>) {
   }, [router.pathname]);
 
   const handleQueryParams = async () => {
+    setAppLoading(true);
+
     const queryString = window.location.search;
     const parameters = new URLSearchParams(queryString);
     const orderId = parameters.get('orderId');
     const phone = parameters.get('phone');
     if (!cartIsOpen && orderId) setCartIsOpen(true);
-
     if (phone) {
-      setAppLoading(true);
       await login({ phone });
       await orderService.initLocalOrder();
-      setAppLoading(false);
       router.push('/');
     }
+
+    setAppLoading(false);
   };
 
   useEffect(() => {
