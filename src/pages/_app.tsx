@@ -19,6 +19,7 @@ import LoadingBar from 'react-top-loading-bar';
 import { useRouter } from 'next/router';
 import { Analytics } from '@vercel/analytics/react';
 import { handleLoginHook } from '@shared/hooks/handleLoginHook';
+import { FROM_TARGET_KEY } from '@shared/constants/seo.constants';
 import { defaultValidateMessages as validateMessages } from '../config/form-validation.config';
 import { defaultTheme } from '../config/theme.config';
 
@@ -68,6 +69,10 @@ function MyApp({ Component, pageProps }: AppProps<IAppProps>) {
       setCompanyId(companyName + (companyName ? '/' : ''));
     }
     setSeoUrl(location.href);
+    const from = router.query.from;
+    if (from) {
+      localStorage.setItem(FROM_TARGET_KEY, from as string);
+    }
   }, [router.pathname]);
 
   const handleQueryParams = async () => {

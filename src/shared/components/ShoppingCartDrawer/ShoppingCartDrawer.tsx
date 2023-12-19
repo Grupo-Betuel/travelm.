@@ -32,6 +32,7 @@ import { useOrderContext } from '@shared/contexts/OrderContext';
 import { ClientEntity } from '@shared/entities/ClientEntity';
 import { ProductsConstants } from '@shared/constants/products.constants';
 import { AppLoadingContext } from '@shared/contexts/AppLoadingContext';
+import { FROM_TARGET_KEY } from '@shared/constants/seo.constants';
 import styles from './ShoppingCartDrawer.module.scss';
 import { orderStatusText } from '../../../utils/constants/order.constant';
 
@@ -108,8 +109,11 @@ export function ShoppingCartDrawer({
       orderService.resetLocalStorageOrder();
     } else if ((client || (newClient && current === 1)) && !orderData._id) {
       const clientData = newClient?._id ? newClient : client;
-      const from = (router.query?.from || 'ecommerce') as OrderFromTypes;
+      const from = (localStorage.getItem(FROM_TARGET_KEY) || 'ecommerce') as OrderFromTypes;
       await sendOrder({ ...orderData, from, client: clientData });
+      if (from) {
+        localStorage.removeItem(FROM_TARGET_KEY);
+      }
       toggleSuccessOrderModal();
       toast.success('Orden enviada con éxito');
       orderService.resetLocalStorageOrder();

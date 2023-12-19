@@ -12,6 +12,8 @@ import { UserAddOutlined } from '@ant-design/icons';
 import { toast } from 'react-toastify';
 import { useOrderContext } from '@shared/contexts/OrderContext';
 import { debounce } from 'lodash';
+import { FROM_TARGET_KEY } from '@shared/constants/seo.constants';
+import { OrderFromTypes } from '@shared/entities/OrderEntity';
 
 export function Register({ isModal, onSubmit, submitBtnLabel }: IAuthProps) {
   const clientEntity = useAppStore((state) => state.clients((stateu) => stateu));
@@ -27,10 +29,12 @@ export function Register({ isModal, onSubmit, submitBtnLabel }: IAuthProps) {
 
   const createClient = async (data: ClientEntity) => {
     data.phone = data.phone.toString().replace(/[- ()+]/g, '');
+    const from = (localStorage.getItem(FROM_TARGET_KEY) || 'ecommerce') as OrderFromTypes;
     const loginData = {
       ...clientLoginData,
       phone: data.phone,
       password: data.password,
+      from,
     };
     setClientLoginData(loginData);
 
