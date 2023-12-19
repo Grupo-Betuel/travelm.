@@ -69,10 +69,6 @@ function MyApp({ Component, pageProps }: AppProps<IAppProps>) {
       setCompanyId(companyName + (companyName ? '/' : ''));
     }
     setSeoUrl(location.href);
-    const from = router.query.from;
-    if (from) {
-      localStorage.setItem(FROM_TARGET_KEY, from as string);
-    }
   }, [router.pathname]);
 
   const handleQueryParams = async () => {
@@ -82,6 +78,10 @@ function MyApp({ Component, pageProps }: AppProps<IAppProps>) {
     const parameters = new URLSearchParams(queryString);
     const orderId = parameters.get('orderId');
     const phone = parameters.get('phone');
+    const from = parameters.get('from');
+    if (from) {
+      localStorage.setItem(FROM_TARGET_KEY, from as string);
+    }
     if (!cartIsOpen && orderId) setCartIsOpen(true);
     if (phone) {
       const pathname = window.location.pathname;
