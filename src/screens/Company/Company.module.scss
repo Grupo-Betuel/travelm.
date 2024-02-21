@@ -56,6 +56,11 @@
   }
 }
 
+.LandingCarouselWrapper {
+  @media (max-width: 768px) {
+    display: none;
+  }
+}
 .products {
   display: flex;
   flex-wrap: wrap;

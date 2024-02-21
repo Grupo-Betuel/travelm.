@@ -14,7 +14,6 @@ import styles from './Company.module.scss';
 import { layoutId, navbarOptionsHeight } from '../../utils/layout.utils';
 
 export interface CompanyProps {
-  hideCarousel?: boolean;
   company?: CompanyEntity;
 }
 
