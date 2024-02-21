@@ -43,6 +43,7 @@ export const getStaticPaths: GetStaticPaths<{ company: string, category: string 
     fallback: 'blocking', // indicates the type of fallback
   });
 };
+
 export const getStaticProps: GetServerSideProps = async (context) => {
   /// / HANDLING COMPANY DATA
   const companyName = context.params?.company;

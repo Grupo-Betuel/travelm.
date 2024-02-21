@@ -691,9 +691,8 @@ export function DetailView({
                 className={`${styles.DetailViewPostDetailsContentDescription} ${
                   showMoreDescription ? styles.showMoreDescription : ''
                 }`}
-              >
-                {product.description}
-              </div>
+                dangerouslySetInnerHTML={{ __html: product.description }}
+              />
               {product?.description?.length > maxDescriptionLength && (
                 <a
                   className={

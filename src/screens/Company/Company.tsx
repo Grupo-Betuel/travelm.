@@ -1,4 +1,4 @@
-import { ProductCard, ScrollView } from '@shared/components';
+import { LandingCarousel, ProductCard, ScrollView } from '@shared/components';
 import { Affix, Input, Spin } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
 import { handleEntityHook } from '@shared/hooks/handleEntityHook';
@@ -123,9 +123,12 @@ export function Company({ company }: CompanyProps) {
         </div>
       )}
       <div className={styles.CompanyWrapper}>
-        {/* <div className={styles.LandingCarouselWrapper}> */}
-        {/*  {!hideCarousel && <LandingCarousel />} */}
-        {/* </div> */}
+        {company?.wallpaper
+          && (
+          <div className={styles.LandingCarouselWrapper}>
+            <LandingCarousel images={[company?.wallpaper]} />
+          </div>
+          )}
         {ProductDetail}
 
         <div className={styles.CompanyContent}>

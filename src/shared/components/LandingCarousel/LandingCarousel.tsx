@@ -3,10 +3,14 @@ import { useRef } from 'react';
 import styles from './LandingCarousel.module.scss';
 
 export interface IAppMainPromotionCarouselProps extends CarouselProps {
-  showArrow?: boolean
+  showArrow?: boolean;
+  images: string[];
 }
 
-export function LandingCarousel(props: IAppMainPromotionCarouselProps) {
+export function LandingCarousel({
+  images,
+  ...props
+}: IAppMainPromotionCarouselProps) {
   const { showArrow } = { showArrow: true, ...props };
 
   const carousel = useRef<any>();
@@ -26,43 +30,18 @@ export function LandingCarousel(props: IAppMainPromotionCarouselProps) {
       )}
       <Image.PreviewGroup>
         <Carousel dots={false} {...props} ref={carousel} autoplay>
-          <div>
-            <div className={styles.HomeCarouselItemWrapper}>
-              <Image
-                alt="carousel"
-                className={styles.HomeCarouselItemImage}
-                rootClassName={styles.HomeCarouselItemImageWrapper}
-                src="https://i.pinimg.com/originals/eb/a7/60/eba760e4d470d2de478d26038e5fc9a9.jpg"
-              />
+          {images.map((image, index) => (
+            <div key={index}>
+              <div className={styles.HomeCarouselItemWrapper}>
+                <Image
+                  alt="carousel"
+                  className={styles.HomeCarouselItemImage}
+                  rootClassName={styles.HomeCarouselItemImageWrapper}
+                  src={image}
+                />
+              </div>
             </div>
-          </div>
-          <div>
-            <div className={styles.HomeCarouselItemWrapper}>
-              <Image
-                className={styles.HomeCarouselItemImage}
-                rootClassName={styles.HomeCarouselItemImageWrapper}
-                src="https://i.pinimg.com/originals/eb/a7/60/eba760e4d470d2de478d26038e5fc9a9.jpg"
-              />
-            </div>
-          </div>
-          <div>
-            <div className={styles.HomeCarouselItemWrapper}>
-              <Image
-                className={styles.HomeCarouselItemImage}
-                rootClassName={styles.HomeCarouselItemImageWrapper}
-                src="https://i.pinimg.com/originals/eb/a7/60/eba760e4d470d2de478d26038e5fc9a9.jpg"
-              />
-            </div>
-          </div>
-          <div>
-            <div className={styles.HomeCarouselItemWrapper}>
-              <Image
-                className={styles.HomeCarouselItemImage}
-                rootClassName={styles.HomeCarouselItemImageWrapper}
-                src="https://i.pinimg.com/originals/eb/a7/60/eba760e4d470d2de478d26038e5fc9a9.jpg"
-              />
-            </div>
-          </div>
+          ))}
         </Carousel>
       </Image.PreviewGroup>
       {showArrow && (

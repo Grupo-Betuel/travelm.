@@ -47,7 +47,7 @@ export function ProductCard({ product, onClick }: IProductProps) {
   }, [product.stock]);
 
   const isOnCart = useMemo(
-    () => order?.sales.some((sale) => sale.product._id === product._id),
+    () => order?.sales.some((sale) => sale.product?._id === product?._id),
     [order?.sales],
   );
 

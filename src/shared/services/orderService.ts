@@ -38,8 +38,8 @@ export default class OrderService extends BaseService<OrderEntity> {
         const orderProducts = order.sales?.map((sale) => sale.product);
         const productIds = Array.from(
           new Set([
-            ...currentOrderProducts.map((p) => p._id),
-            ...orderProducts.map((p) => p._id),
+            ...currentOrderProducts.map((p) => p?._id),
+            ...orderProducts.map((p) => p?._id),
           ]),
         );
 
