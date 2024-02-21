@@ -62,7 +62,7 @@ export function ShoppingCartDrawer({
   const [current, setCurrent] = useState(0);
   const subtotal = useMemo(
     () => order?.sales?.reduce(
-      (acc, sale) => acc + sale.product?.price * sale.quantity,
+      (acc, sale) => acc + (sale?.product?.price || 0) * sale.quantity,
       0,
     ),
     [order?.sales],
