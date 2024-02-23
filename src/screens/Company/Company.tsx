@@ -73,7 +73,7 @@ export function Company({ company }: CompanyProps) {
             company: product.company,
           };
         }
-        acc[category].products.push(product);
+        acc[category].products = [...acc[category].products, product].sort((a, c) => (a.newArrival && !c.newArrival ? -1 : 1));
         return acc;
       },
       {},

@@ -37,6 +37,9 @@ export function ProductCard({ product, onClick }: IProductProps) {
   };
 
   const ribbonText = useMemo(() => {
+    if (product.newArrival) {
+      return ProductsConstants.NEW_ITEM;
+    }
     if (isAlmostSoldOut) {
       return ProductsConstants.ALMOST_SOLD_OUT;
     }
@@ -61,8 +64,8 @@ export function ProductCard({ product, onClick }: IProductProps) {
   return (
     <Badge.Ribbon
       text={ribbonText}
-      style={{ display: ribbonText ? 'none' : 'none' }}
-      color={isAlmostSoldOut ? 'gold' : 'red'}
+      style={{ display: ribbonText ? 'block' : 'none' }}
+      color={product.newArrival ? 'green' : isAlmostSoldOut ? 'gold' : 'red'}
     >
       <Link href={`/${product.company}/products/${product.slug}`}>
         <a>

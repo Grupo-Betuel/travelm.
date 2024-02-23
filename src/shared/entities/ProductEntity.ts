@@ -30,6 +30,8 @@ export class ProductEntity extends BaseEntity {
 
   stock: number = 0;
 
+  newArrival?: boolean = false;
+
   productParams: IProductParam[] = [];
 
   category: CategoryEntity = new CategoryEntity();
