@@ -35,7 +35,7 @@ export const Topbar = () => {
         endpoint: EndpointsAndEntityStateKeys.BY_REF_ID,
         slug: companyIdParam as string,
       });
-    } else if (companyId) {
+    } else if (!companyId) {
       setCurrentCompany(undefined);
     }
   }, [router.query]);
