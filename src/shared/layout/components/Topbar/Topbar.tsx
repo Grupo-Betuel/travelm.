@@ -1,8 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import {
   FacebookFilled,
-  FacebookOutlined,
-  InstagramFilled,
   InstagramOutlined,
   WhatsAppOutlined,
   YoutubeOutlined,
@@ -12,7 +10,6 @@ import { EndpointsAndEntityStateKeys } from '@shared/enums/endpoints.enum';
 import { useRouter } from 'next/router';
 import { CompanyEntity } from '@shared/entities/CompanyEntity';
 import Link from 'next/link';
-import { Button } from 'antd';
 import styles from './Topbar.module.scss';
 import { contactUsByWhatsappLink } from '../../../../utils/url.utils';
 import {
@@ -21,7 +18,6 @@ import {
 } from '../../../../utils/constants/company.constants';
 
 export const Topbar = () => {
-  const [data, setData] = useState();
   const { get, item: company } = handleEntityHook<CompanyEntity>('companies');
   const router = useRouter();
   const [companyId, setCompanyId] = useState<string>();
@@ -35,8 +31,8 @@ export const Topbar = () => {
         endpoint: EndpointsAndEntityStateKeys.BY_REF_ID,
         slug: companyIdParam as string,
       });
-    } else if (!companyId) {
-      setCurrentCompany(undefined);
+    } else if (!companyIdParam) {
+      // setCurrentCompany(undefined);
     }
   }, [router.query]);
 

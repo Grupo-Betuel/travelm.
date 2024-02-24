@@ -16,5 +16,5 @@ export const orderStatusText: { [N in OrderStatusTypes]: string } = {
 };
 
 export const orderMessageTexts = {
-  orderItemByWhatsapp: ({ shortID, company, ...product }: ProductEntity) => `Hola ${company} vi su tienda en la página ecommerce, este es el código del producto que me interesa => ${shortID}`,
+  orderItemByWhatsapp: ({ shortID, company }: ProductEntity) => `Hola ${company} vi su tienda en la página ecommerce, este es el código del producto que me interesa => ${shortID}`,
 };
