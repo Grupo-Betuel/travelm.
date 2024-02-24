@@ -25,6 +25,7 @@ export const Topbar = () => {
   const { get, item: company } = handleEntityHook<CompanyEntity>('companies');
   const router = useRouter();
   const [companyId, setCompanyId] = useState<string>();
+  const [currentCompany, setCurrentCompany] = useState<CompanyEntity>();
 
   useEffect(() => {
     const { company: companyIdParam } = router.query;
@@ -34,10 +35,15 @@ export const Topbar = () => {
         endpoint: EndpointsAndEntityStateKeys.BY_REF_ID,
         slug: companyIdParam as string,
       });
+    } else if (companyId) {
+      setCurrentCompany(undefined);
     }
   }, [router.query]);
 
-  console.log('company', company);
+  useEffect(() => {
+    setCurrentCompany(company);
+  }, [company]);
+
   const whatsappLink = useMemo(
     () => contactUsByWhatsappLink(
       `Hola ${
@@ -64,8 +70,8 @@ export const Topbar = () => {
           </a>
         </Link>
 
-        {company.instagram?.url && (
-          <Link href={company.instagram.url}>
+        {currentCompany?.instagram?.url && (
+          <Link href={currentCompany?.instagram.url}>
             <a target="_blank">
               <InstagramOutlined
                 rev=""
@@ -75,8 +81,8 @@ export const Topbar = () => {
             </a>
           </Link>
         )}
-        {company.facebook?.url && (
-          <Link href={company.facebook.url}>
+        {currentCompany?.facebook?.url && (
+          <Link href={currentCompany?.facebook.url}>
             <a target="_blank">
               <FacebookFilled
                 rev=""
@@ -87,8 +93,8 @@ export const Topbar = () => {
           </Link>
         )}
 
-        {company.youtube?.url && (
-          <Link href={company.youtube.url}>
+        {currentCompany?.youtube?.url && (
+          <Link href={currentCompany?.youtube.url}>
             <a target="_blank">
               <YoutubeOutlined
                 rev=""
