@@ -22,6 +22,8 @@ export class CompanyEntity extends BaseEntity {
   facebook?: any;
 
   instagram?: any;
+
+  youtube?: any;
 }
 
 export const companyTitles: { [N in string]: string } = {

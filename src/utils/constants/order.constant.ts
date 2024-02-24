@@ -1,4 +1,5 @@
 import { OrderStatusTypes } from '@shared/entities/OrderEntity';
+import { ProductEntity } from '@shared/entities/ProductEntity';
 
 export const orderStatusText: { [N in OrderStatusTypes]: string } = {
   pending: 'Pendiente',
@@ -12,5 +13,8 @@ export const orderStatusText: { [N in OrderStatusTypes]: string } = {
   canceled: 'Cancelado',
   'cancel-attempt': 'Intento de cancelación',
   completed: 'Completa',
+};
 
+export const orderMessageTexts = {
+  orderItemByWhatsapp: ({ shortID, company, ...product }: ProductEntity) => `Hola ${company} vi su tienda en la página ecommerce, este es el código del producto que me interesa => ${shortID}`,
 };

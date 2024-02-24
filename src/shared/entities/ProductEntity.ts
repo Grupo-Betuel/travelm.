@@ -28,6 +28,8 @@ export class ProductEntity extends BaseEntity {
 
   company: string = '';
 
+  shortID: string = '';
+
   stock: number = 0;
 
   newArrival?: boolean = false;

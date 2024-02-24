@@ -1,13 +1,16 @@
 import { Badge, Button, Card } from 'antd';
 import { ProductEntity } from '@shared/entities/ProductEntity';
 import { ProductsConstants } from '@shared/constants/products.constants';
-import { useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import { useAppStore } from '@services/store';
 import { useOrderContext } from '@shared/contexts/OrderContext';
 import Image from 'next/image';
 import Link from 'next/link';
+import { WhatsAppOutlined } from '@ant-design/icons';
 import styles from './ProductCard.module.scss';
 import { getSaleDataFromProduct } from '../../../utils/objects.utils';
+import { contactUsByWhatsappLink } from '../../../utils/url.utils';
+import { orderMessageTexts } from '../../../utils/constants/order.constant';
 
 export interface IProductProps {
   product: ProductEntity;
@@ -61,6 +64,11 @@ export function ProductCard({ product, onClick }: IProductProps) {
     onClick && onClick(product);
   };
 
+  const getWhatsappLink = useCallback(
+    (p: ProductEntity) => contactUsByWhatsappLink(orderMessageTexts.orderItemByWhatsapp(p)),
+    [],
+  );
+
   return (
     <Badge.Ribbon
       text={ribbonText}
@@ -81,7 +89,7 @@ export function ProductCard({ product, onClick }: IProductProps) {
                 alt={product.slug}
                 priority
               />
-        )}
+            )}
             onClick={handleClick}
           >
             <div className={styles.ProductCardContent}>
@@ -95,11 +103,11 @@ export function ProductCard({ product, onClick }: IProductProps) {
               </div>
               <div>
                 {isAlmostSoldOut && (
-                <span className="text-red">
-                  Solo quedan:
+                  <span className={`text-red ${!isAlmostSoldOut ? 'v-hidden' : ''}`}>
+                    Solo quedan:
                     {' '}
-                  {product.stock || 0}
-                </span>
+                    {product.stock || 0}
+                  </span>
                 )}
               </div>
               {/* {product.stock ? ( */}
@@ -112,6 +120,18 @@ export function ProductCard({ product, onClick }: IProductProps) {
                   : ProductsConstants.ADD_CART}
               </Button>
               {/* ) : null} */}
+              <Link href={getWhatsappLink(product)}>
+                <a target="_blank" rel="noopener noreferrer">
+                  <Button
+                    type="primary"
+                    className="mt-s w-100"
+                    icon={<WhatsAppOutlined rev="" />}
+                    onClick={(ev) => ev.stopPropagation()}
+                  >
+                    {ProductsConstants.ORDER_BY_WHATSAPP}
+                  </Button>
+                </a>
+              </Link>
             </div>
           </Card>
         </a>

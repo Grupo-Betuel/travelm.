@@ -3,6 +3,7 @@ import React, { FC } from 'react';
 import Title from 'antd/lib/typography/Title';
 import { ISale } from '@shared/entities/OrderEntity';
 import { ProductEntity } from '@shared/entities/ProductEntity';
+import { CheckCircleFilled, FormOutlined, WhatsAppOutlined } from '@ant-design/icons';
 import styles from './ShoppingCart.module.scss';
 
 export interface IShoppingCartAction {
@@ -40,6 +41,29 @@ export function ShoppingCart({ itemActions, sales }: IShoppingCartProps) {
     <List
       className={styles.ShoppingCartList}
       itemLayout="vertical"
+      header={(
+        <p>
+          {' '}
+          <FormOutlined rev="" />
+          {' '}
+          NOTA:
+          <b className="text-nowrap">
+            {' '}
+            Solo pagaras cuando recibas el producto
+            {' '}
+            <CheckCircleFilled className="text-green-5" rev="" />
+          </b>
+          <br />
+          <br />
+          <i>
+            Luego de enviar el pedido te escribiremos por Whatsapp
+            {' '}
+            <WhatsAppOutlined rev="" className="text-green-5" />
+            {' '}
+            para continuar con la orden.
+          </i>
+        </p>
+)}
       size="large"
       locale={{
         emptyText: 'No hay productos en el carrito',

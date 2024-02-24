@@ -17,7 +17,7 @@ import {
   MessageOutlined,
   ShoppingOutlined,
   StarOutlined,
-  UploadOutlined,
+  UploadOutlined, WhatsAppOutlined,
 } from '@ant-design/icons';
 import { useRouter } from 'next/router';
 import React, {
@@ -44,9 +44,12 @@ import { structuredClone } from 'next/dist/compiled/@edge-runtime/primitives/str
 import { useOrderContext } from '@shared/contexts/OrderContext';
 import { useAppStore } from '@services/store';
 import { ProductsConstants } from '@shared/constants/products.constants';
+import Link from 'next/link';
 import { sidebarWidth } from '../../../utils/layout.utils';
 import styles from './DetailView.module.scss';
 import { getSaleDataFromProduct } from '../../../utils/objects.utils';
+import { contactUsByWhatsappLink } from '../../../utils/url.utils';
+import { orderMessageTexts } from '../../../utils/constants/order.constant';
 
 export interface IDetailViewProps {
   productDetails?: any;
@@ -432,6 +435,11 @@ export function DetailView({
     [productExistOnShoppingCart, sale, product],
   );
 
+  const getWhatsappLink = useCallback(
+    (p: ProductEntity) => contactUsByWhatsappLink(orderMessageTexts.orderItemByWhatsapp(p)),
+    [],
+  );
+
   const ShoppingActionButton = (
     <Button
       type="primary"
@@ -762,6 +770,21 @@ export function DetailView({
           </div>
           <StickyFooter className={styles.DetailViewPostDetailsActions}>
             {ShoppingActionButton}
+            <Link href={getWhatsappLink(product)}>
+              <a target="_blank" rel="noopener noreferrer">
+                <Button
+                  type="link"
+                  shape="round"
+                  block
+                  size="large"
+                  icon={<WhatsAppOutlined rev="" />}
+                  className="me-m"
+                >
+                  {ProductsConstants.ORDER_BY_WHATSAPP}
+                </Button>
+              </a>
+            </Link>
+
           </StickyFooter>
         </Resizable>
         <StickyFooter

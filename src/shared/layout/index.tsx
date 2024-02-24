@@ -2,6 +2,7 @@ import { Layout } from 'antd';
 import { Content } from 'antd/lib/layout/layout';
 // import dynamic from 'next/dynamic';
 import Navbar from '@shared/layout/components/Navbar/Navbar';
+import { Topbar } from '@shared/layout/components/Topbar/Topbar';
 import styles from './layout.module.scss';
 import { layoutId } from '../../utils/layout.utils';
 
@@ -13,6 +14,7 @@ export interface IAppLayoutProps {
 function AppLayout({ children }: IAppLayoutProps) {
   return (
     <Layout className={styles.layout} id={layoutId}>
+      <Topbar />
       <Navbar />
       <Layout>
         <Content className={styles.content}>{children}</Content>

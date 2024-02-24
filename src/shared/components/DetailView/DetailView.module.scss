@@ -97,6 +97,8 @@ $bannerHeight: 40px;
 
   .DetailViewPostDetailsActions {
     z-index: 999;
+    flex-direction: column;
+    gap: 1rem;
     &.MobileOnly {
       display: none;
     }

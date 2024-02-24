@@ -1,0 +1,26 @@
+@use '../../../styles/layout-variables' as layout;
+
+.TopBar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  min-height: layout.$topbarHeight;
+  padding: 0 1rem;
+  .TopBarSocialNetworks {
+   display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  @media screen and (max-width: 768px) {
+    font-size: 12px !important;
+  }
+
+  @media screen and (max-width: 560px) {
+    flex-direction: column;
+    min-height: layout.$topbarHeight * 1.8;
+    gap: 0.3rem;
+    justify-content: center;
+  }
+}

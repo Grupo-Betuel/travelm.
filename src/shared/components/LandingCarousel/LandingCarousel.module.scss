@@ -24,7 +24,7 @@
       height: 100%;
       .HomeCarouselItemImage {
         //object-fit: cover;
-        object-fit: stretch;
+        object-fit: fill;
         width: 100%;
         max-height: 100%;
       }
