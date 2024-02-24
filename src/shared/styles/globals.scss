@@ -34,12 +34,12 @@
 }
 
 .FullAppViewPortHeight {
-  height: calc(100vh - $navbarHeight) !important;
+  height: calc(100vh -  ($navbarOptionsHeight + $topbarHeight)) !important;
   top: $navbarHeight !important;
 }
 
 .FullAppViewPortHeightNavbarOptions {
-  height: calc(100vh - $navbarOptionsHeight) !important;
+  height: calc(100vh - ($navbarOptionsHeight + $topbarHeight)) !important;
   top: ($navbarOptionsHeight + $topbarHeight) !important;
 }
 
