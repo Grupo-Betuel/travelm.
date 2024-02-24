@@ -40,7 +40,7 @@
 
 .FullAppViewPortHeightNavbarOptions {
   height: calc(100vh - $navbarOptionsHeight) !important;
-  top: $navbarOptionsHeight !important;
+  top: ($navbarOptionsHeight + $topbarHeight) !important;
 }
 
 .ant-menu-title-content {
