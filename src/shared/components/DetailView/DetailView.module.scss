@@ -9,7 +9,7 @@ $bannerHeight: 40px;
 .DetailViewWrapper {
   display: flex;
   width: 100vw;
-  height: calc(100dvh - layout.$navbarOptionsHeight);
+  height: calc(100dvh - (layout.$navbarOptionsHeight + layout.$topbarHeight));
   align-items: stretch;
   overflow: auto;
   gap: 0;

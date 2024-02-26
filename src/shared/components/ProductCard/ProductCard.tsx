@@ -120,18 +120,18 @@ export function ProductCard({ product, onClick }: IProductProps) {
                   : ProductsConstants.ADD_CART}
               </Button>
               {/* ) : null} */}
-              <Link href={getWhatsappLink(product)}>
-                <a target="_blank" rel="noopener noreferrer">
-                  <Button
-                    type="primary"
-                    className="mt-s w-100"
-                    icon={<WhatsAppOutlined rev="" />}
-                    onClick={(ev) => ev.stopPropagation()}
-                  >
-                    {ProductsConstants.ORDER_BY_WHATSAPP}
-                  </Button>
-                </a>
-              </Link>
+              {/* <Link href={getWhatsappLink(product)}> */}
+              {/*  <a target="_blank" rel="noopener noreferrer"> */}
+              {/*    <Button */}
+              {/*      type="primary" */}
+              {/*      className="mt-s w-100" */}
+              {/*      icon={<WhatsAppOutlined rev="" />} */}
+              {/*      onClick={(ev) => ev.stopPropagation()} */}
+              {/*    > */}
+              {/*      {ProductsConstants.ORDER_BY_WHATSAPP} */}
+              {/*    </Button> */}
+              {/*  </a> */}
+              {/* </Link> */}
             </div>
           </Card>
         </a>

@@ -32,13 +32,13 @@ export const Topbar = () => {
         slug: companyIdParam as string,
       });
     } else if (!companyIdParam) {
-      // setCurrentCompany(undefined);
+      setCurrentCompany(undefined);
     }
   }, [router.query]);
 
   useEffect(() => {
     setCurrentCompany(company);
-  }, [company]);
+  }, [company, companyId]);
 
   const whatsappLink = useMemo(
     () => contactUsByWhatsappLink(
