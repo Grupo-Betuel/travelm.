@@ -1,5 +1,5 @@
 @use 'src/shared/styles/sizing-variables' as sizes;
-
+@use 'src/shared/styles/breakpoints' as breakpoints;
 .ShoppingCartDrawer {
   .ShoppingCartDrawerHeader {
     position: sticky;
@@ -7,18 +7,45 @@
     background: white !important;
     z-index: 1;
     padding: 2rem 0 .5rem 0;
+    @include breakpoints.only-on(('xs', 's')) {
+      padding: 0.5rem 0 .5rem 0;
+      * {
+        font-size: 12px !important;
+      }
+    }
   }
+
   .ShoppingCartDrawerRegisterWrapper {
     padding: sizes.$size-xx-large 0;
+
   }
 
   .ShoppingCartDrawerFooter {
     padding-left: 0;
     padding-right: 0;
     display: block;
+
+    .ShoppingCartDrawerFooterPriceInfo {
+    }
+    @include breakpoints.only-on(('xs', 's')) {
+      padding: sizes.$size-xxx-small 0 sizes.$size-small 0 !important;
+      h5 {
+        font-size: 14px !important;
+      }
+
+      h2 {
+        font-size: 28px !important;
+      }
+
+      i {
+        font-size: 11px !important;
+      }
+    }
+
     .ShoppingCartDrawerFooterSubtotal {
       display: flex;
       justify-content: space-between;
+
     }
   }
 }

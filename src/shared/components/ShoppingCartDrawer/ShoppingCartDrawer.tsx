@@ -15,7 +15,7 @@ import {
   DeleteOutlined,
   EditOutlined, ExclamationCircleFilled,
   PlusOutlined,
-  ShoppingOutlined,
+  ShoppingOutlined, WhatsAppOutlined,
 } from '@ant-design/icons';
 import { useRouter } from 'next/router';
 import { useAppStore } from '@services/store';
@@ -265,7 +265,7 @@ export function ShoppingCartDrawer({
             ]}
           />
           <StickyFooter className={styles.ShoppingCartDrawerFooter}>
-            <div className="flex-between-start py-s">
+            <div className={`flex-between-start pb-s ${styles.ShoppingCartDrawerFooterPriceInfo}`}>
               <Title className="m-0" level={5}>
                 Subtotal
               </Title>
@@ -275,8 +275,20 @@ export function ShoppingCartDrawer({
                 {(subtotal || '0').toLocaleString()}
               </Title>
             </div>
-            {(order?.status === 'pending-confirm' || order?.status === 'pending-info' || order?.status === 'pending' || order?.status === 'personal-assistance')
-              && (
+            <div className="mb-s font-size-4 text-center">
+              <i>
+                Luego de enviar el pedido te escribiremos por Whatsapp
+                {' '}
+                <WhatsAppOutlined rev="" className="text-green-5" />
+                {' '}
+                para
+                continuar con la orden.
+              </i>
+            </div>
+            {(order?.status === 'pending-confirm'
+              || order?.status === 'pending-info'
+              || order?.status === 'pending'
+              || order?.status === 'personal-assistance') && (
               <>
                 <Button
                   className="mb-l"
@@ -285,9 +297,7 @@ export function ShoppingCartDrawer({
                   block
                   size="large"
                   icon={client ? <ShoppingOutlined rev="" /> : null}
-                  onClick={
-                      !order?.sales?.length ? undefined : handleSendOrder
-                    }
+                  onClick={!order?.sales?.length ? undefined : handleSendOrder}
                   disabled={order?.sales?.length === 0}
                 >
                   {order?._id
@@ -309,7 +319,7 @@ export function ShoppingCartDrawer({
                   Agregar más productos
                 </Button>
               </>
-              )}
+            )}
           </StickyFooter>
         </>
       )}
@@ -365,7 +375,7 @@ export function ShoppingCartDrawer({
               Seguir comprando
             </Button>,
             <Button key="buy" onClick={goToOrders}>
-              Ver mis ordenes
+              Ver mis pedidos
             </Button>,
           ]}
         />

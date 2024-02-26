@@ -13,13 +13,17 @@ export const OrderContext = createContext<IOrderContextValue>(
 );
 
 export const useOrderContext = (): IOrderContextValue => {
-  const { orderService, toggleCart, cartIsOpen } = useContext(OrderContext);
+  const {
+    orderService, toggleCart, cartIsOpen,
+  } = useContext(OrderContext);
   const [orderContext, setOrderContext] = useState<IOrderContextValue>(
     {} as IOrderContextValue,
   );
 
   useEffect(() => {
-    setOrderContext({ orderService, toggleCart, cartIsOpen });
+    setOrderContext({
+      orderService, toggleCart, cartIsOpen,
+    });
   }, [orderService, cartIsOpen]);
 
   return orderContext;

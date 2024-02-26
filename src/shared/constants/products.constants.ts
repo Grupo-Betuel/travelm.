@@ -10,6 +10,6 @@ export const ProductsConstants = {
   UPDATE_ORDER_IN_CART: 'Ir a Actualizar Pedido',
   UPDATE_CART: 'Atualizar Pedido',
   CONFIRM_CART_ORDER: 'Confirmar Pedido',
-  SEND_CART: 'Enviar Pedido',
+  SEND_CART: 'Enviar pedido por Whatsapp',
   NEXT: 'Siguiente',
 };

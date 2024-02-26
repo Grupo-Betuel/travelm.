@@ -44,6 +44,7 @@ function MyApp({ Component, pageProps }: AppProps<IAppProps>) {
   );
   const orderService = useMemo(() => new OrderService(), []);
   const [cartIsOpen, setCartIsOpen] = useState(false);
+
   const { client } = useAuthClientHook();
   const [progress, setProgress] = useState(0);
   const router = useRouter();
@@ -206,7 +207,11 @@ function MyApp({ Component, pageProps }: AppProps<IAppProps>) {
         {/* TODO: Check if global posts filters is neccesarry */}
         <AppLoadingContext.Provider value={{ appLoading, setAppLoading }}>
           <OrderContext.Provider
-            value={{ orderService, toggleCart: toggleShoppingCart, cartIsOpen }}
+            value={{
+              orderService,
+              toggleCart: toggleShoppingCart,
+              cartIsOpen,
+            }}
           >
             <AppViewportHeightContext.Provider
               value={{

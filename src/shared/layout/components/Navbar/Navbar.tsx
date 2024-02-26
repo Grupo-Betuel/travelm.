@@ -296,7 +296,7 @@ export default function Navbar() {
 
       <Sider
         className={styles.navbarSidebar}
-        collapsible
+        collapsible={!cartIsOpen}
         collapsedWidth={0}
         collapsed={showSidebar}
         onCollapse={(value) => setHideSidebar(value)}
