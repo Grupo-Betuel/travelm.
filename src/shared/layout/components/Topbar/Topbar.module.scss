@@ -18,9 +18,18 @@
   }
 
   @media screen and (max-width: 560px) {
-    flex-direction: column;
-    min-height: layout.$topbarHeight * 1.8;
-    gap: 0.3rem;
-    justify-content: center;
+
+    .TopBarAddress {
+        max-width: 60%;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+    }
+
+    .TopBarSocialNetworks {
+      .TopBarContactUsText {
+        display: none;
+      }
+    }
   }
 }

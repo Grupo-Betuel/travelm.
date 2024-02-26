@@ -52,7 +52,9 @@ export const Topbar = () => {
   return (
     <div className={styles.TopBar}>
       <Link href={BETUEL_GROUP_LOCATION}>
-        <a target="_blank" className="text-black">{BETUEL_GROUP_ADDRESS}</a>
+        <a target="_blank" className={`text-black text-hover-blue ${styles.TopBarAddress}`}>
+          {BETUEL_GROUP_ADDRESS}
+        </a>
       </Link>
       <div className={styles.TopBarSocialNetworks}>
         <Link href={whatsappLink}>
@@ -61,7 +63,7 @@ export const Topbar = () => {
             rel="noopener noreferrer"
             className="flex-center-center text-green-4 gap-xx-s"
           >
-            <span>¡Contactanos!</span>
+            <span className={styles.TopBarContactUsText}>¡Contáctanos!</span>
             <WhatsAppOutlined rev="" className="font-size-8" />
           </a>
         </Link>

@@ -13,5 +13,11 @@
         border: 0.1875rem solid $color;
       }
     }
+
+    .text-hover-#{$colorType}#{$colorVariant} {
+      &:hover {
+        color: $color !important;
+      }
+    }
   }
 }
