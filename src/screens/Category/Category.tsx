@@ -10,7 +10,7 @@ import { useRouter } from 'next/router';
 import { EndpointsAndEntityStateKeys } from '@shared/enums/endpoints.enum';
 import { showProductDetailsHook } from '@shared/hooks/showProductDetailsHook';
 import styles from './Category.module.scss';
-import { layoutId, navbarOptionsHeight } from '../../utils/layout.utils';
+import { layoutId, navbarOptionsHeight, topbarOptionsHeight } from '../../utils/layout.utils';
 
 export interface CategoryProps {}
 export type ProductPerCategoryType = {
@@ -69,7 +69,7 @@ export function Category({}: CategoryProps) {
         <div className={styles.CategoryContent}>
           <Affix
             className={styles.SidebarAffix}
-            offsetTop={navbarOptionsHeight}
+            offsetTop={navbarOptionsHeight + topbarOptionsHeight}
             target={() => document.getElementById(layoutId)}
           >
             <div>

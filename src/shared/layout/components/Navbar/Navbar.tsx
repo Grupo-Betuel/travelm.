@@ -108,12 +108,12 @@ export default function Navbar() {
     key: cat.slug,
     title: (
       <Link href={`/${cat.company}/category/${cat.slug}`}>
-        <a className="text-black">{cat.title}</a>
+        <a className={styles.navbarOptionsListItemLink}>{cat.title}</a>
       </Link>
     ),
     label: (
       <Link href={`/${cat.company}/category/${cat.slug}`}>
-        <a className="text-black">{cat.title}</a>
+        <a className={styles.navbarOptionsListItemLink}>{cat.title}</a>
       </Link>
     ),
     icon: <DatabaseOutlined rev="" />,
@@ -131,13 +131,13 @@ export default function Navbar() {
     key: company.companyId,
     title: (
       <Link href={`/${company.companyId}`}>
-        <a className="text-black">{company.name}</a>
+        <a className={styles.navbarOptionsListItemLink}>{company.name}</a>
       </Link>
     ),
     // label: company.name,
     label: (
       <Link href={`/${company.companyId}`}>
-        <a className="text-black">{company.name}</a>
+        <a className={styles.navbarOptionsListItemLink}>{company.name}</a>
       </Link>
     ),
     icon: <BankOutlined rev="" />,

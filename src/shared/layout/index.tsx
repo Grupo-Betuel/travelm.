@@ -13,11 +13,13 @@ export interface IAppLayoutProps {
 }
 function AppLayout({ children }: IAppLayoutProps) {
   return (
-    <Layout className={styles.layout} id={layoutId}>
-      <Topbar />
-      <Navbar />
+    <Layout className={styles.Layout} id={layoutId}>
+      <div className={styles.LayoutHeaderWrapper}>
+        <Topbar />
+        <Navbar />
+      </div>
       <Layout>
-        <Content className={styles.content}>{children}</Content>
+        <Content className={styles.LayoutContent}>{children}</Content>
       </Layout>
     </Layout>
   );

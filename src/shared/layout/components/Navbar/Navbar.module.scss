@@ -5,7 +5,8 @@
 @import '../../../styles/box-shadow-utils';
 
 .navbar {
-  @extend .small-bxs;
+  //@extend .propagate-bxs;
+
   padding: 0 !important;
   width: 100%;
   height: layout.$navbarOptionsHeight !important;
@@ -16,7 +17,7 @@
   background: white !important;
   z-index: 999;
   position: sticky;
-  top: 0;
+  top: layout.$topbarHeight;
 
   .navbarOptionsWrapper {
     position: relative;
@@ -35,6 +36,19 @@
       }
       &.navbarOptionsListCenter {
         grid-column: span 2;
+
+        .navbarOptionsListItem {
+          justify-content: center;
+          .navbarOptionsListItemLink {
+            color: colors.$color-black-1;
+          }
+
+          &:hover, &.navbarOptionsListItemActive {
+            .navbarOptionsListItemLink {
+              color: colors.$color-blue-3;
+            }
+          }
+        }
         @include breakpoints.only-on(('m', 'xs')) {
           display: none !important;
         }

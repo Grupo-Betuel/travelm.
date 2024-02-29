@@ -11,7 +11,7 @@ import { EndpointsAndEntityStateKeys } from '@shared/enums/endpoints.enum';
 import { CompanyEntity } from '@shared/entities/CompanyEntity';
 import { showProductDetailsHook } from '@shared/hooks/showProductDetailsHook';
 import styles from './Company.module.scss';
-import { layoutId, navbarOptionsHeight } from '../../utils/layout.utils';
+import { layoutId, navbarOptionsHeight, topbarOptionsHeight } from '../../utils/layout.utils';
 
 export interface CompanyProps {
   company?: CompanyEntity;
@@ -134,7 +134,7 @@ export function Company({ company }: CompanyProps) {
         <div className={styles.CompanyContent}>
           <Affix
             className={styles.SidebarAffix}
-            offsetTop={navbarOptionsHeight}
+            offsetTop={navbarOptionsHeight + topbarOptionsHeight}
             target={() => document.getElementById(layoutId)}
           >
             <div>

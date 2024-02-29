@@ -1,4 +1,6 @@
 const navbarOptionsHeight = 56;
+
+const topbarOptionsHeight = 30; // 35
 const navbarSubOptionsHeight = 35;
 const navbarHeight = navbarOptionsHeight + navbarSubOptionsHeight;
 const sidebarWidth = 360;
@@ -12,4 +14,5 @@ export {
   sidebarId,
   layoutId,
   sidebarWidth,
+  topbarOptionsHeight,
 };
