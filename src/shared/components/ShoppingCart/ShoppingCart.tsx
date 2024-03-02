@@ -49,7 +49,7 @@ export function ShoppingCart({ itemActions, sales }: IShoppingCartProps) {
           NOTA:
           <b className="text-nowrap">
             {' '}
-            Solo pagaras cuando recibas el producto
+            Solo pagarás cuando recibas el producto
             {' '}
             <CheckCircleFilled className="text-green-5" rev="" />
           </b>

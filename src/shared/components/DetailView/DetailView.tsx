@@ -555,7 +555,9 @@ export function DetailView({
                           ` - ${param.value}`
                         )}
                       </Button>
-                      {isActive && param?.relatedParams && !!param?.relatedParams.length ? (
+                      {isActive
+                      && param?.relatedParams
+                      && !!param?.relatedParams.length ? (
                         <div
                           className={
                             styles.DetailViewPostDetailsContentOptionVariants
@@ -621,42 +623,42 @@ export function DetailView({
                             </div>
                           ))}
                         </div>
-                      ) : (
-                        <Form.Item
-                          className={
+                        ) : (
+                          <Form.Item
+                            className={
                             styles.DetailViewPostDetailsContentOptionBtnInput
                           }
-                          name={`${controlNamePrefix}${param._id}`}
-                          rules={[
-                            {
-                              type: 'number',
-                              required: true,
-                              message: maxQuantityError(param.quantity),
-                              max: param.quantity,
-                              min: 0,
-                            },
-                          ]}
-                        >
-                          <InputNumber
-                            onWheel={(e) => e.currentTarget.blur()}
-                            type="number"
-                            className={
+                            name={`${controlNamePrefix}${param._id}`}
+                            rules={[
+                              {
+                                type: 'number',
+                                required: true,
+                                message: maxQuantityError(param.quantity),
+                                max: param.quantity,
+                                min: 0,
+                              },
+                            ]}
+                          >
+                            <InputNumber
+                              onWheel={(e) => e.currentTarget.blur()}
+                              type="number"
+                              className={
                               styles.DetailViewPostDetailsContentOptionQuantity
                             }
-                            placeholder="Cantidad"
-                            onChange={handleSaleProductParamsChange(param._id)}
-                            value={getQuantityValue(param._id)}
-                            defaultValue={0}
-                            min={0}
-                            addonAfter={(
-                              <CloseOutlined
-                                rev=""
-                                onClick={resetSaleProductParam(param._id)}
-                              />
+                              placeholder="Cantidad"
+                              onChange={handleSaleProductParamsChange(param._id)}
+                              value={getQuantityValue(param._id)}
+                              defaultValue={0}
+                              min={0}
+                              addonAfter={(
+                                <CloseOutlined
+                                  rev=""
+                                  onClick={resetSaleProductParam(param._id)}
+                                />
                             )}
-                          />
-                        </Form.Item>
-                      )}
+                            />
+                          </Form.Item>
+                        )}
                     </div>
                   );
                 })
@@ -770,21 +772,22 @@ export function DetailView({
           </div>
           <StickyFooter className={styles.DetailViewPostDetailsActions}>
             {ShoppingActionButton}
-            <Link href={getWhatsappLink(product)}>
-              <a target="_blank" rel="noopener noreferrer">
-                <Button
-                  type="link"
-                  shape="round"
-                  block
-                  size="large"
-                  icon={<WhatsAppOutlined rev="" />}
-                  className="me-m"
-                >
-                  {ProductsConstants.ORDER_BY_WHATSAPP}
-                </Button>
-              </a>
-            </Link>
-
+            { !currentOrder?.sales?.length && (
+              <Link href={getWhatsappLink(product)}>
+                <a target="_blank" rel="noopener noreferrer">
+                  <Button
+                    type="link"
+                    shape="round"
+                    block
+                    size="large"
+                    icon={<WhatsAppOutlined rev="" />}
+                    className="me-m"
+                  >
+                    {ProductsConstants.ORDER_BY_WHATSAPP}
+                  </Button>
+                </a>
+              </Link>
+            )}
           </StickyFooter>
         </Resizable>
         <StickyFooter
@@ -793,7 +796,7 @@ export function DetailView({
           {ShoppingActionButton}
         </StickyFooter>
       </div>
-      {(fetching && !product._id) && (
+      {fetching && !product._id && (
         <div className="loading">
           <Spin size="large" />
         </div>
