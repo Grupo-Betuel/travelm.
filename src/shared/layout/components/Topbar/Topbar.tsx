@@ -52,7 +52,9 @@ export const Topbar = () => {
   return (
     <div className={styles.TopBar}>
       <Link href={BETUEL_GROUP_LOCATION}>
-        <a target="_blank" className={`text-black text-hover-blue ${styles.TopBarAddress}`}>
+        <a target="_blank" className={`${styles.TopBarAddress}`}>
+          📍
+          {' '}
           {BETUEL_GROUP_ADDRESS}
         </a>
       </Link>
