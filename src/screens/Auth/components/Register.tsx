@@ -8,7 +8,7 @@ import { useRouter } from 'next/router';
 import { IAuthProps } from '@screens/Auth/Auth';
 import { EndpointsAndEntityStateKeys } from '@shared/enums/endpoints.enum';
 import React, { useEffect, useState } from 'react';
-import { UserAddOutlined } from '@ant-design/icons';
+import { UserAddOutlined, WhatsAppOutlined } from '@ant-design/icons';
 import { toast } from 'react-toastify';
 import { useOrderContext } from '@shared/contexts/OrderContext';
 import { debounce } from 'lodash';
@@ -143,7 +143,7 @@ export function Register({ isModal, onSubmit, submitBtnLabel }: IAuthProps) {
       {/*  <Input size="large" /> */}
       {/* </Form.Item> */}
       <Form.Item
-        label="Whatsappp"
+        label="Teléfono (Whatsapp)"
         name="phone"
         rules={[{ type: 'string', required: true, min: 17 }]}
       >
@@ -159,13 +159,13 @@ export function Register({ isModal, onSubmit, submitBtnLabel }: IAuthProps) {
 
       </Form.Item>
       {onSubmit && (
-        <Typography.Paragraph italic>
-          Te contactaremos por
+        <Typography.Paragraph className="mb-s font-size-4 text-center" italic>
+          Luego de enviar el pedido te escribiremos por Whatsapp
           {' '}
-          <b>Whatsapp</b>
+          <WhatsAppOutlined rev="" className="text-green-5" />
           {' '}
-          para terminar de procesar la
-          orden.
+          para
+          continuar con la orden.
         </Typography.Paragraph>
       )}
       {/* <Form.Item label="Password" name="password" rules={[{ required: true }]}> */}
