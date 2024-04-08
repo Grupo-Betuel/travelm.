@@ -1,4 +1,4 @@
-import { LandingCarousel, ProductCard, ScrollView } from '@shared/components';
+import { ProductCard, ScrollView } from '@shared/components';
 import { Affix, Input, Spin } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
 import { handleEntityHook } from '@shared/hooks/handleEntityHook';
