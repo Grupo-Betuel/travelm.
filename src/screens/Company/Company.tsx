@@ -123,12 +123,12 @@ export function Company({ company }: CompanyProps) {
         </div>
       )}
       <div className={styles.CompanyWrapper}>
-        {company?.wallpaper
-          && (
-          <div className={styles.LandingCarouselWrapper}>
-            <LandingCarousel images={[company?.wallpaper]} />
-          </div>
-          )}
+        {/* {company?.wallpaper */}
+        {/*  && ( */}
+        {/*  <div className={styles.LandingCarouselWrapper}> */}
+        {/*    <LandingCarousel images={[company?.wallpaper]} /> */}
+        {/*  </div> */}
+        {/*  )} */}
         {ProductDetail}
 
         <div className={styles.CompanyContent}>
