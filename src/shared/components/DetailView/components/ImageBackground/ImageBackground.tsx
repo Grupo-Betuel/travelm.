@@ -19,15 +19,22 @@ export const ImageBackground: FC<ImageBackgroundProps> = ({ image }) => (
           : {}
       }
     />
-    {image ? (
-      <AntdImage
-        preview={{ mask: false }}
-        src={image}
-        rootClassName={styles.ImageWrapper}
-        alt={image}
-      />
-    ) : (
-      <Image priority alt={image} src={image} />
-    )}
+    {/* <Image priority alt={image} src={image} width="800" height="800" /> */}
+    <AntdImage
+      preview={{ mask: false }}
+      src={image}
+      rootClassName={styles.ImageWrapper}
+      alt={image}
+    />
+    {/* {image ? ( */}
+    {/*  <AntdImage */}
+    {/*    preview={{ mask: false }} */}
+    {/*    src={image} */}
+    {/*    rootClassName={styles.ImageWrapper} */}
+    {/*    alt={image} */}
+    {/*  /> */}
+    {/* ) : ( */}
+    {/*  <Image priority alt={image} src={image} /> */}
+    {/* )} */}
   </div>
 );
