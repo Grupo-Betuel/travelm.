@@ -159,6 +159,7 @@ export const getStaticProps: GetServerSideProps = async (context) => {
         : ''
     }${currentCompany?.description || ''}`;
     return {
+      revalidate: 60,
       props: {
         currentCompany,
         cachedResources: cachedProductResource,
