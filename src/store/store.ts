@@ -1,5 +1,5 @@
-import { configureStore } from '@reduxjs/toolkit';
-import { apiSlice } from '../api/apiSlice';
+import {configureStore} from '@reduxjs/toolkit';
+import {apiSlice} from '../api/apiSlice';
 import createEntityApiSlice from "../api/entityApiSlice";
 import {BaseModel} from "../models/interfaces/BaseModel";
 import {IContact} from "../models/contactModel";
@@ -20,6 +20,7 @@ import {IService} from "../models/serviceModel";
 import {IPayment} from "../models/PaymentModel";
 import {IMedia} from "../models/mediaModel";
 import {IClient} from "../models/clientModel";
+import IUser from "../models/interfaces/user";
 
 export const EntityApiStores: EntityStores = {
     contacts: createEntityApiSlice<IContact & BaseModel>('contacts'),
@@ -39,6 +40,7 @@ export const EntityApiStores: EntityStores = {
     payments: createEntityApiSlice<IPayment & BaseModel>('payments'),
     medias: createEntityApiSlice<IMedia & BaseModel>('medias'),
     travelClients: createEntityApiSlice<IClient & BaseModel>('travelClients'),
+    travelUsers: createEntityApiSlice<IUser & BaseModel>('travelUsers'),
 }
 
 const storeReducer: any = {};
@@ -46,7 +48,7 @@ const storeReducer: any = {};
 const storeMiddleware: any = [];
 
 (Object.keys(EntityApiStores) as EntityNames[]).forEach((key: EntityNames) => {
-    const { reducer, middleware, reducerPath } = EntityApiStores[key];
+    const {reducer, middleware, reducerPath} = EntityApiStores[key];
     storeReducer[reducerPath] = reducer;
     storeMiddleware.push(middleware);
 });
@@ -63,7 +65,7 @@ export const appStore = configureStore({
 
 // EntityApiStores.contacts.middleware,
 
-    // EntityApiStores.organizations.middleware,
+// EntityApiStores.organizations.middleware,
 
 
 export type RootState = ReturnType<typeof appStore.getState>;

@@ -7,8 +7,9 @@ import {IBedroom} from "./bedroomModel";
 import {IFinance} from "./financeModel";
 
 export interface IOrganization extends BaseModel {
-    type: 'church' | 'company' | 'transport' | 'restaurant' | 'hotel' | 'tourist-spot';
+    type: 'church' | 'company' | 'transport' | 'restaurant' | 'hotel' | 'tourist-spot' | 'agency';
     name: string;
+    email: string;
     description: string;
     logo: IMedia;
     socialNetworks: ISocialNetwork[];

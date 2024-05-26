@@ -61,3 +61,7 @@ export type CommonConfirmActionsDataTypes<T> = T;
 export interface IQueryDataParam {
     queryData?: any;
 }
+
+export interface IPathDataParam {
+    path?: string;
+}

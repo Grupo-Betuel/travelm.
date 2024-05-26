@@ -1,7 +1,7 @@
 import {apiSlice} from './apiSlice';
 import {BaseModel} from "../models/interfaces/BaseModel";
 import {EntityModelTypes, EntityNames} from "../models/entitiyModels";
-import {IQueryDataParam} from "../models/common";
+import {IPathDataParam, IQueryDataParam} from "../models/common";
 
 
 function createEntityApiSlice<T extends BaseModel>(entityName: EntityNames) {
@@ -32,10 +32,14 @@ function createEntityApiSlice<T extends BaseModel>(entityName: EntityNames) {
                 transformResponse: (response: T) => response,
             }),
             add: builder.mutation({
-                query: (newData: T) => ({
-                    url: `/${entityName}`,
+                query: (newData: T & IPathDataParam) => ({
+                    url: `/${entityName}${newData.path ? `/${newData.path}` : ''}`,
                     method: 'POST',
-                    data: newData,
+                    data: {
+                        ...newData,
+                        queryData: undefined,
+                        path: undefined,
+                    },
                 }),
                 transformResponse: (response: T) => response,
                 invalidatesTags: [{type: entityName, id: 'LIST'}],

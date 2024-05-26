@@ -1,16 +1,24 @@
-import { Routes, Route, Navigate } from "react-router-dom";
-import { Dashboard, Auth } from "@/layouts";
-import Excursions from "@/pages/dashboard/excursion/excursion";
+import {Routes, Route, Navigate} from 'react-router-dom';
+import {Dashboard, Auth} from '@/layouts';
+import Excursions from '@/pages/dashboard/excursion/excursion';
+import {AuthProvider} from '@/context/authContext';
+import ProtectedRoute from '@/components/ProtectedRoute';
 
-function App() {
-  return (
-    <Routes>
-      <Route path="/dashboard/*" element={<Dashboard />} />
-      <Route path="/auth/*" element={<Auth />} />
-      <Route path="/excursions/*" element={<Excursions />} />
-      <Route path="*" element={<Navigate to="/dashboard/home" replace />} />
-    </Routes>
-  );
-}
+
+const App = () => {
+    return (
+        <AuthProvider>
+            <Routes>
+                <Route element={<ProtectedRoute/>}>
+                    <Route path="/dashboard/*" element={<Dashboard/>}/>
+                    <Route path="/excursions/*" element={<Excursions/>}/>
+                </Route>
+                <Route path="/auth/*" element={<Auth/>}/>
+                <Route path="*" element={<Navigate to="/dashboard/home" replace/>}/>
+            </Routes>
+        </AuthProvider>
+    );
+};
 
 export default App;
+
