@@ -60,3 +60,4 @@ export type WhatsappSeedTypes = 'users' | 'groups' | 'labels' | 'all';
 export type WhatsappGroupActionTypes = 'create-ws-group'
     | 'sync-ws-group'
     | 'delete-ws-group'
+    | 'assign-ws-group'

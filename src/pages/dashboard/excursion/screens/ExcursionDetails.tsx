@@ -52,7 +52,8 @@ export const ExcursionDetails: React.FC = () => {
     const onConfirmAction = (type?: ExcursionDetailActions, data?: ExcursionDetailActionsDataTypes, ...extra: any) => {
         switch (type) {
             case 'update':
-                onUpdateExcursion(data as IExcursion);
+                console.log('data', data, 'extra', extra);
+                onUpdateExcursion(data as IExcursion, ...extra);
                 break;
             case 'add-client':
                 onAddClient(data as IClient)
@@ -78,7 +79,10 @@ export const ExcursionDetails: React.FC = () => {
 
 
     useEffect(() => {
-        setExcursion(excursionData || mockExcursion)
+        setExcursion(excursionData ? {
+            ...excursionData,
+            clients: excursionData.clients || []
+        } : mockExcursion);
     }, [excursionData])
 
     useEffect(() => {
@@ -86,6 +90,7 @@ export const ExcursionDetails: React.FC = () => {
             setExcursion({
                 ...excursion,
                 ...updatedExcursion,
+                clients: updatedExcursion.clients || excursion.clients || []
             });
         }
     }, [updatedExcursion]);
@@ -142,7 +147,7 @@ export const ExcursionDetails: React.FC = () => {
         updateExcursion({_id: excursion._id || '', clients: updatedClients});
     }
 
-    const onUpdateClient = (client: Partial<IClient>, optimistic?: boolean) => {
+    const onUpdateClient = (client: Partial<IClient>, isOptimistic?: boolean) => {
         if (!client._id) {
             // TODO: error toast
             return;
@@ -151,12 +156,12 @@ export const ExcursionDetails: React.FC = () => {
             ...excursion,
             clients: excursion.clients.map(c => c._id === client._id ? {...c, ...client} : c)
         });
-        !optimistic && updateClient({_id: client._id, ...client});
+        !isOptimistic && updateClient({_id: client._id, ...client});
     }
 
-    const onUpdateExcursion = (e: Partial<IExcursion>) => {
+    const onUpdateExcursion = (e: Partial<IExcursion>, isOptimistic?: boolean) => {
         setExcursion({...excursion, ...e});
-        updateExcursion({_id: excursion._id || '', ...e});
+        !isOptimistic && updateExcursion({_id: excursion._id || '', ...e});
     }
 
     React.useEffect(() => {
@@ -218,10 +223,10 @@ export const ExcursionDetails: React.FC = () => {
                 onUpdateClient={handleSetActionToConfirm('update-client', CLIENTS_CONSTANTS.UPDATE_CLIENT_TEXT)}
                 excursion={excursion}
                 onAddClient={handleSetActionToConfirm('add-client', CLIENTS_CONSTANTS.ADD_CLIENT_TEXT)}
-                clients={excursion.clients}
+                clients={excursion.clients || []}
             />
-            <FinanceDetails finance={excursion.finance} clients={excursion.clients}
-                            projections={excursion.projections} excursionId={excursion._id}
+            <FinanceDetails finance={excursion.finance} clients={excursion.clients || []}
+                            projections={excursion.projections} excursionId={excursion._id as string}
             />
             <BedroomDetails excursion={excursion}/>
             <ActivityDetails activities={excursion.activities}/>

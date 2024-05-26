@@ -66,7 +66,7 @@ const Messaging: React.FC<IMessaging> = (
         stopMessaging,
         stopMessagingId,
         fetchGroupParticipants,
-    } = useWhatsapp(selectedSession);
+    } = useWhatsapp(selectedSession, true);
 
 
     const handleSendOnlyImage = (id: string) => () => {
@@ -259,15 +259,15 @@ const Messaging: React.FC<IMessaging> = (
 
     const content = (
         <div className="position-relative">
-            <div className="d-flex w-100">
-                {
-                    whatsappSessionList.map((sessionKey, key) => (
-                        <div onClick={selectSession(sessionKey)} key={key}>
-                            <span>{whatsappSessionNames[sessionKey]}</span>
-                        </div>
-                    ))
-                }
-            </div>
+            {/*<div className="d-flex w-100">*/}
+            {/*    {*/}
+            {/*        whatsappSessionList.map((sessionKey, key) => (*/}
+            {/*            <div onClick={selectSession(sessionKey)} key={key}>*/}
+            {/*                <span>{whatsappSessionNames[sessionKey]}</span>*/}
+            {/*            </div>*/}
+            {/*        ))*/}
+            {/*    }*/}
+            {/*</div>*/}
             <div
                 title="Cerrar Sesión"
                 className="bi bi-power text-danger log-out-icon cursor-pointer"
@@ -302,7 +302,7 @@ const Messaging: React.FC<IMessaging> = (
                     <div className="flex items-center">
                         <SearchableSelect<IWsGroup>
                             multiple
-                            options={seedData.groups.filter(item => !item.subject.toLowerCase().includes('sin filtro'))}
+                            options={seedData.groups.filter(item => !item.subject?.toLowerCase()?.includes('sin filtro'))}
                             displayProperty="subject"
                             label="Selecciona un grupo"
                             disabled={fetchingSeed === 'groups'}

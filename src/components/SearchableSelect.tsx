@@ -14,7 +14,7 @@ interface SearchableSelectProps<T> {
     disabled?: boolean;
     multiple?: boolean;
     onSelect?: ((selectedValues: string[], selectedItem: string) => void) | ((selectedValues: T[], selectedItem: T) => void);
-    selectedValues?: string[];
+    selectedValues?: string[] | T[];
 }
 
 function SearchableSelect<T>(
@@ -43,23 +43,24 @@ function SearchableSelect<T>(
     }, [searchTerm, options]);
 
     useEffect(() => {
-        setSelectedOptions(selectedValues || []);
+        const selected = selectedValues?.map(value => JSON.stringify(value)) || [];
+        setSelectedOptions(selected);
     }, [selectedValues]);
 
     const toggleOption = (value: string | any) => {
         value = JSON.stringify(value);
-
+        const included = selectedOptions.includes(value);
         const newSelectedOptions = multiple
-            ? selectedOptions.includes(value)
+            ? included
                 ? selectedOptions.filter(item => item !== value)
                 : [...selectedOptions, value]
-            : [value];
-
+            : included ? [] : [value];
 
         setSelectedOptions(newSelectedOptions);
+
         if (onSelect) {
             const list = newSelectedOptions.map(option => JSON.parse(option));
-            const item = JSON.parse(value);
+            const item = included ? null : JSON.parse(value);
             onSelect(list, item);
         }
 
@@ -81,12 +82,11 @@ function SearchableSelect<T>(
                 return (option as T)?.[displayProperty as keyof T] || (option as IOption)?.label || '';
             }).join(', ') as string;
         } else {
-            const option = options.find(option => JSON.stringify(option) === selectedOptions[0])
+            const option = selectedOptions[0] ? JSON.parse(selectedOptions[0]) : null;
             return ((option as T)?.[displayProperty as keyof T] || (option as IOption)?.label || '') as string;
         }
     }, [selectedOptions, options, multiple, displayProperty])
 
-    console.log('options', filteredOptions)
     return (
         <div ref={ref} onBlur={handleBlur} className="p-4 w-100">
             <Input
@@ -99,18 +99,22 @@ function SearchableSelect<T>(
                     setIsFocused(true);
                     setSearchTerm(''); // Clear search term on focus to show all options
                 }}
-                onBlur={() => {
-                    if (!multiple) {
-                        setSearchTerm(displayValue); // Restore the display value for single select
-                    }
-                }}
+                // onBlur={() => {
+                //     console.log('blur')
+                //     if (!multiple) {
+                //         // setSearchTerm(displayValue); // Restore the display value for single select
+                //     }
+                // }}
                 placeholder={!isFocused && multiple ? displayValue : ''}
             />
             {isFocused && (
-                <List className="max-h-60 overflow-auto mt-1 border rounded absolute bg-white z-50">
+                <List
+                      className="max-h-60 overflow-auto mt-1 border absolute rounded bg-white z-50">
                     {filteredOptions.map((option, index) => (
-                        <div
-                            onClick={() => toggleOption(option)}
+                        <a
+                            onClick={e => {
+                                toggleOption(option)
+                            }}
                         >
                             <ListItem
                                 disabled={disabled}
@@ -121,7 +125,7 @@ function SearchableSelect<T>(
                             >
                                 {displayProperty ? (option as any)[displayProperty] : (option as IOption).label}
                             </ListItem>
-                        </div>
+                        </a>
                     ))}
                 </List>
             )}

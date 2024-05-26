@@ -24,7 +24,10 @@ import {BiCheck, BiDollar, BiPlus, BiSearch} from "react-icons/bi";
 import {ClientsSearch} from "./ClientsSearch";
 import {IBedroom} from "../../../../models/bedroomModel";
 import {IConfirmActionExtraParams} from "../../../../hooks/useConfirmActionHook";
-import {WhatsappGroupActionTypes} from "../../../../models/WhatsappModels";
+import {IWsGroup, IWsLabel, WhatsappGroupActionTypes, whatsappSessionKeys} from "../../../../models/WhatsappModels";
+import SearchableSelect from "../../../../components/SearchableSelect";
+import {IoReload} from "react-icons/io5";
+import useWhatsapp from "../../../../hooks/UseWhatsapp";
 
 export interface IUpdateClientExtra extends IConfirmActionExtraParams {
     isOptimistic?: boolean;
@@ -34,7 +37,7 @@ export interface IClientTableProps {
     clients: IClient[];
     onAddClient: (client: IClient) => void;
     onUpdateClient: (client: Partial<IClient>, extra?: IUpdateClientExtra) => void;
-    updateExcursion: (excursion: Partial<IExcursion>) => any;
+    updateExcursion: (excursion: Partial<IExcursion>, extra?: IUpdateClientExtra) => any;
     excursion: IExcursion;
     bedrooms?: IBedroom[]
 }
@@ -70,12 +73,24 @@ export const ClientsExcursionTable = (
     const [editClientIndex, setEditClientIndex] = useState<number | null>(null);
     const [editedClients, setEditedClients] = useState<{ [key: string]: IClient }>({});
     const [isNewClientOpen, setIsNewClientOpen] = useState<boolean>(false);
+    const [assignWsGroupModal, setAssignWsGroupModal] = useState<boolean>(false);
     const [deletePayment, {isLoading: isDeletingPayment}] = paymentsService.useDeletePayments();
     const [updateService, {isLoading: isUpdatingService}] = servicesService.useUpdateServices();
+    const {
+        seedData,
+        loading: wsLoading,
+        fetchWsSeedData,
+    } = useWhatsapp(whatsappSessionKeys.betueltravel);
+
     const toggleHandleClient = () => {
         setIsNewClientOpen(!isNewClientOpen)
         setClientToEdit(undefined);
     };
+
+    const toggleAssignGroupModal = () => {
+        setSelectedWsGroup(null)
+        setAssignWsGroupModal(!assignWsGroupModal);
+    }
 
     const toggleClientSearch = () => setIsClientSearchOpen(!isClientSearchOpen);
     const getServiceStatus = (client: IClient) => {
@@ -237,7 +252,8 @@ export const ClientsExcursionTable = (
             title: excursion.title,
             description: excursion.description,
             clients: clients,
-            whatsappGroupID: excursion.whatsappGroupID,
+            finance: excursion.finance,
+            whatsappGroupID: action === 'assign-ws-group' ? selectedWsGroup?.id : excursion.whatsappGroupID,
             queryData: {
                 type: action,
             }
@@ -245,6 +261,15 @@ export const ClientsExcursionTable = (
 
         updateExcursion(excursionData);
     }
+
+    const [selectedWsGroup, setSelectedWsGroup] = useState<IWsGroup | null>(null);
+    const loadWsGroups = async () => fetchWsSeedData(whatsappSessionKeys.betueltravel, 'groups');
+
+    const handleWsGroupSelection = async (selectedList: IWsGroup[], selectedItem: IWsGroup) => {
+        console.log('selectedItem', selectedItem, selectedList);
+        setSelectedWsGroup(selectedItem);
+    }
+
 
     return (
         <Card>
@@ -271,10 +296,10 @@ export const ClientsExcursionTable = (
                 <div className="flex items-center justify-end bg-red-400">
                     <p>{excursion.whatsappGroupID}</p>
                     <Button variant="text" color="white" className="flex items-center gap-3"
-                        // onClick={handleWsGroupAction('create-ws-group')}
+                            onClick={toggleAssignGroupModal}
                     >
                         <BiCheck size="18px"/>
-                        <Typography className="capitalize font-bold">Delete Grupo de WS</Typography>
+                        <Typography className="capitalize font-bold">Asignar Grupo de WS</Typography>
                     </Button>
                     <Button variant="text" color="white" className="flex items-center gap-3"
                             onClick={handleWsGroupAction('create-ws-group')}>
@@ -419,6 +444,34 @@ export const ClientsExcursionTable = (
                     </Dialog>
                 )
             }
+
+            <Dialog open={assignWsGroupModal} handler={toggleAssignGroupModal}>
+                <DialogHeader>
+                    Asignar grupo
+                </DialogHeader>
+                <DialogBody>
+                    <div className="flex items-center">
+                        <SearchableSelect<IWsGroup>
+                            options={seedData.groups.filter(item => !item.subject?.toLowerCase()?.includes('sin filtro'))}
+                            displayProperty="subject"
+                            label="Selecciona un grupo"
+                            disabled={wsLoading}
+                            onSelect={handleWsGroupSelection}
+                        />
+                        <Button loading={wsLoading}
+                                disabled={wsLoading}
+                                onClick={loadWsGroups}
+                                color="blue" variant="text">
+                            <IoReload/>
+                        </Button>
+                    </div>
+                </DialogBody>
+                <DialogFooter>
+                    <Button variant="text" size="lg" color="red" onClick={toggleAssignGroupModal}>Cerrar</Button>
+                    <Button variant="text" size="lg" color="blue" onClick={handleWsGroupAction('assign-ws-group')}
+                            disabled={!selectedWsGroup}>Asignar</Button>
+                </DialogFooter>
+            </Dialog>
         </Card>
     )
         ;

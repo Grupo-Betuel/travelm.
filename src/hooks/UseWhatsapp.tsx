@@ -17,14 +17,13 @@ import {IClient} from "../models/clientModel";
 
 export const whatsappSeedStorePrefix = 'whatsappSeedData::';
 
-const useWhatsapp = (whatsappSessionId: WhatsappSessionTypes, autologin = true) => {
+const useWhatsapp = (whatsappSessionId: WhatsappSessionTypes, autologin = false) => {
     const [logged, setLogged] = React.useState(false);
-    const [loading, setLoading] = React.useState(true);
+    const [loading, setLoading] = React.useState(false);
     const [stopMessagingId, setStopMessagingId] = React.useState('');
     const [socket, setSocket] = React.useState<io.Socket>();
     const [seedData, setSeedData] = React.useState<ISeed>({groups: [], users: [], labels: []});
 
-    console.log('session', whatsappSessionId);
     React.useEffect(() => {
         const localData = localStorageImpl.getItem(`${whatsappSeedStorePrefix}${whatsappSessionId}`)
         const storedSeedData = localData && JSON.parse(localData);
