@@ -87,6 +87,7 @@ function SearchableSelect<T>(
         }
     }, [selectedOptions, options, multiple, displayProperty])
 
+
     return (
         <div ref={ref} onBlur={handleBlur} className="p-4 w-100">
             <Input
@@ -112,13 +113,13 @@ function SearchableSelect<T>(
                       className="max-h-60 overflow-auto mt-1 border absolute rounded bg-white z-50">
                     {filteredOptions.map((option, index) => (
                         <a
+                            key={`selectable-options-${index}`}
                             onClick={e => {
                                 toggleOption(option)
                             }}
                         >
                             <ListItem
                                 disabled={disabled}
-                                key={`${(option as IOption).value || generateCustomID()}-${index}`}
                                 className={`cursor-pointer ${
                                     selectedOptions.includes(JSON.stringify(option)) ? 'bg-gray-300' : ''
                                 }`}

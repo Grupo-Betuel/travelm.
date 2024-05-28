@@ -41,7 +41,6 @@ const PaymentHandler: React.FC<PaymentHandlerProps> = ({
 
     const addOrUpdatePayment = () => {
         let paymentsData = payments;
-        console.log('isediting?', editing, newPayment)
         if (editing) {
             setEditing(false);
             setEditIndex(null);

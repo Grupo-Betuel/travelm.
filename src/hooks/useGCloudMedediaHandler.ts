@@ -44,7 +44,6 @@ export const useGCloudMediaHandler = () => {
         setLoading(true);
         try {
             const name = image.content.split('/').pop();
-            console.log('deleting image', name);
             await deletePhoto(name as string);
         } catch (err: any) {
             // toast(err.message, {type: "error"})
@@ -63,7 +62,6 @@ export const useGCloudMediaHandler = () => {
 
     const uploadMultipleMedias = async (medias: IMediaFile[] = []) => {
         const results = await Promise.all(medias.map(async media => await uploadMedia(media)));
-        console.log('resulted medias', results);
         return results;
     }
 
@@ -79,7 +77,6 @@ export const useGCloudMediaHandler = () => {
             return media._id && await deleteMediaData(media._id);
         }));
 
-        console.log('resulted medias', deletedMedias);
         return deletedMedias;
     }
 

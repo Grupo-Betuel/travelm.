@@ -2,15 +2,11 @@ import React, {createContext, useContext, useState, useEffect, ReactNode} from '
 import Cookies from 'js-cookie';
 import {jwtDecode} from 'jwt-decode';
 import {AUTH_CONSTANT} from "../constants/auth.constant";
-
-interface User {
-    role: string;
-
-    [key: string]: any;
-}
+import {useNavigate} from "react-router-dom";
+import IUser from "../models/interfaces/user";
 
 interface AuthContextProps {
-    user: User | null;
+    user: IUser | null;
     token?: string;
     login: (token: string) => void;
     logout: () => void;
@@ -31,14 +27,16 @@ interface AuthProviderProps {
 }
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
-    const [user, setUser] = useState<User | null>(null);
+    const [user, setIUser] = useState<IUser | null>(null);
     const [token, setToken] = useState<string | undefined>(Cookies.get(AUTH_CONSTANT.TOKEN_KEY));
     const tokenCookies = Cookies.get(AUTH_CONSTANT.TOKEN_KEY)
+    const navigate = useNavigate();
+
 
     useEffect(() => {
         if (token) {
-            const decodedUser = jwtDecode<User>(token);
-            setUser(decodedUser);
+            const decodedIUser = jwtDecode<IUser>(token);
+            setIUser(decodedIUser);
         } else {
             // todo: redirect to login page
         }
@@ -53,13 +51,16 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
 
     const login = (token: string) => {
         Cookies.set(AUTH_CONSTANT.TOKEN_KEY, token);
-        const decodedUser = jwtDecode<User>(token);
-        setUser(decodedUser);
+        const decodedIUser = jwtDecode<IUser>(token);
+        setIUser(decodedIUser);
     };
 
     const logout = () => {
         Cookies.remove(AUTH_CONSTANT.TOKEN_KEY);
-        setUser(null);
+        setIUser(null);
+        setToken(undefined);
+        location.href = '/auth/sign-in';
+        // navigate('/auth/sign-in', {replace: true });
     };
 
     return (

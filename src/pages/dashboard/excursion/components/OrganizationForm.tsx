@@ -14,13 +14,16 @@ import MapPicker from "../../../../components/MapPicker";
 import BedroomsHandler from "./BedroomssHandler";
 import {FinanceHandler} from "./FinanceHandler";
 import {IFinance} from "../../../../models/financeModel";
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useMemo, useState} from "react";
 import {useGCloudMediaHandler} from "../../../../hooks/useGCloudMedediaHandler";
 import {IOrganization} from "../../../../models/organizationModel";
 import {ILocation} from "../../../../models/ordersModels";
 import {IMediaFile} from "../../../../models/mediaModel";
 import {IBedroom} from "../../../../models/bedroomModel";
-import {ICustomComponentDialog} from "../../../../models/common";
+import {ICustomComponentDialog, IPathDataParam} from "../../../../models/common";
+import {getCrudService} from "../../../../api/services/CRUD.service";
+import UserForm from "../../users/components/UserForm";
+import IUser from "../../../../models/interfaces/user";
 
 export interface OrganizationHandlerProps {
     dialog?: ICustomComponentDialog;
@@ -49,6 +52,7 @@ export const emptyOrganization: IOrganization = {
     bedrooms: [],
 };
 
+const userService = getCrudService('travelUsers');
 
 export const OrganizationForm: React.FC<OrganizationHandlerProps> = (
     {
@@ -61,6 +65,18 @@ export const OrganizationForm: React.FC<OrganizationHandlerProps> = (
 
     const {uploadMultipleMedias, uploadSingleMedia, deleteMedias} = useGCloudMediaHandler()
     const [organization, setOrganization] = useState<IOrganization>(emptyOrganization);
+    const {data: organizationUserData} = userService.useFetchAllTravelUsers({organization: organization?._id}, {skip: !organization?._id});
+    const [isOrganizationUserDialogOpen, setIsOrganizationUserDialogOpen] = useState(false);
+    const [addUser] = userService.useAddTravelUsers();
+    const [updateUser] = userService.useUpdateTravelUsers();
+
+    const [organizationUser, setOrganizationUser] = useState<IUser>()
+
+    useEffect(() => {
+        organizationUserData?.[0] && setOrganizationUser(organizationUserData?.[0])
+    }, [organizationUserData]);
+
+    const toggleOrganizationUserDialog = () => setIsOrganizationUserDialogOpen(!isOrganizationUserDialogOpen);
 
     const handleInputChange = (event: React.ChangeEvent<any>): void => {
         const {name, value} = event.target;
@@ -159,7 +175,51 @@ export const OrganizationForm: React.FC<OrganizationHandlerProps> = (
         }
     }, [organizationData]);
 
+    const enableUserIsActive = useMemo(() => !!organization._id, [organization]);
+    useEffect(() => {
+        if (!dialog?.open) {
+            setOrganization(emptyOrganization);
+        }
+    }, [dialog?.open]);
 
+    const onCreateOrganizationUser = async (user: IUser) => {
+        const userData: IUser & IPathDataParam = {
+            ...user,
+            organization: organization._id as string,
+            type: 'organization',
+            role: 'admin',
+            path: 'register'
+        }
+
+        const {data: createdUser} = await addUser(userData);
+        console.log('created user', createdUser);
+        setOrganizationUser({...createdUser, password: ''} as IUser);
+    }
+
+    const onUpdateOrganizationUser = async (user: IUser) => {
+        const {data: updatedUser} = await updateUser(user);
+        console.log('updated user', updatedUser);
+        setOrganizationUser({...updatedUser, password: ''} as IUser);
+    }
+
+    const onSubmitOrganizationUser = async (user: IUser) => {
+        if (!organization._id) {
+            // TODO: TOAST ALERT THE ORGANIZATION MUST BE CREATED FIRST
+            return;
+        }
+
+        if (user._id) {
+            // UPDATe
+            await onUpdateOrganizationUser(user);
+        } else {
+            await onCreateOrganizationUser(user);
+        }
+
+        toggleOrganizationUserDialog();
+    }
+
+
+    console.log('organization user', organizationUser)
     const form = (
         <div className="space-y-4">
             <div className="flex items-center space-x-4">
@@ -175,21 +235,18 @@ export const OrganizationForm: React.FC<OrganizationHandlerProps> = (
             <MapPicker onLocationSelect={handleLocationChange}/>
             <BedroomsHandler bedrooms={organization.bedrooms} updateBedrooms={handleBedrooms}/>
             <FinanceHandler finance={organization.entryFee || {} as IFinance} updateFinance={handleEntryFee}/>
+            {enableUserIsActive && <Button
+                onClick={toggleOrganizationUserDialog}>{organizationUser ? 'Editar Usuario' : 'Habilitar Usuario'}</Button>}
             {/*<ContactForm onChange={handleContactChange}/>*/}
         </div>
 
     )
 
-    useEffect(() => {
-        if (!dialog?.open) {
-            setOrganization(emptyOrganization);
-        }
-    }, [dialog?.open]);
 
     return (
         <div>
             {dialog ? (
-                    <Dialog open={dialog.open} handler={dialog.handler} size="xxl">
+                    <Dialog open={dialog.open} handler={dialog.handler} size="xxl" dismiss={{enabled: false}}>
                         <DialogHeader className="justify-between">
                             <Typography>{organization._id ? 'Actualizar' : 'Crear'} Organizacion.</Typography>
                             <IconButton
@@ -235,6 +292,16 @@ export const OrganizationForm: React.FC<OrganizationHandlerProps> = (
                     </Dialog>)
                 : form
             }
+
+            <UserForm
+                dialog={{
+                    open: isOrganizationUserDialogOpen,
+                    handler: toggleOrganizationUserDialog,
+                }}
+                role={'admin'}
+                initialUser={organizationUser}
+                onSubmit={onSubmitOrganizationUser}
+            ></UserForm>
         </div>
     )
 

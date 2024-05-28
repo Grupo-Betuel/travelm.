@@ -45,24 +45,20 @@ const ClientForm: React.FC<ClientFormProps> = (
             value = value.replace(/[^0-9]/g, '');
             if (value == '1') return;
         }
-        console.log('change', value)
 
         setClient({...client, [name]: value});
     };
 
     const onUpdateServices = (services: IService[]) => {
-        console.log('change service')
 
         setClient({...client, services});
     }
 
     const onUpdateSingleService = (s: IService) => {
-        console.log('change service single')
         setClient({...client, services: [s]});
     }
 
     useEffect(() => {
-        console.log('initialClient', initialClient);
         if (initialClient) {
             setClient(() => initialClient)
         }

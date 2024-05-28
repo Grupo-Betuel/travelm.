@@ -17,5 +17,6 @@ export interface IOrganization extends BaseModel {
     contact: IContact;
     reviews: IReview[];
     bedrooms: IBedroom[];
-    entryFee?: IFinance
+    entryFee?: IFinance;
+    sessionId: string;
 }

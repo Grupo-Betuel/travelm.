@@ -12,7 +12,6 @@ export const uploadMedia = async (media: IMediaFile): Promise<IMedia> => {
 
     // @ts-ignore
     const file = new File([media.file], mediaName);
-    console.log(file, file.type, media.file.type);
     // return;
     const responseImage = await uploadGCloudImage(file, 'media', file.type);
     const url = `${gcloudPublicURL}${mediaName}`;

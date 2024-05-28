@@ -118,11 +118,6 @@ const useWhatsapp = (whatsappSessionId: WhatsappSessionTypes, autologin = false)
             setSeedData({...seedData, ...localData});
         }
 
-
-        console.log('group participants =>',
-            data,
-            JSON.parse(localStorageImpl.getItem(`${whatsappSeedStorePrefix}${whatsappSessionId}`) || '{}')
-        );
         setLoading(false);
 
         return data.participants as IWsUser[];
@@ -161,7 +156,6 @@ const useWhatsapp = (whatsappSessionId: WhatsappSessionTypes, autologin = false)
                     // TODO: toast('Sesión de Whatsapp Cerrada');
                     setLogged(false);
                 });
-                console.log('autologin', autologin);
                 autologin && login(whatsappSessionId)
             })
         }

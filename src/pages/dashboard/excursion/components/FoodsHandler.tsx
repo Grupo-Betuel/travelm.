@@ -6,7 +6,7 @@ import ReactQuill from "react-quill";
 import {FinanceHandler} from "./FinanceHandler";
 import {IFinance} from "../../../../models/financeModel";
 import OrganizationHandler from "./OrganizationHandler";
-import excursion from "../excursion";
+import excursion from "../excursions";
 import {getCrudService} from "../../../../api/services/CRUD.service";
 import {CommonConfirmActions, CommonConfirmActionsDataTypes} from "../../../../models/common";
 import {useConfirmAction} from "../../../../hooks/useConfirmActionHook";
@@ -84,6 +84,7 @@ const FoodsHandler: React.FC<FoodsHandlerProps> = ({foods, updateFoods}) => {
     }
 
     const onSelectOrganization = (organizations: IOrganization[]) => {
+        console.log('Organizations =>', organizations)
         setFoodForm({...foodForm, organization: organizations[0]});
     }
 
@@ -101,8 +102,8 @@ const FoodsHandler: React.FC<FoodsHandlerProps> = ({foods, updateFoods}) => {
         <div className="p-4">
 
             <Typography variant="h4" className="mb-4">Restaurante</Typography>
-            <OrganizationHandler onSelect={onSelectOrganization}
-            />
+            <OrganizationHandler selected={foodForm.organization?._id ? [foodForm.organization] : undefined}
+                                 onSelect={onSelectOrganization}/>
             <Typography variant="h5" className="mb-4">Manage Foods</Typography>
             <div className="flex flex-col gap-5 pb-5">
                 <ReactQuill

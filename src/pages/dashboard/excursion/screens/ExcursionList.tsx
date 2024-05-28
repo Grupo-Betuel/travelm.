@@ -1,19 +1,18 @@
 // ExcursionsList.tsx
-import React, {useState, useEffect, ChangeEvent, useMemo} from 'react';
+import React, {ChangeEvent, useEffect, useMemo, useState} from 'react';
 import {Link} from 'react-router-dom';
-import {Input, Card, CardBody, CardHeader, Typography, Dialog, Button, Select, Option} from "@material-tailwind/react";
+import {Button, Card, CardBody, Dialog, Input, Option, Select, Typography} from "@material-tailwind/react";
 import {IExcursion} from "../../../../models/excursionModel";
 import {mockExcursion} from "../../../../data/excursions-mock-data";
-import {ArrowDownIcon, ArrowRightIcon, ArrowLeftIcon, ArrowUpIcon} from "@heroicons/react/20/solid";
+import {ArrowDownIcon, ArrowLeftIcon, ArrowRightIcon, ArrowUpIcon} from "@heroicons/react/20/solid";
 // @ts-ignore
 import StatisticsCard from "../../../../widgets/cards/statistics-card";
 import {BanknotesIcon} from "@heroicons/react/24/solid";
 import {IClient} from "../../../../models/clientModel";
-import {ICheckpoint} from "../../../../models/checkpointModel";
-import {useGetContactsQuery} from "../../../../api/services/contacts.service";
-import {EntityApiStores} from "../../../../store/store";
 import {getCrudService} from "../../../../api/services/CRUD.service";
 import {calculateExcursionsStatistics} from "../../../../utils/statistics.utils";
+import ProtectedElement from "../../../../components/ProtectedElement";
+import {UserRoleTypes} from "../../../../models/interfaces/user";
 
 // Assuming fetchExcursions is an API call to get excursions
 const fetchExcursions = async (): Promise<IExcursion[]> => {
@@ -89,7 +88,6 @@ function ExcursionsList() {
     useEffect(() => {
         setExcursions(excursionsData || [])
         const stats = calculateExcursionsStatistics(excursionsData || []);
-        console.log('stats', stats);
         setStatistics(stats);
     }, [excursionsData])
 
@@ -206,7 +204,6 @@ function ExcursionsList() {
     };
 
 
-    console.log('excursions =>', statistics);
     return (
         <div className="p-4 flex flex-col gap-6 min-h-[88dvh]">
             <div className=" grid gap-y-10 gap-x-6 md:grid-cols-2 xl:grid-cols-4">
@@ -334,6 +331,11 @@ function ExcursionsList() {
                             <Option key={star} value={star.toString()}>{star} Stars</Option>
                         ))}
                     </Select>
+                    <ProtectedElement roles={[UserRoleTypes.ADMIN]}>
+                        <Link to={"handler/"}>
+                            <Button variant="text" color="blue" className="whitespace-nowrap">Crear Excursion</Button>
+                        </Link>
+                    </ProtectedElement>
                 </div>
             </div>
             <div className="overflow-x-auto">
@@ -401,7 +403,8 @@ function ExcursionsList() {
                                 {excursion.images.length + excursion.videos.length + excursion.audios.length}
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                {excursion?.transport?.organization?.name}, ${(excursion.transport?.finance?.price || 0).toFixed(2)},
+                                {excursion?.transport?.organization?.name},
+                                ${(excursion.transport?.finance?.price || 0).toFixed(2)},
                                 Buses: {excursion.transport?.buses?.length || 0}
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">

@@ -57,7 +57,6 @@ const ExcursionStepper: React.FC = () => {
     const navigate = useNavigate();
     const {uploadSingleMedia, uploadMultipleMedias} = useGCloudMediaHandler();
 
-    console.log("excursionData", excursionData);
 
     useEffect(() => {
         if (currentStep !== 0 && !currentStep) return;
@@ -133,8 +132,6 @@ const ExcursionStepper: React.FC = () => {
 
     const updateExcursionData = async (data: Partial<IExcursion>): void => {
         const newData: IExcursion = {...excursion, ...data};
-        console.log('data to update', data);
-        console.log("updated", newData);
         setExcursion(newData);
     };
 
@@ -192,14 +189,12 @@ const ExcursionStepper: React.FC = () => {
 
     const handleExcursionActivitiesData = async (): Promise<IExcursion> => {
         const excursionData: IExcursion = structuredClone({...excursion});
-        console.log('activies', excursionData.activities);
         if (excursionData.activities && excursionData.activities.length > 0) {
 
             const activities = await handleExcursionActivities()
             excursionData.activities = activities;
         }
 
-        console.log('excursion processed', excursionData.activities);
 
         return excursionData;
     }
@@ -208,7 +203,6 @@ const ExcursionStepper: React.FC = () => {
         const stepData = excursionSteps[currentStep || 0];
         let excursionData: IExcursion = structuredClone({...excursion});
 
-        console.log('step', stepData)
         switch (stepData.type) {
             case 'images':
                 excursionData = await handleExcursionMedia();

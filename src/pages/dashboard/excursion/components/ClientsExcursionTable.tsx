@@ -266,7 +266,6 @@ export const ClientsExcursionTable = (
     const loadWsGroups = async () => fetchWsSeedData(whatsappSessionKeys.betueltravel, 'groups');
 
     const handleWsGroupSelection = async (selectedList: IWsGroup[], selectedItem: IWsGroup) => {
-        console.log('selectedItem', selectedItem, selectedList);
         setSelectedWsGroup(selectedItem);
     }
 

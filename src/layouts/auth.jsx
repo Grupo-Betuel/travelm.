@@ -1,38 +1,19 @@
 import React from "react";
 import {Routes, Route} from "react-router-dom";
-import {
-    ChartPieIcon,
-    UserIcon,
-    UserPlusIcon,
-    ArrowRightOnRectangleIcon,
-} from "@heroicons/react/24/solid";
-import {Navbar, Footer} from "@/widgets/layout";
 import routes from "@/routes.jsx";
+import PublicOnly from "@/components/PublicOnlyRoutes";
 
 export function Auth() {
-    const navbarRoutes = [
-        {
-            name: "dashboard",
-            path: "/dashboard/home",
-            icon: ChartPieIcon,
-        },
-        {
-            name: "profile",
-            path: "/dashboard/home",
-            icon: UserIcon,
-        },
-        {
-            name: "sign up",
-            path: "/auth/sign-up",
-            icon: UserPlusIcon,
-        },
-        {
-            name: "sign in",
-            path: "/auth/sign-in",
-            icon: ArrowRightOnRectangleIcon,
-        },
-    ];
 
+    // <Route
+    //     key={path}
+    //     path={path}
+    //     element={
+    //         <ProtectedRoute roles={roles}>
+    //             {React.createElement(element)}
+    //         </ProtectedRoute>
+    //     }
+    // />
     return (
         <div className="relative min-h-screen w-full">
             <Routes>
@@ -40,7 +21,12 @@ export function Auth() {
                     ({layout, pages}) =>
                         layout === "auth" &&
                         pages.map(({path, element}) => (
-                            <Route exact path={path} element={React.createElement(element)}/>
+                            <Route key={path} path={path} element={
+                                <PublicOnly>
+                                    {React.createElement(element)}
+                                </PublicOnly>
+                            }
+                            />
                         ))
                 )}
             </Routes>

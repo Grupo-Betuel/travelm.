@@ -77,16 +77,24 @@ export function SignUp() {
                     <div className="mb-4 flex flex-col gap-6">
                         <Input
                             size="lg"
-                            label="Organization Name"
+                            label="Nombre de la Agencia"
                             name="name"
                             onChange={onChangeOrganization}
                         />
                         <Input
                             size="lg"
-                            label="Your Name"
-                            name="name"
+                            label="Tu Nombre"
+                            name="firstName"
                             onChange={onChangeUser}
                         />
+                        <Input
+                            type="text"
+                            size="lg"
+                            label="Tu Apellido"
+                            name="lastName"
+                            onChange={onChangeUser}
+                        />
+
                         <Input
                             size="lg"
                             label="Email"

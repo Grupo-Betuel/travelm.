@@ -8,7 +8,9 @@ import {
 } from "@heroicons/react/24/solid";
 import {Home, Profile, Tables, Notifications} from "@/pages/dashboard";
 import {SignIn, SignUp} from "@/pages/auth";
-import Excursions from "@/pages/dashboard/excursion/excursion";
+import Excursions from "@/pages/dashboard/excursion/excursions";
+import {CgOrganisation} from "react-icons/cg";
+import Organizations from "@/pages/dashboard/organizations/organizations";
 
 const icon = {
     className: "w-5 h-5 text-inherit",
@@ -20,24 +22,24 @@ export const routes = [
         pages: [
             {
                 icon: <HomeIcon {...icon} />,
-                name: 'dashboard',
-                path: '/home',
-                element: Home,
-                roles: ['admin', 'user'], // Specify roles here
-            },
-            {
-                icon: <HomeIcon {...icon} />,
                 name: 'Excursiones',
                 path: '/excursions/*',
                 element: Excursions,
-                roles: ['admin'], // Only accessible by admin
+                roles: ['admin', 'employee'],
+            },
+            {
+                icon: <CgOrganisation {...icon} />,
+                name: 'Organizaciones',
+                path: '/organizations/*',
+                element: Organizations,
+                roles: ['admin'],
+                userTypes: ['agency'],
             },
             {
                 icon: <UserCircleIcon {...icon} />,
                 name: 'profile',
                 path: '/profile',
                 element: Profile,
-                roles: ['user'], // Only accessible by user
             },
             {
                 icon: <TableCellsIcon {...icon} />,

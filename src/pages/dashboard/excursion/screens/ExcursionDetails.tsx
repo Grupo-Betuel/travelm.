@@ -31,6 +31,8 @@ import {CLIENTS_CONSTANTS} from "../../../../constants/clients.constant";
 import {IBedroom} from "../../../../models/bedroomModel";
 import {BedroomDetails} from "../components/BedroomsDetails";
 import Messaging from "../../../../components/WhatsappMessageHandler";
+import {UserRoleTypes} from "../../../../models/interfaces/user";
+import ProtectedElement from "../../../../components/ProtectedElement";
 
 
 const excursionService = getCrudService('excursions');
@@ -52,7 +54,6 @@ export const ExcursionDetails: React.FC = () => {
     const onConfirmAction = (type?: ExcursionDetailActions, data?: ExcursionDetailActionsDataTypes, ...extra: any) => {
         switch (type) {
             case 'update':
-                console.log('data', data, 'extra', extra);
                 onUpdateExcursion(data as IExcursion, ...extra);
                 break;
             case 'add-client':
@@ -109,7 +110,6 @@ export const ExcursionDetails: React.FC = () => {
     ];
 
     // Function to render media items correctly based on type
-
 
     const [checkpoints, setCheckpoints] = useState<ICheckpoint[]>([]);
     const [selectedCheckpoint, setSelectedCheckpoint] = useState<ICheckpoint | null>(null);
@@ -193,6 +193,11 @@ export const ExcursionDetails: React.FC = () => {
                     </SwiperSlide>
                 ))}
             </Swiper>
+            <ProtectedElement roles={[UserRoleTypes.ADMIN]}>
+                <Link to={`/dashboard/excursions/handler/${excursion._id}/`}>
+                    <Button variant="text" color="blue" className="whitespace-nowrap">Editar Excursion</Button>
+                </Link>
+            </ProtectedElement>
             {excursion.audios.map((audio, index) => (
                 <AudioPlayer key={index} src={audio.content} title={`Audio Track ${index + 1}`}/>
             ))}

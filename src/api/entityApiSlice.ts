@@ -1,14 +1,91 @@
+// import {apiSlice} from './apiSlice';
+// import {BaseModel} from "../models/interfaces/BaseModel";
+// import {EntityNames} from "../models/entitiyModels";
+// import {IPathDataParam, IQueryDataParam} from "../models/common";
+//
+//
+// function createEntityApiSlice<T extends BaseModel>(entityName: EntityNames) {
+//     return apiSlice(entityName).injectEndpoints({
+//         endpoints: (builder) => ({
+//             fetchAll: builder.query({
+//                 query: (data?: T) => ({
+//                     url: `/${entityName}${data ? `?${new URLSearchParams(data as any)}` : ''}`,
+//                     method: 'GET',
+//                     data: data,
+//                     query: data,
+//                 }),
+//                 transformResponse: (response: T[]) => response,
+//                 providesTags: (result) => result
+//                     ? [...result.map(({_id}: BaseModel) => ({type: entityName, id: _id})), {
+//                         type: entityName,
+//                         id: 'LIST'
+//                     }]
+//                     : [{type: entityName, id: 'LIST'}],
+//                 extraOptions: {
+//                     refetchOnTokenChange: true,
+//                 }
+//             }),
+//             fetchById: builder.query({
+//                 query: (id) => id ? ({
+//                     url: `/${entityName}/${id}`,
+//                     method: 'GET',
+//                     data: {} as T,
+//                 }) : null,
+//                 transformResponse: (response: T) => response,
+//             }),
+//             add: builder.mutation({
+//                 query: (newData: T & IPathDataParam) => ({
+//                     url: `/${entityName}${newData.path ? `/${newData.path}` : ''}`,
+//                     method: 'POST',
+//                     data: {
+//                         ...newData,
+//                         queryData: undefined,
+//                         path: undefined,
+//                     },
+//                 }),
+//                 transformResponse: (response: T) => response,
+//                 invalidatesTags: [{type: entityName, id: 'LIST'}],
+//             }),
+//             update: builder.mutation({
+//                 query: (data: Partial<T> & Required<BaseModel> & IQueryDataParam) => ({
+//                     url: `/${entityName}${data.queryData ? `?${new URLSearchParams(data.queryData)}` : ''}`,
+//                     method: 'PUT',
+//                     data: {
+//                         ...data,
+//                         queryData: undefined,
+//                     },
+//                 }),
+//                 transformResponse: (response: T) => response,
+//                 invalidatesTags: (result, error, {_id: id}) => [{type: entityName, id}],
+//             }),
+//             delete: builder.mutation({
+//                 query: (id: string) => ({
+//                     url: `/${entityName}/${id}`,
+//                     method: 'DELETE',
+//                     data: {id},
+//                 }),
+//                 transformResponse: (response: T) => response,
+//                 invalidatesTags: (result, error, id) => [{type: entityName, id}],
+//             }),
+//         }),
+//         overrideExisting: false,
+//     });
+//
+//     // return entityApiSlice;
+// };
+//
+// export default createEntityApiSlice;
+
+
 import {apiSlice} from './apiSlice';
 import {BaseModel} from "../models/interfaces/BaseModel";
-import {EntityModelTypes, EntityNames} from "../models/entitiyModels";
+import {EntityNames} from "../models/entitiyModels";
 import {IPathDataParam, IQueryDataParam} from "../models/common";
 
-
 function createEntityApiSlice<T extends BaseModel>(entityName: EntityNames) {
-    // const customSlice = apiSlice();
     return apiSlice(entityName).injectEndpoints({
         endpoints: (builder) => ({
-            fetchAll: builder.query({
+            fetchAll: builder.query<T[], T | void>({
                 query: (data?: T) => ({
                     url: `/${entityName}${data ? `?${new URLSearchParams(data as any)}` : ''}`,
                     method: 'GET',
@@ -22,8 +99,11 @@ function createEntityApiSlice<T extends BaseModel>(entityName: EntityNames) {
                         id: 'LIST'
                     }]
                     : [{type: entityName, id: 'LIST'}],
+                extraOptions: {
+                    refetchOnTokenChange: true,
+                },
             }),
-            fetchById: builder.query({
+            fetchById: builder.query<T, string>({
                 query: (id) => id ? ({
                     url: `/${entityName}/${id}`,
                     method: 'GET',
@@ -31,7 +111,7 @@ function createEntityApiSlice<T extends BaseModel>(entityName: EntityNames) {
                 }) : null,
                 transformResponse: (response: T) => response,
             }),
-            add: builder.mutation({
+            add: builder.mutation<T, T & IPathDataParam>({
                 query: (newData: T & IPathDataParam) => ({
                     url: `/${entityName}${newData.path ? `/${newData.path}` : ''}`,
                     method: 'POST',
@@ -42,9 +122,9 @@ function createEntityApiSlice<T extends BaseModel>(entityName: EntityNames) {
                     },
                 }),
                 transformResponse: (response: T) => response,
-                invalidatesTags: [{type: entityName, id: 'LIST'}],
+                invalidatesTags: [{type: entityName, id: '_id'}],
             }),
-            update: builder.mutation({
+            update: builder.mutation<T, Partial<T> & Required<BaseModel> & IQueryDataParam>({
                 query: (data: Partial<T> & Required<BaseModel> & IQueryDataParam) => ({
                     url: `/${entityName}${data.queryData ? `?${new URLSearchParams(data.queryData)}` : ''}`,
                     method: 'PUT',
@@ -56,7 +136,7 @@ function createEntityApiSlice<T extends BaseModel>(entityName: EntityNames) {
                 transformResponse: (response: T) => response,
                 invalidatesTags: (result, error, {_id: id}) => [{type: entityName, id}],
             }),
-            delete: builder.mutation({
+            delete: builder.mutation<T, string>({
                 query: (id: string) => ({
                     url: `/${entityName}/${id}`,
                     method: 'DELETE',
@@ -68,8 +148,6 @@ function createEntityApiSlice<T extends BaseModel>(entityName: EntityNames) {
         }),
         overrideExisting: false,
     });
-
-    // return entityApiSlice;
 };
 
 export default createEntityApiSlice;

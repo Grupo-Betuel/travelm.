@@ -17,7 +17,6 @@ export function useConfirmAction<ActionsType, ActionDataType>(handleConfirmedAct
     };
 
     const handleSetActionToConfirm = (type: ActionsType, reasonText?: string) => (data?: ActionDataType, extraParams?: IConfirmActionExtraParams) => {
-        console.log('klk?', extraParams)
         if (extraParams?.avoidConfirm) {
             handleConfirmedAction(type, data, extraParams);
             return;
