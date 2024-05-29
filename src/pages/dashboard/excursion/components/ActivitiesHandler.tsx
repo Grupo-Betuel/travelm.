@@ -35,6 +35,8 @@ const ActivitiesHandler: React.FC<ActivitiesHandlerProps> = ({activities, update
         switch (type) {
             case 'delete':
                 handleDeleteActivity(data as IActivity);
+                // setEditActivityIndex(undefined);
+                // setActivityForm(emptyActivity);
                 break;
         }
     }
@@ -110,45 +112,52 @@ const ActivitiesHandler: React.FC<ActivitiesHandlerProps> = ({activities, update
     // (date: Date) => setActivityForm({ ...activityForm, date })
 
     return (
-        <div>
-            <div className="mb-4">
-                <Typography variant="h5">Manage Activities</Typography>
-            </div>
-            <div className="flex flex-col gap-5">
-                <Input
-                    type="text"
-                    label="Title"
-                    value={activityForm.title}
-                    onChange={(e) => setActivityForm({...activityForm, title: e.target.value})}
-                    className="mb-4"
-                />
-                <DatePicker
-                    label="Select Date"
-                    onChange={onSelectDate}
-                    date={activityForm.date}
-                />
-                <ReactQuill
-                    theme="snow"
-                    value={activityForm.description}
-                    onChange={(content) => setActivityForm({...activityForm, description: content})}
-                />
-            </div>
-            <MediaHandler onChange={onMediaSubmit} medias={activityForm.images}/>
-            <Button color="blue" onClick={() => handleAddOrUpdateActivity()}>
-                {editActivityIndex !== undefined ? 'Actualizar' : 'Crear'} Actividad
-            </Button>
-            {activities.map((activity, index) => (
-                <div key={index} className="mt-2">
-                    <Typography variant="h6">{activity.title}</Typography>
-                    <Button color="red"
-                            onClick={
-                                () => handleSetActionToConfirm('delete', 'Eliminar Actividad')(activity)
-                            }>
-                        Delete
-                    </Button>
-                    <Button onClick={editActivityMode(index)}>Editar</Button>
+        <div className="flex flex-col gap-5 pb-10">
+            <div className="border-2 rounded-lg p-4">
+                <div className="mb-4">
+                    <Typography
+                        variant="h5">{editActivityIndex !== undefined ? 'Editar' : 'Agregar Nueva'} Actividad</Typography>
                 </div>
-            ))}
+                <div className="flex flex-col gap-5">
+                    <Input
+                        type="text"
+                        label="Title"
+                        value={activityForm.title}
+                        onChange={(e) => setActivityForm({...activityForm, title: e.target.value})}
+                        className="mb-4"
+                    />
+                    <DatePicker
+                        label="Select Date"
+                        onChange={onSelectDate}
+                        date={activityForm.date}
+                    />
+                    <ReactQuill
+                        theme="snow"
+                        value={activityForm.description}
+                        onChange={(content) => setActivityForm({...activityForm, description: content})}
+                    />
+                </div>
+                <MediaHandler handle={{
+                    images: true,
+                }} onChange={onMediaSubmit} medias={activityForm.images}/>
+                <Button color="blue" onClick={() => handleAddOrUpdateActivity()}>
+                    {editActivityIndex !== undefined ? 'Actualizar' : 'Crear'} Actividad
+                </Button>
+            </div>
+            <div className="flex gap-4 items-center">
+                {activities.map((activity, index) => (
+                    <div key={index} className="mt-2">
+                        <Typography variant="h6">{activity.title}</Typography>
+                        <Button color="red"
+                                onClick={
+                                    () => handleSetActionToConfirm('delete', 'Eliminar Actividad')(activity)
+                                }>
+                            Delete
+                        </Button>
+                        <Button onClick={editActivityMode(index)}>Editar</Button>
+                    </div>
+                ))}
+            </div>
             <ConfirmDialog/>
         </div>
     );

@@ -32,11 +32,6 @@ const OrganizationHandler: React.FC<IOrganizationSelectorProps> = (
         onSelect, selected
     });
 
-    const organizationOptions = useMemo(() => (organizations || []).map((organization) => ({
-        label: organization.name,
-        value: organization._id || '',
-    })), [organizations]);
-
     const handleOnSelectOrganization = (selectedValues: IOrganization[]) => {
         // Handle organization selection
         // const selectedOrganization = (organizations || []).filter((organization) => selectedValues.includes(organization._id || ''));
@@ -66,7 +61,7 @@ const OrganizationHandler: React.FC<IOrganizationSelectorProps> = (
                 <div className="flex justify-around gap-3 !overflow-x-scroll p-4 py-10 h-[400px]">
                     {selected?.map((entity, index) => (
                         <OrganizationCard
-                            onClick={onEditOrganization}
+                            onEdit={onEditOrganization}
                             className={`w-[250px]`}
                             key={`organization-${index}`}
                             organization={entity}

@@ -1,11 +1,5 @@
 import React, {useEffect, useMemo, useState} from 'react';
-import {
-    Button,
-    Card,
-    CardBody,
-    CardHeader,
-    Typography
-} from "@material-tailwind/react";
+import {Button, Card, CardBody, CardHeader, Typography} from "@material-tailwind/react";
 import {Link, useParams} from 'react-router-dom';
 import {StarIcon} from "@heroicons/react/24/solid";
 import {Swiper, SwiperSlide} from 'swiper/react';
@@ -31,8 +25,9 @@ import {CLIENTS_CONSTANTS} from "../../../../constants/clients.constant";
 import {IBedroom} from "../../../../models/bedroomModel";
 import {BedroomDetails} from "../components/BedroomsDetails";
 import Messaging from "../../../../components/WhatsappMessageHandler";
-import {UserRoleTypes} from "../../../../models/interfaces/user";
+import {UserRoleTypes, UserTypes} from "../../../../models/interfaces/user";
 import ProtectedElement from "../../../../components/ProtectedElement";
+import {IoReload} from "react-icons/io5";
 
 
 const excursionService = getCrudService('excursions');
@@ -43,13 +38,15 @@ export const ExcursionDetails: React.FC = () => {
     const [updateClient, {isLoading: isUpdatingClient}] = clientService.useUpdateTravelClients();
     const params = useParams();
     const [updateExcursion, {isLoading: isUpdating, data: updatedExcursion}] = excursionService.useUpdateExcursions();
-    const [wsMessagingIsOpen, setWsMessagingIsOpen] = useState(true);
+    const [wsMessagingIsOpen, setWsMessagingIsOpen] = useState(false);
+    const ownerOrganization = useMemo(() => excursion.owner, [excursion.owner]);
     const toggleWsMessaging = () => setWsMessagingIsOpen(!wsMessagingIsOpen);
 
     const {
         data: excursionData,
-        isLoading: isLoadingExcursion
-    } = excursionService.useFetchByIdExcursions(params.excursionId);
+        isLoading: isLoadingExcursion,
+        refetch: refetchExcursion
+    } = excursionService.useFetchByIdExcursions(params.excursionId as string, {skip: !params.excursionId});
 
     const onConfirmAction = (type?: ExcursionDetailActions, data?: ExcursionDetailActionsDataTypes, ...extra: any) => {
         switch (type) {
@@ -175,14 +172,17 @@ export const ExcursionDetails: React.FC = () => {
         }, [] as IBedroom[]);
     }, [excursion.destinations]);
 
-    console.log(excursionBedrooms, excursion.destinations);
+    console.log(ownerOrganization?.sessionId);
+
 
     return (
-        <div className="container mx-auto p-4 relative flex flex-col gap-7 ">
+        <div className="container mx-auto relative flex flex-col gap-7">
             <Swiper
+                cssMode
                 modules={[Navigation, Pagination]}
                 spaceBetween={10}
-                slidesPerView={1}
+                slidesPerView={3}
+                centeredSlides
                 navigation
                 pagination={{clickable: true}}
                 className="relative h-[300px] w-full"
@@ -193,7 +193,7 @@ export const ExcursionDetails: React.FC = () => {
                     </SwiperSlide>
                 ))}
             </Swiper>
-            <ProtectedElement roles={[UserRoleTypes.ADMIN]}>
+            <ProtectedElement roles={[UserRoleTypes.ADMIN]} userTypes={[UserTypes.AGENCY]}>
                 <Link to={`/dashboard/excursions/handler/${excursion._id}/`}>
                     <Button variant="text" color="blue" className="whitespace-nowrap">Editar Excursion</Button>
                 </Link>
@@ -207,10 +207,15 @@ export const ExcursionDetails: React.FC = () => {
                 <span className="ml-2">{excursion.reviews[0]?.stars || 0} Stars</span>
             </div>
 
-            {/* Excursion title */}
-            <Typography variant="h1" className="mt-4 mb-2">
-                {excursion.title}
-            </Typography>
+            <div className="flex items-center justify-between">
+                {/* Excursion title */}
+                <Typography variant="h1" className="mt-4 mb-2">
+                    {excursion.title}
+                </Typography>
+                <Button variant="text" color="blue" onClick={refetchExcursion}>
+                    <IoReload className="w-[18px] h-[18px] cursor-pointer"/>
+                </Button>
+            </div>
 
             {/* Organization, Destination, and TransportStep Information Cards */}
             <div className="flex justify-around gap-3 !overflow-x-scroll p-4 py-10 h-[400px]">
@@ -233,8 +238,8 @@ export const ExcursionDetails: React.FC = () => {
             <FinanceDetails finance={excursion.finance} clients={excursion.clients || []}
                             projections={excursion.projections} excursionId={excursion._id as string}
             />
-            <BedroomDetails excursion={excursion}/>
-            <ActivityDetails activities={excursion.activities}/>
+            {!!excursion.bedrooms?.length && <BedroomDetails excursion={excursion}/>}
+            {!!excursion.activities.length && <ActivityDetails activities={excursion.activities}/>}
             <ProjectionsCharts projections={excursion.projections}/>
 
             <div>
@@ -268,10 +273,14 @@ export const ExcursionDetails: React.FC = () => {
                 </Swiper>
             </div>
             <ConfirmDialog/>
-            <Messaging dialog={{
-                open: wsMessagingIsOpen,
-                handler: toggleWsMessaging,
-            }}/>
+            {ownerOrganization?.sessionId &&
+                <Messaging
+                    sessionId={ownerOrganization?.sessionId}
+                    dialog={{
+                        open: wsMessagingIsOpen,
+                        handler: toggleWsMessaging,
+                    }}/>
+            }
         </div>
     );
 };

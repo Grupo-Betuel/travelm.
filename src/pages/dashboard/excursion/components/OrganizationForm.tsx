@@ -231,7 +231,7 @@ export const OrganizationForm: React.FC<OrganizationHandlerProps> = (
             <Textarea label="Description" name="description" value={organization.description}
                       onChange={handleInputChange}/>
             <SocialNetworkForm onChange={handleSocialNetworksChange}/>
-            <MediaHandler onChange={onChangeMedia} medias={organization.medias}/>
+            <MediaHandler handle={{ images: true }} onChange={onChangeMedia} medias={organization.medias}/>
             <MapPicker onLocationSelect={handleLocationChange}/>
             <BedroomsHandler bedrooms={organization.bedrooms} updateBedrooms={handleBedrooms}/>
             <FinanceHandler finance={organization.entryFee || {} as IFinance} updateFinance={handleEntryFee}/>

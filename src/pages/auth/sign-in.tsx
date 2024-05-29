@@ -43,9 +43,8 @@ export function SignIn() {
                     <div className="mb-4 flex flex-col gap-6">
                         <Input
                             size="lg"
-                            label="Email"
+                            label="Email o Usuario"
                             name="email"
-                            type="email"
                             onChange={onChange}
                         />
                         <Input

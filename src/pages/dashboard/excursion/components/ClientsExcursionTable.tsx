@@ -28,6 +28,8 @@ import {IWsGroup, IWsLabel, WhatsappGroupActionTypes, whatsappSessionKeys} from 
 import SearchableSelect from "../../../../components/SearchableSelect";
 import {IoReload} from "react-icons/io5";
 import useWhatsapp from "../../../../hooks/UseWhatsapp";
+import {UserRoleTypes, UserTypes} from "../../../../models/interfaces/user";
+import ProtectedElement from "../../../../components/ProtectedElement";
 
 export interface IUpdateClientExtra extends IConfirmActionExtraParams {
     isOptimistic?: boolean;
@@ -292,25 +294,30 @@ export const ClientsExcursionTable = (
                     </div>
 
                 </div>
-                <div className="flex items-center justify-end bg-red-400">
-                    <p>{excursion.whatsappGroupID}</p>
-                    <Button variant="text" color="white" className="flex items-center gap-3"
-                            onClick={toggleAssignGroupModal}
-                    >
-                        <BiCheck size="18px"/>
-                        <Typography className="capitalize font-bold">Asignar Grupo de WS</Typography>
-                    </Button>
-                    <Button variant="text" color="white" className="flex items-center gap-3"
-                            onClick={handleWsGroupAction('create-ws-group')}>
-                        <BiCheck size="18px"/>
-                        <Typography className="capitalize font-bold">Crear Grupo de WS</Typography>
-                    </Button>
-                    <Button variant="text" color="white" className="flex items-center gap-3"
-                            onClick={handleWsGroupAction('sync-ws-group')}>
-                        <BiCheck size="18px"/>
-                        <Typography className="capitalize font-bold">Sync Grupo de WS</Typography>
-                    </Button>
-                </div>
+                <ProtectedElement roles={[UserRoleTypes.ADMIN]} userTypes={[UserTypes.AGENCY]}>
+                    <div className="flex items-center justify-end bg-red-400">
+                        <p>{excursion.whatsappGroupID}</p>
+                        <Button variant="text" color="white" className="flex items-center gap-3"
+                                onClick={toggleAssignGroupModal}
+                        >
+                            <BiCheck size="18px"/>
+                            <Typography className="capitalize font-bold">Asignar Grupo de WS</Typography>
+                        </Button>
+                        {!excursion.whatsappGroupID &&
+                            <Button variant="text" color="white" className="flex items-center gap-3"
+                                    onClick={handleWsGroupAction('create-ws-group')}>
+                                <BiCheck size="18px"/>
+                                <Typography className="capitalize font-bold">Crear Grupo de WS</Typography>
+                            </Button>}
+                        {excursion.whatsappGroupID &&
+                            <Button variant="text" color="white" className="flex items-center gap-3"
+                                    onClick={handleWsGroupAction('sync-ws-group')}>
+                                <BiCheck size="18px"/>
+                                <Typography className="capitalize font-bold">Sync Grupo de WS</Typography>
+                            </Button>
+                        }
+                    </div>
+                </ProtectedElement>
             </CardHeader>
             <CardBody className="overflow-x-auto px-0 pt-0 pb-2">
                 <table className="w-full min-w-[640px] table-auto">

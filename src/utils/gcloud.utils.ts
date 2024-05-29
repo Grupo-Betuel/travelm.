@@ -18,6 +18,7 @@ export const uploadMedia = async (media: IMediaFile): Promise<IMedia> => {
     media.content = url;
 
     return {
+        ...media,
         title: mediaName,
         content: url,
         type: media.type,

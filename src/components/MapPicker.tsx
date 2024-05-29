@@ -1,5 +1,5 @@
 import React from 'react';
-import {GoogleMap, LoadScript, Marker, Autocomplete} from '@react-google-maps/api';
+import {GoogleMap, LoadScript, Marker, Autocomplete, Libraries} from '@react-google-maps/api';
 import {ILocation} from '../models/ordersModels';
 import {Input} from "@material-tailwind/react";
 
@@ -17,6 +17,8 @@ interface MapPickerProps {
     onLocationSelect: (location: ILocation) => void;
 }
 
+const mapLibraries: Libraries = ['places'];
+
 const MapPicker: React.FC<MapPickerProps> = ({onLocationSelect}) => {
     const [marker, setMarker] = React.useState(center);
     const mapRef = React.useRef<any>(null);
@@ -24,14 +26,14 @@ const MapPicker: React.FC<MapPickerProps> = ({onLocationSelect}) => {
 
     const onLoad = (mapInstance: google.maps.Map) => {
         mapRef.current = mapInstance;
-        mapInstance.addListener('mouseover', () => {
-            // @ts-ignore
-            mapInstance.getDiv().style.cursor = 'pointer';
-        });
-        mapInstance.addListener('mouseout', () => {
-            // @ts-ignore
-            mapInstance.getDiv().style.cursor = '';
-        });
+        // mapInstance.addListener('mouseover', () => {
+        //     // @ts-ignore
+        //     mapInstance.getDiv().style.cursor = 'pointer';
+        // });
+        // mapInstance.addListener('mouseout', () => {
+        //     // @ts-ignore
+        //     mapInstance.getDiv().style.cursor = '';
+        // });
     };
 
     const onMarkerSelected = (e: google.maps.MapMouseEvent) => {
@@ -81,15 +83,13 @@ const MapPicker: React.FC<MapPickerProps> = ({onLocationSelect}) => {
     return (
         <LoadScript
             googleMapsApiKey="AIzaSyAJMQBQHGFFFYkG7G4JeabqyjrCDpu3Mwc"
-            libraries={['places']}
+            libraries={mapLibraries}
         >
+
             <Autocomplete
                 onLoad={(auto) => {
                     autocomplete.current = auto;
                 }}
-
-                // onLoad={onLoad}
-                //{/*@ts-ignore*/}
                 onPlaceChanged={() => onPlaceSelected(autocomplete.current?.getPlace())}
             >
                 <input
@@ -108,7 +108,8 @@ const MapPicker: React.FC<MapPickerProps> = ({onLocationSelect}) => {
                         textOverflow: `ellipses`,
                         position: `absolute`,
                         left: `50%`,
-                        marginLeft: `-120px`
+                        marginLeft: `-120px`,
+                        zIndex: 99999999
                     }}
                 />
             </Autocomplete>

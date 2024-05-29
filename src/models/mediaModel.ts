@@ -1,8 +1,16 @@
 import {BaseModel} from "./interfaces/BaseModel";
 
+export enum MediaTypeEnum {
+    IMAGE = "image",
+    VIDEO = "video",
+    AUDIO = "audio",
+    DOCUMENT = "document",
+}
+
 export interface IMedia extends BaseModel {
-    type: 'video' | 'image' | 'audio';
+    type: MediaTypeEnum;
     content: string;
+    owner?: string;
     title: string;
     tags?: string[];
 }

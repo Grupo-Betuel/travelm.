@@ -32,6 +32,7 @@ const UserForm: React.FC<UserFormProps> = ({initialUser, role, onSubmit, dialog}
 
     const {data: existingUsers} = userService.useFetchAllTravelUsers({phone: user?.phone}, {skip: (user?.phone?.length || 0) < 11});
 
+    console.log('user?.phone?.length', user?.phone?.length, existingUsers)
     const handleChange = ({target: {value, name, type}}: React.ChangeEvent<HTMLInputElement>) => {
         if (type === 'tel') {
             value = value.replace(/[^0-9]/g, '');

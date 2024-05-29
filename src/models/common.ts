@@ -65,3 +65,9 @@ export interface IQueryDataParam {
 export interface IPathDataParam {
     path?: string;
 }
+
+export interface ICaption {
+    title?: string;
+    subtitle?: string;
+    endTitle?: string;
+}

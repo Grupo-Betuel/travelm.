@@ -10,6 +10,7 @@ import {
 // import { ChevronRightIcon, ChevronLeftIcon } from "@heroicons/react/24/outline";
 import {IExcursion} from "../../../../models/excursionModel";
 import DatePicker from "../../../../components/DatePicker";
+import MapPicker from "../../../../components/MapPicker";
 
 interface GeneralInfoProps {
     excursionData: IExcursion;
@@ -18,7 +19,14 @@ interface GeneralInfoProps {
 
 const ExcursionGeneralInfo: React.FC<GeneralInfoProps> = ({excursionData, updateExcursion}) => {
     const handleInputChange = (event: any): void => {
-        updateExcursion({[event.target.name]: event.target.value});
+        if (event.target.name === 'startDate' && !excursionData.endDate) {
+            updateExcursion({
+                [event.target.name]: event.target.value,
+                endDate: event.target.value
+            });
+        } else {
+            updateExcursion({[event.target.name]: event.target.value});
+        }
     };
 
     return (

@@ -1,7 +1,7 @@
 import {IOrganization} from "../models/organizationModel";
 import {IMedia, IMediaFile} from "../models/mediaModel";
 import {useGCloudMediaHandler} from "./useGCloudMedediaHandler";
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import {getCrudService} from "../api/services/CRUD.service";
 import {OrganizationForm} from "../pages/dashboard/excursion/components/OrganizationForm";
 
@@ -26,7 +26,8 @@ export const useOrganizationHandler = ({onSelect, selected}: IOrganizationHandle
         isLoading: isUpdating,
         data: updatedOrganization
     }] = organizationService.useUpdateOrganizations();
-    const {data: organizations, refetch: refetchOrganizations} = organizationService.useFetchAllOrganizations();
+    const {data: organizationsData, refetch: refetchOrganizations} = organizationService.useFetchAllOrganizations();
+    const [organizations, setOrganizations] = useState<IOrganization[]>(organizationsData || []);
 
     const [isNewOrganizationOpen, setHandleOrganizationOpen] = useState(false);
     const toggleHandleOrganization = () => {
@@ -37,6 +38,12 @@ export const useOrganizationHandler = ({onSelect, selected}: IOrganizationHandle
     const {uploadMultipleMedias, uploadSingleMedia, deleteMedias} = useGCloudMediaHandler()
 
     const [selectedOrganization, setSelectedOrganization] = useState<IOrganization | undefined>(undefined);
+
+    useEffect(() => {
+        if (organizationsData) {
+            setOrganizations(organizationsData);
+        }
+    }, [organizationsData]);
 
     const onCreateOrganization = async (formData: IOrganization) => {
         const medias = await uploadMultipleMedias(formData.medias as IMediaFile[]);
@@ -54,6 +61,7 @@ export const useOrganizationHandler = ({onSelect, selected}: IOrganizationHandle
         if (data) {
             const selectedData = [...(selected || []), data as IOrganization];
             onSelect && onSelect(selectedData);
+            setOrganizations([...organizations, data as IOrganization]);
             toggleHandleOrganization();
         } else {
             // Handle error
@@ -85,6 +93,12 @@ export const useOrganizationHandler = ({onSelect, selected}: IOrganizationHandle
                 });
 
                 onSelect && onSelect(selectedData);
+                setOrganizations(organizations.map((organization) => {
+                    if (organization._id === data._id) {
+                        return data;
+                    }
+                    return organization;
+                }));
             } else {
                 // Handle error
                 console.log('Error creating organization');

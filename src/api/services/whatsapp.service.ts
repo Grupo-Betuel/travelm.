@@ -32,7 +32,7 @@ export const getWhatsappNumberURl = (phone: string, message?: string) => `https:
 
 export const startWhatsappServices = async (
     start = true,
-    sessionId: WhatsappSessionTypes,
+    sessionId: string,
     removeSession?: boolean
 ) => {
     try {
@@ -166,7 +166,7 @@ export const sendWhatsappMessage = async (
 };
 
 export const getWhatsappSeedData = async (
-    sessionId: WhatsappSessionTypes,
+    sessionId: string,
     seedType: WhatsappSeedTypes = "all"
 ) => {
     try {
@@ -187,7 +187,7 @@ export const getWhatsappSeedData = async (
 
 
 export const getGroupChatParticipants = async (
-    sessionId: WhatsappSessionTypes,
+    sessionId: string,
     groupChatId: string
 ) => {
     try {

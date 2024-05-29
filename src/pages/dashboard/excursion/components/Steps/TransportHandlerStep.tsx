@@ -47,7 +47,7 @@ export const TransportHandlerStep = ({
                 excursionData?.transport?.organization &&
                 <div className="flex justify-around gap-3 !overflow-x-scroll p-4 py-10 h-[400px]">
                     <OrganizationCard
-                        className={`w-[250px]`}
+                        className={`min-w-[450px]`}
                         organization={excursionData.transport.organization}
                     />
                 </div>

@@ -17,7 +17,7 @@ import {IClient} from "../models/clientModel";
 
 export const whatsappSeedStorePrefix = 'whatsappSeedData::';
 
-const useWhatsapp = (whatsappSessionId: WhatsappSessionTypes, autologin = false) => {
+const useWhatsapp = (whatsappSessionId: string, autologin = false) => {
     const [logged, setLogged] = React.useState(false);
     const [loading, setLoading] = React.useState(false);
     const [stopMessagingId, setStopMessagingId] = React.useState('');
@@ -25,6 +25,7 @@ const useWhatsapp = (whatsappSessionId: WhatsappSessionTypes, autologin = false)
     const [seedData, setSeedData] = React.useState<ISeed>({groups: [], users: [], labels: []});
 
     React.useEffect(() => {
+        if (!whatsappSessionId) return;
         const localData = localStorageImpl.getItem(`${whatsappSeedStorePrefix}${whatsappSessionId}`)
         const storedSeedData = localData && JSON.parse(localData);
         storedSeedData && setSeedData(storedSeedData);
@@ -37,7 +38,7 @@ const useWhatsapp = (whatsappSessionId: WhatsappSessionTypes, autologin = false)
         }
     }, [])
 
-    const startWhatsapp = async (start: boolean, sessionId: WhatsappSessionTypes, removeSession?: boolean) => {
+    const startWhatsapp = async (start: boolean, sessionId: string, removeSession?: boolean) => {
         const response: any = await (await startWhatsappServices(start, sessionId, removeSession)).json();
         return response;
     }
@@ -52,14 +53,14 @@ const useWhatsapp = (whatsappSessionId: WhatsappSessionTypes, autologin = false)
         return response;
     }
 
-    const updateSeedDataWithLocalStorage = (sessionKey: WhatsappSessionTypes) => {
+    const updateSeedDataWithLocalStorage = (sessionKey: string) => {
         const localData = localStorageImpl.getItem(`${whatsappSeedStorePrefix}${sessionKey}`)
         const storedSeedData = localData && JSON.parse(localData);
         // const newSeed = JSON.parse(localStorageImpl.getItem(`${whatsappSeedStorePrefix}${sessionKey}`) || '[]');
         storedSeedData && setSeedData(storedSeedData);
     }
 
-    const login = async (sessionId: WhatsappSessionTypes) => {
+    const login = async (sessionId: string) => {
         updateSeedDataWithLocalStorage(sessionId);
         return startWhatsapp(true, sessionId).then(res => {
             const {status} = res;
@@ -89,6 +90,7 @@ const useWhatsapp = (whatsappSessionId: WhatsappSessionTypes, autologin = false)
     }
 
     const fetchWsSeedData = async (sessionId = whatsappSessionId, seedType: WhatsappSeedTypes) => {
+        if (!sessionId) return;
         const emptySeed = seedData.groups?.length === 0 && seedData.users?.length === 0 && seedData.labels?.length === 0;
         setLoading(emptySeed)
         const data = await (await getWhatsappSeedData(sessionId, seedType)).json()
@@ -101,6 +103,7 @@ const useWhatsapp = (whatsappSessionId: WhatsappSessionTypes, autologin = false)
     }
 
     const fetchGroupParticipants = async (groupChatId: string) => {
+        if (!whatsappSessionId) return;
         setLoading(true);
         const data = await (await getGroupChatParticipants(whatsappSessionId, groupChatId)).json();
         const localData = JSON.parse(localStorageImpl.getItem(`${whatsappSeedStorePrefix}${whatsappSessionId}`) || '{}');
@@ -156,7 +159,7 @@ const useWhatsapp = (whatsappSessionId: WhatsappSessionTypes, autologin = false)
                     // TODO: toast('Sesión de Whatsapp Cerrada');
                     setLogged(false);
                 });
-                autologin && login(whatsappSessionId)
+                whatsappSessionId && autologin && login(whatsappSessionId)
             })
         }
 

@@ -23,7 +23,7 @@ import {IoReload} from "react-icons/io5";
 
 export interface IMessaging {
     dialog?: ICustomComponentDialog;
-    whatsappSession?: WhatsappSessionTypes;
+    sessionId?: string;
 
 }
 
@@ -31,11 +31,11 @@ export type SessionActionsTypes = 'restart' | 'close' | 'cancel-messaging' | Wha
 
 const Messaging: React.FC<IMessaging> = (
     {
-        whatsappSession,
+        sessionId,
         dialog
     }
 ) => {
-    const [selectedSession, setSelectedSession] = useState<WhatsappSessionTypes>(whatsappSession || whatsappSessionKeys.betueltravel)
+    const [selectedSession, setSelectedSession] = useState<string | undefined>(sessionId)
     const [message, setMessage] = useState<string>('')
     const [onlySendImagesIds, setOnlySendImagesIds] = useState<string[]>([]);
     const [photo, setPhoto] = useState<any>()
@@ -44,7 +44,7 @@ const Messaging: React.FC<IMessaging> = (
     const [groupedUsers, setGroupedUsers] = React.useState<IWsUser[]>([]);
     const [excludedWhatsappUsers, setExcludedWhatsappUsers] = React.useState<IWsUser[]>([]);
     const [selectedWhatsappUsers, setSelectedWhatsappUsers] = React.useState<IWsUser[]>([]);
-    const lastSession = React.useRef<WhatsappSessionTypes>();
+    const lastSession = React.useRef<string>();
     const [actionToConfirm, setActionToConfirm] = React.useState<SessionActionsTypes | undefined>(undefined);
     const [fetchingSeed, setFetchingSeed] = React.useState<WhatsappSeedTypes>();
     React.useEffect(() => {

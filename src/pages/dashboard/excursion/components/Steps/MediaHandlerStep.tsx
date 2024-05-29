@@ -2,7 +2,7 @@ import React, {useMemo} from 'react';
 import {Button} from '@material-tailwind/react';
 import MediaHandler, {IMediaHandled} from "../MediaHandler";
 import {IExcursion} from "../../../../../models/excursionModel";
-import {IMedia} from "../../../../../models/mediaModel";
+import {IMedia, IMediaFile} from "../../../../../models/mediaModel";
 
 interface MediaProps {
     excursionData: IExcursion;
@@ -10,17 +10,6 @@ interface MediaProps {
 }
 
 export const MediaHandlerStep: React.FC<MediaProps> = ({excursionData, updateExcursion}) => {
-    const [loadedMedia, setLoadedMedia] = React.useState<IMedia[]>([]);
-
-    // const { mediaData}
-    const addMedia = (type: string) => {
-        const newMedia = {type, content: 'http://example.com/new-media.jpg'}; // Simplified example
-        const updatedMedia = excursionData.media ? {
-            ...excursionData.media,
-            [type]: [...excursionData.media[type], newMedia]
-        } : {[type]: [newMedia]};
-        updateExcursion({media: updatedMedia});
-    };
 
     const onSubmitMedia = async (data: IMediaHandled) => {
         updateExcursion({
@@ -34,20 +23,11 @@ export const MediaHandlerStep: React.FC<MediaProps> = ({excursionData, updateExc
 
     return (
         <div>
-            <Button color="blue" onClick={() => addMedia('images')}>Add Image</Button>
-            <Button color="blue" onClick={() => addMedia('videos')}>Add Video</Button>
-            {/* Displaying media for demonstration purposes */}
-            {/*{formData.media?.images?.map((image, index) => (*/}
-            {/*    <div key={index}>*/}
-            {/*        <img src={image.content} alt="Uploaded" />*/}
-            {/*    </div>*/}
-            {/*))}*/}
-
             <MediaHandler
                 onChange={onSubmitMedia}
                 medias={medias}
+                flyerData={excursionData.flyer as IMediaFile}
             />
-
         </div>
     );
 };

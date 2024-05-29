@@ -13,6 +13,11 @@ import {IBedroom} from "./bedroomModel";
 
 export type ExcursionDetailActions = 'remove-client' | 'add-client' | 'update-client' | 'update';
 export type ExcursionDetailActionsDataTypes = IClient | Partial<IExcursion>;
+export enum ExcursionStatusEnum {
+    DRAFT = 'draft',
+    COMPLETED = 'completed',
+    ENDED = 'ended'
+}
 
 export interface IExcursion extends BaseModel {
     title: string;
@@ -36,6 +41,7 @@ export interface IExcursion extends BaseModel {
     startDate: Date;
     endDate: Date;
     whatsappGroupID?: string;
+    status: ExcursionStatusEnum;
 }
 
 

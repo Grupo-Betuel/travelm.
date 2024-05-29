@@ -15,7 +15,11 @@ const axiosBaseQuery =
         unknown,
         unknown
     > =>
-        async ({url, method, data, params}) => {
+        async (parameters) => {
+            const {url, method, data, params} = parameters || {};
+            if (!url) {
+                return {}
+            }
             try {
                 const result = await axiosInstance({
                     url: baseUrl + url,

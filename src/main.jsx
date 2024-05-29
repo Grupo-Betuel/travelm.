@@ -16,6 +16,7 @@ import {BrowserRouter} from "react-router-dom";
 import {ThemeProvider} from "@material-tailwind/react";
 import {MaterialTailwindControllerProvider} from "@/context";
 import "../public/css/tailwind.css";
+import "../public/css/base.css";
 
 // Import Swiper styles
 import 'swiper/css';  // Core Swiper

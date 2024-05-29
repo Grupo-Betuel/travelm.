@@ -23,7 +23,11 @@ export const FinanceHandler = (
         if (type === 'number') {
             value = Number(value);
         }
-        updateFinance({...finance, [name]: value});
+        updateFinance({
+            ...finance,
+            type: type || finance.type,
+            [name]: value,
+        });
     }
 
     useEffect(() => {
@@ -41,7 +45,8 @@ export const FinanceHandler = (
         <div className="flex flex-col gap-5">
             <div className="flex w-100 justify-between">
                 <span></span>
-                <Button onClick={toggleCost} color={enableCost ? 'red' : 'green'}>{ enableCost ? 'Quitar Costo' :'Agregar Costo'}</Button>
+                <Button onClick={toggleCost}
+                        color={enableCost ? 'red' : 'green'}>{enableCost ? 'Quitar Costo' : 'Agregar Costo'}</Button>
             </div>
             <Input
                 type="number"
@@ -63,7 +68,7 @@ export const FinanceHandler = (
                 label="Type"
                 name="type"
                 disabled={!!type}
-                value={finance?.type}
+                value={type || finance?.type}
                 onChange={(value) => updateFinance({...finance, type: value as FinanceTypes})}
                 className="mb-4"
             >

@@ -4,7 +4,7 @@ import {Link} from 'react-router-dom';
 import {Button, Card, CardBody, Dialog, Input, Option, Select, Typography} from "@material-tailwind/react";
 import {IExcursion} from "../../../../models/excursionModel";
 import {mockExcursion} from "../../../../data/excursions-mock-data";
-import {ArrowDownIcon, ArrowLeftIcon, ArrowRightIcon, ArrowUpIcon} from "@heroicons/react/20/solid";
+import {ArrowDownIcon, ArrowLeftIcon, ArrowRightIcon, ArrowUpIcon, HomeIcon} from "@heroicons/react/20/solid";
 // @ts-ignore
 import StatisticsCard from "../../../../widgets/cards/statistics-card";
 import {BanknotesIcon} from "@heroicons/react/24/solid";
@@ -342,7 +342,7 @@ function ExcursionsList() {
                 <table className="min-w-full divide-y divide-gray-200">
                     <thead className="bg-gray-50">
                     <tr>
-                        {["title", "organization", "destination", "clients", 'finance', "stars", 'flyer', "activities", "medias", 'transport', 'foods'].map((key) => (
+                        {["Titulo", "Estado", "Organizaciones", "Destinos", "Clientes", 'Precio', "Estrellas", "Acciones"].map((key) => (
                             <th key={key} scope="col"
                                 className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
                                 <div onClick={() => handleSort(key as keyof IExcursion)}>
@@ -361,7 +361,11 @@ function ExcursionsList() {
                     {excursionsToShow.map(excursion => (
                         <tr key={excursion._id}>
                             <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                <Link to={`/dashboard/excursions/${excursion._id}`}>{excursion.title}</Link>
+                                <Link to={`/dashboard/excursions/${excursion._id}`}
+                                      className="whitespace-pre-line line-clamp-2 w-[150px]">{excursion.title}</Link>
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                {excursion.status}
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                 {excursion.organizations.map(item => <Link to={`/organization/${item._id}`}>
@@ -370,7 +374,7 @@ function ExcursionsList() {
                                 )}
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                {excursion.destinations.map(item => item.name).join(', ')}
+                                <p className="whitespace-break-spaces line-clamp-4">{excursion.destinations.map(item => item.name).join(',\n')}</p>
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                 {excursion.clients.length}
@@ -379,37 +383,53 @@ function ExcursionsList() {
                                 ${excursion.finance?.price.toFixed(2)}
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                {excursion.reviews.reduce((acc, review) => acc + review.stars, 0) / excursion.reviews.length}
+                                {excursion.reviews.reduce((acc, review) => acc + review.stars, 0) / excursion.reviews.length || 0}
                             </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                <div className="flex items-center space-x-2">
-                                    {excursion.images.map((image, i) => (
-                                        <img
-                                            key={i}
-                                            src={image.content}
-                                            alt="Flyer"
-                                            className="w-10 h-10 cursor-pointer"
-                                            onClick={() => handleImageClick(image.content)}
-                                        />
-                                    ))}
+                            <td>
+                                <div className="flex items-center">
+                                    <Button
+                                        size="sm"
+                                        color="blue"
+                                        variant="text"
+                                        className="rounded-full"
+                                        ripple
+                                    >
+                                        Editar
+                                    </Button>
+                                    <Button
+                                        size="sm"
+                                        color="blue"
+                                        variant="text"
+                                        className="rounded-full"
+                                        ripple
+                                    >
+                                        Eliminar
+                                    </Button>
+
                                 </div>
                             </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                {excursion.activities.map((activity, i) => (
-                                    <div key={i}>{activity.title}</div>
-                                ))}
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                {excursion.images.length + excursion.videos.length + excursion.audios.length}
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                {excursion?.transport?.organization?.name},
-                                ${(excursion.transport?.finance?.price || 0).toFixed(2)},
-                                Buses: {excursion.transport?.buses?.length || 0}
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                {excursion.foods.map(food => `${food.type}: ${food.menu}`).join(', ')}
-                            </td>
+                            {/*<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">*/}
+                            {/*    <div className="flex items-center space-x-2">*/}
+                            {/*        {excursion.images.map((image, i) => (*/}
+                            {/*            <img*/}
+                            {/*                key={i}*/}
+                            {/*                src={image.content}*/}
+                            {/*                alt="Flyer"*/}
+                            {/*                className="w-10 h-10 cursor-pointer"*/}
+                            {/*                onClick={() => handleImageClick(image.content)}*/}
+                            {/*            />*/}
+                            {/*        ))}*/}
+                            {/*    </div>*/}
+                            {/*</td>*/}
+
+                            {/*<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">*/}
+                            {/*    {excursion?.transport?.organization?.name},*/}
+                            {/*    ${(excursion.transport?.finance?.price || 0).toFixed(2)},*/}
+                            {/*    Buses: {excursion.transport?.buses?.length || 0}*/}
+                            {/*</td>*/}
+                            {/*<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">*/}
+                            {/*    {excursion.foods.map(food => `${food.type}: ${food.menu}`).join(', ')}*/}
+                            {/*</td>*/}
                         </tr>
                     ))}
                     </tbody>

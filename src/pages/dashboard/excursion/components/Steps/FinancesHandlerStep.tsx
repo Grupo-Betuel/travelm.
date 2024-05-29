@@ -49,7 +49,8 @@ const FinancesHandlerStep: React.FC<FinancesStepProps> = ({excursionData, update
             <FinanceHandler
                 enabledCost={true}
                 finance={excursionData.finance}
-                updateFinance={onUpdateFinances} type="excursion"/>
+                updateFinance={onUpdateFinances}
+                type="excursion"/>
             <Typography variant="h5" color="blue" className="p-4 text-center">Transporte: RD${transportPrice.toLocaleString()}</Typography>
             <Typography variant="h5" color="blue" className="p-4 text-center">Precio de Destino: RD${destinationsPrice.toLocaleString()}</Typography>
             <Typography variant="h5" color="blue" className="p-4 text-center">Precio de Comida: RD${foodPrice.toLocaleString()}</Typography>

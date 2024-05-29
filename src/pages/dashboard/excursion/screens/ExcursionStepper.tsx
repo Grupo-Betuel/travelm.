@@ -1,23 +1,17 @@
-import React, {useState, useEffect} from 'react';
-import {
-    Input,
-    Textarea,
-    Typography,
-    Button,
-    Card,
-    CardBody,
-    Stepper,
-    Step, CardHeader
-} from '@material-tailwind/react';
+import React, {useEffect, useState} from 'react';
+import {Button, Card, CardBody, CardHeader, Typography} from '@material-tailwind/react';
 import {UserIcon} from '@heroicons/react/20/solid';
 import ExcursionGeneralInfo from '../components/ExcursionGeneralnfo';
 import {MediaHandlerStep} from '../components/Steps/MediaHandlerStep';
-import {IExcursion} from '../../../../models/excursionModel';
+import {ExcursionStatusEnum, IExcursion} from '../../../../models/excursionModel';
 import {
     validateStep1,
     validateStep2,
     validateStep3,
-    validateStep4, validateStep5, validateStep6, validateStep7
+    validateStep4,
+    validateStep5,
+    validateStep6,
+    validateStep7
 } from "../../../../utils/excursionStepperValidations";
 import {OrganizationsDestinationsStep} from "../components/Steps/OrganizationsDestinationsStep";
 import ActivitiesHandlerStep from "../components/Steps/ActivitiesHandlerStep";
@@ -25,13 +19,15 @@ import FoodsHandlerStep from "../components/Steps/FoodsHandlerStep";
 import {ProjectHandlerStep} from "../components/Steps/ProjectionsHandlerStep";
 import {TransportHandlerStep} from "../components/Steps/TransportHandlerStep";
 import {getCrudService} from "../../../../api/services/CRUD.service";
-import {useNavigation, useNavigate, useParams, useRoutes} from "react-router-dom";
+import {useNavigate, useParams} from "react-router-dom";
 import {EXCURSION_CONSTANTS} from "../../../../constants/excursion.constant";
 import {useGCloudMediaHandler} from "../../../../hooks/useGCloudMedediaHandler";
-import {IMedia, IMediaFile} from "../../../../models/mediaModel";
+import {IMediaFile} from "../../../../models/mediaModel";
 import FinancesHandlerStep from "../components/Steps/FinancesHandlerStep";
 import {IStep} from "../../../../models/common";
 import {AppStepper} from "../../../../components/AppStepper";
+import {useCheckUserAuthorization} from "../../../../hooks/useCheckUserAuthorization";
+import {useAuth} from "../../../../context/authContext";
 
 
 const excursionService = getCrudService("excursions");
@@ -53,10 +49,10 @@ const ExcursionStepper: React.FC = () => {
     const {
         data: excursionData,
         isLoading: isLoadingExcursion
-    } = excursionService.useFetchByIdExcursions(params.excursionId);
+    } = excursionService.useFetchByIdExcursions(params.excursionId as string, {skip: !params.excursionId});
     const navigate = useNavigate();
     const {uploadSingleMedia, uploadMultipleMedias} = useGCloudMediaHandler();
-
+    const {user} = useAuth();
 
     useEffect(() => {
         if (currentStep !== 0 && !currentStep) return;
@@ -76,14 +72,11 @@ const ExcursionStepper: React.FC = () => {
         validateFormData();
     }, [excursion]);
 
-    useEffect(() => {
-        if (excursionData) setExcursion(excursionData);
-    }, [excursionData]);
 
     useEffect(() => {
         if (createdExcursion && createdExcursion._id) {
             navigate('/dashboard/excursions/handler/' + createdExcursion._id, {replace: true});
-            // setExcursion(createdExcursion);
+            setExcursion(createdExcursion);
         }
     }, [createdExcursion]);
 
@@ -132,6 +125,9 @@ const ExcursionStepper: React.FC = () => {
 
     const updateExcursionData = async (data: Partial<IExcursion>): void => {
         const newData: IExcursion = {...excursion, ...data};
+        const stepData = excursionSteps[currentStep || 0];
+
+        console.log('updated', newData, stepData)
         setExcursion(newData);
     };
 
@@ -149,28 +145,21 @@ const ExcursionStepper: React.FC = () => {
 
     const handleExcursionMedia = async (): Promise<IExcursion> => {
         const excursionData: IExcursion = structuredClone({...excursion});
-
-        // TODO: NEED TO HANDLE VIDEOS
-        // const videos: IMediaFile = excursion.videos.filter((video: any) => video.file);
         const imageFiles: IMediaFile[] = [] as IMediaFile[];
-        // const leftImages: IMedia[] = [] as IMedia[];
         const audioFiles: IMediaFile[] = [] as IMediaFile[];
-        // const leftAudios: IMedia[] = [] as IMedia[];
 
         [...excursion.images, ...excursion.audios].forEach((media: any) => {
-            // if (media.file) {
             if (media.type === 'image') {
-                imageFiles.push(media);
+                imageFiles.push({
+                    ...media,
+                    owner: user?.organization || media.owner,
+                });
             } else if (media.type === 'audio') {
-                audioFiles.push(media);
+                audioFiles.push({
+                    ...media,
+                    owner: user?.organization || media.owner,
+                });
             }
-            // } else {
-            //     if (media.type === 'image') {
-            //         leftImages.push(media);
-            //     } else if (media.type === 'audio') {
-            //         leftAudios.push(media);
-            //     }
-            // }
         });
 
         const uploadedImages = await uploadMultipleMedias(imageFiles);
@@ -178,8 +167,14 @@ const ExcursionStepper: React.FC = () => {
         const images = uploadedImages;
         const audios = uploadedAudios;
 
-
-        // const flyer = await uploadSingleMedia(data.flyer);
+        if (!!excursionData.flyer) {
+            const flyer = await uploadSingleMedia(excursionData.flyer as IMediaFile);
+            const newFlyerData = flyer || excursionData.flyer || {};
+            excursionData.flyer = {
+                ...newFlyerData,
+                owner: user?.organization || flyer?.owner,
+            };
+        }
 
         excursionData.images = images;
         excursionData.audios = audios;
@@ -212,7 +207,6 @@ const ExcursionStepper: React.FC = () => {
                 break;
         }
 
-
         if (!!excursion._id) {
             let excursionToUpdate: Partial<IExcursion> = {};
             if (stepData?.properties?.length && (stepData?.properties?.length || 0) > 0) {
@@ -225,7 +219,7 @@ const ExcursionStepper: React.FC = () => {
                 excursionToUpdate = excursionData;
             }
 
-            await updateExcursion({_id: excursion._id, ...excursionToUpdate});
+            await updateExcursion({_id: excursion._id, status: excursion.status, ...excursionToUpdate});
         } else {
             await addExcursion(excursion);
         }
@@ -254,38 +248,34 @@ const ExcursionStepper: React.FC = () => {
             properties: ['destinations'],
             label: 'Destinos',
             icon: <UserIcon className="max-w-[20px]"/>,
-            component: <OrganizationsDestinationsStep type="destinations" excursionData={excursion}
-                                                      updateExcursion={updateExcursionData}/>,
+            component: <OrganizationsDestinationsStep
+                type="destinations"
+                excursionData={excursion}
+                updateExcursion={updateExcursionData}/>,
         },
         {
-            properties: ['images', 'audios', 'videos'],
-            label: 'Media',
+            properties: ['images', 'audios', 'videos', 'flyer'],
+            label: 'Imagenes',
             type: 'images',
             icon: <UserIcon className="max-w-[20px]"/>,
             component: <MediaHandlerStep excursionData={excursion} updateExcursion={updateExcursionData}/>,
         },
         {
             properties: ['activities'],
-            label: 'Activities',
+            label: 'Actividades',
             type: 'activities',
             icon: <UserIcon className="max-w-[20px]"/>,
             component: <ActivitiesHandlerStep excursionData={excursion} updateExcursion={updateExcursionData}/>,
         },
         {
             properties: ['foods'],
-            label: 'Foods',
+            label: 'Comidas',
             icon: <UserIcon className="max-w-[20px]"/>,
             component: <FoodsHandlerStep excursionData={excursion} updateExcursion={updateExcursionData}/>,
         },
         {
-            properties: ['projections'],
-            label: 'Projections',
-            icon: <UserIcon className="max-w-[20px]"/>,
-            component: <ProjectHandlerStep excursionData={excursion} updateExcursion={updateExcursionData}/>,
-        },
-        {
             properties: ['transport'],
-            label: 'Transport',
+            label: 'Transporte',
             icon: <UserIcon className="max-w-[20px]"/>,
             component: <TransportHandlerStep excursionData={excursion} updateExcursion={updateExcursionData}/>,
         },
@@ -294,6 +284,12 @@ const ExcursionStepper: React.FC = () => {
             label: 'Finanzas',
             icon: <UserIcon className="max-w-[20px]"/>,
             component: <FinancesHandlerStep excursionData={excursion} updateExcursion={updateExcursionData}/>,
+        },
+        {
+            properties: ['projections'],
+            label: 'Proyecciones',
+            icon: <UserIcon className="max-w-[20px]"/>,
+            component: <ProjectHandlerStep excursionData={excursion} updateExcursion={updateExcursionData}/>,
         },
         {
             properties: [],
@@ -307,11 +303,40 @@ const ExcursionStepper: React.FC = () => {
         setCurrentStep(index);
     }
 
+    useEffect(() => {
+        if (
+            // excursion.organizations && excursion.organizations.length > 0 &&
+            // excursion.activities && excursion.activities.length > 0 &&
+            // excursion.foods && excursion.foods.length > 0 &&
+            // excursion.projections && excursion.projections.length > 0 &&
+            excursion.title, excursion.description && excursion.startDate && excursion.endDate &&
+            excursion.destinations && excursion.destinations.length > 0 &&
+            excursion.flyer &&
+            excursion.transport &&
+            excursion.finance
+        ) {
+            if (excursion.status !== 'completed') {
+                setExcursion({...excursion, status: ExcursionStatusEnum.COMPLETED});
+            }
+        } else {
+            console.log('draft')
+            if (excursion.status !== 'draft') {
+                setExcursion({...excursion, status: ExcursionStatusEnum.DRAFT});
+            }
+        }
+
+    }, [excursion]);
+
+    useEffect(() => {
+        console.log('excursionData =>', excursionData)
+        if (excursionData) setExcursion({...excursionData});
+    }, [excursionData]);
+
     return (
         <Card>
             <CardHeader>
                 <Typography variant="h1" className="p-2 text-center">
-                    Create Excursion
+                    {params.excursionId ? 'Editar' : 'Create'} Excursión
                 </Typography>
             </CardHeader>
             <CardBody>

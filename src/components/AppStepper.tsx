@@ -9,6 +9,8 @@ export interface AppStepperProps<T> {
 }
 
 export function AppStepper<T>({ steps, activeStep, onClickStep}: AppStepperProps<T> ) {
+    console.log('steps', steps)
+    if(steps.length === 0) return null;
     return (
         <>
             <Stepper activeStep={activeStep || 0} className="p-4 overflow-x-scroll h-[200px] w-[100%]">
@@ -29,7 +31,7 @@ export function AppStepper<T>({ steps, activeStep, onClickStep}: AppStepperProps
                 ))}
             </Stepper>
             <div className="app-stepper__content">
-                {steps[activeStep || 0].component}
+                {steps[activeStep || 0]?.component}
             </div>
         </>
     )

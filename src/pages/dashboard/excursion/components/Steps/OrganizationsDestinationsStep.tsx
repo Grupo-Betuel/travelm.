@@ -25,7 +25,7 @@ export const OrganizationsDestinationsStep = (
 
     useEffect(() => {
         setSelectedOrganizations(excursionData[type || 'organizations'] || []);
-    }, [excursionData])
+    }, [excursionData, type])
 
     return (
         <div>
