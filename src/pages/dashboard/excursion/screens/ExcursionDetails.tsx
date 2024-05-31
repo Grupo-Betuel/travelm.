@@ -5,7 +5,7 @@ import {StarIcon} from "@heroicons/react/24/solid";
 import {Swiper, SwiperSlide} from 'swiper/react';
 import {mockExcursion} from "../../../../data/excursions-mock-data";
 import {ExcursionDetailActions, ExcursionDetailActionsDataTypes, IExcursion} from "../../../../models/excursionModel";
-import {Navigation, Pagination} from "swiper/modules";
+import {EffectCoverflow, Navigation, Pagination} from "swiper/modules";
 import {ClientsExcursionTable} from "../components/ClientsExcursionTable";
 import {FinanceDetails} from "../components/FinanceDetail";
 import {ActivityDetails} from "../components/ActivityList";
@@ -25,7 +25,7 @@ import {CLIENTS_CONSTANTS} from "../../../../constants/clients.constant";
 import {IBedroom} from "../../../../models/bedroomModel";
 import {BedroomDetails} from "../components/BedroomsDetails";
 import Messaging from "../../../../components/WhatsappMessageHandler";
-import {UserRoleTypes, UserTypes} from "../../../../models/interfaces/user";
+import {UserRoleTypes, UserTypes} from "../../../../models/interfaces/userModel";
 import ProtectedElement from "../../../../components/ProtectedElement";
 import {IoReload} from "react-icons/io5";
 
@@ -178,17 +178,29 @@ export const ExcursionDetails: React.FC = () => {
     return (
         <div className="container mx-auto relative flex flex-col gap-7">
             <Swiper
-                cssMode
-                modules={[Navigation, Pagination]}
-                spaceBetween={10}
+                coverflowEffect={{
+                    rotate: 50,
+                    stretch: 0,
+                    // depth: 100,
+                    modifier: 1,
+                    slideShadows: false,
+                }}
+                autoplay={{delay: 3000}}
+                grabCursor
                 slidesPerView={3}
+                // spaceBetween={10}
+                effect={'coverflow'}
+                pagination
+                modules={[
+                    // Navigation,
+                    Pagination, EffectCoverflow]}
                 centeredSlides
-                navigation
-                pagination={{clickable: true}}
-                className="relative h-[300px] w-full"
+                // navigation
+                cssMode
+                className="relative h-[500px] w-full"
             >
                 {mediaItems.map((media, index) => (
-                    <SwiperSlide key={`slider-item-${index}`} className="!flex justify-center">
+                    <SwiperSlide key={`slider-item-${index}`} className=" py-5 !flex justify-center">
                         {renderMedia(media)}
                     </SwiperSlide>
                 ))}

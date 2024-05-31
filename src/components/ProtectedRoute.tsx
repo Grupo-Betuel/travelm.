@@ -1,6 +1,6 @@
 import React from 'react';
 import {Navigate} from 'react-router-dom';
-import {UserRoleTypes, UserTypes} from "../models/interfaces/user";
+import {UserRoleTypes, UserTypes} from "../models/interfaces/userModel";
 import {useCheckUserAuthorization} from "../hooks/useCheckUserAuthorization";
 
 interface ProtectedRouteProps {

@@ -1,10 +1,8 @@
-// ExcursionsList.tsx
 import React, {ChangeEvent, useEffect, useMemo, useState} from 'react';
 import {Link} from 'react-router-dom';
 import {Button, Card, CardBody, Dialog, Input, Option, Select, Typography} from "@material-tailwind/react";
 import {IExcursion} from "../../../../models/excursionModel";
-import {mockExcursion} from "../../../../data/excursions-mock-data";
-import {ArrowDownIcon, ArrowLeftIcon, ArrowRightIcon, ArrowUpIcon, HomeIcon} from "@heroicons/react/20/solid";
+import {ArrowDownIcon, ArrowLeftIcon, ArrowRightIcon, ArrowUpIcon, TrashIcon} from "@heroicons/react/20/solid";
 // @ts-ignore
 import StatisticsCard from "../../../../widgets/cards/statistics-card";
 import {BanknotesIcon} from "@heroicons/react/24/solid";
@@ -12,22 +10,11 @@ import {IClient} from "../../../../models/clientModel";
 import {getCrudService} from "../../../../api/services/CRUD.service";
 import {calculateExcursionsStatistics} from "../../../../utils/statistics.utils";
 import ProtectedElement from "../../../../components/ProtectedElement";
-import {UserRoleTypes} from "../../../../models/interfaces/user";
+import {UserRoleTypes, UserTypes} from "../../../../models/interfaces/userModel";
+import {CommonConfirmActions, CommonConfirmActionsDataTypes} from "../../../../models/common";
+import {useConfirmAction} from "../../../../hooks/useConfirmActionHook";
+import {AiFillEdit} from "react-icons/ai";
 
-// Assuming fetchExcursions is an API call to get excursions
-const fetchExcursions = async (): Promise<IExcursion[]> => {
-    // Placeholder function to mimic fetching data from an API
-    return [mockExcursion, {
-        ...mockExcursion,
-        _id: "333",
-        title: "Otra Excursion",
-        organizations: [{
-            ...mockExcursion.organizations[0],
-            name: 'Oasis de Amor'
-        }],
-        clients: mockExcursion.clients.map(item => ({...item, firstName: "Fabian"}))
-    }]; // Replace with actual API call
-};
 
 interface Filters {
     organization: string;
@@ -50,7 +37,6 @@ function ExcursionsList() {
     });
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage, setItemsPerPage] = useState(10); // Initial items per page
-
     const [statistics, setStatistics] = useState({
         totalClients: 0,
         totalBenefit: 0,
@@ -58,32 +44,37 @@ function ExcursionsList() {
         totalOrganizations: 0,
         averageSatisfaction: 0
     });
+    const [deleteExcursion, {isLoading: isDeleting}] = excursionService.useDeleteExcursions();
 
-    useEffect(() => {
-        // const stats = calculateExcursionsStatistics(excursions); // Assuming 'excursions' is the array you have
-        // setStatistics(stats);
-    }, [excursions]);
+    const onConfirmAction = (type?: CommonConfirmActions, data?: CommonConfirmActionsDataTypes<IExcursion>) => {
+        switch (type) {
+            case 'delete':
+                handleDeleteExcursion(data as IExcursion);
+                break;
+        }
+    }
 
+    const onDeniedAction = (type?: CommonConfirmActions, data?: CommonConfirmActionsDataTypes<IExcursion>) => {
 
-    // const [statistics, setStatistics] = useState({
-    //     totalClients: 0,
-    //     totalMoney: 0,
-    //     destinationsVisited: 0,
-    //     totalOrganizations: new Set<string>(),
-    //     totalTransportInvestment: 0
-    // });
+    }
+
+    const {
+        handleSetActionToConfirm,
+        resetActionToConfirm,
+        ConfirmDialog
+    } = useConfirmAction<CommonConfirmActions, CommonConfirmActionsDataTypes<IExcursion>>(onConfirmAction, onDeniedAction);
+
+    const handleDeleteExcursion = (excursion: IExcursion) => {
+        // Handle delete
+        excursion._id && deleteExcursion(excursion._id);
+        //TODO: toast
+    }
+
 
     const [sortConfig, setSortConfig] = useState<{
         key: keyof IExcursion;
         direction: 'ascending' | 'descending'
     } | null>(null);
-
-    // useEffect(() => {
-    //     fetchExcursions().then(data => {
-    //         setExcursions(data)
-    //         calculateStatistics(data);
-    //     });
-    // }, []);
 
     useEffect(() => {
         setExcursions(excursionsData || [])
@@ -122,14 +113,6 @@ function ExcursionsList() {
         });
     }, [excursions, sortConfig]);
 
-    // const filteredExcursions = useMemo(() => {
-    //     const searchLower = searchTerm.toLowerCase();
-    //     return sortedExcursions.filter(excursion => {
-    //         // Serialize each excursion object and perform a case-insensitive search
-    //         const excursionData = JSON.stringify(excursion).toLowerCase();
-    //         return excursionData.includes(searchLower);
-    //     });
-    // }, [sortedExcursions, searchTerm]);
 
     const filteredExcursions = useMemo(() => {
         const searchLower = searchTerm.toLowerCase();
@@ -155,36 +138,6 @@ function ExcursionsList() {
         setSelectedImage(imageUrl);
         setModalOpen(true);
     };
-
-
-    // const calculateStatistics = (data: IExcursion[]) => {
-    //     let totalClients = 0;
-    //     let totalMoney = 0;
-    //     let destinationsVisited = new Set();
-    //     let totalOrganizations = new Set();
-    //     let totalTransportInvestment = 0;
-    //
-    //     data.forEach(excursion => {
-    //         totalClients += excursion.clients.length;
-    //         // totalMoney += (excursion?.finance?.price || 0) * excursion.clients.length;
-    //         totalMoney += 0;
-    //         destinationsVisited.add(excursion.destinations);
-    //         totalOrganizations.add(excursion.organizations.map(item => item.name).join(', '))
-    //         totalTransportInvestment += excursion.transport?.finance?.price || 0;
-    //
-    //         excursion.transport?.buses?.forEach(bus => {
-    //             totalTransportInvestment += excursion.transport.finance.price * bus.capacity
-    //         });
-    //     });
-    //
-    //     setStatistics({
-    //         totalClients,
-    //         totalMoney,
-    //         destinationsVisited: destinationsVisited.size,
-    //         totalOrganizations: totalOrganizations as any,
-    //         totalTransportInvestment
-    //     });
-    // };
 
 
     const totalPages = useMemo(() => Math.ceil(filteredExcursions.length / itemsPerPage), [filteredExcursions, itemsPerPage]);
@@ -331,7 +284,7 @@ function ExcursionsList() {
                             <Option key={star} value={star.toString()}>{star} Stars</Option>
                         ))}
                     </Select>
-                    <ProtectedElement roles={[UserRoleTypes.ADMIN]}>
+                    <ProtectedElement roles={[UserRoleTypes.ADMIN]} userTypes={[UserTypes.AGENCY]}>
                         <Link to={"handler/"}>
                             <Button variant="text" color="blue" className="whitespace-nowrap">Crear Excursion</Button>
                         </Link>
@@ -361,8 +314,9 @@ function ExcursionsList() {
                     {excursionsToShow.map(excursion => (
                         <tr key={excursion._id}>
                             <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                <Link to={`/dashboard/excursions/${excursion._id}`}
-                                      className="whitespace-pre-line line-clamp-2 w-[150px]">{excursion.title}</Link>
+                                <Link
+                                    to={excursion.status === 'completed' ? `/dashboard/excursions/${excursion._id}` : `/dashboard/excursions/handler/${excursion._id}`}
+                                    className="whitespace-pre-line line-clamp-2 w-[150px]">{excursion.title || ' _'}</Link>
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                 {excursion.status}
@@ -386,27 +340,33 @@ function ExcursionsList() {
                                 {excursion.reviews.reduce((acc, review) => acc + review.stars, 0) / excursion.reviews.length || 0}
                             </td>
                             <td>
-                                <div className="flex items-center">
-                                    <Button
-                                        size="sm"
-                                        color="blue"
-                                        variant="text"
-                                        className="rounded-full"
-                                        ripple
-                                    >
-                                        Editar
-                                    </Button>
-                                    <Button
-                                        size="sm"
-                                        color="blue"
-                                        variant="text"
-                                        className="rounded-full"
-                                        ripple
-                                    >
-                                        Eliminar
-                                    </Button>
+                                <ProtectedElement roles={[UserRoleTypes.ADMIN]} userTypes={[UserTypes.AGENCY]}>
+                                    <div className="flex items-center">
+                                        <Link
+                                            to={`/dashboard/excursions/handler/${excursion._id}`}>
+                                            <Button
+                                                size="sm"
+                                                color="blue"
+                                                variant="text"
+                                                className="rounded-full"
+                                                ripple
+                                            >
+                                                <AiFillEdit className="w-[21px] h-[21px]"/>
+                                            </Button>
+                                        </Link>
+                                        <Button
+                                            size="sm"
+                                            color="red"
+                                            variant="text"
+                                            className="rounded-full"
+                                            onClick={() => handleSetActionToConfirm('delete', 'eliminar esta excursion')(excursion)}
+                                            ripple
+                                        >
+                                            <TrashIcon className="w-[21px] h-[21px]"/>
+                                        </Button>
 
-                                </div>
+                                    </div>
+                                </ProtectedElement>
                             </td>
                             {/*<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">*/}
                             {/*    <div className="flex items-center space-x-2">*/}
@@ -497,6 +457,7 @@ function ExcursionsList() {
                     </CardBody>
                 </Card>
             </Dialog>
+            <ConfirmDialog/>
         </div>
     );
 }

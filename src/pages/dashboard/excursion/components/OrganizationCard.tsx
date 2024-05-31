@@ -35,13 +35,13 @@ export const OrganizationCard: React.FC<OrganizationCardProps> = ({onEdit, organ
 
     return (
         <Card className={`${className} min-w-[250px]`}>
-            <CardHeader className="min-h-[150px]">
+            <CardHeader className="min-h-[100px]">
                 <Swiper
                     modules={[Navigation, Pagination]}
                     navigation
                     spaceBetween={5}
                     slidesPerView={1}
-                    className="text-xs custom-swiper relative max-h-[150px]"
+                    className="text-xs custom-swiper relative max-h-[100px]"
                 >
                     {organization?.medias?.map((media, index) => (
                         <SwiperSlide key={index}>

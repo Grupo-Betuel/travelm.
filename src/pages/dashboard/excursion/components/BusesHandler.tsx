@@ -2,7 +2,7 @@
 import React, {useState} from 'react';
 import {Button, Input, Card, CardBody} from '@material-tailwind/react';
 import {IBus} from "../../../../models/busesModel";
-import IUser from "../../../../models/interfaces/user";
+import IUser from "../../../../models/interfaces/userModel";
 import {IFinance} from "../../../../models/financeModel";
 import {FinanceHandler} from "./FinanceHandler";
 import InputMask from "react-input-mask";
@@ -18,17 +18,9 @@ interface BusHandlerProps {
 
 export const emptyBus: IBus = {
     model: '',
-    driver: {
-        firstName: '',
-        lastName: '',
-        email: '',
-        phone: '',
-        role: 'driver'
-    } as IUser, // Adjust according to the IUser interface
     capacity: 0,
     color: '',
     description: '',
-    finance: {price: 0, cost: 0, type: 'transport'} // Default finance data
 };
 
 const busesService = getCrudService('buses');
@@ -37,7 +29,6 @@ const BusHandler: React.FC<BusHandlerProps> = ({buses, updateBuses}) => {
     const [editingIndex, setEditingIndex] = useState<number | null>(null);
     const [updateBus, {isLoading: isUpdating}] = busesService.useUpdateBuses();
     const [deleteBusById, {isLoading: isDeleting}] = busesService.useDeleteBuses();
-
     const onConfirmAction = (type?: CommonConfirmActions, data?: CommonConfirmActionsDataTypes<IBus>) => {
         switch (type) {
             case 'delete':
@@ -121,26 +112,6 @@ const BusHandler: React.FC<BusHandlerProps> = ({buses, updateBuses}) => {
                        value={newBus.model}
                        name="model"
                        onChange={handleInputChange}/>
-                <Input type="text" label="Driver Name" value={newBus.driver.firstName}
-                       name={"driver.firstName"}
-                       onChange={handleInputChange}/>
-                <InputMask
-                    mask="+1 (999) 999-9999"
-                    type="tel"
-                    value={newBus.driver.phone}
-                    name="driver.phone"
-                    onChange={handleInputChange}
-                    maskPlaceholder={null} // This avoids showing underscores or other characters in unfocused state
-                    alwaysShowMask={false}
-                >
-                    {
-                        ((inputProps: any) => (
-                            <Input
-                                {...(inputProps as any)}
-                                type="text" label="Telefono del conductor"
-                            />
-                        ) as any) as any}
-                </InputMask>
                 <Input type="number" label="Capacity" value={newBus.capacity.toString()}
                        name="capacity"
                        onChange={handleInputChange}/>
@@ -150,25 +121,27 @@ const BusHandler: React.FC<BusHandlerProps> = ({buses, updateBuses}) => {
                 <Input type="text" label="Description" value={newBus.description}
                        name={"description"}
                        onChange={handleInputChange}/>
+
+                <Button color="blue" onClick={addBus}>{editingIndex !== null ? 'Save Changes' : 'Add Bus'}</Button>
             </div>
-            <FinanceHandler finance={newBus.finance} type="transport" updateFinance={handleFinanceChange}/>
-            <Button color="blue" onClick={addOrEditBus}>{editingIndex !== null ? 'Save Changes' : 'Add Bus'}</Button>
+            {/*<FinanceHandler finance={newBus.finance} type="transport" updateFinance={handleFinanceChange}/>*/}
+            {/*<Button color="blue" onClick={addOrEditBus}>{editingIndex !== null ? 'Save Changes' : 'Add Bus'}</Button>*/}
             <div className="grid grid-cols-3 gap-4">
                 {buses.map((bus, index) => (
                     <Card key={index} className="p-4 my-2 flex">
                         <p>Model: {bus.model}</p>
-                        <p>Driver: {bus.driver.firstName}</p>
                         <p>Capacity: {bus.capacity}</p>
                         <p>Color: {bus.color}</p>
                         <p>Description: {bus.description}</p>
-                        {bus.finance?.cost ? <p>Cost: {bus.finance.cost}</p> : null}
-                        <p>Price: RD${bus.finance?.price?.toLocaleString()}</p>
+                        {/*{bus.finance?.cost ? <p>Cost: {bus.finance.cost}</p> : null}*/}
+                        {/*<p>Price: RD${bus.finance?.price?.toLocaleString()}</p>*/}
                         <Button variant="text" color="green" onClick={() => startEditing(index)}>Edit</Button>
                         <Button variant="text" color="red"
                                 onClick={() => handleSetActionToConfirm('delete', 'Eliminar Bus')(bus)}>Delete</Button>
                     </Card>
                 ))}
             </div>
+
             <ConfirmDialog/>
 
         </div>

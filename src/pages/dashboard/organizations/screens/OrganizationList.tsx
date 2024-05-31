@@ -4,7 +4,7 @@ import {useOrganizationHandler} from "../../../../hooks/useOrganizationHandler";
 import {IOrganization} from "../../../../models/organizationModel";
 import {IoReload} from "react-icons/io5";
 import ProtectedElement from "../../../../components/ProtectedElement";
-import {UserRoleTypes} from "../../../../models/interfaces/user";
+import {UserRoleTypes} from "../../../../models/interfaces/userModel";
 
 export const OrganizationList: React.FC = () => {
     const {

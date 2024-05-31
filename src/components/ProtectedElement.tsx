@@ -1,5 +1,5 @@
 import React from 'react';
-import {UserRoleTypes, UserTypes} from "../models/interfaces/user";
+import {UserRoleTypes, UserTypes} from "../models/interfaces/userModel";
 import {useCheckUserAuthorization} from "../hooks/useCheckUserAuthorization";
 
 interface ProtectedElementProps {

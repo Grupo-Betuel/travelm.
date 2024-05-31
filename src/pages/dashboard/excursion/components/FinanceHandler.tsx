@@ -13,7 +13,7 @@ export const FinanceHandler = (
     {
         finance,
         updateFinance,
-        type,
+        type: financeType,
         enabledCost
     }: IFinanceProps) => {
 
@@ -25,7 +25,7 @@ export const FinanceHandler = (
         }
         updateFinance({
             ...finance,
-            type: type || finance.type,
+            type: financeType || finance.type,
             [name]: value,
         });
     }
@@ -35,27 +35,29 @@ export const FinanceHandler = (
     }, [enabledCost])
 
     useEffect(() => {
-        if (type) {
-            updateFinance({...finance, type})
+        if (financeType) {
+            updateFinance({...finance, type: financeType})
         }
-    }, [type])
+    }, [financeType])
 
 
     return (
         <div className="flex flex-col gap-5">
-            <div className="flex w-100 justify-between">
-                <span></span>
-                <Button onClick={toggleCost}
-                        color={enableCost ? 'red' : 'green'}>{enableCost ? 'Quitar Costo' : 'Agregar Costo'}</Button>
+            <div className="flex w-100 justify-between gap-3">
+                <Input
+                    type="number"
+                    label="Price"
+                    name="price"
+                    value={finance?.price || ''}
+                    onChange={handleOnChangeFinance}
+                    className="mb-4"
+                />
+                <Button
+                    className={"whitespace-nowrap"}
+                    onClick={toggleCost}
+                    color={enableCost ? 'red' : 'green'}>
+                    {enableCost ? 'Quitar Costo' : 'Agregar Costo'}</Button>
             </div>
-            <Input
-                type="number"
-                label="Price"
-                name="price"
-                value={finance?.price || ''}
-                onChange={handleOnChangeFinance}
-                className="mb-4"
-            />
             {enableCost && <Input
                 type="number"
                 label="Cost"
@@ -64,21 +66,18 @@ export const FinanceHandler = (
                 onChange={handleOnChangeFinance}
                 className="mb-4"
             />}
-            <Select
+            {!financeType && <Select
                 label="Type"
                 name="type"
-                disabled={!!type}
-                value={type || finance?.type}
+                disabled={!!financeType}
+                value={financeType || finance?.type}
                 onChange={(value) => updateFinance({...finance, type: value as FinanceTypes})}
                 className="mb-4"
             >
                 {financeTypes.map((type) => (
                     <Option key={type} value={type}>{type}</Option>
                 ))}
-                {/*<Option value="desert">Desert</Option>*/}
-                {/*<Option value="lunch">Lunch</Option>*/}
-                {/*<Option value="snack">Snack</Option>*/}
-            </Select>
+            </Select>}
         </div>
     )
 }

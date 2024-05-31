@@ -28,7 +28,7 @@ import {IWsGroup, IWsLabel, WhatsappGroupActionTypes, whatsappSessionKeys} from 
 import SearchableSelect from "../../../../components/SearchableSelect";
 import {IoReload} from "react-icons/io5";
 import useWhatsapp from "../../../../hooks/UseWhatsapp";
-import {UserRoleTypes, UserTypes} from "../../../../models/interfaces/user";
+import {UserRoleTypes, UserTypes} from "../../../../models/interfaces/userModel";
 import ProtectedElement from "../../../../components/ProtectedElement";
 
 export interface IUpdateClientExtra extends IConfirmActionExtraParams {

@@ -6,8 +6,19 @@ import {BaseModel} from "./interfaces/BaseModel";
 import {IBedroom} from "./bedroomModel";
 import {IFinance} from "./financeModel";
 
+export enum OrganizationTypesEnum {
+
+    CHURCH = 'church',
+    COMPANY = 'company',
+    TRANSPORT = 'transport',
+    RESTAURANT = 'restaurant',
+    HOTEL = 'hotel',
+    TOURIST_SPOT = 'tourist-spot',
+    AGENCY = 'agency',
+}
+
 export interface IOrganization extends BaseModel {
-    type: 'church' | 'company' | 'transport' | 'restaurant' | 'hotel' | 'tourist-spot' | 'agency';
+    type: OrganizationTypesEnum;
     name: string;
     email: string;
     description: string;
@@ -20,3 +31,14 @@ export interface IOrganization extends BaseModel {
     entryFee?: IFinance;
     sessionId: string;
 }
+
+
+export const organizationTypeList: OrganizationTypesEnum[] = [
+    OrganizationTypesEnum.CHURCH,
+    OrganizationTypesEnum.COMPANY,
+    OrganizationTypesEnum.TRANSPORT,
+    OrganizationTypesEnum.RESTAURANT,
+    OrganizationTypesEnum.HOTEL,
+    OrganizationTypesEnum.TOURIST_SPOT,
+    OrganizationTypesEnum.AGENCY,
+]

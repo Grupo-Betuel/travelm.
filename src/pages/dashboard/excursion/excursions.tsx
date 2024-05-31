@@ -4,7 +4,7 @@ import ExcursionsList from "./screens/ExcursionList";
 import {ExcursionDetails} from "./screens/ExcursionDetails";
 import ExcursionStepper from "./screens/ExcursionStepper";
 import ProtectedRoute from "../../../components/ProtectedRoute";
-import {UserRoleTypes} from "../../../models/interfaces/user";
+import {UserRoleTypes, UserTypes} from "../../../models/interfaces/userModel";
 
 function Excursions() {
 
@@ -15,13 +15,16 @@ function Excursions() {
                 <Route path="/:excursionId" element={<ExcursionDetails/>}/>
 
                 <Route path="/handler" element={
-                    // <ProtectedRoute roles={[UserRoleTypes.ADMIN]}>
+                    <ProtectedRoute roles={[UserRoleTypes.ADMIN]} userTypes={[UserTypes.AGENCY]}>
                         <ExcursionStepper/>
-                    // </ProtectedRoute>
+                    </ProtectedRoute>
                 }/>
 
-                <Route path="/handler/:excursionId" element={<ExcursionStepper/>}/>
-                {/*<Route path="organization/:organizationId" element={<OrganizationDetail />} />*/}
+                <Route path="/handler/:excursionId" element={
+                    <ProtectedRoute roles={[UserRoleTypes.ADMIN]} userTypes={[UserTypes.AGENCY]}>
+                        <ExcursionStepper/>
+                    </ProtectedRoute>
+                }/>
             </Routes>
         </div>
     );

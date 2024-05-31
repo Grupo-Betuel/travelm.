@@ -15,6 +15,7 @@ interface SearchableSelectProps<T> {
     multiple?: boolean;
     onSelect?: ((selectedValues: string[], selectedItem: string) => void) | ((selectedValues: T[], selectedItem: T) => void);
     selectedValues?: string[] | T[];
+    className?: string;
 }
 
 function SearchableSelect<T>(
@@ -26,6 +27,7 @@ function SearchableSelect<T>(
         onSelect,
         selectedValues,
         displayProperty,
+        className,
     }: SearchableSelectProps<T>) {
     const [searchTerm, setSearchTerm] = useState<string>('');
     const [filteredOptions, setFilteredOptions] = useState<(IOption | T)[]>(options);
@@ -89,7 +91,7 @@ function SearchableSelect<T>(
 
 
     return (
-        <div ref={ref} onBlur={handleBlur} className="p-4 w-100">
+        <div ref={ref} onBlur={handleBlur} className={`${className || ''} w-100`}>
             <Input
                 disabled={disabled}
                 label={label}

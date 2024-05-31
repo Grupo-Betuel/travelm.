@@ -3,7 +3,7 @@ import Cookies from 'js-cookie';
 import {jwtDecode} from 'jwt-decode';
 import {AUTH_CONSTANT} from "../constants/auth.constant";
 import {useNavigate} from "react-router-dom";
-import IUser from "../models/interfaces/user";
+import IUser from "../models/interfaces/userModel";
 
 interface AuthContextProps {
     user: IUser | null;

@@ -1,5 +1,5 @@
 import {useMemo} from "react";
-import IUser, {UserRoleTypes, UserTypes} from "../models/interfaces/user";
+import IUser, {UserRoleTypes, UserTypes} from "../models/interfaces/userModel";
 import {useAuth} from "../context/authContext";
 
 export interface IUseCheckUserAuthorization {

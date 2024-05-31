@@ -26,8 +26,6 @@ import {IMediaFile} from "../../../../models/mediaModel";
 import FinancesHandlerStep from "../components/Steps/FinancesHandlerStep";
 import {IStep} from "../../../../models/common";
 import {AppStepper} from "../../../../components/AppStepper";
-import {useCheckUserAuthorization} from "../../../../hooks/useCheckUserAuthorization";
-import {useAuth} from "../../../../context/authContext";
 
 
 const excursionService = getCrudService("excursions");
@@ -52,8 +50,6 @@ const ExcursionStepper: React.FC = () => {
     } = excursionService.useFetchByIdExcursions(params.excursionId as string, {skip: !params.excursionId});
     const navigate = useNavigate();
     const {uploadSingleMedia, uploadMultipleMedias} = useGCloudMediaHandler();
-    const {user} = useAuth();
-
     useEffect(() => {
         if (currentStep !== 0 && !currentStep) return;
         const key = `${EXCURSION_CONSTANTS.CURRENT_STEP_STORE_KEY}::${params.excursionId || 'new'}`;
@@ -152,12 +148,10 @@ const ExcursionStepper: React.FC = () => {
             if (media.type === 'image') {
                 imageFiles.push({
                     ...media,
-                    owner: user?.organization || media.owner,
                 });
             } else if (media.type === 'audio') {
                 audioFiles.push({
                     ...media,
-                    owner: user?.organization || media.owner,
                 });
             }
         });
@@ -172,7 +166,6 @@ const ExcursionStepper: React.FC = () => {
             const newFlyerData = flyer || excursionData.flyer || {};
             excursionData.flyer = {
                 ...newFlyerData,
-                owner: user?.organization || flyer?.owner,
             };
         }
 

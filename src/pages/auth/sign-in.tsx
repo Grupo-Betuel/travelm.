@@ -6,7 +6,7 @@ import {
 } from "@material-tailwind/react";
 import {Link} from "react-router-dom";
 import React, {useState} from "react";
-import IUser from "../../models/interfaces/user";
+import IUser from "../../models/interfaces/userModel";
 import {useLogin} from "../../context/useLogin";
 
 export function SignIn() {

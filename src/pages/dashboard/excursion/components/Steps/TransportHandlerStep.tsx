@@ -1,25 +1,21 @@
 import React from "react";
 import OrganizationHandler from "../OrganizationHandler";
 import {IExcursion} from "../../../../../models/excursionModel";
-import {OrganizationCard} from "../OrganizationCard";
-import {IOrganization} from "../../../../../models/organizationModel";
-import {FinanceHandler} from "../FinanceHandler";
-import {IFinance} from "../../../../../models/financeModel";
-import BusHandler from "../BusesHandler";
-import {IBus} from "../../../../../models/busesModel";
+import {IOrganization, OrganizationTypesEnum} from "../../../../../models/organizationModel";
+import TransportResourceHandler from "../TransportResourceHandler";
+import {ITransportResource} from "../../../../../models/transportResourcesModel";
 
 export interface ITransportHandlerStepProps {
     excursionData: IExcursion;
     updateExcursion: (excursion: Partial<IExcursion>) => void;
 }
 
-export const TransportHandlerStep = ({
-                                         excursionData,
-                                         updateExcursion,
-                                     }: ITransportHandlerStepProps) => {
-    const [selectedOrganizations, setSelectedOrganizations] = React.useState<IOrganization[]>([]);
+export const TransportHandlerStep = (
+    {
+        excursionData,
+        updateExcursion,
+    }: ITransportHandlerStepProps) => {
     const onSelectOrganization = (organizations: IOrganization[]) => {
-        setSelectedOrganizations(organizations);
         updateExcursion({
             transport: {
                 ...excursionData.transport,
@@ -28,37 +24,24 @@ export const TransportHandlerStep = ({
         });
     }
 
-    // const handleTransportFinance = (finance: IFinance) => {
-    //     updateExcursion({
-    //         transport: {
-    //             ...excursionData?.transport,
-    //             finance
-    //         }
-    //     });
-    // }
-
-    const handleUpdateBuses = (buses: IBus[]) => updateExcursion({ transport: { ...excursionData.transport, buses }})
+    const handleUpdateTransportResources = (transportResources: ITransportResource[]) => updateExcursion({
+        transport: {
+            ...excursionData.transport,
+            transportResources
+        }
+    })
 
     return (
         <div>
             <h1>Transport Organization</h1>
-            <OrganizationHandler onSelect={onSelectOrganization}/>
-            {
-                excursionData?.transport?.organization &&
-                <div className="flex justify-around gap-3 !overflow-x-scroll p-4 py-10 h-[400px]">
-                    <OrganizationCard
-                        className={`min-w-[450px]`}
-                        organization={excursionData.transport.organization}
-                    />
-                </div>
-            }
-            <BusHandler
-                buses={excursionData.transport?.buses || []}
-                updateBuses={handleUpdateBuses}
+            <OrganizationHandler
+                isMultiple={false}
+                organizationType={OrganizationTypesEnum.TRANSPORT}
+                onSelect={onSelectOrganization}
+                selected={excursionData.transport?.organization ? [excursionData.transport?.organization] : []}
             />
+            <TransportResourceHandler transportResources={excursionData.transport?.transportResources || []}
+                                      updateTransportResources={handleUpdateTransportResources}/>
         </div>
     );
 }
-
-// <h2>Transport Finance</h2>
-// <FinanceHandler finance={excursionData?.transport?.finance} updateFinance={handleTransportFinance}/>

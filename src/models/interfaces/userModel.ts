@@ -2,18 +2,19 @@ import {BaseModel} from "./BaseModel";
 
 export enum UserRoleTypes {
     ADMIN = 'admin',
-    EMPLOYEE = 'employee'
+    EMPLOYEE = 'employee',
 }
 
 export enum UserTypes {
     ORGANIZATION = 'organization',
-    AGENCY = 'agency'
+    AGENCY = 'agency',
+    DRIVER = 'driver'
 }
 
 export default interface IUser extends BaseModel {
     username?: string;
     firstName: string;
-    lastName: string;
+    lastName?: string;
     password?: string;
     phone: string;
     email?: string;

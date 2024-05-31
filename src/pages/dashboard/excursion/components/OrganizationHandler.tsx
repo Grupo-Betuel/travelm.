@@ -3,7 +3,7 @@ import {
     Button,
 } from "@material-tailwind/react";
 
-import {IOrganization} from "../../../../models/organizationModel";
+import {IOrganization, OrganizationTypesEnum} from "../../../../models/organizationModel";
 import SearchableSelect from "../../../../components/SearchableSelect";
 import {OrganizationCard} from "./OrganizationCard";
 import {useOrganizationHandler} from "../../../../hooks/useOrganizationHandler";
@@ -12,13 +12,15 @@ export interface IOrganizationSelectorProps {
     onSelect: (selected: IOrganization[]) => void;
     selected?: IOrganization[];
     isMultiple?: boolean;
+    organizationType?: OrganizationTypesEnum;
 }
 
 const OrganizationHandler: React.FC<IOrganizationSelectorProps> = (
     {
         onSelect,
         isMultiple,
-        selected
+        selected,
+        organizationType,
     }) => {
 
     const {
@@ -29,7 +31,7 @@ const OrganizationHandler: React.FC<IOrganizationSelectorProps> = (
         setHandleOrganizationOpen,
         onEditOrganization,
     } = useOrganizationHandler({
-        onSelect, selected
+        onSelect, selected, type: organizationType,
     });
 
     const handleOnSelectOrganization = (selectedValues: IOrganization[]) => {

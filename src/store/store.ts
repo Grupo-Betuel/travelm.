@@ -20,7 +20,8 @@ import {IService} from "../models/serviceModel";
 import {IPayment} from "../models/PaymentModel";
 import {IMedia} from "../models/mediaModel";
 import {IClient} from "../models/clientModel";
-import IUser from "../models/interfaces/user";
+import IUser from "../models/interfaces/userModel";
+import {ITransportResource} from "../models/transportResourcesModel";
 
 export const EntityApiStores: EntityStores = {
     contacts: createEntityApiSlice<IContact & BaseModel>('contacts'),
@@ -41,6 +42,7 @@ export const EntityApiStores: EntityStores = {
     medias: createEntityApiSlice<IMedia & BaseModel>('medias'),
     travelClients: createEntityApiSlice<IClient & BaseModel>('travelClients'),
     travelUsers: createEntityApiSlice<IUser & BaseModel>('travelUsers'),
+    transportResources: createEntityApiSlice<ITransportResource & BaseModel>('transportResources'),
 }
 
 const storeReducer: any = {};

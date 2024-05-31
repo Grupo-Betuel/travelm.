@@ -7,7 +7,7 @@ import {
 import {Link} from "react-router-dom";
 import React, {useMemo} from "react";
 import {getCrudService} from "../../api/services/CRUD.service";
-import IUser from "../../models/interfaces/user";
+import IUser from "../../models/interfaces/userModel";
 import {IOrganization} from "../../models/organizationModel";
 import {useLogin} from "../../context/useLogin";
 

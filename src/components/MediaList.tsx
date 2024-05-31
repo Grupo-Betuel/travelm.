@@ -9,7 +9,7 @@ import {TrashIcon} from "@heroicons/react/20/solid";
 import {CommonConfirmActions} from "../models/common";
 import {useGCloudMediaHandler} from "../hooks/useGCloudMedediaHandler";
 import {IoReload} from "react-icons/io5";
-import {CustomImage} from "./CustomImage";
+import {AppImage} from "./AppImage";
 
 export interface MediaListProps {
     multiple?: boolean;
@@ -55,6 +55,7 @@ export const MediaList: React.FC<MediaListProps> = ({onSelect, multiple, mediaTy
     }, [mediaByTypeData]);
 
     const handleSelect = (media: IMedia) => {
+        console.log('klk')
         let updatedSelectedMedias: IMedia[];
 
         if (multiple) {
@@ -128,7 +129,7 @@ export const MediaList: React.FC<MediaListProps> = ({onSelect, multiple, mediaTy
                             {medias.map((media) => (
                                 <div
                                     key={media._id}
-                                    className={`p-2 border rounded-xl cursor-pointer relative bg-gray-50 ${selectedMedias.includes(media) ? "bg-blue-100" : ""}`}
+                                    className={`p-2 border rounded-xl cursor-pointer relative bg-gray-50 ${selectedMedias.includes(media) ? "!bg-blue-200" : ""}`}
                                     onClick={() => handleSelect(media)}
                                 >
                                     {renderMedia(media)}

@@ -13,6 +13,7 @@ interface FinancesStepProps {
 
 const FinancesHandlerStep: React.FC<FinancesStepProps> = ({excursionData, updateExcursion}) => {
     const onUpdateFinances = (finance: IFinance) => {
+        console.log('ffff=>',finance);
         updateExcursion({finance});
     }
 
@@ -30,8 +31,8 @@ const FinancesHandlerStep: React.FC<FinancesStepProps> = ({excursionData, update
     }, [excursionData.destinations]);
 
     const transportPrice = useMemo(() => {
-        const busesQuantity = excursionData.transport?.buses?.length || 0;
-        const busesPrices = excursionData?.transport?.buses?.reduce((a,b) => ((b?.finance?.price || 0) / b.capacity) + a, 0);
+        const busesQuantity = excursionData.transport?.transportResources?.length || 0;
+        const busesPrices = excursionData?.transport?.transportResources?.reduce((a, b) => ((b?.finance?.price || 0) / b.bus.capacity) + a, 0);
         return Math.ceil(busesPrices / busesQuantity);
 
     }, [excursionData.transport]);
@@ -50,7 +51,8 @@ const FinancesHandlerStep: React.FC<FinancesStepProps> = ({excursionData, update
                 enabledCost={true}
                 finance={excursionData.finance}
                 updateFinance={onUpdateFinances}
-                type="excursion"/>
+                type="excursion"
+            />
             <Typography variant="h5" color="blue" className="p-4 text-center">Transporte: RD${transportPrice.toLocaleString()}</Typography>
             <Typography variant="h5" color="blue" className="p-4 text-center">Precio de Destino: RD${destinationsPrice.toLocaleString()}</Typography>
             <Typography variant="h5" color="blue" className="p-4 text-center">Precio de Comida: RD${foodPrice.toLocaleString()}</Typography>

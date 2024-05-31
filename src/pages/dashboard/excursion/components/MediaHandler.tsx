@@ -9,9 +9,10 @@ import {useConfirmAction} from "../../../../hooks/useConfirmActionHook";
 import {CommonConfirmActions, CommonConfirmActionsDataTypes} from "../../../../models/common";
 import {getCrudService} from "../../../../api/services/CRUD.service";
 import {useGCloudMediaHandler} from "../../../../hooks/useGCloudMedediaHandler";
-import {CustomImage} from "../../../../components/CustomImage";
+import {AppImage} from "../../../../components/AppImage";
 import {FaSearch, FaUpload} from "react-icons/fa";
 import {MediaList} from "../../../../components/MediaList";
+import {useAuth} from "../../../../context/authContext";
 
 
 const renderMediaPreview = (media: IMediaFile): JSX.Element => {
@@ -21,7 +22,7 @@ const renderMediaPreview = (media: IMediaFile): JSX.Element => {
         case 'image':
             // @ts-ignore
             // return <img src={media.content} alt={media.name} className="max-w-full h-auto"/>;
-            return <CustomImage
+            return <AppImage
                 src={media.content}
                 alt={media.title}
                 caption={{
@@ -68,7 +69,7 @@ const MediaHandler = ({onChange, medias, flyerData, handle}: IHandleMediaFormPro
     const [audios, setAudios] = useState<IMediaFile[]>([]);
     const [deleteMedia] = mediasService.useDeleteMedias();
     const {deleteImage} = useGCloudMediaHandler();
-
+    const {user} = useAuth()
     useEffect(() => {
         if (flyerData) {
             setFlyer(flyerData);
@@ -122,10 +123,10 @@ const MediaHandler = ({onChange, medias, flyerData, handle}: IHandleMediaFormPro
     const handleImagesChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         if (event.target.files) {
             const imagesMedias: IMediaFile[] = Array.from(event.target.files).map(file => ({
-                type: 'image',
-                // @ts-ignore
+                type: MediaTypeEnum.IMAGE,
                 content: URL.createObjectURL(file),
                 title: file?.name || 'No title',
+                owner: user?.organization,
                 file,
             }));
 
@@ -140,7 +141,8 @@ const MediaHandler = ({onChange, medias, flyerData, handle}: IHandleMediaFormPro
             const flyerMedia: IMediaFile = {
                 content: URL.createObjectURL(file),
                 title: file?.name || 'No title',
-                type: 'image',
+                owner: user?.organization,
+                type: MediaTypeEnum.IMAGE,
                 file,
             };
 
@@ -151,9 +153,9 @@ const MediaHandler = ({onChange, medias, flyerData, handle}: IHandleMediaFormPro
     const handleVideosChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         if (event.target.files) {
             const videosMedias: IMediaFile[] = Array.from(event.target.files).map(file => ({
-                type: 'video',
-                // @ts-ignore
+                type: MediaTypeEnum.VIDEO,
                 content: URL.createObjectURL(file),
+                owner: user?.organization,
                 title: file?.name || 'No title',
                 file,
             }));
@@ -164,9 +166,9 @@ const MediaHandler = ({onChange, medias, flyerData, handle}: IHandleMediaFormPro
     const handleAudiosChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         if (event.target.files) {
             const audiosMedias: IMediaFile[] = Array.from(event.target.files).map(file => ({
-                type: 'audio',
-                // @ts-ignore
+                type: MediaTypeEnum.AUDIO,
                 content: URL.createObjectURL(file),
+                owner: user?.organization,
                 title: file?.name || 'No title',
                 file,
             }));

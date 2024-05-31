@@ -1,10 +1,12 @@
 import {
-    Avatar, Button,
+    Avatar,
+    Button,
     Dialog,
-    DialogBody, DialogFooter,
+    DialogBody,
+    DialogFooter,
     DialogHeader,
     IconButton,
-    Input,
+    Input, Option, Select,
     Textarea,
     Typography
 } from "@material-tailwind/react";
@@ -13,17 +15,18 @@ import MediaHandler, {IMediaHandled} from "./MediaHandler";
 import MapPicker from "../../../../components/MapPicker";
 import BedroomsHandler from "./BedroomssHandler";
 import {FinanceHandler} from "./FinanceHandler";
-import {IFinance} from "../../../../models/financeModel";
+import {financeTypes, FinanceTypes, IFinance} from "../../../../models/financeModel";
 import React, {useEffect, useMemo, useState} from "react";
 import {useGCloudMediaHandler} from "../../../../hooks/useGCloudMedediaHandler";
-import {IOrganization} from "../../../../models/organizationModel";
+import {IOrganization, organizationTypeList} from "../../../../models/organizationModel";
 import {ILocation} from "../../../../models/ordersModels";
 import {IMediaFile} from "../../../../models/mediaModel";
 import {IBedroom} from "../../../../models/bedroomModel";
 import {ICustomComponentDialog, IPathDataParam} from "../../../../models/common";
 import {getCrudService} from "../../../../api/services/CRUD.service";
 import UserForm from "../../users/components/UserForm";
-import IUser from "../../../../models/interfaces/user";
+import IUser, {UserRoleTypes, UserTypes} from "../../../../models/interfaces/userModel";
+import {useAuth} from "../../../../context/authContext";
 
 export interface OrganizationHandlerProps {
     dialog?: ICustomComponentDialog;
@@ -69,7 +72,7 @@ export const OrganizationForm: React.FC<OrganizationHandlerProps> = (
     const [isOrganizationUserDialogOpen, setIsOrganizationUserDialogOpen] = useState(false);
     const [addUser] = userService.useAddTravelUsers();
     const [updateUser] = userService.useUpdateTravelUsers();
-
+    const {user} = useAuth()
     const [organizationUser, setOrganizationUser] = useState<IUser>()
 
     useEffect(() => {
@@ -104,7 +107,9 @@ export const OrganizationForm: React.FC<OrganizationHandlerProps> = (
             content: URL.createObjectURL(file),
             type: 'image',
             title: organization.name || 'No title',
+            owner: user?.organization,
             file,
+
         };
 
         setOrganization((prevFormData) => ({
@@ -163,6 +168,7 @@ export const OrganizationForm: React.FC<OrganizationHandlerProps> = (
     }
 
     const handleEntryFee = (fee: IFinance) => {
+        if (!fee.price) return;
         setOrganization({
             ...organization,
             entryFee: fee,
@@ -186,8 +192,8 @@ export const OrganizationForm: React.FC<OrganizationHandlerProps> = (
         const userData: IUser & IPathDataParam = {
             ...user,
             organization: organization._id as string,
-            type: 'organization',
-            role: 'admin',
+            type: UserTypes.ORGANIZATION,
+            role: UserRoleTypes.ADMIN,
             path: 'register'
         }
 
@@ -228,10 +234,21 @@ export const OrganizationForm: React.FC<OrganizationHandlerProps> = (
                        onChange={(e: any) => handleLogoChange(e.target.files?.[0])}/>
             </div>
             <Input label="Name" name="name" value={organization.name} onChange={handleInputChange}/>
+            <Select
+                label="Type"
+                name="type"
+                value={organization.type}
+                onChange={(value) => handleInputChange({target: {value: value, name: 'type'}} as any)}
+                className="mb-4"
+            >
+                {organizationTypeList.map((type) => (
+                    <Option key={type} value={type}>{type}</Option>
+                ))}
+            </Select>
             <Textarea label="Description" name="description" value={organization.description}
                       onChange={handleInputChange}/>
             <SocialNetworkForm onChange={handleSocialNetworksChange}/>
-            <MediaHandler handle={{ images: true }} onChange={onChangeMedia} medias={organization.medias}/>
+            <MediaHandler handle={{images: true}} onChange={onChangeMedia} medias={organization.medias}/>
             <MapPicker onLocationSelect={handleLocationChange}/>
             <BedroomsHandler bedrooms={organization.bedrooms} updateBedrooms={handleBedrooms}/>
             <FinanceHandler finance={organization.entryFee || {} as IFinance} updateFinance={handleEntryFee}/>

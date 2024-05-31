@@ -19,7 +19,8 @@ import {Api} from "@reduxjs/toolkit/query";
 import {CreateApi} from "@reduxjs/toolkit/src/query/createApi";
 import createEntityApiSlice from "../api/entityApiSlice";
 import {IClient} from "./clientModel";
-import IUser from "./interfaces/user";
+import IUser from "./interfaces/userModel";
+import {ITransportResource} from "./transportResourcesModel";
 
 export type EntityModels = {
     finances: IFinance,
@@ -40,6 +41,7 @@ export type EntityModels = {
     medias: IMedia,
     travelClients: IClient,
     travelUsers: IUser,
+    transportResources: ITransportResource,
 }
 
 export type EntityNames = keyof EntityModels;

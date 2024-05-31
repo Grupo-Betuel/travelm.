@@ -1,7 +1,7 @@
 import React from "react";
 import Cookies from "js-cookie";
 import {getCrudService} from "../api/services/CRUD.service";
-import IUser from "../models/interfaces/user";
+import IUser from "../models/interfaces/userModel";
 import {useNavigate} from "react-router-dom";
 import {AUTH_CONSTANT} from "../constants/auth.constant";
 

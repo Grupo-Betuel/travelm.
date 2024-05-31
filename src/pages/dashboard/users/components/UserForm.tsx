@@ -3,7 +3,7 @@ import {Input, Button, Dialog, DialogHeader, DialogBody, DialogFooter, Select, O
 import InputMask from "react-input-mask";
 import {getCrudService} from "../../../../api/services/CRUD.service";
 import {ICustomComponentDialog} from "../../../../models/common";
-import IUser, {UserRoleTypes} from "../../../../models/interfaces/user";
+import IUser, {UserRoleTypes} from "../../../../models/interfaces/userModel";
 
 interface UserFormProps {
     initialUser?: IUser;
@@ -32,7 +32,6 @@ const UserForm: React.FC<UserFormProps> = ({initialUser, role, onSubmit, dialog}
 
     const {data: existingUsers} = userService.useFetchAllTravelUsers({phone: user?.phone}, {skip: (user?.phone?.length || 0) < 11});
 
-    console.log('user?.phone?.length', user?.phone?.length, existingUsers)
     const handleChange = ({target: {value, name, type}}: React.ChangeEvent<HTMLInputElement>) => {
         if (type === 'tel') {
             value = value.replace(/[^0-9]/g, '');
@@ -57,7 +56,7 @@ const UserForm: React.FC<UserFormProps> = ({initialUser, role, onSubmit, dialog}
             const foundUser = existingUsers[0];
             foundUser && setUser(foundUser);
         } else if (user.phone?.length === 11) {
-            setUser({...emptyUser, phone: user.phone});
+            setUser({...emptyUser, _id: undefined, phone: user.phone});
         }
     }, [existingUsers, user.phone]);
 

@@ -1,9 +1,7 @@
 import {IOrganization} from "./organizationModel";
-import {IBus} from "./busesModel";
-import {IFinance} from "./financeModel";
+import {ITransportResource} from "./transportResourcesModel";
 
 export interface ITransport {
-    // finance: IFinance;
     organization: IOrganization;
-    buses: IBus[];
+    transportResources: ITransportResource[];
 }

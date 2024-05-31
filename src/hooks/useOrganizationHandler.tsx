@@ -1,4 +1,4 @@
-import {IOrganization} from "../models/organizationModel";
+import {IOrganization, OrganizationTypesEnum} from "../models/organizationModel";
 import {IMedia, IMediaFile} from "../models/mediaModel";
 import {useGCloudMediaHandler} from "./useGCloudMedediaHandler";
 import React, {useEffect, useState} from "react";
@@ -8,11 +8,12 @@ import {OrganizationForm} from "../pages/dashboard/excursion/components/Organiza
 export interface IOrganizationHandlerProps {
     onSelect?: (selected: IOrganization[]) => void;
     selected?: IOrganization[];
+    type?: OrganizationTypesEnum;
 }
 
 const organizationService = getCrudService('organizations');
 
-export const useOrganizationHandler = ({onSelect, selected}: IOrganizationHandlerProps) => {
+export const useOrganizationHandler = ({onSelect, selected, type}: IOrganizationHandlerProps) => {
     const [addOrganization, {
         isLoading: isCreating,
         data: createdOrganization
@@ -26,7 +27,10 @@ export const useOrganizationHandler = ({onSelect, selected}: IOrganizationHandle
         isLoading: isUpdating,
         data: updatedOrganization
     }] = organizationService.useUpdateOrganizations();
-    const {data: organizationsData, refetch: refetchOrganizations} = organizationService.useFetchAllOrganizations();
+    const {
+        data: organizationsData,
+        refetch: refetchOrganizations
+    } = organizationService.useFetchAllOrganizations(type ? {type} : undefined);
     const [organizations, setOrganizations] = useState<IOrganization[]>(organizationsData || []);
 
     const [isNewOrganizationOpen, setHandleOrganizationOpen] = useState(false);

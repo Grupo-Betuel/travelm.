@@ -9,14 +9,14 @@ export interface ICustomImageProps {
     caption?: ICaption;
 }
 
-export function CustomImage(
+export function AppImage(
     {
         src,
         alt,
         caption
     }: ICustomImageProps) {
     return (
-        <figure className="relative h-full w-full">
+        <figure className="relative h-full w-auto">
             <img
                 className="h-full w-full rounded-xl object-cover object-center"
                 src={src}
@@ -28,9 +28,9 @@ export function CustomImage(
                     {caption?.title && <Typography variant="h5" color="blue-gray">
                         {caption?.title}
                     </Typography>}
-                    <Typography color="gray" className="mt-2 font-normal">
+                    {caption?.subtitle && <Typography color="gray" className="mt-2 font-normal">
                         {caption?.subtitle}
-                    </Typography>
+                    </Typography>}
                 </div>
                 {caption?.endTitle && <Typography variant="h5" color="blue-gray">
                     {caption?.endTitle}

@@ -16,7 +16,7 @@ import {ITransport} from "../models/transportModel";
 import {IFood} from "../models/foodModel";
 import {IProjection} from "../models/projectionModel";
 import {IExcursion} from "../models/excursionModel";
-import IUser from "../models/interfaces/user";
+import IUser from "../models/interfaces/userModel";
 
 const richTextActivity = `
 <!DOCTYPE html>
@@ -249,7 +249,7 @@ export const mockCheckpoint: ICheckpoint = {
 export const mockTransport: ITransport = {
     finance: mockFinance,
     organization: mockOrganization,
-    buses: [mockBus]
+    transportResources: [mockBus]
 };
 
 export const mockFood: IFood = {

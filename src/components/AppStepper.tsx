@@ -9,11 +9,10 @@ export interface AppStepperProps<T> {
 }
 
 export function AppStepper<T>({ steps, activeStep, onClickStep}: AppStepperProps<T> ) {
-    console.log('steps', steps)
     if(steps.length === 0) return null;
     return (
         <>
-            <Stepper activeStep={activeStep || 0} className="p-4 overflow-x-scroll h-[200px] w-[100%]">
+            <Stepper activeStep={activeStep || 0} className="px-7 overflow-x-scroll mb-10 h-[110px] w-[100%]">
                 {steps.map((step, index) => (
                     <Step key={index} onClick={() => onClickStep(index, step)} >
                         {step.icon}

@@ -1,6 +1,7 @@
 import {IMedia} from "../models/mediaModel";
 import React, {useMemo} from "react";
 import YouTube, {YouTubeProps} from "react-youtube";
+import {AppImage} from "../components/AppImage";
 
 export const useRenderMedia = () => {
     // Options for the YouTube player
@@ -15,7 +16,8 @@ export const useRenderMedia = () => {
     const renderMedia = (media: IMedia) => {
         switch (media?.type) {
             case 'image':
-                return <img src={media.content} alt={media.title} className="h-full"/>;
+                return <AppImage src={media.content} alt={media.title} />;
+                // return <img src={media.content} alt={media.title} className="h-full"/>;
             case 'video':
                 // @ts-ignore
                 const videoId = new URLSearchParams(new URL(media.content).search).get('v');
