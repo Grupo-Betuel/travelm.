@@ -1,12 +1,13 @@
 import {
-    Avatar,
     Button,
     Dialog,
     DialogBody,
     DialogFooter,
     DialogHeader,
     IconButton,
-    Input, Option, Select,
+    Input,
+    Option,
+    Select,
     Textarea,
     Typography
 } from "@material-tailwind/react";
@@ -15,10 +16,9 @@ import MediaHandler, {IMediaHandled} from "./MediaHandler";
 import MapPicker from "../../../../components/MapPicker";
 import BedroomsHandler from "./BedroomssHandler";
 import {FinanceHandler} from "./FinanceHandler";
-import {financeTypes, FinanceTypes, IFinance} from "../../../../models/financeModel";
+import {IFinance} from "../../../../models/financeModel";
 import React, {useEffect, useMemo, useState} from "react";
-import {useGCloudMediaHandler} from "../../../../hooks/useGCloudMedediaHandler";
-import {IOrganization, organizationTypeList} from "../../../../models/organizationModel";
+import {IOrganization, organizationTypeList, OrganizationTypesEnum} from "../../../../models/organizationModel";
 import {ILocation} from "../../../../models/ordersModels";
 import {IMediaFile} from "../../../../models/mediaModel";
 import {IBedroom} from "../../../../models/bedroomModel";
@@ -26,7 +26,6 @@ import {ICustomComponentDialog, IPathDataParam} from "../../../../models/common"
 import {getCrudService} from "../../../../api/services/CRUD.service";
 import UserForm from "../../users/components/UserForm";
 import IUser, {UserRoleTypes, UserTypes} from "../../../../models/interfaces/userModel";
-import {useAuth} from "../../../../context/authContext";
 
 export interface OrganizationHandlerProps {
     dialog?: ICustomComponentDialog;
@@ -36,7 +35,7 @@ export interface OrganizationHandlerProps {
 }
 
 export const emptyOrganization: IOrganization = {
-    type: 'church',
+    type: OrganizationTypesEnum.CHURCH,
     name: '',
     description: '',
     logo: {} as IMediaFile,
@@ -66,13 +65,11 @@ export const OrganizationForm: React.FC<OrganizationHandlerProps> = (
     }) => {
 
 
-    const {uploadMultipleMedias, uploadSingleMedia, deleteMedias} = useGCloudMediaHandler()
     const [organization, setOrganization] = useState<IOrganization>(emptyOrganization);
     const {data: organizationUserData} = userService.useFetchAllTravelUsers({organization: organization?._id}, {skip: !organization?._id});
     const [isOrganizationUserDialogOpen, setIsOrganizationUserDialogOpen] = useState(false);
     const [addUser] = userService.useAddTravelUsers();
-    const [updateUser] = userService.useUpdateTravelUsers();
-    const {user} = useAuth()
+    const [updateUser] = userService.useUpdateTravelUsers('organization');
     const [organizationUser, setOrganizationUser] = useState<IUser>()
 
     useEffect(() => {
@@ -99,23 +96,14 @@ export const OrganizationForm: React.FC<OrganizationHandlerProps> = (
             },
         })
     }
-    const handleLogoChange = (file: any | null): void => {
-        // Handle logo upload here
 
-        const logo: IMediaFile = {
-            // @ts-ignore
-            content: URL.createObjectURL(file),
-            type: 'image',
-            title: organization.name || 'No title',
-            owner: user?.organization,
-            file,
-
-        };
-
-        setOrganization((prevFormData) => ({
-            ...prevFormData,
-            logo,
-        }));
+    const handleLogoChange = ({logo}: IMediaHandled): void => {
+        if (logo) {
+            setOrganization((prevFormData) => ({
+                ...prevFormData,
+                logo,
+            }));
+        }
     };
 
     const handleSocialNetworksChange = (socialNetworks: any[]): void => {
@@ -228,11 +216,13 @@ export const OrganizationForm: React.FC<OrganizationHandlerProps> = (
     console.log('organization user', organizationUser)
     const form = (
         <div className="space-y-4">
-            <div className="flex items-center space-x-4">
-                <Avatar src={organization.logo?.content} size="lg"/>
-                <input type="file" accept="image/*"
-                       onChange={(e: any) => handleLogoChange(e.target.files?.[0])}/>
-            </div>
+            <MediaHandler logoMedia={organization.logo} medias={organization.medias} onChange={handleLogoChange} handle={{logo: true}}/>
+            {/*<div className="flex items-center space-x-4">*/}
+            {/*    <Avatar src={organization.logo?.content} size="lg"/>*/}
+            {/*    <input type="file" accept="image/*"*/}
+            {/*           onChange={(e: any) => handleLogoChange(e.target.files?.[0])}/>*/}
+            {/*</div>*/}
+
             <Input label="Name" name="name" value={organization.name} onChange={handleInputChange}/>
             <Select
                 label="Type"

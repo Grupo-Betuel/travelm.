@@ -221,7 +221,7 @@ const TransportResourceHandler: React.FC<TransportResourceHandlerProps> = ({
             <div className="grid grid-cols-3 gap-4">
                 {transportResources.map((bus, index) => (
                     <Card key={index} className="p-4 my-2 flex">
-                        <p>Driver: {bus.driver?.firstName}</p>
+                        <p>Conductor: {bus.driver?.firstName || 'No hay'}</p>
                         <p>Capacity: {bus.bus.capacity}</p>
                         <p>Color: {bus.bus.color}</p>
                         <p>Description: {bus.bus.description}</p>

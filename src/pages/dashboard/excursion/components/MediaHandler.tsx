@@ -1,18 +1,19 @@
 import React, {useEffect, useMemo, useState} from 'react';
-import {Button, Dialog, DialogBody, DialogFooter, DialogHeader, Typography} from '@material-tailwind/react';
+import {Avatar, Button, Dialog, DialogBody, DialogFooter, DialogHeader, Typography} from '@material-tailwind/react';
 import {Swiper, SwiperSlide} from "swiper/react";
 import AudioPlayer from "./AudioCard";
 import {Navigation, Pagination} from "swiper/modules";
-import {IMedia, IMediaFile, MediaTypeEnum} from "../../../../models/mediaModel";
-import {TrashIcon} from "@heroicons/react/20/solid";
+import {ExtraMediaTypesEnum, IMedia, IMediaFile, MediaTypeEnum} from "../../../../models/mediaModel";
 import {useConfirmAction} from "../../../../hooks/useConfirmActionHook";
 import {CommonConfirmActions, CommonConfirmActionsDataTypes} from "../../../../models/common";
 import {getCrudService} from "../../../../api/services/CRUD.service";
-import {useGCloudMediaHandler} from "../../../../hooks/useGCloudMedediaHandler";
 import {AppImage} from "../../../../components/AppImage";
-import {FaSearch, FaUpload} from "react-icons/fa";
 import {MediaList} from "../../../../components/MediaList";
 import {useAuth} from "../../../../context/authContext";
+import {AiOutlineCloudUpload} from "react-icons/ai";
+import {CgClose} from "react-icons/cg";
+import {IoSearch} from "react-icons/io5";
+import {IMG_CONSTANTS} from "../../../../constants/img.utils";
 
 
 const renderMediaPreview = (media: IMediaFile): JSX.Element => {
@@ -43,6 +44,7 @@ const renderMediaPreview = (media: IMediaFile): JSX.Element => {
 
 export interface IMediaHandled {
     flyer?: IMediaFile;
+    logo?: IMediaFile;
     images: IMediaFile[];
     videos: IMediaFile[];
     audios: IMediaFile[];
@@ -51,30 +53,33 @@ export interface IMediaHandled {
 export interface IHandleMediaFormProps {
     onChange: (data: IMediaHandled) => any;
     medias?: IMedia[];
-    flyerData?: IMediaFile;
+    flyerMedia?: IMediaFile;
+    logoMedia?: IMedia;
     handle?: {
         images?: boolean;
         videos?: boolean;
         audios?: boolean;
         flyer?: boolean;
+        logo?: boolean;
     }
 }
 
 export const mediasService = getCrudService('medias');
 
-const MediaHandler = ({onChange, medias, flyerData, handle}: IHandleMediaFormProps) => {
+const MediaHandler = ({onChange, medias, logoMedia, flyerMedia, handle}: IHandleMediaFormProps) => {
     const [flyer, setFlyer] = useState<IMediaFile>();
+    const [logo, setLogo] = useState<IMediaFile>();
     const [images, setImages] = useState<IMediaFile[]>([]);
     const [videos, setVideos] = useState<IMediaFile[]>([]);
     const [audios, setAudios] = useState<IMediaFile[]>([]);
-    const [deleteMedia] = mediasService.useDeleteMedias();
-    const {deleteImage} = useGCloudMediaHandler();
     const {user} = useAuth()
+
     useEffect(() => {
-        if (flyerData) {
-            setFlyer(flyerData);
+        if (flyerMedia) {
+            setFlyer(flyerMedia);
         }
-    }, [flyerData]);
+    }, [flyerMedia]);
+
 
     const onConfirmAction = (type?: CommonConfirmActions, data?: CommonConfirmActionsDataTypes<IMedia>) => {
         switch (type) {
@@ -150,6 +155,21 @@ const MediaHandler = ({onChange, medias, flyerData, handle}: IHandleMediaFormPro
         }
     };
 
+    const handleLogoChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        if (event.target.files) {
+            const file = event.target.files[0];
+            const logoMediaFile: IMediaFile = {
+                content: URL.createObjectURL(file),
+                title: file?.name || 'No title',
+                owner: user?.organization,
+                type: MediaTypeEnum.IMAGE,
+                file,
+            };
+
+            setLogo(logoMediaFile);
+        }
+    };
+
     const handleVideosChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         if (event.target.files) {
             const videosMedias: IMediaFile[] = Array.from(event.target.files).map(file => ({
@@ -183,13 +203,14 @@ const MediaHandler = ({onChange, medias, flyerData, handle}: IHandleMediaFormPro
     };
 
     useEffect(() => {
-        onChange({flyer, images, videos, audios});
-    }, [flyer, images, videos, audios]);
+        onChange({flyer, images, videos, audios, logo});
+    }, [flyer, images, videos, audios, logo]);
 
     const onDeleteMedia = async (media: IMedia) => {
         const mediaType = media.type;
         switch (mediaType) {
             case 'image':
+                if (media.content === flyer?.content) setFlyer(undefined);
                 setImages(images.filter((m) => m.content !== media.content));
                 break;
             case 'video':
@@ -201,10 +222,6 @@ const MediaHandler = ({onChange, medias, flyerData, handle}: IHandleMediaFormPro
             default:
                 break;
         }
-        if (media._id) {
-            await deleteMedia(media._id as string);
-            await deleteImage(media);
-        }
     }
 
     const allImagesMedia = useMemo(() => {
@@ -212,7 +229,7 @@ const MediaHandler = ({onChange, medias, flyerData, handle}: IHandleMediaFormPro
     }, [images, flyer])
 
     const [searchMediaModal, setSearchMediaModal] = useState(false);
-    const [selectedMediaSelectorType, setSelectedMediaSelectorType] = useState<MediaTypeEnum | 'flyer'>();
+    const [selectedMediaSelectorType, setSelectedMediaSelectorType] = useState<MediaTypeEnum | ExtraMediaTypesEnum>();
 
     const [selectedMedia, setSelectedMedia] = useState<IMedia[]>([]);
 
@@ -234,13 +251,16 @@ const MediaHandler = ({onChange, medias, flyerData, handle}: IHandleMediaFormPro
             case 'flyer':
                 setFlyer(selectedMedia[0] as IMediaFile);
                 break;
+            case 'logo':
+                setLogo(selectedMedia[0] as IMediaFile);
+                break;
             default:
                 break;
         }
         setSearchMediaModal(false);
     }
 
-    const toggleSearchMediaModal = (mediaType?: MediaTypeEnum | 'flyer') => () => {
+    const toggleSearchMediaModal = (mediaType?: MediaTypeEnum | ExtraMediaTypesEnum) => () => {
         const newValue = !searchMediaModal;
         if (newValue) {
             let media = images;
@@ -256,43 +276,63 @@ const MediaHandler = ({onChange, medias, flyerData, handle}: IHandleMediaFormPro
                     break;
                 case 'flyer':
                     media = flyer ? [flyer] : [];
+                case 'logo':
+                    media = logo ? [logo] : [];
                     break;
                 default:
                     break;
             }
+
             setSelectedMedia(medias || []);
             setSelectedMediaSelectorType(mediaType);
         } else {
             setSelectedMedia([]);
             setSelectedMediaSelectorType(undefined);
         }
-
         setSearchMediaModal(newValue);
     }
 
+
     return (
         <div className="space-y-4 p-4">
+            {(handle?.logo) && <>
+                <div className="flex items-center gap-5">
+                    <div className="flex flex-col items-center gap-2">
+                        <Avatar src={logo?.content || logoMedia?.content || IMG_CONSTANTS.LOGO_PLACEHOLDER} size="lg"/>
+                        <Typography variant="h6">Logo</Typography>
+
+                    </div>
+                    <IoSearch onClick={toggleSearchMediaModal(ExtraMediaTypesEnum.LOGO)}
+                              className="text-blue-400 w-[23px] h-[23px] cursor-pointer"/>
+                    <label>
+                        <input type="file" className="hidden absolute -z-10" placeholder="flyer" accept="image/*"
+                               onChange={handleLogoChange}/>
+                        <AiOutlineCloudUpload className="h-10 w-10 cursor-pointer text-blue-400 w-[26px]"/>
+                    </label>
+                </div>
+            </>
+            }
             {(!handle || handle.flyer) &&
                 <div className="flex items-center gap-5">
-                    <Typography variant="h6">Flyer:</Typography>
-                    <FaSearch onClick={toggleSearchMediaModal('flyer')}
-                              className="text-blue-400 w-[26px] h-[26px] cursor-pointer"/>
+                    <Typography variant="h6">Flyer ({flyer ? 1 : 0}):</Typography>
+                    <IoSearch onClick={toggleSearchMediaModal(ExtraMediaTypesEnum.FLYER)}
+                              className="text-blue-400 w-[23px] h-[23px] cursor-pointer"/>
                     <label>
                         <input type="file" className="hidden absolute -z-10" placeholder="flyer" accept="image/*"
                                onChange={handleFlyerChange}/>
-                        <FaUpload className="h-10 w-10 cursor-pointer text-blue-400 w-[26px]"/>
+                        <AiOutlineCloudUpload className="h-10 w-10 cursor-pointer text-blue-400 w-[26px]"/>
                     </label>
                 </div>
             }
             {(!handle || handle.images) &&
                 <div className="flex items-center gap-5">
-                    <Typography variant="h6">Imagenes:</Typography>
-                    <FaSearch onClick={toggleSearchMediaModal(MediaTypeEnum.IMAGE)}
-                              className="text-blue-400 w-[26px] h-[26px] cursor-pointer"/>
+                    <Typography variant="h6">Imagenes ({images.length}):</Typography>
+                    <IoSearch onClick={toggleSearchMediaModal(MediaTypeEnum.IMAGE)}
+                              className="text-blue-400 w-[23px] h-[23px] cursor-pointer"/>
                     <label>
                         <input type="file" className="hidden absolute -z-10" placeholder="flyer" accept="image/*"
                                onChange={handleImagesChange}/>
-                        <FaUpload className="h-10 w-10 cursor-pointer text-blue-400 w-[26px]"/>
+                        <AiOutlineCloudUpload className="h-10 w-10 cursor-pointer text-blue-400 w-[26px]"/>
                     </label>
                 </div>
             }
@@ -305,13 +345,13 @@ const MediaHandler = ({onChange, medias, flyerData, handle}: IHandleMediaFormPro
 
             {(!handle || handle.audios) &&
                 <div className="flex items-center gap-5">
-                    <Typography variant="h6">Audios:</Typography>
-                    <FaSearch onClick={toggleSearchMediaModal(MediaTypeEnum.AUDIO)}
-                              className="text-blue-400 w-[26px] h-[26px] cursor-pointer"/>
+                    <Typography variant="h6">Audios ({audios.length}):</Typography>
+                    <IoSearch onClick={toggleSearchMediaModal(MediaTypeEnum.AUDIO)}
+                              className="text-blue-400 w-[23px] h-[23px] cursor-pointer"/>
                     <label>
                         <input type="file" className="hidden absolute -z-10" placeholder="flyer" accept="audio/*"
                                onChange={handleAudiosChange}/>
-                        <FaUpload className="h-10 w-10 cursor-pointer text-blue-400 w-[26px]"/>
+                        <AiOutlineCloudUpload className="h-10 w-10 cursor-pointer text-blue-400 w-[26px]"/>
                     </label>
                 </div>
             }
@@ -324,10 +364,10 @@ const MediaHandler = ({onChange, medias, flyerData, handle}: IHandleMediaFormPro
                         <SwiperSlide key={`image-slide-${index}`} className="flex justify-center">
                             <div className="flex">
                                 {renderMediaPreview(image)}
-                                <TrashIcon onClick={() =>
-                                    handleSetActionToConfirm('delete', 'Eliminar Imagen')(image)
+                                <CgClose onClick={() =>
+                                    handleSetActionToConfirm('delete', 'quitar esta imagen')(image)
                                 }
-                                           className="absolute top-4 cursor-pointer right-4 h-10 w-10 text-red-500 z-50"/>
+                                         className="absolute top-4 cursor-pointer right-4 h-8 w-8 p-1 text-red-500 z-50 bg-white rounded-full"/>
                             </div>
                         </SwiperSlide>
                     ))}
@@ -359,8 +399,11 @@ const MediaHandler = ({onChange, medias, flyerData, handle}: IHandleMediaFormPro
                 </DialogHeader>
                 <DialogBody className="overflow-y-scroll max-h-[80dvh]">
                     <MediaList
-                        mediaType={selectedMediaSelectorType === 'flyer' ? MediaTypeEnum.IMAGE : selectedMediaSelectorType}
-                        multiple={selectedMediaSelectorType !== 'flyer'}
+                        mediaType={selectedMediaSelectorType === ExtraMediaTypesEnum.FLYER || selectedMediaSelectorType === ExtraMediaTypesEnum.LOGO  ?
+                            MediaTypeEnum.IMAGE
+                            : selectedMediaSelectorType as MediaTypeEnum
+                        }
+                        multiple={selectedMediaSelectorType !== ExtraMediaTypesEnum.FLYER && selectedMediaSelectorType !== ExtraMediaTypesEnum.LOGO}
                         onSelect={onSelectMedia}
                     />
                 </DialogBody>

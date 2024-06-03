@@ -7,6 +7,11 @@ export enum MediaTypeEnum {
     DOCUMENT = "document",
 }
 
+export enum ExtraMediaTypesEnum {
+    FLYER = 'flyer',
+    LOGO = 'logo',
+}
+
 export interface IMedia extends BaseModel {
     type: MediaTypeEnum;
     content: string;

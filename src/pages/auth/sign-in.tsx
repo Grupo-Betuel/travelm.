@@ -7,7 +7,7 @@ import {
 import {Link} from "react-router-dom";
 import React, {useState} from "react";
 import IUser from "../../models/interfaces/userModel";
-import {useLogin} from "../../context/useLogin";
+import {useLogin} from "../../hooks/useLogin";
 
 export function SignIn() {
     const [auth, setAuth] = useState<Pick<IUser, 'email' | 'password'>>({email: '', password: ''});

@@ -2,3 +2,20 @@
 .pac-container {
     z-index: 99999 !important;
 }
+
+
+@keyframes loading-bar {
+    0% {
+        transform: translateX(-100dvw);
+    }
+    50% {
+        transform: translateX(0);
+    }
+    100% {
+        transform: translateX(100dvw);
+    }
+}
+
+.animate-loading-bar {
+    animation: loading-bar 1.3s linear infinite;
+}

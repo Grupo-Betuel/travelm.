@@ -1,7 +1,7 @@
 import createEntityApiSlice from "../entityApiSlice";
 import {EntityModels, EntityNames} from "../../models/entitiyModels";
 import {BaseModel} from "../../models/interfaces/BaseModel";
-import {EntityApiStores} from "../../store/store";
+import {EntityApiStores, RootState} from "../../store/store";
 import {TypedUseQuery, UseQuery} from "@reduxjs/toolkit/query/react";
 import {QueryDefinition} from '@reduxjs/toolkit/query';
 
@@ -54,6 +54,7 @@ export function getCrudService<T extends EntityNames>(
     const entityApi = EntityApiStores[entityName];
     const capEntityName = entityName.charAt(0).toUpperCase() + entityName.slice(1);
 
+    // console.log(entityApi)
     const addMutation = entityApi.useAddMutation;
     const updateMutation = entityApi.useUpdateMutation;
 

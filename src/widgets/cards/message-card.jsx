@@ -1,12 +1,13 @@
 import PropTypes from "prop-types";
 import { Avatar, Typography } from "@material-tailwind/react";
+import {IMG_CONSTANTS} from "@/constants/img.utils";
 
 export function MessageCard({ img, name, message, action }) {
   return (
     <div className="flex items-center justify-between gap-4">
       <div className="flex items-center gap-4">
         <Avatar
-          src={img}
+          src={img || IMG_CONSTANTS.LOGO_PLACEHOLDER}
           alt={name}
           variant="rounded"
           className="shadow-lg shadow-blue-gray-500/25"

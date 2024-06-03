@@ -17,7 +17,7 @@ import {IClient} from "../models/clientModel";
 
 export const whatsappSeedStorePrefix = 'whatsappSeedData::';
 
-const useWhatsapp = (whatsappSessionId: string, autologin = false) => {
+const useWhatsapp = (whatsappSessionId?: string, autologin = false) => {
     const [logged, setLogged] = React.useState(false);
     const [loading, setLoading] = React.useState(false);
     const [stopMessagingId, setStopMessagingId] = React.useState('');
@@ -43,12 +43,12 @@ const useWhatsapp = (whatsappSessionId: string, autologin = false) => {
         return response;
     }
 
-    const restartWhatsapp = async (sessionId: WhatsappSessionTypes) => {
+    const restartWhatsapp = async (sessionId: string) => {
         const response: any = await (await restartWhatsappServices(sessionId)).json();
         return response;
     }
 
-    const closeWhatsapp = async (sessionId: WhatsappSessionTypes) => {
+    const closeWhatsapp = async (sessionId: string) => {
         const response: any = await (await closeWhatsappServices(sessionId)).json();
         return response;
     }
@@ -70,7 +70,7 @@ const useWhatsapp = (whatsappSessionId: string, autologin = false) => {
         });
     }
 
-    const logOut = async (sessionId: WhatsappSessionTypes) => {
+    const logOut = async (sessionId: string) => {
         return closeWhatsapp(sessionId);
     };
 
@@ -173,7 +173,7 @@ const useWhatsapp = (whatsappSessionId: string, autologin = false) => {
         }
     }
 
-    const sendMessage = async (sessionId: WhatsappSessionTypes, contacts: (IClient | IWsUser)[], message: IWhatsappMessage) => {
+    const sendMessage = async (sessionId: string, contacts: (IClient | IWsUser)[], message: IWhatsappMessage) => {
         const {stopMessagesId} = await sendWhatsappMessage(sessionId, contacts, message);
         setStopMessagingId(stopMessagesId);
     }

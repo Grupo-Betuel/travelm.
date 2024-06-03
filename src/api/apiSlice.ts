@@ -25,6 +25,7 @@ const baseQueryWithReauth: (path: string) => BaseQueryFn = (path: EntityNames) =
 
 export const apiSlice = (path: EntityNames) => createApi({
     reducerPath: path,
+    tagTypes: [path],
     baseQuery: baseQueryWithReauth(path),
     endpoints: (builder) => ({})
 });

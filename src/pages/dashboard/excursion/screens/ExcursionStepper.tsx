@@ -26,6 +26,7 @@ import {IMediaFile} from "../../../../models/mediaModel";
 import FinancesHandlerStep from "../components/Steps/FinancesHandlerStep";
 import {IStep} from "../../../../models/common";
 import {AppStepper} from "../../../../components/AppStepper";
+import {useAppLoading} from "../../../../context/appLoadingContext";
 
 
 const excursionService = getCrudService("excursions");
@@ -35,6 +36,8 @@ const ExcursionStepper: React.FC = () => {
     const [excursion, setExcursion] = useState<IExcursion>({} as IExcursion);
     const [isFormValid, setIsFormValid] = useState<boolean>(false);
     const [validationErrors, setValidationErrors] = useState<string[]>([]);
+    const {setAppIsLoading} = useAppLoading();
+
     const [updateExcursion, {
         isLoading: isUpdatingExcursion,
         data: updatedExcursion
@@ -44,6 +47,7 @@ const ExcursionStepper: React.FC = () => {
         data: createdExcursion
     }] = excursionService.useAddExcursions();
     const params = useParams();
+
     const {
         data: excursionData,
         isLoading: isLoadingExcursion
@@ -60,7 +64,7 @@ const ExcursionStepper: React.FC = () => {
     useEffect(() => {
         const key = `${EXCURSION_CONSTANTS.CURRENT_STEP_STORE_KEY}::${params.excursionId || 'new'}`;
         // @ts-ignore
-        const step = JSON.parse(localStorage.getItem(key) || 0);
+        const step = JSON.parse(localStorage.getItem(key) || 1);
         if (step !== null) setCurrentStep(step);
     }, [params.excursionId]);
 
@@ -106,12 +110,20 @@ const ExcursionStepper: React.FC = () => {
         setValidationErrors(errors);
     };
 
-    const handleNext = (): void => {
-        if (currentStep < excursionSteps.length
-            // && isFormValid
-        ) {
-            setCurrentStep(currentStep + 1);
-            handleExcursionSave();
+    const handleNext = async () => {
+        try {
+            setAppIsLoading(true);
+            if (currentStep < excursionSteps.length
+                // && isFormValid
+            ) {
+                setCurrentStep(currentStep + 1);
+                await handleExcursionSave();
+            }
+            setAppIsLoading(false);
+        } catch (error) {
+            // TODO: TOAS handle error
+            setAppIsLoading(false);
+            console.log('error', error)
         }
     };
 

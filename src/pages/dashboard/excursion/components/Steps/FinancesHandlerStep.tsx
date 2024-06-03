@@ -13,7 +13,6 @@ interface FinancesStepProps {
 
 const FinancesHandlerStep: React.FC<FinancesStepProps> = ({excursionData, updateExcursion}) => {
     const onUpdateFinances = (finance: IFinance) => {
-        console.log('ffff=>',finance);
         updateExcursion({finance});
     }
 
@@ -42,9 +41,10 @@ const FinancesHandlerStep: React.FC<FinancesStepProps> = ({excursionData, update
     }, [foodPrice, activityPrice, destinationsPrice, transportPrice]);
 
     useEffect(() => {
-            updateExcursion({finance: {...excursionData.finance, cost: total}});
-        }, [total])
+        updateExcursion({finance: {...excursionData.finance, cost: total}});
+    }, [total, excursionData.finance?.cost])
 
+    console.log('total', total, excursionData.finance);
     return (
         <div>
             <FinanceHandler
@@ -53,11 +53,16 @@ const FinancesHandlerStep: React.FC<FinancesStepProps> = ({excursionData, update
                 updateFinance={onUpdateFinances}
                 type="excursion"
             />
-            <Typography variant="h5" color="blue" className="p-4 text-center">Transporte: RD${transportPrice.toLocaleString()}</Typography>
-            <Typography variant="h5" color="blue" className="p-4 text-center">Precio de Destino: RD${destinationsPrice.toLocaleString()}</Typography>
-            <Typography variant="h5" color="blue" className="p-4 text-center">Precio de Comida: RD${foodPrice.toLocaleString()}</Typography>
-            <Typography variant="h5" color="blue" className="p-4 text-center">Precio por Actividad: RD${activityPrice.toLocaleString()}</Typography>
-            <Typography variant="h5" color="blue" className="p-4 text-center">Beneficio: {(excursionData.finance?.price - total).toLocaleString()}</Typography>
+            <Typography variant="h5" color="blue" className="p-4 text-center">Transporte:
+                RD${transportPrice.toLocaleString()}</Typography>
+            <Typography variant="h5" color="blue" className="p-4 text-center">Precio de Destino:
+                RD${destinationsPrice.toLocaleString()}</Typography>
+            <Typography variant="h5" color="blue" className="p-4 text-center">Precio de Comida:
+                RD${foodPrice.toLocaleString()}</Typography>
+            <Typography variant="h5" color="blue" className="p-4 text-center">Precio por Actividad:
+                RD${activityPrice.toLocaleString()}</Typography>
+            <Typography variant="h5" color="blue"
+                        className="p-4 text-center">Beneficio: {(excursionData.finance?.price - total).toLocaleString()}</Typography>
         </div>
     );
 };

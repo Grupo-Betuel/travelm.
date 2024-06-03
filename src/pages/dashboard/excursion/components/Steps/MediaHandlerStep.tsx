@@ -17,6 +17,7 @@ export const MediaHandlerStep: React.FC<MediaProps> = ({excursionData, updateExc
         });
     }
 
+
     const medias: IMedia[] = useMemo(() => {
         return ([] as IMedia[]).concat(excursionData.images || [], excursionData.videos || [], excursionData.audios || []);
     }, [excursionData.images, excursionData.audios, excursionData.videos]);
@@ -26,7 +27,7 @@ export const MediaHandlerStep: React.FC<MediaProps> = ({excursionData, updateExc
             <MediaHandler
                 onChange={onSubmitMedia}
                 medias={medias}
-                flyerData={excursionData.flyer as IMediaFile}
+                flyerMedia={excursionData.flyer as IMediaFile}
             />
         </div>
     );

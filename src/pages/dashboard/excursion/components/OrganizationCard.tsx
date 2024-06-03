@@ -8,6 +8,7 @@ import {Navigation, Pagination} from "swiper/modules";
 import {useRenderMedia} from "../../../../hooks/useRenderMedia"; // Adjust the path as necessary
 import {FaFacebookF, FaTwitter, FaWhatsapp, FaPhone, FaInstagram} from 'react-icons/fa';
 import {TravelMap} from "../../../../components/TravelMap";
+import {IMG_CONSTANTS} from "../../../../constants/img.utils";
 
 interface OrganizationCardProps {
     organization: IOrganization;
@@ -52,12 +53,14 @@ export const OrganizationCard: React.FC<OrganizationCardProps> = ({onEdit, organ
             </CardHeader>
             <CardBody>
                 <div className="flex items-center space-x-4">
-                    <Avatar src={organization?.logo?.content} size="xl" />
+                    <Avatar src={organization?.logo?.content || IMG_CONSTANTS.LOGO_PLACEHOLDER} size="xl"/>
                     <span className="font-bold whitespace-break-spaces line-clamp-2">{organization.name}</span>
                 </div>
                 <Typography
                     className="font-bold whitespace-pre-line line-clamp-2">{organization.description}</Typography>
                 <div className="flex mt-4">
+                    {organization.entryFee?.price &&
+                        <Typography>Precio: RD${organization.entryFee?.price.toLocaleString()}</Typography>}
                     {organization?.contact?.tel &&
                         <a target="_blank" href={`tel:${organization?.contact?.tel}`} className="mr-4"><FaPhone/></a>}
                     {organization?.contact?.phone &&
@@ -77,7 +80,7 @@ export const OrganizationCard: React.FC<OrganizationCardProps> = ({onEdit, organ
             </CardBody>
             <CardFooter className="flex justify-between flex-row-reverse pt-0">
                 {onEdit && <Button className="justify-self-end" variant="text" color="blue"
-                         onClick={handleOnEdit}>Editar</Button>}
+                                   onClick={handleOnEdit}>Editar</Button>}
             </CardFooter>
         </Card>
     );

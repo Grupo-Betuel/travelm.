@@ -80,7 +80,8 @@ export const useOrganizationHandler = ({onSelect, selected, type}: IOrganization
         // const deletedMedias = await deleteMedias(mediasToDelete);
         // console.log('Deleted Medias', deletedMedias);
         // TODO: check what are the new medias
-        // const mediasToUpdate = []
+        // const mediasToUpdate = [];
+
         // const medias = await uploadMultipleMedias(mediasToUpdate);
         if (formData._id) {
             const {data} = await updateOrganizationData({

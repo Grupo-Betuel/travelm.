@@ -28,6 +28,7 @@ import Messaging from "../../../../components/WhatsappMessageHandler";
 import {UserRoleTypes, UserTypes} from "../../../../models/interfaces/userModel";
 import ProtectedElement from "../../../../components/ProtectedElement";
 import {IoReload} from "react-icons/io5";
+import {FaWhatsapp} from "react-icons/fa";
 
 
 const excursionService = getCrudService('excursions');
@@ -126,16 +127,10 @@ export const ExcursionDetails: React.FC = () => {
 
     const onAddClient = (client: IClient) => {
         // HANDLING COMPANY RELATIONSHIP
-        const relatedCompanies = (client.relatedCompanies || '').split(',');
-        if (!relatedCompanies.includes(GLOBAL_CONSTANTS.BETUEL_TRAVEL)) {
-            relatedCompanies.push(GLOBAL_CONSTANTS.BETUEL_TRAVEL);
-        }
-
         const updatedClients = [
             ...excursion.clients,
             {
                 ...client,
-                relatedCompany: relatedCompanies.join(','),
             }
         ];
 
@@ -205,11 +200,15 @@ export const ExcursionDetails: React.FC = () => {
                     </SwiperSlide>
                 ))}
             </Swiper>
-            <ProtectedElement roles={[UserRoleTypes.ADMIN]} userTypes={[UserTypes.AGENCY]}>
-                <Link to={`/dashboard/excursions/handler/${excursion._id}/`}>
-                    <Button variant="text" color="blue" className="whitespace-nowrap">Editar Excursion</Button>
-                </Link>
-            </ProtectedElement>
+            <div className="flex justify-end">
+                <ProtectedElement roles={[UserRoleTypes.ADMIN]} userTypes={[UserTypes.AGENCY]}>
+                    <Button variant="text" color="blue" className="whitespace-nowrap">
+                        <Link to={`/dashboard/excursions/handler/${excursion._id}/`}>
+                            Editar Excursion
+                        </Link>
+                    </Button>
+                </ProtectedElement>
+            </div>
             {excursion.audios.map((audio, index) => (
                 <AudioPlayer key={index} src={audio.content} title={`Audio Track ${index + 1}`}/>
             ))}
@@ -224,11 +223,15 @@ export const ExcursionDetails: React.FC = () => {
                 <Typography variant="h1" className="mt-4 mb-2">
                     {excursion.title}
                 </Typography>
-                <Button variant="text" color="blue" onClick={refetchExcursion}>
-                    <IoReload className="w-[18px] h-[18px] cursor-pointer"/>
+            </div>
+            <div className="flex gap-3 items-center justify-end">
+                <Button color="green" className="flex items-center gap-2" onClick={toggleWsMessaging}>
+                    Whatsapp <FaWhatsapp className="w-[18px] h-[18px] cursor-pointer"/>
+                </Button>
+                <Button color="blue" className="flex items-center gap-2" onClick={refetchExcursion}>
+                    Recargar <IoReload className="w-[18px] h-[18px] cursor-pointer"/>
                 </Button>
             </div>
-
             {/* Organization, Destination, and TransportStep Information Cards */}
             <div className="flex justify-around gap-3 !overflow-x-scroll p-4 py-10 h-[400px]">
                 {[...excursion.organizations, ...excursion.destinations, excursion.transport.organization].map((entity, index) => (

@@ -1,15 +1,16 @@
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useMemo, useState} from "react";
 import {Tabs, Tab, TabsHeader, TabPanel, TabsBody} from "@material-tailwind/react";
 import {IMedia, MediaTypeEnum} from "../models/mediaModel";
 import {getCrudService} from "../api/services/CRUD.service";
-import {FaVideo, FaFileAlt, FaMusic, FaSearch} from "react-icons/fa";
+import {FaVideo, FaFileAlt, FaMusic} from "react-icons/fa";
 import {useConfirmAction} from "../hooks/useConfirmActionHook";
-import {Button, IconButton, Typography} from "@material-tailwind/react";
-import {TrashIcon} from "@heroicons/react/20/solid";
+import {Button} from "@material-tailwind/react";
 import {CommonConfirmActions} from "../models/common";
 import {useGCloudMediaHandler} from "../hooks/useGCloudMedediaHandler";
 import {IoReload} from "react-icons/io5";
-import {AppImage} from "./AppImage";
+import {AiOutlineCloudUpload} from "react-icons/ai";
+import {useAuth} from "../context/authContext";
+import {parseMultipleFilesToMedia} from "../utils/media.utils";
 
 export interface MediaListProps {
     multiple?: boolean;
@@ -24,7 +25,10 @@ export const MediaList: React.FC<MediaListProps> = ({onSelect, multiple, mediaTy
     const [medias, setMedias] = useState<IMedia[]>([]);
     const [selectedMedias, setSelectedMedias] = useState<IMedia[]>([]);
     const [deleteMedia] = mediaService.useDeleteMedias();
+    const [addMedia] = mediaService.useAddMedias();
     const {deleteImage} = useGCloudMediaHandler();
+    const {user} = useAuth();
+    const {uploadMultipleMedias} = useGCloudMediaHandler();
 
     const {
         data: mediaByTypeData,
@@ -35,7 +39,6 @@ export const MediaList: React.FC<MediaListProps> = ({onSelect, multiple, mediaTy
         mediaType && setSelectedType(mediaType || selectedType);
     }, [mediaType]);
     const onConfirmAction = (type?: CommonConfirmActions, data?: IMedia) => {
-        console.log('delete', type);
         if (type === 'delete') {
             handleDeleteMedia(data as IMedia);
         }
@@ -55,7 +58,6 @@ export const MediaList: React.FC<MediaListProps> = ({onSelect, multiple, mediaTy
     }, [mediaByTypeData]);
 
     const handleSelect = (media: IMedia) => {
-        console.log('klk')
         let updatedSelectedMedias: IMedia[];
 
         if (multiple) {
@@ -95,15 +97,62 @@ export const MediaList: React.FC<MediaListProps> = ({onSelect, multiple, mediaTy
         setSelectedType(type);
     };
 
+
+    const uploadMedia = async (event: React.ChangeEvent<HTMLInputElement>) => {
+        const files = event.target.files;
+
+        if (!files) return;
+        if (!selectedType) {
+            // Todo: TOAST
+            return;
+        }
+
+        const mediasFiles = parseMultipleFilesToMedia(selectedType, Array.from(files), user?.organization as string);
+
+        const uploadedImages = await uploadMultipleMedias(mediasFiles);
+
+        if (uploadedImages) {
+            setMedias([...uploadedImages, ...medias]);
+        }
+
+        await addMedia(uploadedImages);
+        refetchCurrentMediaType();
+
+    }
+
+    const currentAcceptType = useMemo(() => {
+        return selectedType === MediaTypeEnum.IMAGE ? 'image/*' :
+            selectedType === MediaTypeEnum.VIDEO ? 'video/*' :
+                selectedType === MediaTypeEnum.AUDIO ? 'audio/*' : '*';
+    }, [selectedType])
+
     return (
         <div className="p-4 h-[70vh]">
-            <div className="w-full flex justify-end pb-4">
+            <div className="w-full flex justify-between pb-4">
                 <Button
+                    variant={"text"}
                     color="blue"
                     className="flex items-center gap-2 "
                     onClick={refetchCurrentMediaType}>
-                    <IoReload className="w-[18px] h-[18px]"/>
+                    <label
+                        className="flex items-center gap-2 "
+                    >
+                        <input type="file"
+                               className="hidden absolute -z-10"
+                               multiple
+                               accept={currentAcceptType}
+                               onChange={uploadMedia}/>
+                        Subir
+                        <AiOutlineCloudUpload className="h-10 w-10 cursor-pointer text-blue-400 w-[21px]"/>
+                    </label>
+                </Button>
+                <Button
+                    variant={"text"}
+                    color="blue"
+                    className="flex items-center gap-2 "
+                    onClick={refetchCurrentMediaType}>
                     Recargar
+                    <IoReload className="w-[18px] h-[18px]"/>
                 </Button>
             </div>
             <div>

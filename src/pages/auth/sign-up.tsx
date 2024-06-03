@@ -9,7 +9,7 @@ import React, {useMemo} from "react";
 import {getCrudService} from "../../api/services/CRUD.service";
 import IUser from "../../models/interfaces/userModel";
 import {IOrganization} from "../../models/organizationModel";
-import {useLogin} from "../../context/useLogin";
+import {useLogin} from "../../hooks/useLogin";
 
 const userService = getCrudService('travelUsers');
 const organizationService = getCrudService('organizations');

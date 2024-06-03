@@ -50,7 +50,7 @@ export const startWhatsappServices = async (
 };
 
 export const restartWhatsappServices = async (
-    sessionId: WhatsappSessionTypes,
+    sessionId: string,
 ) => {
     try {
         return await fetch(`${import.meta.env.VITE_PROMOTION_API}whatsapp/restart`, {
@@ -68,7 +68,7 @@ export const restartWhatsappServices = async (
 
 
 export const closeWhatsappServices = async (
-    sessionId: WhatsappSessionTypes,
+    sessionId: string,
 ) => {
     try {
         return await fetch(`${import.meta.env.VITE_PROMOTION_API}whatsapp/close`, {
@@ -139,7 +139,7 @@ export const getScheduleStatus = async (
 
 
 export const sendWhatsappMessage = async (
-    sessionId: WhatsappSessionTypes,
+    sessionId: string,
     contacts: (IClient | IWsUser)[],
     message: IWhatsappMessage
 ) => {

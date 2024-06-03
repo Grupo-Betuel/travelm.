@@ -107,7 +107,7 @@ material-tailwind-dashboard-react
     │   ├── layouts
     │   ├── pages
     │   ├── widgets
-    │   ├── App.jsx
+    │   ├── App.tsx
     │   ├── main.jsx
     │   └── routes.jsx
     ├── .gitignore

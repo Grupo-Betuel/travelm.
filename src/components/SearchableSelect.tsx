@@ -91,7 +91,7 @@ function SearchableSelect<T>(
 
 
     return (
-        <div ref={ref} onBlur={handleBlur} className={`${className || ''} w-100`}>
+        <div ref={ref} onBlur={handleBlur} className={`${className || ''} relative w-full`}>
             <Input
                 disabled={disabled}
                 label={label}
@@ -102,17 +102,11 @@ function SearchableSelect<T>(
                     setIsFocused(true);
                     setSearchTerm(''); // Clear search term on focus to show all options
                 }}
-                // onBlur={() => {
-                //     console.log('blur')
-                //     if (!multiple) {
-                //         // setSearchTerm(displayValue); // Restore the display value for single select
-                //     }
-                // }}
                 placeholder={!isFocused && multiple ? displayValue : ''}
             />
             {isFocused && (
                 <List
-                      className="max-h-60 overflow-auto mt-1 border absolute rounded bg-white z-50">
+                      className="max-h-60 overflow-auto mt-1 border absolute w-full rounded bg-white z-50">
                     {filteredOptions.map((option, index) => (
                         <a
                             key={`selectable-options-${index}`}

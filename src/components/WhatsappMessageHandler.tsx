@@ -4,8 +4,8 @@ import {
     Dialog,
     DialogBody,
     DialogFooter,
-    DialogHeader,
-    Textarea,
+    DialogHeader, Spinner,
+    Textarea, Typography,
 } from "@material-tailwind/react";
 import InputMask from "react-input-mask";
 import useWhatsapp from "../hooks/UseWhatsapp";
@@ -20,6 +20,9 @@ import {
 import {ICustomComponentDialog} from "../models/common";
 import SearchableSelect from "./SearchableSelect";
 import {IoReload} from "react-icons/io5";
+import {CgClose} from "react-icons/cg";
+import MediaHandler from "../pages/dashboard/excursion/components/MediaHandler";
+import {AppImage} from "./AppImage";
 
 export interface IMessaging {
     dialog?: ICustomComponentDialog;
@@ -119,7 +122,7 @@ const Messaging: React.FC<IMessaging> = (
         xhr.send();
     }
 
-    const handleSendMessage = (sessionId: WhatsappSessionTypes) => async () => {
+    const handleSendMessage = (sessionId: string) => async () => {
         const whatsappUsers = getWhatsappUsers();
         sendMessage(sessionId, whatsappUsers, {text: message, photo, audio});
     }
@@ -197,12 +200,8 @@ const Messaging: React.FC<IMessaging> = (
         }
     };
 
-    const handleUserSelection = (isRemove: boolean) => (users: IWsUser[], currentUser: IWsUser) => {
-        if (isRemove) {
-            setSelectedWhatsappUsers(selectedWhatsappUsers.filter(item => item.phone !== currentUser.phone));
-        } else {
-            setSelectedWhatsappUsers([...selectedWhatsappUsers, currentUser]);
-        }
+    const handleUserSelection = (users: IWsUser[]) => {
+        setSelectedWhatsappUsers(users);
     };
 
     const getWhatsappUsers = (): IWsUser[] => {
@@ -221,10 +220,11 @@ const Messaging: React.FC<IMessaging> = (
     }
 
     const handleSessionAction = async () => {
+
         if (actionToConfirm === 'restart') {
-            await restartWhatsapp(selectedSession);
+            selectedSession && await restartWhatsapp(selectedSession);
         } else if (actionToConfirm === 'close') {
-            await logOut(selectedSession)
+            selectedSession && await logOut(selectedSession)
         } else if (actionToConfirm === 'all' || actionToConfirm === 'users' || actionToConfirm === 'groups' || actionToConfirm === 'labels') {
             setFetchingSeed(actionToConfirm);
             fetchWsSeedData(selectedSession, actionToConfirm).then(() => {
@@ -256,100 +256,106 @@ const Messaging: React.FC<IMessaging> = (
         setActionToConfirm(value);
     }
 
+    const handleMedia = (media: any) => {
+        console.log('media', media);
+        // setPhoto(media);
+    }
 
     const content = (
-        <div className="position-relative">
-            {/*<div className="d-flex w-100">*/}
-            {/*    {*/}
-            {/*        whatsappSessionList.map((sessionKey, key) => (*/}
-            {/*            <div onClick={selectSession(sessionKey)} key={key}>*/}
-            {/*                <span>{whatsappSessionNames[sessionKey]}</span>*/}
-            {/*            </div>*/}
-            {/*        ))*/}
-            {/*    }*/}
-            {/*</div>*/}
-            <div
-                title="Cerrar Sesión"
-                className="bi bi-power text-danger log-out-icon cursor-pointer"
-                onClick={handleActionToConfirm('close')}/>
+        <div className="relative">
+            {/*<div*/}
+            {/*    title="Cerrar Sesión"*/}
+            {/*    className="bi bi-power text-danger log-out-icon cursor-pointer"*/}
+            {/*    onClick={handleActionToConfirm('close')} />*/}
             {
                 loading ?
                     (
-                        <div className="loading-sale-container">
-                            {/* TODO: <Spinner animation="grow" variant="secondary"/>*/}
+                        <div
+                            className="absolute w-full h-full flex items-center justify-center bg-[rgba(255,255,255,.5)] z-50 rounded-2xl">
+                            <Spinner className="h-16 w-16 text-blue-900/50"/>;
                             {stopMessagingId &&
-                                <Button onClick={handleActionToConfirm('cancel-messaging')} color="danger">
+                                <Button variant="text" onClick={handleActionToConfirm('cancel-messaging')} color="red">
                                     Cancelar
-                                    <i className={`bi bi-x-lg`}/>
+                                    <CgClose/>
                                 </Button>}
                         </div>
                     ) : null
             }
 
-            <div className="messaging-actions">
-                <Button onClick={handleActionToConfirm('restart')} color="warning" outline>Reiniciar Sesion</Button>
+            <div className="pb-5 flex justify-end">
+                <Button onClick={handleActionToConfirm('restart')} color="yellow">Reiniciar Sesion</Button>
             </div>
-            {!!logged && <>
-                <InputMask className="form-control mb-3" placeholder="Numeros de whatsapp"
-                           onChange={onChangeCustomContact}
-                           mask="+1 (999) 999-9999"/>
-                <div className="d-flex align-items-center gap-2 w-100 mb-3 users-multiselect-wrapper">
-                    <Button disabled={fetchingSeed === 'users'} onClick={handleActionToConfirm('users')} color="blue"><i
-                        className={`bi bi-arrow-clockwise ${fetchingSeed === 'users' ? 'rotate' : ''}`}></i></Button>
-                </div>
-
-                <div className="mb-3 flex items-center">
-                    <div className="flex items-center">
-                        <SearchableSelect<IWsGroup>
+            {logged &&
+                <div className="flex flex-col gap-4">
+                    <div className="flex items-center w-100">
+                        <SearchableSelect<IWsUser>
                             multiple
-                            options={seedData.groups.filter(item => !item.subject?.toLowerCase()?.includes('sin filtro'))}
-                            displayProperty="subject"
-                            label="Selecciona un grupo"
-                            disabled={fetchingSeed === 'groups'}
-                            onSelect={handleGroupSelection}
+                            options={seedData.users || []}
+                            displayProperty="firstName"
+                            label="Selecciona clientes"
+                            disabled={fetchingSeed === 'users'}
+                            onSelect={handleUserSelection}
                         />
-                        <Button loading={fetchingSeed === 'groups'}
+                        <Button loading={fetchingSeed === 'users'}
+                                disabled={fetchingSeed === 'users'}
+                                onClick={handleActionToConfirm('users')}
+                                color="blue" variant="text">
+                            {fetchingSeed !== 'users' && <IoReload/>}
+                        </Button>
+                    </div>
+
+                    <div className="flex items-center">
+                        <div className="flex items-center">
+                            <SearchableSelect<IWsGroup>
+                                multiple
+                                options={seedData.groups.filter(item => !item.subject?.toLowerCase()?.includes('sin filtro'))}
+                                displayProperty="subject"
+                                label="Selecciona un grupo"
                                 disabled={fetchingSeed === 'groups'}
-                                onClick={handleActionToConfirm('groups')}
-                                color="blue" variant="text">
-                            <IoReload/>
-                        </Button>
-                    </div>
-                    <SearchableSelect<IWsUser>
-                        multiple
-                        options={labeledUsers || []}
-                        displayProperty="firstName"
-                        label="Excepto estos usuarios"
-                        onSelect={handleUserExcluding(false)}
-                    />
-                </div>
-
-                <div className="mb-3 flex items-center">
-                    <div className="flex items-center">
-                        <SearchableSelect<IWsLabel>
+                                onSelect={handleGroupSelection}
+                            />
+                            <Button loading={fetchingSeed === 'groups'}
+                                    disabled={fetchingSeed === 'groups'}
+                                    onClick={handleActionToConfirm('groups')}
+                                    color="blue" variant="text">
+                                {fetchingSeed !== 'groups' && <IoReload/>}
+                            </Button>
+                        </div>
+                        <SearchableSelect<IWsUser>
                             multiple
-                            options={seedData.labels || []}
-                            displayProperty="name"
-                            label="Etiquetas"
-                            disabled={fetchingSeed === 'labels'}
-                            onSelect={handleLabelSelection}
+                            options={groupedUsers || []}
+                            displayProperty="firstName"
+                            label="Excepto estos usuarios"
+                            onSelect={handleUserExcluding(false)}
                         />
-                        <Button loading={fetchingSeed === 'labels'}
-                                disabled={fetchingSeed === 'labels'}
-                                onClick={handleActionToConfirm('labels')}
-                                color="blue" variant="text">
-                            <IoReload/>
-                        </Button>
                     </div>
-                    <SearchableSelect<IWsUser>
-                        multiple
-                        options={labeledUsers}
-                        displayProperty="firstName"
-                        label="Excepto estos usuarios"
-                        onSelect={handleUserExcluding(false)}
-                    />
-                </div>
-            </>}
+
+                    <div className="flex items-center">
+                        <div className="flex items-center">
+                            <SearchableSelect<IWsLabel>
+                                multiple
+                                options={seedData.labels || []}
+                                displayProperty="name"
+                                label="Etiquetas"
+                                disabled={fetchingSeed === 'labels'}
+                                onSelect={handleLabelSelection}
+                            />
+                            <Button loading={fetchingSeed === 'labels'}
+                                    disabled={fetchingSeed === 'labels'}
+                                    onClick={handleActionToConfirm('labels')}
+                                    color="blue" variant="text">
+                                {fetchingSeed !== 'labels' && <IoReload/>}
+                            </Button>
+                        </div>
+                        <SearchableSelect<IWsUser>
+                            multiple
+                            options={labeledUsers}
+                            displayProperty="firstName"
+                            label="Excepto estos usuarios"
+                            onSelect={handleUserExcluding(false)}
+                        />
+                    </div>
+                </div>}
 
             {!logged ?
                 <div>
@@ -357,47 +363,46 @@ const Messaging: React.FC<IMessaging> = (
                     {qrElement}
                 </div>
                 :
-                <div>
+                <div className="pt-5 flex flex-col gap-4">
                     <p className="mt-2">Puedes usar @firstName, @lastName, @fullName y @number para personalizar el
                         mensaje</p>
                     <Textarea
-                        className="mb-3 w-100"
                         onChange={onChangeMessage}
+                        value={message}
+                        placeholder="Escribe tu mensaje aquí"
                     />
-                    {!!photo &&
-                        <div>
-                            <img src={photo} alt=""/>
-                        </div>}
-                    <div className="mt-3 mb-5">
-                        <label className="btn btn-outline-info w-100" htmlFor="file">
-                            Cargar Imagen
-                        </label>
-                        <input
-                            className="invisible"
-                            onChange={onSelectPhoto}
-                            type="file"
-                            name="file"
-                            id="file"
-                            accept="image/png,image/jpg,image/gif,image/jpeg"
-                        />
-                    </div>
-                    <div className="mt-3 mb-5">
-                        {audio?.fileName && <span className="text-success">Audio: {audio?.fileName}</span>}
-                        <label className="btn btn-outline-info w-100" htmlFor="audioFile">
-                            Subir Audio
-                        </label>
-                        <input
-                            className="invisible"
-                            onChange={onSelectAudio}
-                            type="file"
-                            name="audioFile"
-                            id="audioFile"
-                            accept="audio/*"
-                        />
-                    </div>
-                    <Button className="float-right" color="light-green" outline
-                            onClick={handleSendMessage(selectedSession)}>Send
-                        Message</Button>
+
+                    <MediaHandler onChange={handleMedia} handle={{images: true, audios: true}}/>
+
+                    {/*<label className="btn btn-outline-info w-100" htmlFor="file">*/}
+                    {/*    Cargar Imagen*/}
+                    {/*</label>*/}
+                    {/*<input*/}
+                    {/*    className="invisible"*/}
+                    {/*    onChange={onSelectPhoto}*/}
+                    {/*    type="file"*/}
+                    {/*    name="file"*/}
+                    {/*    id="file"*/}
+                    {/*    accept="image/png,image/jpg,image/gif,image/jpeg"*/}
+                    {/*/>*/}
+                    {/*<div className="mt-3 mb-5">*/}
+                    {/*    {audio?.fileName && <span className="text-success">Audio: {audio?.fileName}</span>}*/}
+                    {/*    <label className="btn btn-outline-info w-100" htmlFor="audioFile">*/}
+                    {/*        Subir Audio*/}
+                    {/*    </label>*/}
+                    {/*    <input*/}
+                    {/*        className="invisible"*/}
+                    {/*        onChange={onSelectAudio}*/}
+                    {/*        type="file"*/}
+                    {/*        name="audioFile"*/}
+                    {/*        id="audioFile"*/}
+                    {/*        accept="audio/*"*/}
+                    {/*    />*/}
+                    {/*</div>*/}
+                    {!dialog &&
+                        <Button variant="text" color="light-green"
+                                onClick={handleSendMessage(selectedSession as string)}>Send
+                            Message</Button>}
                 </div>
             }
             <Dialog open={!!actionToConfirm} handler={handleActionToConfirm()}>
@@ -425,11 +430,16 @@ const Messaging: React.FC<IMessaging> = (
     )
     return dialog ? (<Dialog open={dialog.open} handler={dialog.handler}>
             <DialogHeader>
-                Envia Mensajes
+                <Typography variant="h3" className="text-center w-full">Envia Mensajes</Typography>
             </DialogHeader>
-            <DialogBody>
+            <DialogBody className="overflow-y-scroll max-h-[80dvh]">
                 {content}
             </DialogBody>
+            <DialogFooter>
+                <Button variant="text" color="light-green" className="w-full" size="lg"
+                        onClick={handleSendMessage(selectedSession as string)}>Send
+                    Message</Button>
+            </DialogFooter>
         </Dialog>)
         : content
 }
