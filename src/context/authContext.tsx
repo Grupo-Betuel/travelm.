@@ -59,7 +59,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
         Cookies.remove(AUTH_CONSTANT.TOKEN_KEY);
         setIUser(null);
         setToken(undefined);
-        location.href = '/auth/sign-in';
+        location.href = '/';
         // navigate('/auth/sign-in', {replace: true });
     };
 
