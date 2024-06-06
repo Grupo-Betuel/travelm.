@@ -2,9 +2,9 @@ import React, {useState, useEffect, useRef, useMemo} from 'react';
 import {Input, List, ListItem} from '@material-tailwind/react';
 import {generateCustomID} from "../utils/text.utils";
 
-export interface IOption {
+export interface IOption<T = any> {
     label: string;
-    value: string;
+    value: T;
 }
 
 interface SearchableSelectProps<T> {
@@ -106,7 +106,7 @@ function SearchableSelect<T>(
             />
             {isFocused && (
                 <List
-                      className="max-h-60 overflow-auto mt-1 border absolute w-full rounded bg-white z-50">
+                      className="max-h-60 overflow-auto mt-1 border absolute w-full rounded bg-white z-50" style={{zIndex: 999999999999}}>
                     {filteredOptions.map((option, index) => (
                         <a
                             key={`selectable-options-${index}`}

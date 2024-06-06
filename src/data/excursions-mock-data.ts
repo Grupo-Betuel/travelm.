@@ -270,7 +270,6 @@ export const mockProjection: IProjection = {
 
 
 export const mockExcursion: IExcursion = {
-    _id: '1234',
     title: 'Beach Day',
     description: 'A fun day at the beach.',
     destinations: [mockOrganization],

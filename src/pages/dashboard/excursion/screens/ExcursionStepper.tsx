@@ -363,13 +363,13 @@ const ExcursionStepper: React.FC = () => {
                         {currentStep === excursionSteps.length ? 'Finish' : 'Next'}
                     </Button>
                 </div>
-                {validationErrors.length > 0 && (
-                    <div className="mt-2">
-                        {validationErrors.map((error, index) => (
-                            <Typography key={index} color="red">{error}</Typography>
-                        ))}
-                    </div>
-                )}
+                {/*{validationErrors.length > 0 && (*/}
+                {/*    <div className="mt-2">*/}
+                {/*        {validationErrors.map((error, index) => (*/}
+                {/*            <Typography key={index} color="red">{error}</Typography>*/}
+                {/*        ))}*/}
+                {/*    </div>*/}
+                {/*)}*/}
             </CardBody>
         </Card>
     );
@@ -383,111 +383,5 @@ const validateStep0 = (formData: IExcursion): string[] => {
     return errors;
 };
 
-// Add validation functions for other steps as needed...
 
 export default ExcursionStepper;
-
-
-{/*<Stepper activeStep={currentStep || 0} className="p-4 overflow-x-scroll h-[200px] w-[100%]">*/
-}
-{/*    {excursionSteps.map((step, index) => (*/
-}
-{/*        <Step key={index} onClick={() => setCurrentStep(index)} >*/
-}
-{/*            {step.icon}*/
-}
-{/*            <div className="absolute -bottom-[2.5rem] w-max text-center">*/
-}
-{/*                <Typography*/
-}
-{/*                    className="min-w-[100px]"*/
-}
-{/*                    variant="h6"*/
-}
-{/*                    color={currentStep === index ? 'blue-gray' : 'gray'}*/
-}
-{/*                >*/
-}
-{/*                    {step.label}*/
-}
-{/*                </Typography>*/
-}
-{/*            </div>*/
-}
-{/*        </Step>*/
-}
-{/*    ))}*/
-}
-{/*</Stepper>*/
-}
-{/*<div>*/
-}
-{/*    {currentStep === 0 && (*/
-}
-{/*        <ExcursionGeneralInfo*/
-}
-{/*            excursionData={excursion}*/
-}
-{/*            updateExcursion={updateExcursionData}*/
-}
-{/*        />*/
-}
-{/*    )}*/
-}
-{/*    {currentStep === 1 &&*/
-}
-{/*        <OrganizationsDestinationsStep excursionData={excursion} updateExcursion={updateExcursionData}/>*/
-}
-{/*    }*/
-}
-{/*    {currentStep === 2 &&*/
-}
-{/*        <OrganizationsDestinationsStep type="destinations" excursionData={excursion} updateExcursion={updateExcursionData}/>*/
-}
-{/*    }*/
-}
-
-{/*    {currentStep === 3 &&*/
-}
-{/*        <MediaHandlerStep excursionData={excursion} updateExcursion={updateExcursionData}/>*/
-}
-{/*    }*/
-}
-{/*    {currentStep === 4 &&*/
-}
-{/*        <ActivitiesHandlerStep excursionData={excursion} updateExcursion={updateExcursionData}/>}*/
-}
-{/*    {currentStep === 5 &&*/
-}
-{/*        <FoodsHandlerStep excursionData={excursion} updateExcursion={updateExcursionData}/>}*/
-}
-{/*    {currentStep === 6 &&*/
-}
-{/*        <ProjectHandlerStep excursionData={excursion} updateExcursion={updateExcursionData}/>}*/
-}
-{/*    {currentStep === 7 &&*/
-}
-{/*        <TransportHandlerStep excursionData={excursion} updateExcursion={updateExcursionData}/>*/
-}
-{/*    }*/
-}
-{/*    {currentStep === 8 &&*/
-}
-{/*        <FinancesHandlerStep excursionData={excursion} updateExcursion={updateExcursionData}/>*/
-}
-{/*    }*/
-}
-
-{/*    {currentStep === 9 &&*/
-}
-{/*        <div>*/
-}
-{/*            <Typography variant="h2">Comparte!</Typography>*/
-}
-{/*        </div>*/
-}
-{/*    }*/
-}
-
-{/*</div>*/
-}

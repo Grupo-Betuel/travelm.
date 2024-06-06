@@ -1,5 +1,5 @@
 import React, {ReactNode, useEffect, useMemo, useState} from 'react';
-import {Input, Button, Dialog, DialogHeader, DialogBody, DialogFooter} from "@material-tailwind/react";
+import {Input, Button, Dialog, DialogHeader, DialogBody, DialogFooter, Typography} from "@material-tailwind/react";
 import {IClient} from "../../../../models/clientModel";
 import InputMask from "react-input-mask";
 import ServiceHandler from "./ServiceHandler";
@@ -100,7 +100,7 @@ const ClientForm: React.FC<ClientFormProps> = (
     }
 
     useEffect(() => {
-        if(!service) return;
+        if (!service) return;
 
         const newServices = mergeClientServices();
         setClient({
@@ -110,7 +110,8 @@ const ClientForm: React.FC<ClientFormProps> = (
     }, [service])
 
     const form = (
-        <div className="p-4 flex flex-col gap-3">
+        <div className="px-4 flex flex-col gap-3">
+            <Typography variant="h6">Datos del Cliente</Typography>
             <InputMask
                 mask="+1 (999) 999-9999"
                 name="phone"
@@ -130,18 +131,20 @@ const ClientForm: React.FC<ClientFormProps> = (
                         />
                     ) as any) as any}
             </InputMask>
-            <Input
-                label="Nombre"
-                name="firstName"
-                value={client.firstName}
-                onChange={handleChange}
-            />
-            <Input
-                label="Apellido"
-                name="lastName"
-                value={client.lastName}
-                onChange={handleChange}
-            />
+            <div className="flex gap-3 items-center">
+                <Input
+                    label="Nombre"
+                    name="firstName"
+                    value={client.firstName}
+                    onChange={handleChange}
+                />
+                <Input
+                    label="Apellido"
+                    name="lastName"
+                    value={client.lastName}
+                    onChange={handleChange}
+                />
+            </div>
             {enableService && <ServiceHandler
                 service={service}
                 services={client.services}
@@ -187,7 +190,7 @@ const ClientForm: React.FC<ClientFormProps> = (
                         color="blue"
                         onClick={() => onSubmit(client)}
                     >
-                       Enviar
+                        Enviar
                     </Button>
                 </DialogFooter>
             </Dialog>

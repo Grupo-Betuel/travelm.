@@ -124,19 +124,21 @@ const BedroomsHandler: React.FC<BedroomsHandlerProps> = ({bedrooms, updateBedroo
                 <Button color="blue"
                         onClick={handleAddOrUpdateBedroom}>{editBedroomIndex !== undefined ? 'Actualizar' : 'Crear'} Habitacion</Button>
             </div>
-            {(bedrooms || []).map((bedroom, index) => (
-                <div key={index} className="mt-2 bg-gray-100 p-2 rounded">
-                    <Typography variant="h6">Nombre: {bedroom.name}</Typography>
-                    <Typography variant="h6">Capacidad: {bedroom.capacity}</Typography>
-                    <Typography variant="h6">Planta: ${bedroom.level}</Typography>
-                    <Typography variant="h6">Zona: ${bedroom.zone}</Typography>
-                    <div className="flex space-x-2 mt-2">
-                        <Button color="red"
-                                onClick={() => handleSetActionToConfirm('delete', 'Eliminar Habitacion')(bedroom)}>Delete</Button>
-                        <Button onClick={editBedroomMode(index)}>Edit</Button>
+            <div className="grid gap-y-6 gap-x-6 md:grid-cols-2 xl:grid-cols-5">
+                {(bedrooms || []).map((bedroom, index) => (
+                    <div key={index} className="mt-2 bg-gray-100 p-2 rounded-xl p-4">
+                        <Typography variant="h6">Nombre: {bedroom.name}</Typography>
+                        <Typography variant="h6">Capacidad: {bedroom.capacity}</Typography>
+                        <Typography variant="h6">Planta: {bedroom.level}</Typography>
+                        <Typography variant="h6">Zona: {bedroom.zone}</Typography>
+                        <div className="flex space-x-4 mt-2">
+                            <Button color="red"
+                                    onClick={() => handleSetActionToConfirm('delete', 'Eliminar Habitacion')(bedroom)}>Delete</Button>
+                            <Button onClick={editBedroomMode(index)}>Edit</Button>
+                        </div>
                     </div>
-                </div>
-            ))}
+                ))}
+            </div>
             <ConfirmDialog/>
         </div>
     );

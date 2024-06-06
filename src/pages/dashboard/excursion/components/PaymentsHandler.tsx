@@ -1,12 +1,18 @@
 // PaymentHandler.tsx
 import React, {useState} from 'react';
 import {Button, Input, Select, Option, Textarea} from '@material-tailwind/react';
-import {IPayment} from "../../../../models/PaymentModel";
+import {IPayment, paymentTypeLabels} from "../../../../models/PaymentModel";
 import DatePicker from "../../../../components/DatePicker";
 import {PencilIcon, TrashIcon} from "@heroicons/react/20/solid";
 import {PAYMENT_CONSTANTS} from "../../../../constants/payment.constants";
+import {CommonConfirmActions, CommonConfirmActionsDataTypes} from "../../../../models/common";
+import {useConfirmAction} from "../../../../hooks/useConfirmActionHook";
+import MediaHandler, {IMediaHandled} from "./MediaHandler";
+import {IMedia} from "../../../../models/mediaModel";
+import {AppImage} from "../../../../components/AppImage";
 
 interface PaymentHandlerProps {
+    enableAddPayment?: boolean;
     payments: IPayment[];
     onChangePayment: (payments: IPayment[]) => any;
     onUpdatePayment: (payments: IPayment[]) => any;
@@ -15,15 +21,37 @@ interface PaymentHandlerProps {
 
 export const emptyPayment: IPayment = {type: 'cash', date: new Date(), amount: 0, comment: ''}
 
-const PaymentHandler: React.FC<PaymentHandlerProps> = ({
-                                                           payments,
-                                                           onDeletePayment,
-                                                           onChangePayment,
-                                                           onUpdatePayment
-                                                       }) => {
+
+const PaymentHandler: React.FC<PaymentHandlerProps> = (
+    {
+        payments,
+        onDeletePayment,
+        onChangePayment,
+        onUpdatePayment
+    }) => {
     const [newPayment, setNewPayment] = useState<IPayment>(emptyPayment);
     const [editing, setEditing] = useState<boolean>(false);
     const [editIndex, setEditIndex] = useState<number | null>(null);
+
+    const onConfirmAction = (type?: CommonConfirmActions, data?: CommonConfirmActionsDataTypes<IPayment>) => {
+        console.log('confirm action', type, data);
+        switch (type) {
+            case 'delete':
+                handleOnDelete(data as IPayment);
+                break;
+        }
+    }
+
+    const onDeniedAction = (type?: CommonConfirmActions, data?: CommonConfirmActionsDataTypes<IPayment>) => {
+
+    }
+
+    const {
+        handleSetActionToConfirm,
+        resetActionToConfirm,
+        ConfirmDialog
+    } = useConfirmAction<CommonConfirmActions, CommonConfirmActionsDataTypes<IPayment>>(onConfirmAction, onDeniedAction);
+
 
     const handleInputChange = (field: keyof IPayment, value: any) => {
         if (editing && editIndex !== null) {
@@ -46,7 +74,7 @@ const PaymentHandler: React.FC<PaymentHandlerProps> = ({
             setEditIndex(null);
         } else {
             paymentsData = [...paymentsData, {...newPayment}];
-            onChangePayment(paymentsData);
+            // onChangePayment(paymentsData);
             setNewPayment(emptyPayment);
         }
 
@@ -64,52 +92,71 @@ const PaymentHandler: React.FC<PaymentHandlerProps> = ({
         setEditIndex(null);
     };
 
-    const handleOnDelete = (p: IPayment) => () => {
-        // TODO: Loading state
+    const handleOnDelete = (p: IPayment) => {
         onDeletePayment(p);
+    }
+
+    const handleMedia = (media: IMediaHandled) => {
+        const image = media.images && media.images[0];
+        if (editing && editIndex !== null) {
+
+            const updatedPayments = [...payments];
+            if (!updatedPayments[editIndex]) {
+                // TODO: handle error
+                return;
+            }
+
+            const updatedPayment: IPayment = {...updatedPayments[editIndex], media: image as IMedia};
+            updatedPayments[editIndex] = updatedPayment;
+            onChangePayment(updatedPayments);
+        } else {
+            setNewPayment({...newPayment, media: image as IMedia});
+        }
     }
 
     return (
         <div className="flex flex-col gap-3">
             <div className="flex items-center gap-3 justify-between">
                 <Select
-                    label="Payment Type"
+                    label="Tipo de Pago"
                     value={editing && editIndex !== null ? payments[editIndex].type : newPayment.type}
                     onChange={(e) => handleInputChange('type', e)}
                 >
                     {PAYMENT_CONSTANTS.PAYMENT_TYPES.map(type => (
-                        <Option key={type} value={type}>{type}</Option>
+                        <Option key={type} value={type}>{paymentTypeLabels[type]}</Option>
                     ))}
                 </Select>
                 <Input
                     type="number"
-                    label="Amount"
+                    label="Cantidad"
                     value={(editing && editIndex !== null ? payments[editIndex].amount : newPayment.amount).toString()}
                     onChange={(e) => handleInputChange('amount', parseFloat(e.target.value))}
                 />
             </div>
             <Textarea
                 rows={1}
-                label="Comment"
+                label="Comentario (Opcional)"
                 value={editing && editIndex !== null ? payments[editIndex].comment : newPayment.comment}
                 onChange={(e) => handleInputChange('comment', e.target.value)}
             />
             <div className="flex items-center gap-3 justify-between">
                 <DatePicker
-                    label="Select Date"
+                    label="Fecha"
                     onChange={date => handleInputChange('date', date)}
                     date={editing && editIndex !== null ? payments[editIndex].date : newPayment.date}
                 />
-                <Button className="w-[100%]" onClick={addOrUpdatePayment} color={editing ? "orange" : "green"}>
-                    {editing ? "Save Changes" : "Add Payment"}
+            </div>
+            <MediaHandler onChange={handleMedia} handle={{images: true}} disableUpload/>
+            <div className="flex items-center gap-5">
+                {editing && (
+                    <Button onClick={cancelEditing} color="red">
+                        Cancel
+                    </Button>
+                )}
+                <Button onClick={addOrUpdatePayment} color={editing ? "blue" : "green"}>
+                    {editing ? "Guardar Cambios" : "Agregar Pago"}
                 </Button>
             </div>
-
-            {editing && (
-                <Button onClick={cancelEditing} color="red">
-                    Cancel
-                </Button>
-            )}
             <div className="flex flex-wrap -mx-4">
                 {
                     payments.map((payment, index) => (
@@ -118,12 +165,19 @@ const PaymentHandler: React.FC<PaymentHandlerProps> = ({
                             <p>Amount: RD$ {payment.amount.toLocaleString()}</p>
                             <p>Date: {new Date(payment.date).toLocaleDateString()}</p>
                             <p>Comment: {payment.comment}</p>
-                            <div className="flex items-center gap-3 justify-between">
+                            {payment.media &&
+                                <div className="flex items-center gap-3">
+                                    <p>Bauche: </p>
+                                    <AppImage src={payment.media.content} alt={payment.media.title}
+                                              className="!w-16 !h-16 border-2 rounded-xl"/>
+                                </div>
+                            }
+                            <div className="flex items-center gap-3 justify-between mt-4">
                                 <Button onClick={() => startEditing(index)} color="blue">
                                     <PencilIcon className=" h-5 w-5"/>
                                 </Button>
 
-                                <Button onClick={handleOnDelete(payment)} color="red">
+                                <Button onClick={() => handleSetActionToConfirm('delete')(payment)} color="red">
                                     <TrashIcon className=" h-5 w-5"/>
                                 </Button>
                             </div>
@@ -131,6 +185,7 @@ const PaymentHandler: React.FC<PaymentHandlerProps> = ({
                     ))
                 }
             </div>
+            <ConfirmDialog/>
         </div>
     );
 };

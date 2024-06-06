@@ -9,6 +9,8 @@ import {useRenderMedia} from "../../../../hooks/useRenderMedia"; // Adjust the p
 import {FaFacebookF, FaTwitter, FaWhatsapp, FaPhone, FaInstagram} from 'react-icons/fa';
 import {TravelMap} from "../../../../components/TravelMap";
 import {IMG_CONSTANTS} from "../../../../constants/img.utils";
+import {Link} from "react-router-dom";
+import {GrLocation} from "react-icons/gr";
 
 interface OrganizationCardProps {
     organization: IOrganization;
@@ -36,33 +38,37 @@ export const OrganizationCard: React.FC<OrganizationCardProps> = ({onEdit, organ
 
     return (
         <Card className={`${className} min-w-[250px]`}>
-            <CardHeader className="min-h-[100px]">
-                <Swiper
-                    modules={[Navigation, Pagination]}
-                    navigation
-                    spaceBetween={5}
-                    slidesPerView={1}
-                    className="text-xs custom-swiper relative max-h-[100px]"
-                >
-                    {organization?.medias?.map((media, index) => (
-                        <SwiperSlide key={index}>
-                            {renderMedia(media)}
-                        </SwiperSlide>
-                    ))}
-                </Swiper>
-            </CardHeader>
-            <CardBody>
+            {!!organization?.medias?.length &&
+                <CardHeader className="min-h-[100px]">
+                    <Swiper
+                        modules={[Navigation, Pagination]}
+                        navigation
+                        spaceBetween={5}
+                        slidesPerView={1}
+                        className="text-xs custom-swiper relative max-h-[100px]"
+                    >
+                        {organization?.medias?.map((media, index) => (
+                            <SwiperSlide key={index}>
+                                {renderMedia(media)}
+                            </SwiperSlide>
+                        ))}
+                    </Swiper>
+                </CardHeader>
+            }
+
+            <CardBody className="h-full">
                 <div className="flex items-center space-x-4">
                     <Avatar src={organization?.logo?.content || IMG_CONSTANTS.LOGO_PLACEHOLDER} size="xl"/>
                     <span className="font-bold whitespace-break-spaces line-clamp-2">{organization.name}</span>
                 </div>
-                <Typography
-                    className="font-bold whitespace-pre-line line-clamp-2">{organization.description}</Typography>
-                <div className="flex mt-4">
+                <div className="flex flex-col gap-2 py-4">
+                    {organization.description && <Typography
+                        className="whitespace-pre-line line-clamp-2">{organization.description}</Typography>}
                     {organization.entryFee?.price &&
-                        <Typography>Precio: RD${organization.entryFee?.price.toLocaleString()}</Typography>}
+                        <Typography><b>Entrada:</b> RD${organization.entryFee?.price.toLocaleString()}</Typography>}
                     {organization?.contact?.tel &&
-                        <a target="_blank" href={`tel:${organization?.contact?.tel}`} className="mr-4"><FaPhone/></a>}
+                        <a target="_blank" href={`tel:${organization?.contact?.tel}`}
+                           className="mr-4"><FaPhone/></a>}
                     {organization?.contact?.phone &&
                         <a target="_blank" href={`https://wa.me/${organization?.contact?.phone}`}
                            className="mr-4"><FaWhatsapp/></a>}
@@ -73,10 +79,26 @@ export const OrganizationCard: React.FC<OrganizationCardProps> = ({onEdit, organ
                             {network.type === 'twitter' && <FaTwitter className="text-blue-600 text-lg"/>}
                         </a>
                     ))}
+                    {!!(organization.contact?.location?.link || organization.contact?.location?.link) &&
+                        <div className="flex items-center gap-2">
+                            <GrLocation color="red" className="w-16 h-16"/>
+                            {
+                                organization.contact?.location?.link ?
+
+                                    <Link target={"_blank"} to={organization.contact?.location?.link}
+                                          className="font-light text-blue-500 whitespace-pre-line line-clamp-1">
+                                        {organization.contact.location.address}
+                                    </Link>
+                                    : organization.contact?.location?.address &&
+                                    <span
+                                        className="font-light whitespace-pre-line line-clamp-1">
+                                {organization.contact.location.address}
+                            </span>
+                            }
+                        </div>
+                    }
+
                 </div>
-                {organization.contact?.location?.address &&
-                    <span
-                        className="font-light whitespace-pre-line line-clamp-2">{organization.contact.location.address}</span>}
             </CardBody>
             <CardFooter className="flex justify-between flex-row-reverse pt-0">
                 {onEdit && <Button className="justify-self-end" variant="text" color="blue"

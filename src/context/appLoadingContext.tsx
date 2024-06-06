@@ -24,7 +24,7 @@ export const AppLoadingProvider: React.FC<{ children: any }> = ({children}) => {
     };
 
     useEffect(() => {
-        const query = 'button,input,select,textarea';
+        const query = 'button,input,select,textarea,checkbox,radio';
         document.querySelectorAll(query).forEach((el) => {
             if (!appIsLoading) {
                 el.removeAttribute('disabled');

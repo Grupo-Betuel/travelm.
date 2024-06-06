@@ -38,19 +38,19 @@ export const BedroomDetails: React.FC<BedroomStatusProps> = ({excursion}) => {
 
     const occupiedCapacity = useMemo(() => calculateOccupiedCapacity(excursion), [excursion.clients, excursion._id]);
 
-    const occupiedPercentage = (occupiedCapacity / totalCapacity) * 100;
+    const occupiedPercentage = Math.ceil((occupiedCapacity / totalCapacity) * 100);
 
     return (
         <div className="container mx-auto flex flex-col gap-5">
-            <Typography variant="h2">
-                Estado de las Habitaciones
+            <Typography variant="h3">
+                Habitaciones
             </Typography>
             <Card className="w-full mb-4">
                 <CardBody>
-                    <Typography className="text-lg mb-2">Overall Occupancy</Typography>
-                    <Progress value={occupiedPercentage} color="blue"/>
+                    <Typography className="text-lg mb-2">Porcentaje Ocupado</Typography>
+                    <Progress value={occupiedPercentage} label=" " color="blue"/>
                     <Typography className="text-sm mt-2">
-                        {occupiedCapacity} / {totalCapacity} (Occupied / Total Capacity)
+                        {occupiedCapacity} / {totalCapacity} (Ocupadas / Capacidad total)
                     </Typography>
                 </CardBody>
             </Card>
@@ -58,22 +58,20 @@ export const BedroomDetails: React.FC<BedroomStatusProps> = ({excursion}) => {
                 {bedrooms.map((bedroom: IBedroom, index: number) => {
                     const bedroomOccupiedCapacity = bedroom.occupiedQuantity || 0;
                     const remainingCapacity = bedroom.capacity - bedroomOccupiedCapacity;
-                    const bedroomOccupiedPercentage = (bedroomOccupiedCapacity / bedroom.capacity) * 100;
+                    const bedroomOccupiedPercentage = Math.ceil((bedroomOccupiedCapacity / bedroom.capacity) * 100);
 
                     return (
                         <Card key={index} className="w-full">
-                            <CardHeader>
+                            <CardHeader color="blue-gray">
                                 <Typography variant="h5" className="px-3 py-2">{bedroom.name}</Typography>
                             </CardHeader>
                             <CardBody>
-                                <Typography className="text-sm mb-2">Zone: {bedroom.zone}</Typography>
-                                <Typography className="text-sm mb-2">Level: {bedroom.level}</Typography>
-                                <Typography className="text-sm mb-2">Total Capacity: {bedroom.capacity}</Typography>
-                                <Typography className="text-sm mb-2">Occupied
-                                    Capacity: {bedroomOccupiedCapacity}</Typography>
-                                <Typography className="text-sm mb-2">Remaining
-                                    Capacity: {remainingCapacity}</Typography>
-                                <Progress value={bedroomOccupiedPercentage} color="blue"/>
+                                <Typography className="text-sm mb-2">Zona: {bedroom.zone}</Typography>
+                                <Typography className="text-sm mb-2">Planta: {bedroom.level}</Typography>
+                                <Typography className="text-sm mb-2">Capacidad: {bedroom.capacity}</Typography>
+                                <Typography className="text-sm mb-2">Ocupadas: {bedroomOccupiedCapacity}</Typography>
+                                <Typography className="text-sm mb-2">Restante: {remainingCapacity}</Typography>
+                                <Progress value={bedroomOccupiedPercentage} label=" " color="blue"/>
                             </CardBody>
                         </Card>
                     );
@@ -82,3 +80,9 @@ export const BedroomDetails: React.FC<BedroomStatusProps> = ({excursion}) => {
         </div>
     );
 };
+
+
+
+
+
+

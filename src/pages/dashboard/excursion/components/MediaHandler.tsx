@@ -51,6 +51,7 @@ export interface IMediaHandled {
 }
 
 export interface IHandleMediaFormProps {
+    disableUpload?: boolean;
     onChange: (data: IMediaHandled) => any;
     medias?: IMedia[];
     flyerMedia?: IMediaFile;
@@ -66,7 +67,7 @@ export interface IHandleMediaFormProps {
 
 export const mediasService = getCrudService('medias');
 
-const MediaHandler = ({onChange, medias, logoMedia, flyerMedia, handle}: IHandleMediaFormProps) => {
+const MediaHandler = ({onChange, medias, disableUpload, logoMedia, flyerMedia, handle}: IHandleMediaFormProps) => {
     const [flyer, setFlyer] = useState<IMediaFile>();
     const [logo, setLogo] = useState<IMediaFile>();
     const [images, setImages] = useState<IMediaFile[]>([]);
@@ -304,11 +305,11 @@ const MediaHandler = ({onChange, medias, logoMedia, flyerMedia, handle}: IHandle
                     </div>
                     <IoSearch onClick={toggleSearchMediaModal(ExtraMediaTypesEnum.LOGO)}
                               className="text-blue-400 w-[23px] h-[23px] cursor-pointer"/>
-                    <label>
+                    {!disableUpload && <label>
                         <input type="file" className="hidden absolute -z-10" placeholder="flyer" accept="image/*"
                                onChange={handleLogoChange}/>
                         <AiOutlineCloudUpload className="h-10 w-10 cursor-pointer text-blue-400 w-[26px]"/>
-                    </label>
+                    </label>}
                 </div>
             </>
             }
@@ -317,23 +318,23 @@ const MediaHandler = ({onChange, medias, logoMedia, flyerMedia, handle}: IHandle
                     <Typography variant="h6">Flyer ({flyer ? 1 : 0}):</Typography>
                     <IoSearch onClick={toggleSearchMediaModal(ExtraMediaTypesEnum.FLYER)}
                               className="text-blue-400 w-[23px] h-[23px] cursor-pointer"/>
-                    <label>
+                    {!disableUpload && <label>
                         <input type="file" className="hidden absolute -z-10" placeholder="flyer" accept="image/*"
                                onChange={handleFlyerChange}/>
                         <AiOutlineCloudUpload className="h-10 w-10 cursor-pointer text-blue-400 w-[26px]"/>
-                    </label>
+                    </label>}
                 </div>
             }
             {(!handle || handle.images) &&
                 <div className="flex items-center gap-5">
-                    <Typography variant="h6">Imagenes ({images.length}):</Typography>
+                    <Typography variant="h6" className="whitespace-nowrap">Imagenes ({images.length}):</Typography>
                     <IoSearch onClick={toggleSearchMediaModal(MediaTypeEnum.IMAGE)}
                               className="text-blue-400 w-[23px] h-[23px] cursor-pointer"/>
-                    <label>
+                    {!disableUpload && <label>
                         <input type="file" className="hidden absolute -z-10" placeholder="flyer" accept="image/*"
                                onChange={handleImagesChange}/>
                         <AiOutlineCloudUpload className="h-10 w-10 cursor-pointer text-blue-400 w-[26px]"/>
-                    </label>
+                    </label>}
                 </div>
             }
             {/*{(!handle || handle.videos) &&*/}
@@ -348,18 +349,20 @@ const MediaHandler = ({onChange, medias, logoMedia, flyerMedia, handle}: IHandle
                     <Typography variant="h6">Audios ({audios.length}):</Typography>
                     <IoSearch onClick={toggleSearchMediaModal(MediaTypeEnum.AUDIO)}
                               className="text-blue-400 w-[23px] h-[23px] cursor-pointer"/>
-                    <label>
+                    {!disableUpload && <label>
                         <input type="file" className="hidden absolute -z-10" placeholder="flyer" accept="audio/*"
                                onChange={handleAudiosChange}/>
                         <AiOutlineCloudUpload className="h-10 w-10 cursor-pointer text-blue-400 w-[26px]"/>
-                    </label>
+                    </label>}
                 </div>
             }
 
             {allImagesMedia.length > 0 && (
-                <Swiper modules={[Navigation, Pagination]}
-                        spaceBetween={10} slidesPerView={3} navigation
-                        pagination={{clickable: true}} className="relative h-[300px] w-full">
+                <Swiper
+                    cssMode
+                    modules={[Navigation, Pagination]}
+                    spaceBetween={10} slidesPerView={3} navigation
+                    pagination={{clickable: true}} className="relative h-[300px] w-full">
                     {allImagesMedia.map((image, index) => (
                         <SwiperSlide key={`image-slide-${index}`} className="flex justify-center">
                             <div className="flex">
@@ -399,7 +402,7 @@ const MediaHandler = ({onChange, medias, logoMedia, flyerMedia, handle}: IHandle
                 </DialogHeader>
                 <DialogBody className="overflow-y-scroll max-h-[80dvh]">
                     <MediaList
-                        mediaType={selectedMediaSelectorType === ExtraMediaTypesEnum.FLYER || selectedMediaSelectorType === ExtraMediaTypesEnum.LOGO  ?
+                        mediaType={selectedMediaSelectorType === ExtraMediaTypesEnum.FLYER || selectedMediaSelectorType === ExtraMediaTypesEnum.LOGO ?
                             MediaTypeEnum.IMAGE
                             : selectedMediaSelectorType as MediaTypeEnum
                         }

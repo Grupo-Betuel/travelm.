@@ -23,7 +23,7 @@ export default function DatePicker({onChange, date, label}: ICustomDatePickerPro
                     name="date"
                     label={label}
                     onChange={() => null}
-                    value={date ? format(date, "PPP") : ""}
+                    value={date ? format(date, "dd / MM / yyyy") : ""}
                 />
             </PopoverHandler>
             <PopoverContent className="z-[9999]">

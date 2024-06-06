@@ -18,7 +18,6 @@ import {ICheckpoint} from "../../../../models/checkpointModel";
 import {TravelMap} from "../../../../components/TravelMap";
 import {getCrudService} from "../../../../api/services/CRUD.service";
 import {IClient} from "../../../../models/clientModel";
-import {GLOBAL_CONSTANTS} from "../../../../constants/global.constant";
 import {useConfirmAction} from "../../../../hooks/useConfirmActionHook";
 import {EXCURSION_CONSTANTS} from "../../../../constants/excursion.constant";
 import {CLIENTS_CONSTANTS} from "../../../../constants/clients.constant";
@@ -29,7 +28,8 @@ import {UserRoleTypes, UserTypes} from "../../../../models/interfaces/userModel"
 import ProtectedElement from "../../../../components/ProtectedElement";
 import {IoReload} from "react-icons/io5";
 import {FaWhatsapp} from "react-icons/fa";
-
+import {useAppLoading} from "../../../../context/appLoadingContext";
+import ExcursionDetailsSkeleton from "../../../../components/ExcursionDetailsSkeleton";
 
 const excursionService = getCrudService('excursions');
 const clientService = getCrudService('travelClients');
@@ -42,12 +42,18 @@ export const ExcursionDetails: React.FC = () => {
     const [wsMessagingIsOpen, setWsMessagingIsOpen] = useState(false);
     const ownerOrganization = useMemo(() => excursion.owner, [excursion.owner]);
     const toggleWsMessaging = () => setWsMessagingIsOpen(!wsMessagingIsOpen);
+    const {setAppIsLoading} = useAppLoading();
 
     const {
         data: excursionData,
         isLoading: isLoadingExcursion,
+        isFetching: isFetchingExcursion,
         refetch: refetchExcursion
     } = excursionService.useFetchByIdExcursions(params.excursionId as string, {skip: !params.excursionId});
+
+    useEffect(() => {
+        setAppIsLoading(isLoadingExcursion || isFetchingExcursion);
+    }, [isLoadingExcursion, isFetchingExcursion]);
 
     const onConfirmAction = (type?: ExcursionDetailActions, data?: ExcursionDetailActionsDataTypes, ...extra: any) => {
         switch (type) {
@@ -139,16 +145,37 @@ export const ExcursionDetails: React.FC = () => {
         updateExcursion({_id: excursion._id || '', clients: updatedClients});
     }
 
-    const onUpdateClient = (client: Partial<IClient>, isOptimistic?: boolean) => {
-        if (!client._id) {
-            // TODO: error toast
-            return;
+    const onUpdateClient = async (client: Partial<IClient> | Partial<IClient>[], isOptimistic?: boolean) => {
+        setAppIsLoading(true);
+        if (Array.isArray(client)) {
+            setExcursion({
+                ...excursion,
+                clients: excursion.clients.map(c => {
+                    const updatedClient = (client as Partial<IClient>[]).find(cl => cl._id === c._id);
+                    return updatedClient ? {...c, ...updatedClient} : c;
+                })
+            });
+            !isOptimistic && updateClient(client as any);
+        } else {
+            if (!client._id) {
+                // TODO: error toast
+                return;
+            }
+
+            if (!isOptimistic) {
+                const {data} = await updateClient({_id: client._id, ...client})
+                client = {
+                    ...client,
+                    ...data,
+                };
+            }
+
+            setExcursion({
+                ...excursion,
+                clients: excursion.clients.map(c => c._id === client._id ? {...c, ...client} : c)
+            });
         }
-        setExcursion({
-            ...excursion,
-            clients: excursion.clients.map(c => c._id === client._id ? {...c, ...client} : c)
-        });
-        !isOptimistic && updateClient({_id: client._id, ...client});
+        setAppIsLoading(false);
     }
 
     const onUpdateExcursion = (e: Partial<IExcursion>, isOptimistic?: boolean) => {
@@ -169,10 +196,18 @@ export const ExcursionDetails: React.FC = () => {
 
     console.log(ownerOrganization?.sessionId);
 
+    if (
+        !excursion._id
+    ) return (
+        <div className="container mx-auto relative flex flex-col gap-5">
+            <ExcursionDetailsSkeleton/>
+        </div>
+    );
 
     return (
-        <div className="container mx-auto relative flex flex-col gap-7">
+        <div className="container mx-auto relative flex flex-col gap-5">
             <Swiper
+                initialSlide={1}
                 coverflowEffect={{
                     rotate: 50,
                     stretch: 0,
@@ -192,6 +227,7 @@ export const ExcursionDetails: React.FC = () => {
                 centeredSlides
                 // navigation
                 cssMode
+                wrapperClass={'!overflow-y-hidden'}
                 className="relative h-[500px] w-full"
             >
                 {mediaItems.map((media, index) => (
@@ -224,24 +260,18 @@ export const ExcursionDetails: React.FC = () => {
                     {excursion.title}
                 </Typography>
             </div>
+
             <div className="flex gap-3 items-center justify-end">
-                <Button color="green" className="flex items-center gap-2" onClick={toggleWsMessaging}>
-                    Whatsapp <FaWhatsapp className="w-[18px] h-[18px] cursor-pointer"/>
-                </Button>
+                <ProtectedElement roles={[UserRoleTypes.ADMIN]} userTypes={[UserTypes.AGENCY]}>
+                    <Button color="green" className="flex items-center gap-2" onClick={toggleWsMessaging}>
+                        Whatsapp <FaWhatsapp className="w-[18px] h-[18px] cursor-pointer"/>
+                    </Button>
+                </ProtectedElement>
                 <Button color="blue" className="flex items-center gap-2" onClick={refetchExcursion}>
                     Recargar <IoReload className="w-[18px] h-[18px] cursor-pointer"/>
                 </Button>
             </div>
-            {/* Organization, Destination, and TransportStep Information Cards */}
-            <div className="flex justify-around gap-3 !overflow-x-scroll p-4 py-10 h-[400px]">
-                {[...excursion.organizations, ...excursion.destinations, excursion.transport.organization].map((entity, index) => (
-                    <OrganizationCard
-                        className={`w-[250px]`}
-                        key={`organization-${index}`}
-                        organization={entity}/>
-                ))}
-            </div>
-            {/* More sections like Clients Table, Finance Details, Activities Tabs, etc., can follow here */}
+
             <ClientsExcursionTable
                 bedrooms={excursionBedrooms}
                 updateExcursion={handleSetActionToConfirm('update', EXCURSION_CONSTANTS.UPDATE_EXCURSION_TEXT)}
@@ -250,45 +280,59 @@ export const ExcursionDetails: React.FC = () => {
                 onAddClient={handleSetActionToConfirm('add-client', CLIENTS_CONSTANTS.ADD_CLIENT_TEXT)}
                 clients={excursion.clients || []}
             />
-            <FinanceDetails finance={excursion.finance} clients={excursion.clients || []}
-                            projections={excursion.projections} excursionId={excursion._id as string}
+            <FinanceDetails
+                transport={excursion.transport}
+                destinations={excursion.destinations}
+                finance={excursion.finance}
+                clients={excursion.clients || []}
+                projections={excursion.projections} excursionId={excursion._id as string}
             />
-            {!!excursion.bedrooms?.length && <BedroomDetails excursion={excursion}/>}
-            {!!excursion.activities.length && <ActivityDetails activities={excursion.activities}/>}
-            <ProjectionsCharts projections={excursion.projections}/>
+            {!!excursionBedrooms?.length && <BedroomDetails excursion={excursion}/>}
+            {/*{!!excursion.activities.length && <ActivityDetails activities={excursion.activities}/>}*/}
+            {/*<ProjectionsCharts projections={excursion.projections}/>*/}
+            {!!excursion.checkpoints?.length &&
+                <div>
 
+                    <Swiper
+                        modules={[Navigation, Pagination]}
+                        spaceBetween={10}
+                        slidesPerView={1}
+                        navigation
+                        pagination={{clickable: true}}
+                        className="relative h-[300px] w-full"
+                    >
+                        {excursion.checkpoints.map((checkpoint, index) => (
+                            <SwiperSlide key={index}>
+                                <Card>
+                                    <CardHeader>
+                                        <TravelMap location={checkpoint.location}/>
+                                    </CardHeader>
+                                    <CardBody>
+                                        <Typography>{checkpoint.description}</Typography>
+                                        <Button color="orange" onClick={() => editCheckpoint(checkpoint)}>Edit</Button>
+                                    </CardBody>
+                                </Card>
+                            </SwiperSlide>
+                        ))}
+                    </Swiper>
+
+                </div>
+            }
+
+            {/* Organization, Destination, and TransportStep Information Cards */}
             <div>
-                <Button color="blue" onClick={addCheckpoint}>Add New Checkpoint</Button>
-                {selectedCheckpoint && (
-                    <CheckpointForm checkpoint={selectedCheckpoint} onSave={saveCheckpoint} onCancel={() => {
-                    }}/>
-                )}
-                <Swiper
-                    style={{width: '350px'}}
-                    modules={[Navigation, Pagination]}
-                    spaceBetween={10}
-                    slidesPerView={1}
-                    navigation
-                    pagination={{clickable: true}}
-                    className="relative h-[300px] w-full"
-                >
-                    {excursion.checkpoints.map((checkpoint, index) => (
-                        <SwiperSlide key={index}>
-                            <Card>
-                                <CardHeader>
-                                    <TravelMap location={checkpoint.location}/>
-                                </CardHeader>
-                                <CardBody>
-                                    <Typography>{checkpoint.description}</Typography>
-                                    <Button color="orange" onClick={() => editCheckpoint(checkpoint)}>Edit</Button>
-                                </CardBody>
-                            </Card>
-                        </SwiperSlide>
+                <Typography variant="h2" className="mt-10">Organizaciones y Destinos</Typography>
+                <div className="flex justify-around gap-3 !overflow-x-scroll p-4 py-10 h-[400px]">
+                    {[...excursion.organizations, ...excursion.destinations, excursion.transport.organization].map((entity, index) => (
+                        <OrganizationCard
+                            className={`w-[250px]`}
+                            key={`organization-${index}`}
+                            organization={entity}/>
                     ))}
-                </Swiper>
+                </div>
             </div>
             <ConfirmDialog/>
-            {ownerOrganization?.sessionId &&
+            {ownerOrganization?.sessionId && wsMessagingIsOpen &&
                 <Messaging
                     sessionId={ownerOrganization?.sessionId}
                     dialog={{

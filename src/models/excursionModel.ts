@@ -12,7 +12,7 @@ import {BaseModel} from "./interfaces/BaseModel";
 import {IBedroom} from "./bedroomModel";
 
 export type ExcursionDetailActions = 'remove-client' | 'add-client' | 'update-client' | 'update';
-export type ExcursionDetailActionsDataTypes = IClient | Partial<IExcursion>;
+export type ExcursionDetailActionsDataTypes = IClient | Partial<IExcursion> | Partial<IClient>[];
 export enum ExcursionStatusEnum {
     DRAFT = 'draft',
     COMPLETED = 'completed',

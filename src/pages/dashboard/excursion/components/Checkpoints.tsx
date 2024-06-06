@@ -7,7 +7,6 @@ interface CheckpointsProps {
 }
 
 const Checkpoints: React.FC<CheckpointsProps> = ({ formData, updateFormData }) => {
-    // Example: Adding a simple interface to add a checkpoint. Assume you have a model for checkpoints.
     const addCheckpoint = () => {
         const newCheckpoint = { location: 'New Location', description: 'New Description' }; // Simplified example
         const updatedCheckpoints = formData.checkpoints ? [...formData.checkpoints, newCheckpoint] : [newCheckpoint];

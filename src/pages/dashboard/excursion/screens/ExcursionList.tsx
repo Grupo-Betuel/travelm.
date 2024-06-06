@@ -2,7 +2,7 @@ import React, {useEffect, useMemo, useState} from 'react';
 import {Link} from 'react-router-dom';
 import {Button, Card, CardBody, Dialog, Typography} from "@material-tailwind/react";
 import {IExcursion} from "../../../../models/excursionModel";
-import {TrashIcon} from "@heroicons/react/20/solid";
+import {TrashIcon, UserGroupIcon} from "@heroicons/react/20/solid";
 import StatisticsCard from "../../../../widgets/cards/statistics-card";
 import {BanknotesIcon} from "@heroicons/react/24/solid";
 import {getCrudService} from "../../../../api/services/CRUD.service";
@@ -11,17 +11,17 @@ import ProtectedElement from "../../../../components/ProtectedElement";
 import {UserRoleTypes, UserTypes} from "../../../../models/interfaces/userModel";
 import {CommonConfirmActions, CommonConfirmActionsDataTypes} from "../../../../models/common";
 import {useConfirmAction} from "../../../../hooks/useConfirmActionHook";
-import {AiFillEdit} from "react-icons/ai";
-import {DataPagination} from "../../../../components/DataPagination";
+import {AiFillEdit, AiFillStar} from "react-icons/ai";
 import {DataTable, IDataTableColumn, IFilterOption} from "../../../../components/DataTable";
+import {BiDollar} from "react-icons/bi";
+import {MdPlace} from "react-icons/md";
+import {RiOrganizationChart} from "react-icons/ri";
 
 const excursionService = getCrudService("excursions");
 
 function ExcursionsList() {
     const [excursions, setExcursions] = useState<IExcursion[]>([]);
     const {data: excursionsData} = excursionService.useFetchAllExcursions();
-    const [currentPage, setCurrentPage] = useState(1);
-    const [itemsPerPage, setItemsPerPage] = useState(10); // Initial items per page
     const [statistics, setStatistics] = useState({
         totalClients: 0,
         totalBenefit: 0,
@@ -58,19 +58,6 @@ function ExcursionsList() {
         setStatistics(stats);
     }, [excursionsData]);
 
-    const totalPages = Math.ceil(excursions.length / itemsPerPage);
-
-    const excursionsToShow = excursions.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
-
-    const handlePageChange = (page: number) => {
-        setCurrentPage(page);
-    };
-
-    const handleItemsPerPageChange = (value: string) => {
-        setItemsPerPage(Math.abs(Number(value)) || 1);
-        setCurrentPage(1); // Reset to first page when changing items per page
-    };
-
     const columns: IDataTableColumn<IExcursion>[] = [
         {key: 'title', label: 'Titulo'},
         {key: 'status', label: 'Estado'},
@@ -78,7 +65,7 @@ function ExcursionsList() {
         {key: 'destinations', label: 'Destinos'},
         {key: 'clients', label: 'Clientes'},
         {key: 'finance.price', label: 'Precio'},
-        {key: 'reviews.stars', label: 'Estrellas'},
+        // {key: 'reviews.stars', label: 'Estrellas'},
         {key: 'actions', label: 'Acciones'}
     ];
 
@@ -124,18 +111,18 @@ function ExcursionsList() {
     const renderRow = (excursion: IExcursion) => (
         <tr key={excursion._id}>
             <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                <Link
-                    to={excursion.status === 'completed' ? `/dashboard/excursions/${excursion._id}` : `/dashboard/excursions/handler/${excursion._id}`}
-                    className="whitespace-pre-line line-clamp-2 w-[150px]">{excursion.title || ' _'}</Link>
+                <Button variant="text" className="text-start capitalize" size="lg">
+                    <Link
+                        to={excursion.status === 'completed' ? `/dashboard/excursions/${excursion._id}` : `/dashboard/excursions/handler/${excursion._id}`}
+                        className="whitespace-pre-line line-clamp-2 w-[150px]">{excursion.title || ' _'}</Link>
+                </Button>
             </td>
             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                 {excursion.status}
             </td>
             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                {excursion.organizations.map(item => <Link to={`/organization/${item._id}`}>
-                        {item.name}
-                    </Link>
-                )}
+                {excursion.organizations.map(item => item.name).join(', ')}
+
             </td>
             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                 <p className="whitespace-break-spaces line-clamp-4">{excursion.destinations.map(item => item.name).join(',\n')}</p>
@@ -144,11 +131,11 @@ function ExcursionsList() {
                 {excursion.clients.length}
             </td>
             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                ${excursion.finance?.price.toFixed(2)}
+                RD${excursion.finance?.price.toLocaleString()}
             </td>
-            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                {excursion.reviews.reduce((acc, review) => acc + review.stars, 0) / excursion.reviews.length || 0}
-            </td>
+            {/*<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">*/}
+            {/*    {excursion.reviews.reduce((acc, review) => acc + review.stars, 0) / excursion.reviews.length || 0}*/}
+            {/*</td>*/}
             <td>
                 <ProtectedElement roles={[UserRoleTypes.ADMIN]} userTypes={[UserTypes.AGENCY]}>
                     <div className="flex items-center">
@@ -184,83 +171,73 @@ function ExcursionsList() {
         <div className="p-4 flex flex-col gap-6 min-h-[88dvh]">
             <div className="grid gap-y-10 gap-x-6 md:grid-cols-2 xl:grid-cols-4">
                 <StatisticsCard
-                    title="Total Clients"
+                    title="Clientes"
                     value={statistics.totalClients.toString()}
-                    icon={React.createElement(BanknotesIcon, {
-                        className: "w-6 h-6 text-white",
-                    })}
+                    icon={<UserGroupIcon className="w-6 h-6 text-white"/>}
                     footer={
-                        <Typography className="font-normal text-blue-gray-600">
-                            <strong className="red">strong</strong>
-                            &nbsp;label
+                        <Typography variant="small" className="font-normal text-blue-gray-600">
+                            Total de clientes alcanzados
                         </Typography>
                     }
                 />
                 <StatisticsCard
-                    title="Total Money Collected"
-                    value={statistics.totalBenefit.toString()}
-                    icon={React.createElement(BanknotesIcon, {
-                        className: "w-6 h-6 text-white",
-                    })}
+                    title="Ganancia total"
+                    value={`RD${statistics.totalBenefit.toLocaleString()}`}
+                    icon={<BiDollar className="w-6 h-6 text-white"/>}
+
                     footer={
-                        <Typography className="font-normal text-blue-gray-600">
-                            <strong className="red">strong</strong>
-                            &nbsp;label
+                        <Typography variant="small" className="font-normal text-blue-gray-600">
+                            Ganancia de todas las excursiones
                         </Typography>
                     }
                 />
                 <StatisticsCard
-                    title="Destinations Visited"
+                    title="Destinos"
                     value={statistics.totalDestinationsVisited.toString()}
-                    icon={React.createElement(BanknotesIcon, {
-                        className: "w-6 h-6 text-white",
-                    })}
+                    icon={<MdPlace className="w-6 h-6 text-white"/>}
+
                     footer={
-                        <Typography className="font-normal text-blue-gray-600">
-                            <strong className="red">strong</strong>
-                            &nbsp;label
+                        <Typography variant="small" className="font-normal text-blue-gray-600">
+                            Todos los destinos visitados
                         </Typography>
                     }
                 />
                 <StatisticsCard
-                    title="Total Organizations"
+                    title="Organizaciones"
                     value={statistics.totalOrganizations.toString()}
-                    icon={React.createElement(BanknotesIcon, {
-                        className: "w-6 h-6 text-white",
-                    })}
+                    icon={<RiOrganizationChart className="w-6 h-6 text-white"/>}
                     footer={
-                        <Typography className="font-normal text-blue-gray-600">
-                            <strong className="red">strong</strong>
-                            &nbsp;label
+                        <Typography variant="small" className="font-normal text-blue-gray-600">
+                            Total de colaboraciones con organizaciones
                         </Typography>
                     }
                 />
                 <StatisticsCard
                     title="Promedio de Satisfacción"
                     value={statistics.averageSatisfaction.toString()}
-                    icon={React.createElement(BanknotesIcon, {
-                        className: "w-6 h-6 text-white",
-                    })}
+                    icon={<AiFillStar className="w-6 h-6 text-white"/>}
+
                     footer={
-                        <Typography className="font-normal text-blue-gray-600">
-                            <strong className="red">strong</strong>
-                            &nbsp;label
+                        <Typography variant="small" className="font-normal text-blue-gray-600">
+                            Promedio de satisfacción de todas las excursiones
                         </Typography>
                     }
                 />
+            </div>
+            <div className="flex items-center justify-end gap-5">
+                <ProtectedElement roles={[UserRoleTypes.ADMIN]} userTypes={[UserTypes.AGENCY]}>
+                    <Button color="blue" variant="text" size="lg">
+                        <Link to="/dashboard/excursions/handler">
+                            Crear Excursion
+                        </Link>
+                    </Button>
+                </ProtectedElement>
             </div>
             <DataTable
                 data={excursions}
                 columns={columns}
                 filterOptions={filterOptions}
                 renderRow={renderRow}
-            />
-            <DataPagination
-                currentPage={currentPage}
-                totalPages={totalPages}
-                itemsPerPage={itemsPerPage}
-                onPageChange={handlePageChange}
-                onItemsPerPageChange={handleItemsPerPageChange}
             />
             <Dialog open={modalOpen} handler={() => setModalOpen(false)}>
                 <Card>

@@ -36,7 +36,7 @@ function createEntityApiSlice<T extends BaseModel>(entityName: EntityNames) {
                 extraOptions: {
                     fixedCacheKey: `${entityName}-fetchById`,
                 },
-                providesTags: (result, error, id) => [{ type: entityName, id }],
+                providesTags: (result, error, id) => [{type: entityName, id}],
             }),
             add: builder.mutation<T, (T & IPathDataParam) | (T & IPathDataParam)[]>({
                 query: (newData: (T & IPathDataParam) | (T & IPathDataParam)[]) => ({
@@ -50,16 +50,16 @@ function createEntityApiSlice<T extends BaseModel>(entityName: EntityNames) {
                 }),
                 transformResponse: (response: T) => response,
                 // invalidatesTags: [{type: entityName, id: '_id'}],
-                invalidatesTags: [{ type: entityName, id: 'LIST' }],
+                invalidatesTags: [{type: entityName, id: 'LIST'}],
                 extraOptions: {
                     fixedCacheKey: `${entityName}-add`,
                 },
             }),
             update: builder.mutation<T, Partial<T> & Required<BaseModel> & IQueryDataParam>({
-                query: (data: Partial<T> & Required<BaseModel> & IQueryDataParam) => ({
-                    url: `/${entityName}${data.queryData ? `?${new URLSearchParams(data.queryData)}` : ''}`,
+                query: (data: (Partial<T> & Required<BaseModel> & IQueryDataParam) | (Partial<T> & Required<BaseModel> & IQueryDataParam)[]) => ({
+                    url: `/${entityName}${!Array.isArray(data) ? data.queryData ? `?${new URLSearchParams(data.queryData)}` : '' : ''}`,
                     method: 'PUT',
-                    data: {
+                    data: Array.isArray(data) ? data : {
                         ...data,
                         queryData: undefined,
                     },
@@ -69,7 +69,7 @@ function createEntityApiSlice<T extends BaseModel>(entityName: EntityNames) {
                 extraOptions: {
                     fixedCacheKey: `${entityName}-update`,
                 },
-                invalidatesTags: (result, error, { _id }) => [{ type: entityName, id: _id }],
+                invalidatesTags: (result, error, {_id}) => [{type: entityName, id: _id}],
 
             }),
             delete: builder.mutation<T, string>({
@@ -80,7 +80,7 @@ function createEntityApiSlice<T extends BaseModel>(entityName: EntityNames) {
                 }),
                 transformResponse: (response: T) => response,
                 // invalidatesTags: (result, error, id) => [{type: entityName, id}],
-                invalidatesTags: (result, error, id) => [{ type: entityName, id }],
+                invalidatesTags: (result, error, id) => [{type: entityName, id}],
 
                 extraOptions: {
                     fixedCacheKey: `${entityName}-delete`,
