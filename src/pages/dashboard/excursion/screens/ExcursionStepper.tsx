@@ -314,8 +314,12 @@ const ExcursionStepper: React.FC = () => {
             // excursion.activities && excursion.activities.length > 0 &&
             // excursion.foods && excursion.foods.length > 0 &&
             // excursion.projections && excursion.projections.length > 0 &&
-            excursion.title, excursion.description && excursion.startDate && excursion.endDate &&
-            excursion.destinations && excursion.destinations.length > 0 &&
+            excursion.title &&
+            excursion.description &&
+            excursion.startDate &&
+            excursion.endDate &&
+            excursion.destinations &&
+            excursion.destinations.length > 0 &&
             excursion.flyer &&
             excursion.transport &&
             excursion.finance
