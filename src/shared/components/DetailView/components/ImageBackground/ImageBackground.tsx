@@ -1,5 +1,4 @@
 import { FC } from 'react';
-import Image from 'next/image';
 import { Image as AntdImage } from 'antd';
 import styles from './ImageBackground.module.scss';
 
