@@ -173,6 +173,11 @@ export function ProductCard({ product, onClick }: IProductProps) {
     && product.stock > 0;
   const { orderService, toggleCart } = useOrderContext();
 
+  const isOnCart = useMemo(
+    () => order?.sales.some((sale) => sale.product?._id === product?._id),
+    [order, product],
+  );
+
   const handleProductAction = useCallback(
     (ev: any) => {
       ev.preventDefault();
@@ -204,11 +209,6 @@ export function ProductCard({ product, onClick }: IProductProps) {
     }
     return '';
   }, [product]);
-
-  const isOnCart = useMemo(
-    () => order?.sales.some((sale) => sale.product?._id === product?._id),
-    [order, product],
-  );
 
   const handleClick = useCallback(
     (event: any) => {
