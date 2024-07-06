@@ -197,8 +197,11 @@
 //   );
 // }
 import dynamic from 'next/dynamic';
-import { Affix, Input, Spin } from 'antd';
-import { SearchOutlined } from '@ant-design/icons';
+import {
+  // Affix, Input,
+  Spin,
+} from 'antd';
+// import { SearchOutlined } from '@ant-design/icons';
 import { handleEntityHook } from '@shared/hooks/handleEntityHook';
 import { ProductEntity } from '@shared/entities/ProductEntity';
 import React, {
@@ -209,11 +212,11 @@ import { EndpointsAndEntityStateKeys } from '@shared/enums/endpoints.enum';
 import { CompanyEntity } from '@shared/entities/CompanyEntity';
 import { showProductDetailsHook } from '@shared/hooks/showProductDetailsHook';
 import styles from './Company.module.scss';
-import {
-  layoutId,
-  navbarOptionsHeight,
-  topbarOptionsHeight,
-} from '../../utils/layout.utils';
+// import {
+//   layoutId,
+//   navbarOptionsHeight,
+//   topbarOptionsHeight,
+// } from '../../utils/layout.utils';
 
 // Dynamically import heavy components
 const DynamicScrollView = dynamic(
@@ -312,17 +315,17 @@ export function Company({ company, products }: CompanyProps) {
       && setCompanyProducts(companyProductsData?.data || products || []);
   }, [companyProductsData?.data]);
 
-  const onSearch = async ({
-    target: { value },
-  }: ChangeEvent<HTMLInputElement>) => {
-    const deepMatch = (await import('../../utils/matching.util')).deepMatch;
-    setSearchValue(value);
-    const results = deepMatch<ProductEntity>(
-      value,
-      companyProductsData?.data || [],
-    );
-    setCompanyProducts([...results]);
-  };
+  // const onSearch = async ({
+  //   target: { value },
+  // }: ChangeEvent<HTMLInputElement>) => {
+  //   const deepMatch = (await import('../../utils/matching.util')).deepMatch;
+  //   setSearchValue(value);
+  //   const results = deepMatch<ProductEntity>(
+  //     value,
+  //     companyProductsData?.data || [],
+  //   );
+  //   setCompanyProducts([...results]);
+  // };
 
   useEffect(() => {
     if (currentCompany?.logo) {
