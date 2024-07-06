@@ -26,6 +26,7 @@ import { useRouter } from 'next/router';
 import { useOrderContext } from '@shared/contexts/OrderContext';
 import { useAppStore } from '@services/store';
 import Sider from 'antd/lib/layout/Sider';
+import Image from 'next/image';
 import { appLogOut } from '../../../../utils/auth.utils';
 import styles from './Navbar.module.scss';
 
@@ -176,7 +177,9 @@ export default function Navbar() {
                 key={company._id}
               >
                 <a className="d-flex">
-                  <img
+                  <Image
+                    width={50}
+                    height={50}
                     className={styles.navbarLogo}
                     src={company.logo}
                     alt="logo"

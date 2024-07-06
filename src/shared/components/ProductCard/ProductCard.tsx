@@ -243,7 +243,7 @@ export function ProductCard({ product, onClick }: IProductProps) {
                 width={250}
                 height={250}
                 alt={product.slug}
-                priority
+                loading="lazy"
               />
             )}
             onClick={handleClick}
