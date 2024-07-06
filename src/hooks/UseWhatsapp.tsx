@@ -65,8 +65,8 @@ const useWhatsapp = (whatsappSessionId?: string, autologin = false) => {
         return startWhatsapp(true, sessionId).then(res => {
             const {status} = res;
             // TODO: toast(`Whatsapp is ${status}`);
-            setLogged(status === 'logged')
-            setLoading(status !== 'logged')
+            setLogged(status === 'connected')
+            setLoading(status !== 'connected')
         });
     }
 
