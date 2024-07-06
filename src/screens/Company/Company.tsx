@@ -209,14 +209,25 @@ import { EndpointsAndEntityStateKeys } from '@shared/enums/endpoints.enum';
 import { CompanyEntity } from '@shared/entities/CompanyEntity';
 import { showProductDetailsHook } from '@shared/hooks/showProductDetailsHook';
 import styles from './Company.module.scss';
-import { layoutId, navbarOptionsHeight, topbarOptionsHeight } from '../../utils/layout.utils';
+import {
+  layoutId,
+  navbarOptionsHeight,
+  topbarOptionsHeight,
+} from '../../utils/layout.utils';
 
 // Dynamically import heavy components
-const DynamicScrollView = dynamic(() => import('@shared/components').then((mod) => mod.ScrollView));
-const DynamicProductCard = dynamic(() => import('@shared/components').then((mod) => mod.ProductCard));
+const DynamicScrollView = dynamic(
+  () => import('@shared/components').then((mod) => mod.ScrollView),
+  { ssr: false },
+);
+const DynamicProductCard = dynamic(
+  () => import('@shared/components').then((mod) => mod.ProductCard),
+  { ssr: false },
+);
 
 export interface CompanyProps {
   company?: CompanyEntity;
+  products?: ProductEntity[];
 }
 
 export type ProductPerCategoryType = {
@@ -224,15 +235,18 @@ export type ProductPerCategoryType = {
     products: ProductEntity[];
     title: string;
     slug: string;
-    company: string
+    company: string;
   };
 };
 
-export function Company({ company }: CompanyProps) {
+export function Company({ company, products }: CompanyProps) {
   const router = useRouter();
   const [companyName, setCompanyName] = useState<string>();
   const [searchValue, setSearchValue] = useState<string>();
-  const [companyProducts, setCompanyProducts] = useState<ProductEntity[]>([]);
+  const [companyProducts, setCompanyProducts] = useState<ProductEntity[]>(
+    products || [],
+  );
+
   const {
     loading,
     get: getProducts,
@@ -245,7 +259,7 @@ export function Company({ company }: CompanyProps) {
   const { goToProductDetail, ProductDetail } = showProductDetailsHook();
 
   const currentCompany: CompanyEntity = useMemo(
-    () => currentCompanyRes?.data[0] || company || {} as CompanyEntity,
+    () => currentCompanyRes?.data[0] || company || ({} as CompanyEntity),
     [currentCompanyRes?.data, company],
   );
 
@@ -255,7 +269,7 @@ export function Company({ company }: CompanyProps) {
       endpoint: EndpointsAndEntityStateKeys.BY_REF_ID,
       slug: companyName,
     });
-  }, [companyName]);
+  }, [companyName, company]);
 
   const productsPerCategories = useMemo<ProductPerCategoryType>(() => {
     const data = companyProducts.reduce<ProductPerCategoryType>(
@@ -271,8 +285,9 @@ export function Company({ company }: CompanyProps) {
             company: product.company,
           };
         }
-        acc[category].products = [...acc[category].products, product]
-          .sort((a, c) => (a.newArrival && !c.newArrival ? -1 : 1));
+        acc[category].products = [...acc[category].products, product].sort(
+          (a, c) => (a.newArrival && !c.newArrival ? -1 : 1),
+        );
         return acc;
       },
       {},
@@ -283,7 +298,7 @@ export function Company({ company }: CompanyProps) {
   useEffect(() => {
     const company = router.query.company as string;
 
-    if (company && company !== companyName) {
+    if (company && company !== companyName && !products?.length) {
       getProducts({
         endpoint: EndpointsAndEntityStateKeys.BY_COMPANY,
         slug: company,
@@ -293,10 +308,13 @@ export function Company({ company }: CompanyProps) {
   }, [router.query]);
 
   useEffect(() => {
-    setCompanyProducts(companyProductsData?.data || []);
+    companyProductsData?.data?.length
+      && setCompanyProducts(companyProductsData?.data || products || []);
   }, [companyProductsData?.data]);
 
-  const onSearch = async ({ target: { value } }: ChangeEvent<HTMLInputElement>) => {
+  const onSearch = async ({
+    target: { value },
+  }: ChangeEvent<HTMLInputElement>) => {
     const deepMatch = (await import('../../utils/matching.util')).deepMatch;
     setSearchValue(value);
     const results = deepMatch<ProductEntity>(

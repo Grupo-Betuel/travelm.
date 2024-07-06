@@ -42,6 +42,7 @@ function MyApp({ Component, pageProps }: AppProps<IAppProps>) {
   ] = useState<AppViewportHeightClassNames>(
     AppViewportHeightClassNames.WITH_NAVBAR_OPTION,
   );
+
   const orderService = useMemo(() => new OrderService(), []);
   const [cartIsOpen, setCartIsOpen] = useState(false);
 

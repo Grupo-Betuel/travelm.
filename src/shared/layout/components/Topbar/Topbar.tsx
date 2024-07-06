@@ -43,10 +43,10 @@ export const Topbar = () => {
   const whatsappLink = useMemo(
     () => contactUsByWhatsappLink(
       `Hola ${
-        company.companyId || ''
+        currentCompany?.name || ''
       } vi tus productos en el ecommerce, quiero mas información sobre ustedes.`,
     ),
-    [company],
+    [currentCompany?.name],
   );
 
   return (

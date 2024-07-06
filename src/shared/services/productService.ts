@@ -12,4 +12,10 @@ export default class ProductService extends BaseService<ProductEntity> {
       `${process.env.NEXT_PUBLIC_API_URL}api/products/by-slug/${slug}`,
     )).data;
   }
+
+  async getProductByCompany(companyId: string) {
+    return (await axios.get<ProductEntity[]>(
+      `${process.env.NEXT_PUBLIC_API_URL}api/products/by-company/${companyId}`,
+    )).data;
+  }
 }

@@ -192,10 +192,8 @@ import { showProductDetailsHook } from '@shared/hooks/showProductDetailsHook';
 import dynamic from 'next/dynamic';
 import styles from './Home.module.scss';
 
-const DynamicScrollView = dynamic(() => import('@shared/components').then((mod) => mod.ScrollView));
-
-// Dynamically import components to reduce initial load
-const DynamicProductCard = dynamic(() => import('@shared/components').then((mod) => mod.ProductCard));
+const DynamicScrollView = dynamic(() => import('@shared/components').then((mod) => mod.ScrollView), { ssr: false });
+const DynamicProductCard = dynamic(() => import('@shared/components').then((mod) => mod.ProductCard), { ssr: false });
 
 export interface HomeProps {
   hideCarousel?: boolean;

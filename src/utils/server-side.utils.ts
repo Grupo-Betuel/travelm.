@@ -23,6 +23,7 @@ export interface ICachedResourceResponse<T> {
   sitemapURL?: string;
   jsonld?: string;
   canonical?: string;
+  products?: ProductEntity[];
 }
 
 export const handleCachedCatch = (res: any) => {
@@ -38,13 +39,20 @@ export async function handleCachedCompany(
 ): Promise<ICachedResourceResponse<CompanyEntity>> {
   try {
     const companyService = new CompanyService();
+    const productService = new ProductService();
     const currentCompany = await companyService.getCompanyByRefName(companyId);
+    const products = await productService.getProductByCompany(currentCompany.companyId);
+
     // currentCompany && setCachedResource(currentCompany, 'companies', currentCompany.companyId);
     const sitemapURL = `${BETUEL_GROUP_ECOMMERCE_URL}sitemaps/companies/${currentCompany._id}.xml`;
     const jsonld = currentCompany && generateCompanyJSONLD(currentCompany);
     const canonical = getCompanyUrl(currentCompany);
     return {
-      data: currentCompany, sitemapURL, jsonld, canonical,
+      data: currentCompany,
+      sitemapURL,
+      jsonld,
+      canonical,
+      products,
     };
   } catch (res: any) {
     return handleCachedCatch(res);
