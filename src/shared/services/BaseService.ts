@@ -50,7 +50,7 @@ export class BaseService<T> implements AbstractBaseService<T> {
     properties: IServiceMethodProperties<T> = {} as IServiceMethodProperties<T>,
     callback: CallbackType<T> = () => {},
     handleError: HandleErrorType = () => {},
-    enableCache = false,
+    enableCache = true,
     cacheLifeTime: number = 60 * 1000 * 5,
   ): Promise<T[] | IPaginatedResponse<T> | undefined> {
     try {

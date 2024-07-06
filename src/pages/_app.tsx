@@ -17,7 +17,7 @@ import Link from 'next/link';
 import Head from 'next/head';
 import LoadingBar from 'react-top-loading-bar';
 import { useRouter } from 'next/router';
-import { Analytics } from '@vercel/analytics/react';
+// import { Analytics } from '@vercel/analytics/react';
 import { handleLoginHook } from '@shared/hooks/handleLoginHook';
 import { FROM_TARGET_KEY } from '@shared/constants/seo.constants';
 import { defaultValidateMessages as validateMessages } from '../config/form-validation.config';
@@ -243,7 +243,7 @@ function MyApp({ Component, pageProps }: AppProps<IAppProps>) {
         </AppLoadingContext.Provider>
         <ToastContainer />
       </ConfigProvider>
-      <Analytics />
+      {/* <Analytics /> */}
     </>
   );
 }
