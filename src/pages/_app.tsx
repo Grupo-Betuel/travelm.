@@ -252,7 +252,6 @@
 
 import '@styles/globals.scss';
 import type { AppProps } from 'next/app';
-import dynamic from 'next/dynamic';
 import AppLayout from '@shared/layout';
 import {
   Button, ConfigProvider, Result, Spin,
