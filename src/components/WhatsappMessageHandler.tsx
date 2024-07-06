@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, {useMemo, useState} from "react";
 import {
     Button,
     Dialog,
@@ -261,6 +261,14 @@ const Messaging: React.FC<IMessaging> = (
         // setPhoto(media);
     }
 
+    const usersData: IWsUser[] = useMemo(() => {
+        return seedData.users.map((user: IWsUser) => ({
+            ...user,
+            fullName: `${user.firstName || user.phone || ''} ${user.lastName || ''}`,
+        }));
+    }, [seedData.users]);
+
+
     const content = (
         <div className="relative">
             {/*<div*/}
@@ -290,8 +298,8 @@ const Messaging: React.FC<IMessaging> = (
                     <div className="flex items-center w-100">
                         <SearchableSelect<IWsUser>
                             multiple
-                            options={seedData.users || []}
-                            displayProperty="firstName"
+                            options={usersData || []}
+                            displayProperty="fullName"
                             label="Selecciona clientes"
                             disabled={fetchingSeed === 'users'}
                             onSelect={handleUserSelection}

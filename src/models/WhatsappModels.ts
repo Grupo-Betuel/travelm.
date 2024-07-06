@@ -30,6 +30,7 @@ export const whatsappSessionNames: { [K in WhatsappSessionTypes & any]: string }
 export interface IWsUser {
     firstName: string;
     lastName: string;
+    fullName?: string;
     phone: string;
 }
 
