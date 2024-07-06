@@ -196,7 +196,6 @@
 //     </>
 //   );
 // }
-
 import dynamic from 'next/dynamic';
 import { Affix, Input, Spin } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
