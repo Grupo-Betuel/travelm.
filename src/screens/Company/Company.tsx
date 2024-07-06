@@ -205,7 +205,8 @@ import {
 import { handleEntityHook } from '@shared/hooks/handleEntityHook';
 import { ProductEntity } from '@shared/entities/ProductEntity';
 import React, {
-  useEffect, useState, useMemo, ChangeEvent,
+  useEffect, useState, useMemo,
+  // ChangeEvent,
 } from 'react';
 import { useRouter } from 'next/router';
 import { EndpointsAndEntityStateKeys } from '@shared/enums/endpoints.enum';
@@ -245,7 +246,10 @@ export type ProductPerCategoryType = {
 export function Company({ company, products }: CompanyProps) {
   const router = useRouter();
   const [companyName, setCompanyName] = useState<string>();
-  const [searchValue, setSearchValue] = useState<string>();
+  const [
+    searchValue,
+    // setSearchValue
+  ] = useState<string>();
   const [companyProducts, setCompanyProducts] = useState<ProductEntity[]>(
     products || [],
   );
