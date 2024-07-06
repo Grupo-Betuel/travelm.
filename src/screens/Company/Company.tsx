@@ -341,30 +341,30 @@ export function Company({ company, products }: CompanyProps) {
       <div className={styles.CompanyWrapper}>
         {ProductDetail}
         <div className={styles.CompanyContent}>
-          <Affix
-            className={styles.SidebarAffix}
-            offsetTop={navbarOptionsHeight + topbarOptionsHeight}
-            target={() => document.getElementById(layoutId)}
-          >
-            <div>
-              <div className={styles.CompanySearchWrapper}>
-                <Input
-                  value={searchValue}
-                  className={styles.CompanyInputSearch}
-                  placeholder="Buscar"
-                  suffix={
-                    <SearchOutlined rev="" className="site-form-item-icon" />
-                  }
-                  bordered={false}
-                  onChange={onSearch}
-                  size="large"
-                />
-              </div>
-              {!companyProducts?.length && (
-                <h2 className="p-xx-l">No hay resultados!</h2>
-              )}
-            </div>
-          </Affix>
+          {/* <Affix */}
+          {/*  className={styles.SidebarAffix} */}
+          {/*  offsetTop={navbarOptionsHeight + topbarOptionsHeight} */}
+          {/*  target={() => document.getElementById(layoutId)} */}
+          {/* > */}
+          {/*  <div> */}
+          {/*    <div className={styles.CompanySearchWrapper}> */}
+          {/*      <Input */}
+          {/*        value={searchValue} */}
+          {/*        className={styles.CompanyInputSearch} */}
+          {/*        placeholder="Buscar" */}
+          {/*        suffix={ */}
+          {/*          <SearchOutlined rev="" className="site-form-item-icon" /> */}
+          {/*        } */}
+          {/*        bordered={false} */}
+          {/*        onChange={onSearch} */}
+          {/*        size="large" */}
+          {/*      /> */}
+          {/*    </div> */}
+          {/*    {!companyProducts?.length && ( */}
+          {/*      <h2 className="p-xx-l">No hay resultados!</h2> */}
+          {/*    )} */}
+          {/*  </div> */}
+          {/* </Affix> */}
           {companyProducts.length > 0 && (
             <div className={styles.CompanyContentProducts}>
               {Object.keys(productsPerCategories).map((categoryId, i) => {
