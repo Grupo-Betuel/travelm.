@@ -10,6 +10,7 @@ export enum WhatsappEvents {
     ON_START_MESSAGE = 'start_messages',
     EMIT_CURRENT_MESSAGE = 'ws-messages-current',
     ON_FAILED_MESSAGE = 'ws-messages-failed',
+
 }
 
 export enum EcommerceEvents {
