@@ -202,7 +202,7 @@ export function ProductCard({ product, onClick }: IProductProps) {
       return ProductsConstants.NEW_ITEM;
     }
     if (isAlmostSoldOut) {
-      return ProductsConstants.ALMOST_SOLD_OUT;
+      return `Solo quedan ${product.stock || 0}`;
     }
     if (!product.stock) {
       return ProductsConstants.SOLD_OUT;
@@ -232,67 +232,63 @@ export function ProductCard({ product, onClick }: IProductProps) {
       color={product.newArrival ? 'green' : isAlmostSoldOut ? 'gold' : 'red'}
     >
       <Link href={`/${product.company}/products/${product.slug}`}>
-        <a>
-          <Card
-            className={styles.ProductCard}
-            bodyStyle={{ padding: '10px 0' }}
-            cover={(
-              <Image
-                src={img}
-                className={styles.ProductImage}
-                width={225}
-                height={225}
-                alt={product.slug}
-                loading="lazy"
-              />
-            )}
-            onClick={handleClick}
-          >
-            <div className={styles.ProductCardContent}>
-              <div className={styles.ProductCardContentHeader}>
-                <span className={styles.ProductTitle}>{product.name}</span>
-                <span className={styles.ProductPrice}>
-                  RD$
-                  {' '}
-                  {product.price.toLocaleString()}
-                </span>
-              </div>
-              <div>
-                {isAlmostSoldOut && (
-                  <span
-                    className={`text-red ${!isAlmostSoldOut ? 'v-hidden' : ''}`}
-                  >
-                    Solo quedan:
-                    {' '}
-                    {product.stock || 0}
-                  </span>
-                )}
-              </div>
-              <Button
-                className={`mt-s ${product.stock ? '' : 'v-hidden'}`}
-                onClick={handleProductAction}
-              >
-                {isOnCart
-                  ? ProductsConstants.VIEW_CART
-                  : ProductsConstants.ADD_CART}
-              </Button>
-              {!order?.sales?.length && (
-                <Link href={getWhatsappLink(product)}>
-                  <a target="_blank" rel="noopener noreferrer">
-                    <Button
-                      type="primary"
-                      className="mt-s w-100"
-                      icon={<WhatsAppOutlined rev="" />}
-                      onClick={(ev) => ev.stopPropagation()}
-                    >
-                      {ProductsConstants.ORDER_BY_WHATSAPP}
-                    </Button>
-                  </a>
-                </Link>
-              )}
+        {/* <a> */}
+        <Card
+          className={styles.ProductCard}
+          bodyStyle={{ padding: '10px 0' }}
+          onClick={handleClick}
+        >
+          <Image
+            src={img}
+            className={styles.ProductImage}
+            width={225}
+            height={225}
+            alt={product.slug}
+            loading="lazy"
+          />
+          <div className={styles.ProductCardContent}>
+            <div className={styles.ProductCardContentHeader}>
+              <span className={styles.ProductTitle}>{product.name}</span>
+              <span className={styles.ProductPrice}>
+                RD$
+                {' '}
+                {product.price.toLocaleString()}
+              </span>
             </div>
-          </Card>
-        </a>
+            <div>
+              {/* {isAlmostSoldOut && ( */}
+              {/*  <span */}
+              {/*    className={`text-red ${!isAlmostSoldOut ? 'v-hidden' : ''}`} */}
+              {/*  > */}
+              {/*   */}
+              {/*  </span> */}
+              {/* )} */}
+            </div>
+            <Button
+              className={`mt-s ${product.stock ? '' : 'v-hidden'}`}
+              onClick={handleProductAction}
+            >
+              {isOnCart
+                ? ProductsConstants.VIEW_CART
+                : ProductsConstants.ADD_CART}
+            </Button>
+            {!order?.sales?.length && (
+              <Link href={getWhatsappLink(product)}>
+                <a target="_blank" rel="noopener noreferrer">
+                  <Button
+                    type="primary"
+                    className="mt-s w-100"
+                    icon={<WhatsAppOutlined rev="" />}
+                    onClick={(ev) => ev.stopPropagation()}
+                  >
+                    {ProductsConstants.ORDER_BY_WHATSAPP}
+                  </Button>
+                </a>
+              </Link>
+            )}
+          </div>
+        </Card>
+        {/* </a> */}
       </Link>
     </Badge.Ribbon>
   );
