@@ -412,21 +412,21 @@ const MyApp = ({ Component, pageProps }: AppProps<IAppProps>) => {
         <meta property="og:locale" content="es_ES" />
         <meta property="og:url" content={seoUrl} />
         <meta property="fb:app_id" content="1304512236864343" />
-        <script
-          async
-          src="https://www.googletagmanager.com/gtag/js?id=AW-11423261608"
-        />
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              window.dataLayer = window.dataLayer || [];
-              function gtag() {
-                dataLayer.push(arguments);
-              }
-              gtag('js', new Date());
-              gtag('config', 'AW-11423261608');`,
-          }}
-        />
+        {/* <script */}
+        {/*  async */}
+        {/*  src="https://www.googletagmanager.com/gtag/js?id=AW-11423261608" */}
+        {/* /> */}
+        {/* <script */}
+        {/*  dangerouslySetInnerHTML={{ */}
+        {/*    __html: ` */}
+        {/*      window.dataLayer = window.dataLayer || []; */}
+        {/*      function gtag() { */}
+        {/*        dataLayer.push(arguments); */}
+        {/*      } */}
+        {/*      gtag('js', new Date()); */}
+        {/*      gtag('config', 'AW-11423261608');`, */}
+        {/*  }} */}
+        {/* /> */}
       </Head>
 
       <ConfigProvider form={{ validateMessages }} theme={defaultTheme}>
