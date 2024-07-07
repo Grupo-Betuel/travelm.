@@ -2,14 +2,15 @@ import { useRef } from 'react';
 import { ProductCard } from '@shared/components';
 import { ProductEntity } from '@shared/entities/ProductEntity';
 import Link from 'next/link';
+import { Icon } from '@iconify/react';
 import styles from './ScrollView.module.scss';
 
 export interface IScrollViewProps {
-  products: ProductEntity[]
-  title: string
-  handleProductClick?: (product: ProductEntity) => void
-  wrapperClassName?: string
-  seeMoreRoute: string
+  products: ProductEntity[];
+  title: string;
+  handleProductClick?: (product: ProductEntity) => void;
+  wrapperClassName?: string;
+  seeMoreRoute: string;
 }
 
 export function ScrollView({
@@ -43,19 +44,26 @@ export function ScrollView({
         </Link>
       </div>
       <div className={styles.ScrollViewWrapper}>
-        <i
-          className={`bi bi-chevron-left ${styles.ScrollViewLeftArrow}`}
+        <Icon
+          icon="mdi-light:chevron-left"
+          className={styles.ScrollViewLeftArrow}
           onClick={preview(true)}
         />
         <div className={styles.ScrollView} ref={scrollViewRef}>
-          {products?.map((product, i) => !!product.stock && (
-            <div className={styles.ScrollViewItem} key={`scrollview-item-${i}`}>
+          {products?.map(
+            (product, i) => !!product.stock && (
+            <div
+              className={styles.ScrollViewItem}
+              key={`scrollview-item-${i}`}
+            >
               <ProductCard onClick={handleProductClick} product={product} />
             </div>
-          ))}
+            ),
+          )}
         </div>
-        <i
-          className={`bi bi-chevron-right ${styles.ScrollViewRightArrow}`}
+        <Icon
+          icon="mdi-light:chevron-right"
+          className={styles.ScrollViewRightArrow}
           onClick={preview(false)}
         />
       </div>

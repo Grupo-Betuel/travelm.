@@ -1,5 +1,6 @@
 import { Carousel, CarouselProps } from 'antd';
 import { useRef } from 'react';
+import { Icon } from '@iconify/react';
 import styles from './Carousel.module.scss';
 
 const contentStyle: React.CSSProperties = {
@@ -11,7 +12,7 @@ const contentStyle: React.CSSProperties = {
 };
 
 export interface IAppCarouselProps extends CarouselProps {
-  showArrow?: boolean
+  showArrow?: boolean;
 }
 
 export function AppCarousel(props: IAppCarouselProps) {
@@ -26,12 +27,7 @@ export function AppCarousel(props: IAppCarouselProps) {
 
   return (
     <div className={styles.CarouselWrapper}>
-      {showArrow && (
-        <i
-          className={`bi bi-chevron-left ${styles.CarouselLeftArrow}`}
-          onClick={prev}
-        />
-      )}
+      {showArrow && <Icon icon="mdi-light:chevron-left" className={styles.CarouselLeftArrow} onClick={prev} />}
       <Carousel dots={false} {...props} ref={carousel}>
         <div>
           <h3 style={contentStyle}>1</h3>
@@ -47,10 +43,7 @@ export function AppCarousel(props: IAppCarouselProps) {
         </div>
       </Carousel>
       {showArrow && (
-        <i
-          className={`bi bi-chevron-right ${styles.CarouselRightArrow}`}
-          onClick={next}
-        />
+        <Icon icon="mdi-light:chevron-right" className={styles.CarouselRightArrow} onClick={next} />
       )}
     </div>
   );
