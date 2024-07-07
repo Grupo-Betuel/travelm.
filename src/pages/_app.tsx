@@ -289,7 +289,7 @@ export interface IAppProps {
 const MyApp = ({ Component, pageProps }: AppProps<IAppProps>) => {
   const clientEntity = useAppStore((state) => state.clients((s) => s));
   const productEntity = useAppStore((state) => state.products((s) => s));
-  const [appLoading, setAppLoading] = useState<boolean>(false);
+  const [appLoading, setAppLoading] = useState<boolean>();
   const [appViewportHeightClassName, setAppViewportHeightClassName] = useState<AppViewportHeightClassNames>(
     AppViewportHeightClassNames.WITH_NAVBAR_OPTION,
   );
