@@ -240,8 +240,8 @@ export function ProductCard({ product, onClick }: IProductProps) {
               <Image
                 src={img}
                 className={styles.ProductImage}
-                width={250}
-                height={250}
+                width={225}
+                height={225}
                 alt={product.slug}
                 loading="lazy"
               />
