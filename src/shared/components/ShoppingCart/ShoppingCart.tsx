@@ -12,6 +12,7 @@ export interface IShoppingCartAction {
   text: string;
   onClick: (product: ProductEntity) => void;
 }
+
 export interface IShoppingCartProps {
   itemActions: IShoppingCartAction[];
   // eslint-disable-next-line react/require-default-props
@@ -53,7 +54,6 @@ export function ShoppingCart({ itemActions, sales }: IShoppingCartProps) {
             {' '}
             <CheckCircleFilled className="text-green-5" rev="" />
           </b>
-
           {/* <br /> */}
           {/* <br /> */}
           {/* <i> */}
@@ -64,7 +64,7 @@ export function ShoppingCart({ itemActions, sales }: IShoppingCartProps) {
           {/*  para continuar con la orden. */}
           {/* </i> */}
         </div>
-)}
+      )}
       size="large"
       locale={{
         emptyText: 'No hay productos en el carrito',
@@ -81,7 +81,13 @@ export function ShoppingCart({ itemActions, sales }: IShoppingCartProps) {
               onClick={() => action.onClick && action.onClick(sale.product)}
             />
           ))}
-          extra={<Image width={100} alt={sale.product.slug} src={sale.product.image} />}
+          extra={(
+            <Image
+              width={100}
+              alt={sale.product.slug}
+              src={sale.product.image}
+            />
+          )}
         >
           <List.Item.Meta
             title={sale.product.name}
