@@ -252,27 +252,30 @@
 
 import '@styles/globals.scss';
 import type { AppProps } from 'next/app';
-import AppLayout from '@shared/layout';
+import dynamic from 'next/dynamic';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
   Button, ConfigProvider, Result, Spin,
 } from 'antd';
-import React, { useEffect, useMemo, useState } from 'react';
 import { ToastContainer } from 'react-toastify';
 import { useAppStore } from '@services/store';
 import { AppLoadingContext } from '@shared/contexts/AppLoadingContext';
 import { AppViewportHeightContext } from '@shared/contexts/AppViewportHeightContext';
 import { OrderContext } from '@shared/contexts/OrderContext';
-import OrderService from '@services/orderService';
 import { useAuthClientHook } from '@shared/hooks/useAuthClientHook';
-import Link from 'next/link';
-import Head from 'next/head';
-import LoadingBar from 'react-top-loading-bar';
-import { useRouter } from 'next/router';
 import { handleLoginHook } from '@shared/hooks/handleLoginHook';
 import { FROM_TARGET_KEY } from '@shared/constants/seo.constants';
-import { defaultValidateMessages as validateMessages } from '../config/form-validation.config';
+import { useRouter } from 'next/router';
+import Head from 'next/head';
+import Link from 'next/link';
+import LoadingBar from 'react-top-loading-bar';
+import OrderService from '@services/orderService';
 import { defaultTheme } from '../config/theme.config';
+import { defaultValidateMessages as validateMessages } from '../config/form-validation.config';
 import 'react-toastify/dist/ReactToastify.css';
+
+// Dynamic imports
+const AppLayout = dynamic(() => import('@shared/layout'), { ssr: false });
 
 export enum AppViewportHeightClassNames {
   WITH_NAVBAR = 'FullAppViewPortHeight',
@@ -286,25 +289,20 @@ export interface IAppProps {
 const MyApp = ({ Component, pageProps }: AppProps<IAppProps>) => {
   const clientEntity = useAppStore((state) => state.clients((s) => s));
   const productEntity = useAppStore((state) => state.products((s) => s));
-  const [appLoading, setAppLoading] = useState<boolean>();
-  const [
-    appViewportHeightClassName,
-    setAppViewportHeightClassName,
-  ] = useState<AppViewportHeightClassNames>(
+  const [appLoading, setAppLoading] = useState<boolean>(false);
+  const [appViewportHeightClassName, setAppViewportHeightClassName] = useState<AppViewportHeightClassNames>(
     AppViewportHeightClassNames.WITH_NAVBAR_OPTION,
   );
-
   const orderService = useMemo(() => new OrderService(), []);
   const [cartIsOpen, setCartIsOpen] = useState(false);
   const { client } = useAuthClientHook();
   const [progress, setProgress] = useState(0);
   const router = useRouter();
   const { login } = handleLoginHook();
+  const [companyId, setCompanyId] = useState<string>('');
+  const [seoUrl, setSeoUrl] = useState<string>('');
 
   const toggleShoppingCart = () => setCartIsOpen(!cartIsOpen);
-
-  const [companyId, setCompanyId] = useState<string>();
-  const [seoUrl, setSeoUrl] = useState<string>('');
 
   useEffect(() => {
     const companyName = location.pathname.split('/')[1];
@@ -316,30 +314,24 @@ const MyApp = ({ Component, pageProps }: AppProps<IAppProps>) => {
 
   const handleQueryParams = async () => {
     setAppLoading(true);
-
     const queryString = window.location.search;
     const parameters = new URLSearchParams(queryString);
     const orderId = parameters.get('orderId');
     const phone = parameters.get('phone');
     const from = parameters.get('from');
     if (from) {
-      localStorage.setItem(FROM_TARGET_KEY, from as string);
+      localStorage.setItem(FROM_TARGET_KEY, from);
     }
     if (!cartIsOpen && orderId) setCartIsOpen(true);
     if (phone) {
-      const pathname = window.location.pathname;
       await login({ phone });
       await orderService.initLocalOrder();
       router.replace(
-        {
-          pathname: pathname || '',
-          query: {},
-        },
+        { pathname: window.location.pathname, query: {} },
         undefined,
         { shallow: true },
       );
     }
-
     setAppLoading(false);
   };
 
@@ -352,14 +344,15 @@ const MyApp = ({ Component, pageProps }: AppProps<IAppProps>) => {
   }, [clientEntity.loading, productEntity.loading]);
 
   useEffect(() => {
-    router.events.on('routeChangeStart', () => {
-      setProgress(40);
-    });
-
-    router.events.on('routeChangeComplete', () => {
-      setProgress(100);
-    });
-  }, []);
+    const handleRouteChangeStart = () => setProgress(40);
+    const handleRouteChangeComplete = () => setProgress(100);
+    router.events.on('routeChangeStart', handleRouteChangeStart);
+    router.events.on('routeChangeComplete', handleRouteChangeComplete);
+    return () => {
+      router.events.off('routeChangeStart', handleRouteChangeStart);
+      router.events.off('routeChangeComplete', handleRouteChangeComplete);
+    };
+  }, [router.events]);
 
   if (pageProps.protected && !client) {
     return (
@@ -412,21 +405,6 @@ const MyApp = ({ Component, pageProps }: AppProps<IAppProps>) => {
         <meta property="og:locale" content="es_ES" />
         <meta property="og:url" content={seoUrl} />
         <meta property="fb:app_id" content="1304512236864343" />
-        {/* <script */}
-        {/*  async */}
-        {/*  src="https://www.googletagmanager.com/gtag/js?id=AW-11423261608" */}
-        {/* /> */}
-        {/* <script */}
-        {/*  dangerouslySetInnerHTML={{ */}
-        {/*    __html: ` */}
-        {/*      window.dataLayer = window.dataLayer || []; */}
-        {/*      function gtag() { */}
-        {/*        dataLayer.push(arguments); */}
-        {/*      } */}
-        {/*      gtag('js', new Date()); */}
-        {/*      gtag('config', 'AW-11423261608');`, */}
-        {/*  }} */}
-        {/* /> */}
       </Head>
 
       <ConfigProvider form={{ validateMessages }} theme={defaultTheme}>
