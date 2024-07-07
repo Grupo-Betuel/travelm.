@@ -1,6 +1,6 @@
 import CompanyService from '@services/companyService';
 import { CompanyEntity } from '@shared/entities/CompanyEntity';
-import { ProductEntity } from '@shared/entities/ProductEntity';
+import { IProductPerCategory, ProductEntity } from '@shared/entities/ProductEntity';
 import ProductService from '@services/productService';
 import { CategoryEntity } from '@shared/entities/CategoryEntity';
 import CategoryService from '@services/categoryService';
@@ -23,7 +23,7 @@ export interface ICachedResourceResponse<T> {
   sitemapURL?: string;
   jsonld?: string;
   canonical?: string;
-  products?: ProductEntity[];
+  productsPerCategory?: IProductPerCategory[];
 }
 
 export const handleCachedCatch = (res: any) => {
@@ -41,7 +41,7 @@ export async function handleCachedCompany(
     const companyService = new CompanyService();
     const productService = new ProductService();
     const currentCompany = await companyService.getCompanyByRefName(companyId);
-    const products = await productService.getProductByCompany(currentCompany.companyId);
+    const products = await productService.getProductsPerCategories(currentCompany.companyId);
 
     // currentCompany && setCachedResource(currentCompany, 'companies', currentCompany.companyId);
     const sitemapURL = `${BETUEL_GROUP_ECOMMERCE_URL}sitemaps/companies/${currentCompany._id}.xml`;
@@ -52,7 +52,7 @@ export async function handleCachedCompany(
       sitemapURL,
       jsonld,
       canonical,
-      products,
+      productsPerCategory: products,
     };
   } catch (res: any) {
     return handleCachedCatch(res);

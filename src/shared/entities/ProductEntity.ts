@@ -66,3 +66,8 @@ export interface IProductSaleParam {
   isChild?: boolean
   relatedParams?: IProductSaleParam[]
 }
+
+export type IProductPerCategory = {
+  category: CategoryEntity;
+  products: ProductEntity[];
+};

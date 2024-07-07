@@ -93,7 +93,7 @@ import axios from 'axios';
 import { handleCachedCompany } from '../../utils/server-side.utils';
 import { saveCompanySitemap } from '../../utils/fs.utils';
 
-export default function CompanyProducts({ metadata, cachedResources, products }: any) {
+export default function CompanyProducts({ metadata, cachedResources, productsPerCategory }: any) {
   const {
     sitemapURL,
     jsonld,
@@ -105,7 +105,7 @@ export default function CompanyProducts({ metadata, cachedResources, products }:
         ...metadata, jsonld, sitemapURL, canonical,
       }}
       />
-      <Company company={cachedResources?.data} products={products} />
+      <Company company={cachedResources?.data} productsPerCategoryData={productsPerCategory} />
     </>
   );
 }
@@ -134,13 +134,13 @@ export const getStaticProps: GetStaticProps = async (context) => {
 
   const {
     data: currentCompany,
-    products,
+    productsPerCategory,
   } = cachedResources;
 
   const keywords = `${currentCompany?.tags?.join(', ') || ''}`;
   return {
     props: {
-      products,
+      productsPerCategory,
       cachedResources,
       metadata: {
         keywords,

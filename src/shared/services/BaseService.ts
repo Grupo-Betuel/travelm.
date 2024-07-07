@@ -17,7 +17,7 @@ export interface IServiceMethodProperties<T> {
   queryParams?: { [N in keyof T]: any } | any;
   endpoint?: EndpointsAndEntityStateKeys;
   slug?: string;
-  storeDataInStateKey?: EndpointsAndEntityStateKeys;
+  storeDataInStateKey?: EndpointsAndEntityStateKeys | string;
   queryString?: string;
 }
 
@@ -50,7 +50,7 @@ export class BaseService<T> implements AbstractBaseService<T> {
     properties: IServiceMethodProperties<T> = {} as IServiceMethodProperties<T>,
     callback: CallbackType<T> = () => {},
     handleError: HandleErrorType = () => {},
-    enableCache = true,
+    enableCache = false,
     cacheLifeTime: number = 60 * 1000 * 5,
   ): Promise<T[] | IPaginatedResponse<T> | undefined> {
     try {
@@ -70,14 +70,16 @@ export class BaseService<T> implements AbstractBaseService<T> {
         },
       );
 
-      if (enableCache && (!!(data as any)?.length || (data as any)?.content?.length)) {
+      if (
+        enableCache
+        && (!!(data as any)?.length || (data as any)?.content?.length)
+      ) {
         const cachedData: T[] = this.cacheData(
           extractContent(data),
           'get',
           cacheLifeTime,
           properties,
         ) as T[];
-
         if (cachedData && (data as IPaginatedResponse<T>).content) {
           (data as IPaginatedResponse<T>).content = cachedData;
         } else if (cachedData) {
@@ -125,7 +127,6 @@ export class BaseService<T> implements AbstractBaseService<T> {
   ): Promise<T | undefined> {
     try {
       const res = await http.put(`${this.api}`, data);
-      console.log('res', res.data);
       enableCache && this.cacheData(res.data as T, 'add', cacheLifeTime);
       return res as T;
     } catch (err: IResponseError | any) {
@@ -149,6 +150,8 @@ export class BaseService<T> implements AbstractBaseService<T> {
     }
   }
 
+  getCacheKey = (key: CRUDTypes, properties?: IServiceMethodProperties<T>) => `${this.localStorageKey[key]}-${properties?.storeDataInStateKey || 'default'}`;
+
   cacheData(
     data: T | T[],
     key: CRUDTypes,
@@ -160,23 +163,26 @@ export class BaseService<T> implements AbstractBaseService<T> {
 
       if (
         properties
-        && properties.storeDataInStateKey
-          === EndpointsAndEntityStateKeys.INFINITE_SCROLL_DATA
+        && properties.storeDataInStateKey?.includes(
+          EndpointsAndEntityStateKeys.INFINITE_SCROLL_DATA,
+        )
       ) {
         oldData = JSON.parse(
-          localStorage.getItem(this.localStorageKey[key]) || '[]',
+          localStorage.getItem(this.getCacheKey(key, properties)) || '[]',
         );
       }
 
       const items: T[] = [...oldData, ...(data as T[])];
       const itemsData: T[] = Array.from(
-        new Set(items.map((item: any) => item._id)),
-      ).map((id) => items.find((item: any) => item._id === id)) as T[];
+        new Set(items.map((item: any) => JSON.stringify(item))),
+      ).map((id) => JSON.parse(id) as T);
+      // items.find((item: any) => item._id === id)
+      // ) as T[];
       // when key is get just will be cached if it's longer than 1 item
       itemsData.length
         && itemsData.length > 1
         && localStorage.setItem(
-          this.localStorageKey[key],
+          this.getCacheKey(key, properties),
           JSON.stringify(itemsData),
         );
       return itemsData;
@@ -199,7 +205,7 @@ export class BaseService<T> implements AbstractBaseService<T> {
     key: CRUDTypes,
     properties?: IServiceMethodProperties<T>,
   ): T | T[] | null {
-    const cached = localStorage.getItem(this.localStorageKey[key]);
+    const cached = localStorage.getItem(this.getCacheKey(key, properties));
     if (cached && cached !== '[]' && cached !== '{}') {
       const data = JSON.parse(cached);
       const value = properties?.queryParams?.title || properties?.slug;
