@@ -420,9 +420,7 @@
 import dynamic from 'next/dynamic';
 import { Spin } from 'antd';
 import { handleEntityHook } from '@shared/hooks/handleEntityHook';
-import {
-  IProductPerCategory,
-} from '@shared/entities/ProductEntity';
+import { IProductPerCategory } from '@shared/entities/ProductEntity';
 import React, { useEffect, useState, useMemo } from 'react';
 import { useRouter } from 'next/router';
 import { EndpointsAndEntityStateKeys } from '@shared/enums/endpoints.enum';
@@ -505,10 +503,25 @@ export function Company({ company, productsPerCategoryData }: CompanyProps) {
   }, [router.query]);
 
   useEffect(() => {
-    infinityScrollData?.data?.length
-      && setCompanyProducts(
-        infinityScrollData?.data || productsPerCategoryData || [],
+    if (infinityScrollData?.data?.length || productsPerCategoryData?.length) {
+      const data = [
+        ...(productsPerCategoryData || []),
+        ...(infinityScrollData?.data || []),
+      ].reduce<IProductPerCategory[]>((acc, item) => {
+        const index = acc.findIndex(
+          (i) => i.category._id === item.category._id,
+        );
+        if (index === -1) {
+          acc.push(item);
+        } else {
+          // acc[index].products = [...acc[index].products, ...item.products];
+        }
+        return acc;
+      }, []);
+      setCompanyProducts(
+        [...data],
       );
+    }
   }, [infinityScrollData?.data]);
 
   useEffect(() => {
