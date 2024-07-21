@@ -322,6 +322,7 @@ export function DataTable<T>(
                         return filterWith.some((filter: string) => JSON.stringify(value).toLowerCase().includes(filter?.toString()?.toLowerCase() || ''));
                     }
 
+                    console.log(filterWith, value, filterWith);
                     return filterWith.includes(value);
                 });
             }
