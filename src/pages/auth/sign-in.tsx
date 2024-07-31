@@ -82,10 +82,10 @@ export function SignIn() {
                 </form>
             </div>
             <div className="w-2/5 h-[93dvh] hidden lg:block">
-                <img
-                    src="/img/login banner.webp"
-                    className="h-full w-full object-cover rounded-3xl"
-                />
+                {/*<img*/}
+                {/*    src="/img/login banner.webp"*/}
+                {/*    className="h-full w-full object-cover rounded-3xl"*/}
+                {/*/>*/}
             </div>
         </section>
     );
