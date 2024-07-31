@@ -58,6 +58,7 @@ export const FinanceDetails = ({
         return total + payments.reduce((sum, p) => sum + p.amount, 0);
     }, 0), [clients, excursionId]);
 
+
     // Calculate total to pay for transport
     const totalTransportCost = useMemo(() => transport.transportResources.reduce((total, resource) => total + (resource.finance?.cost || resource.finance?.price || 0), 0), [transport]);
     const totalDestinationsPerClient = useMemo(() => destinations.reduce((total, destination) => total + (destination.entryFee?.cost || destination.entryFee?.price || 0) * (clients).filter(client => {
