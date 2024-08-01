@@ -9,19 +9,23 @@ import React, {useState} from "react";
 import IUser from "../../models/interfaces/userModel";
 import {useLogin} from "../../hooks/useLogin";
 import {useAppLoading} from "../../context/appLoadingContext";
+import {AlertWithContent} from "../../components/AlertWithContent";
 
 export function SignIn() {
     const [auth, setAuth] = useState<Pick<IUser, 'email' | 'password'>>({email: '', password: ''});
     const {login} = useLogin();
-    const { setAppIsLoading } = useAppLoading()
+    const [inValid, setInValid] = React.useState(false);
+    const {setAppIsLoading} = useAppLoading()
 
     const onSubmit = async (e: React.FormEvent) => {
         try {
-            setAppIsLoading(true);
+               setAppIsLoading(true);
+            setInValid(false)
             e.preventDefault();
             await login(auth);
             setAppIsLoading(false);
         } catch (e) {
+            setInValid(true)
             setAppIsLoading(false);
             console.log('Error logging in', e);
         }
@@ -34,6 +38,7 @@ export function SignIn() {
 
     return (
         <section className="m-8 flex gap-4">
+            <AlertWithContent open={inValid} setOpen={setInValid} content={"Usuario o contraseña incorrectos"}/>
             <div className="w-full lg:w-3/5 mt-24">
                 <div className="text-center">
                     <Typography variant="h2" className="font-bold mb-4">Iniciar sesion</Typography>
@@ -80,12 +85,16 @@ export function SignIn() {
                         Iniciar Sesion
                     </Button>
                 </form>
+                <div className="text-center mt-4">
+                    <Link to="/auth/sign-up" className="text-blue-600 hover:underline">¿No tienes cuenta?
+                        Registrate</Link>
+                </div>
             </div>
             <div className="w-2/5 h-[93dvh] hidden lg:block">
-                {/*<img*/}
-                {/*    src="/img/login banner.webp"*/}
-                {/*    className="h-full w-full object-cover rounded-3xl"*/}
-                {/*/>*/}
+                <img
+                    src="/img/login banner.webp"
+                    className="h-full w-full object-cover rounded-3xl"
+                />
             </div>
         </section>
     );

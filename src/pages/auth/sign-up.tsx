@@ -18,13 +18,15 @@ export function SignUp() {
     const [user, setUser] = React.useState<IUser>({} as IUser);
     const [organization, setOrganization] = React.useState<any>({} as IOrganization);
     const [addUser] = userService.useAddTravelUsers();
-    const [addOrganization] = organizationService.useAddOrganizations();
+    const [addOrganization, { data: recentCreatedOrganization }] = organizationService.useAddOrganizations();
     const {login} = useLogin();
     const register = async () => {
         const {data: createdOrganization} = await addOrganization({
             ...organization, type: 'agency'
         });
 
+
+        console.log('user', user);
         if (createdOrganization) {
             const {data: createdUser} = await addUser({
                 ...user,
