@@ -8,27 +8,34 @@ export interface AppStepperProps<T> {
     onClickStep: (position: number, step: IStep<T>) => any;
 }
 
-export function AppStepper<T>({ steps, activeStep, onClickStep}: AppStepperProps<T> ) {
-    if(steps.length === 0) return null;
+export function AppStepper<T>({steps, activeStep, onClickStep}: AppStepperProps<T>) {
+    if (steps.length === 0) return null;
     return (
         <>
-            <Stepper activeStep={activeStep || 0} className="px-7 overflow-x-scroll mb-10 h-[110px] w-[100%]">
-                {steps.map((step, index) => (
-                    <Step key={index} onClick={() => onClickStep(index, step)} >
-                        {step.icon}
+            <div className="w-full py-4 px-8">
+                <div className='overflow-x-auto sm:overflow-x-visible'>
+                    {/*<Stepper activeStep={activeStep || 0} className="px-7 overflow-hidden mb-5 h-[150px] w-[100%]">*/}
+                    <Stepper activeStep={activeStep || 0} className="flex flex-nowrap px-8 mb-8  ">
+                        {steps.map((step, index) => (
+                            <Step key={index} onClick={() => onClickStep(index, step)}>
+                                {step.icon}
 
-                        <div className="absolute -bottom-[2.5rem] w-max text-center">
-                            <Typography
-                                className="min-w-[100px]"
-                                variant="h6"
-                                color={activeStep === index ? 'blue-gray' : 'gray'}
-                            >
-                                {step.label}
-                            </Typography>
-                        </div>
-                    </Step>
-                ))}
-            </Stepper>
+                                <div className="lg:fixed sm:static object-center mt-20 w-max text-center">
+                                    {/*<div className="absolute -bottom-[2.5rem] w-max text-center">*/}
+                                    <Typography
+                                        // className="min-w-[100px]"
+                                        className="min-w-[100px] w-max"
+                                        variant="h6"
+                                        color={activeStep === index ? 'blue-gray' : 'gray'}
+                                    >
+                                        {step.label}
+                                    </Typography>
+                                </div>
+                            </Step>
+                        ))}
+                    </Stepper>
+                </div>
+            </div>
             <div className="app-stepper__content">
                 {steps[activeStep || 0]?.component}
             </div>

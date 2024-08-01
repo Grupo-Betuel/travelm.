@@ -3,7 +3,7 @@ import {Button, Card, CardBody, CardHeader, Typography} from '@material-tailwind
 import {UserIcon} from '@heroicons/react/20/solid';
 import ExcursionGeneralInfo from '../components/ExcursionGeneralnfo';
 import {MediaHandlerStep} from '../components/Steps/MediaHandlerStep';
-import {ExcursionStatusEnum, IExcursion} from '../../../../models/excursionModel';
+import {ExcursionStatusEnum, IExcursion} from '@/models/excursionModel';
 import {
     validateStep1,
     validateStep2,
@@ -12,21 +12,21 @@ import {
     validateStep5,
     validateStep6,
     validateStep7
-} from "../../../../utils/excursionStepperValidations";
+} from "@/utils/excursionStepperValidations";
 import {OrganizationsDestinationsStep} from "../components/Steps/OrganizationsDestinationsStep";
 import ActivitiesHandlerStep from "../components/Steps/ActivitiesHandlerStep";
 import FoodsHandlerStep from "../components/Steps/FoodsHandlerStep";
 import {ProjectHandlerStep} from "../components/Steps/ProjectionsHandlerStep";
 import {TransportHandlerStep} from "../components/Steps/TransportHandlerStep";
-import {getCrudService} from "../../../../api/services/CRUD.service";
+import {getCrudService} from "@/api/services/CRUD.service";
 import {useNavigate, useParams} from "react-router-dom";
-import {EXCURSION_CONSTANTS} from "../../../../constants/excursion.constant";
-import {useGCloudMediaHandler} from "../../../../hooks/useGCloudMedediaHandler";
-import {IMediaFile} from "../../../../models/mediaModel";
+import {EXCURSION_CONSTANTS} from "@/constants/excursion.constant";
+import {useGCloudMediaHandler} from "@/hooks/useGCloudMedediaHandler";
+import {IMediaFile} from "@/models/mediaModel";
 import FinancesHandlerStep from "../components/Steps/FinancesHandlerStep";
-import {IStep} from "../../../../models/common";
-import {AppStepper} from "../../../../components/AppStepper";
-import {useAppLoading} from "../../../../context/appLoadingContext";
+import {IStep} from "@/models/common";
+import {AppStepper} from "@/components/AppStepper";
+import {useAppLoading} from "@/context/appLoadingContext";
 
 
 const excursionService = getCrudService("excursions");
