@@ -14,16 +14,13 @@ export function AppStepper<T>({steps, activeStep, onClickStep}: AppStepperProps<
         <>
             <div className="w-full py-4 px-8">
                 <div className='overflow-x-auto sm:overflow-x-visible'>
-                    {/*<Stepper activeStep={activeStep || 0} className="px-7 overflow-hidden mb-5 h-[150px] w-[100%]">*/}
                     <Stepper activeStep={activeStep || 0} className="flex flex-nowrap px-8 mb-8  ">
                         {steps.map((step, index) => (
                             <Step key={index} onClick={() => onClickStep(index, step)}>
                                 {step.icon}
 
                                 <div className="lg:fixed sm:static object-center mt-20 w-max text-center">
-                                    {/*<div className="absolute -bottom-[2.5rem] w-max text-center">*/}
                                     <Typography
-                                        // className="min-w-[100px]"
                                         className="min-w-[100px] w-max"
                                         variant="h6"
                                         color={activeStep === index ? 'blue-gray' : 'gray'}
