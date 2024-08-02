@@ -1,5 +1,5 @@
 import React from "react";
-import { Alert, Button, Typography } from "@material-tailwind/react";
+import { Alert, Typography } from "@material-tailwind/react";
 
 function Icon() {
     return (
@@ -24,21 +24,39 @@ interface AlertWithContentProps<T> {
     content: string;
     open: boolean;
     setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+    type: 'warning' | 'success' | 'error';
 }
+const alertTypes = {
+    warning: {
+        color: 'yellow-600',
+        icon: <Icon />, // Puedes definir diferentes iconos si lo deseas
+        title: 'Warning',
+    },
+    success: {
+        color: 'green-600',
+        icon: <Icon />, // Cambia el icono para éxito
+        title: 'Success',
+    },
+    error: {
+        color: 'red-600',
+        icon: <Icon />, // Cambia el icono para error
+        title: 'Error',
+    },
+};
 
-export function AlertWithContent<T>({content, open, setOpen}: AlertWithContentProps<T>) {
-    // const [open, setOpen] = React.useState(true);
-
+export function AlertWithContent<T>({content, open, setOpen, type}: AlertWithContentProps<T>) {
+    const alertType = alertTypes[type];
+    console.log(alertType.color);
     return (
         <>
             <Alert
                 open={open}
-                className="w-96 h-32 bg-yellow-600 bg-opacity-90 fixed bottom-10 left-10 z-50"
-                icon={<Icon />}
+                className={`w-96 h-32 bg-${alertType.color} bg-opacity-90 fixed bottom-10 left-10 z-50`}
+                icon={alertType.icon}
                 onClose={() => setOpen(false)}
             >
                 <Typography variant="h5" color="white">
-                    Warning
+                    {alertType.title}
                 </Typography>
                 <Typography color="white" className="mt-2 font-normal">
                     {content}

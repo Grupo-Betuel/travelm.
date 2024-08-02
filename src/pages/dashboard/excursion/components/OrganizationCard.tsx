@@ -139,7 +139,7 @@ export const OrganizationCard: React.FC<OrganizationCardProps> = ({onEdit, organ
                         }
                     </div>
                 }
-                <AlertWithContent content='Direccion Copiada en el portapapeles' open={alertVisible} setOpen={setAlertVisible}/>
+                <AlertWithContent content='Direccion Copiada en el portapapeles' open={alertVisible} setOpen={setAlertVisible} type="success"/>
                 {onEdit && <Button className="px-4" variant="outlined" color="blue"
                                    onClick={handleOnEdit}>Editar</Button>}
             </CardFooter>
