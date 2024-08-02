@@ -30,7 +30,7 @@ const ExcursionGeneralInfo: React.FC<GeneralInfoProps> = ({excursionData, update
     };
 
     return (
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-4 mb-6">
             <Input
                 label="Title"
                 name="title"

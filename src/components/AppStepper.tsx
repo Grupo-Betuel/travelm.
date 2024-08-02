@@ -19,7 +19,7 @@ export function AppStepper<T>({steps, activeStep, onClickStep}: AppStepperProps<
                             <Step key={index} onClick={() => onClickStep(index, step)}>
                                 {step.icon}
 
-                                <div className="lg:fixed sm:static object-center mt-20 w-max text-center">
+                                <div className="lg:absolute sm:static object-center mt-20 w-max text-center">
                                     <Typography
                                         className="min-w-[100px] w-max"
                                         variant="h6"
