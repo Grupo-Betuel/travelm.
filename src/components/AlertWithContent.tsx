@@ -33,7 +33,7 @@ export function AlertWithContent<T>({content, open, setOpen}: AlertWithContentPr
         <>
             <Alert
                 open={open}
-                className="w-96 h-32 bg-yellow-600 fixed bottom-10 left-10"
+                className="w-96 h-32 bg-yellow-600 bg-opacity-90 fixed bottom-10 left-10 z-50"
                 icon={<Icon />}
                 onClose={() => setOpen(false)}
             >

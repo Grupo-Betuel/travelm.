@@ -1,4 +1,4 @@
-import React, {useMemo} from 'react';
+import React, {useMemo, useState} from 'react';
 import {Card, CardBody, Typography, Avatar, CardHeader, CardFooter, Button} from "@material-tailwind/react";
 import {Swiper, SwiperSlide} from 'swiper/react';
 import 'swiper/css';
@@ -36,8 +36,17 @@ export const OrganizationCard: React.FC<OrganizationCardProps> = ({onEdit, organ
     const handleOnEdit = () => {
         onEdit && onEdit(organization);
     }
-
-
+    const [alertVisible, setAlertVisible] = useState(false);
+    const handleCopyToClipboard = (text : string) => {
+        navigator.clipboard.writeText(text)
+            .then(() => {
+                setAlertVisible(true);
+                setTimeout(() => {
+                    setAlertVisible(false);
+                }, 2000); // La alerta será visible durante 2 segundos
+            })
+            .catch(err => console.error('Error copying text: ', err));
+    };
 
     return (
         <Card className={`${className} min-w-[250px]`}>
@@ -109,7 +118,7 @@ export const OrganizationCard: React.FC<OrganizationCardProps> = ({onEdit, organ
                 {!!(organization.contact?.location?.link || organization.contact?.location?.address) &&
                     <div className="flex">
                         {
-                            organization.contact?.location?.link ?
+                            !organization.contact?.location?.link ?
                                 <Button
                                     variant="outlined"
                                     color="blue"
@@ -122,7 +131,7 @@ export const OrganizationCard: React.FC<OrganizationCardProps> = ({onEdit, organ
                                 <Button
                                     variant="outlined"
                                     color="blue"
-                                    onClick={() => navigator.clipboard.writeText(organization.contact?.location?.address as string)}
+                                    onClick={() => handleCopyToClipboard(organization.contact?.location?.address as string)}
                                     className="whitespace-pre-line line-clamp-1 px-4">
                                     Direccion
                                 </Button>
@@ -130,7 +139,7 @@ export const OrganizationCard: React.FC<OrganizationCardProps> = ({onEdit, organ
                         }
                     </div>
                 }
-                {/*<AlertWithContent content='Direccion Copiada en el portapapeles' open={} setOpen={}/>*/}
+                <AlertWithContent content='Direccion Copiada en el portapapeles' open={alertVisible} setOpen={setAlertVisible}/>
                 {onEdit && <Button className="px-4" variant="outlined" color="blue"
                                    onClick={handleOnEdit}>Editar</Button>}
             </CardFooter>
