@@ -118,7 +118,7 @@ export const OrganizationCard: React.FC<OrganizationCardProps> = ({onEdit, organ
                 {!!(organization.contact?.location?.link || organization.contact?.location?.address) &&
                     <div className="flex">
                         {
-                            !organization.contact?.location?.link ?
+                            organization.contact?.location?.link ?
                                 <Button
                                     variant="outlined"
                                     color="blue"
