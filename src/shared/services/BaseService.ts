@@ -10,6 +10,7 @@ import {
 import { IResponseError } from '@interfaces/error.interface';
 import { EndpointsAndEntityStateKeys } from '@shared/enums/endpoints.enum';
 import { IPaginatedResponse } from '@interfaces/pagination.interface';
+import { keys } from 'lodash';
 import { deepMatch } from '../../utils/matching.util';
 import { extractContent } from '../../utils/objects.utils';
 
@@ -54,8 +55,9 @@ export class BaseService<T> implements AbstractBaseService<T> {
     cacheLifeTime: number = 60 * 1000 * 5,
   ): Promise<T[] | IPaginatedResponse<T> | undefined> {
     try {
+      let cached = null;
       if (enableCache) {
-        const cached = this.getCachedData('get', properties);
+        cached = this.getCachedData('get', properties);
         if (cached && (cached as any)?.length) {
           callback(cached, true);
         }
@@ -80,14 +82,19 @@ export class BaseService<T> implements AbstractBaseService<T> {
           cacheLifeTime,
           properties,
         ) as T[];
+
         if (cachedData && (data as IPaginatedResponse<T>).content) {
-          (data as IPaginatedResponse<T>).content = cachedData;
+          (data as IPaginatedResponse<T>).content = this.getCachedData('get', properties) as any;
         } else if (cachedData) {
           data = cachedData;
         }
       }
 
-      callback((data as T[]) || []);
+      if ((!cached || !(cached as any).length) || (data as IPaginatedResponse<T>).content) {
+        (data as IPaginatedResponse<T>).content = (cached || (data as IPaginatedResponse<T>).content) as any;
+        callback((data as T[]) || []);
+      }
+
       return data;
     } catch (err: any) {
       handleError && handleError(err?.data ? err.data.message : err?.message);
@@ -150,7 +157,9 @@ export class BaseService<T> implements AbstractBaseService<T> {
     }
   }
 
-  getCacheKey = (key: CRUDTypes, properties?: IServiceMethodProperties<T>) => `${this.localStorageKey[key]}-${properties?.storeDataInStateKey || 'default'}`;
+  getCacheKey = (key: CRUDTypes, properties?: IServiceMethodProperties<T>) => `${this.localStorageKey[key]}-${
+    properties?.storeDataInStateKey || properties?.endpoint || 'default'
+  }`;
 
   cacheData(
     data: T | T[],
@@ -209,7 +218,13 @@ export class BaseService<T> implements AbstractBaseService<T> {
     if (cached && cached !== '[]' && cached !== '{}') {
       const data = JSON.parse(cached);
       const value = properties?.queryParams?.title || properties?.slug;
+      const page = properties?.queryParams?.page;
+      const limit = properties?.queryParams?.limit;
       const res = value ? deepMatch(value, data) : data;
+      if (page && limit) {
+        return res.slice(0, page * limit);
+      }
+
       return res;
     }
 

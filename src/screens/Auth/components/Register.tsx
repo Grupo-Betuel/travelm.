@@ -30,6 +30,10 @@ export function Register({ isModal, onSubmit, submitBtnLabel }: IAuthProps) {
   const createClient = async (data: ClientEntity) => {
     data.phone = data.phone.toString().replace(/[- ()+]/g, '');
     const from = (localStorage.getItem(FROM_TARGET_KEY) || 'ecommerce') as OrderFromTypes;
+    const nameList = data.firstName.split(' ');
+    data.firstName = nameList[0];
+    data.lastName = nameList[1];
+
     const loginData = {
       ...clientLoginData,
       phone: data.phone,
@@ -136,9 +140,6 @@ export function Register({ isModal, onSubmit, submitBtnLabel }: IAuthProps) {
           <Spin size="large" />
         </div>
       )}
-      <Form.Item label="Nombre" name="firstName" rules={[{ required: true }]}>
-        <Input size="large" />
-      </Form.Item>
       {/* <Form.Item label="Apellido" name="lastName" rules={[{ required: true }]}> */}
       {/*  <Input size="large" /> */}
       {/* </Form.Item> */}
@@ -156,7 +157,9 @@ export function Register({ isModal, onSubmit, submitBtnLabel }: IAuthProps) {
           }}
           size="large"
         />
-
+      </Form.Item>
+      <Form.Item label="Nombre" name="firstName" rules={[{ required: true }]}>
+        <Input size="large" />
       </Form.Item>
       {onSubmit && (
         <Typography.Paragraph className="mb-s font-size-4 text-center" italic>

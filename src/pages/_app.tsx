@@ -273,6 +273,7 @@ import OrderService from '@services/orderService';
 import { defaultTheme } from '../config/theme.config';
 import { defaultValidateMessages as validateMessages } from '../config/form-validation.config';
 import 'react-toastify/dist/ReactToastify.css';
+import { ImageCacheProvider } from '@shared/contexts/ImageCacheContext';
 
 // Dynamic imports
 const AppLayout = dynamic(() => import('@shared/layout'), { ssr: false });
@@ -290,9 +291,7 @@ const MyApp = ({ Component, pageProps }: AppProps<IAppProps>) => {
   const clientEntity = useAppStore((state) => state.clients((s) => s));
   const productEntity = useAppStore((state) => state.products((s) => s));
   const [appLoading, setAppLoading] = useState<boolean>();
-  const [
-    appViewportHeightClassName,
-    setAppViewportHeightClassName] = useState<AppViewportHeightClassNames>(
+  const [appViewportHeightClassName, setAppViewportHeightClassName] = useState<AppViewportHeightClassNames>(
     AppViewportHeightClassNames.WITH_NAVBAR_OPTION,
   );
   const orderService = useMemo(() => new OrderService(), []);
@@ -415,34 +414,35 @@ const MyApp = ({ Component, pageProps }: AppProps<IAppProps>) => {
             <Spin size="large" />
           </div>
         )}
-
-        <AppLoadingContext.Provider value={{ appLoading, setAppLoading }}>
-          <OrderContext.Provider
-            value={{
-              orderService,
-              toggleCart: toggleShoppingCart,
-              cartIsOpen,
-            }}
-          >
-            <AppViewportHeightContext.Provider
+        <ImageCacheProvider>
+          <AppLoadingContext.Provider value={{ appLoading, setAppLoading }}>
+            <OrderContext.Provider
               value={{
-                appViewportHeightClassName,
-                setAppviewPortHeightClassName: setAppViewportHeightClassName,
+                orderService,
+                toggleCart: toggleShoppingCart,
+                cartIsOpen,
               }}
             >
-              <LoadingBar
-                height={4}
-                color="rgb(180, 130, 251)"
-                progress={progress}
-                onLoaderFinished={() => setProgress(0)}
-                waitingTime={400}
-              />
-              <AppLayout>
-                <Component {...pageProps} />
-              </AppLayout>
-            </AppViewportHeightContext.Provider>
-          </OrderContext.Provider>
-        </AppLoadingContext.Provider>
+              <AppViewportHeightContext.Provider
+                value={{
+                  appViewportHeightClassName,
+                  setAppviewPortHeightClassName: setAppViewportHeightClassName,
+                }}
+              >
+                <LoadingBar
+                  height={4}
+                  color="rgb(180, 130, 251)"
+                  progress={progress}
+                  onLoaderFinished={() => setProgress(0)}
+                  waitingTime={400}
+                />
+                <AppLayout>
+                  <Component {...pageProps} />
+                </AppLayout>
+              </AppViewportHeightContext.Provider>
+            </OrderContext.Provider>
+          </AppLoadingContext.Provider>
+        </ImageCacheProvider>
         <ToastContainer />
       </ConfigProvider>
     </>

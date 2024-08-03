@@ -427,16 +427,13 @@ import { EndpointsAndEntityStateKeys } from '@shared/enums/endpoints.enum';
 import { CompanyEntity } from '@shared/entities/CompanyEntity';
 import { showProductDetailsHook } from '@shared/hooks/showProductDetailsHook';
 import { useInfiniteScroll } from '@shared/hooks/useInfiniteScrollHook';
+import { useImageCache } from '@shared/contexts/ImageCacheContext';
 import styles from './Company.module.scss';
 
 const DynamicScrollView = dynamic(
   () => import('@shared/components').then((mod) => mod.ScrollView),
   { ssr: false },
 );
-// const DynamicProductCard = dynamic(
-//   () => import('@shared/components').then((mod) => mod.ProductCard),
-//   { ssr: false },
-// );
 
 export interface CompanyProps {
   company?: CompanyEntity;
@@ -445,6 +442,7 @@ export interface CompanyProps {
 
 export function Company({ company, productsPerCategoryData }: CompanyProps) {
   const router = useRouter();
+  const { cacheImage } = useImageCache();
   const avoidInitialLoad = useMemo(
     () => !!productsPerCategoryData,
     [productsPerCategoryData],
@@ -467,7 +465,6 @@ export function Company({ company, productsPerCategoryData }: CompanyProps) {
     infinityScrollData,
     loadMoreCallback,
     isLastPage,
-    // fetching: fetchingProducts,
     loading: loadingProducts,
   } = useInfiniteScroll<IProductPerCategory>('products', !avoidInitialLoad, {
     endpoint: EndpointsAndEntityStateKeys.PER_CATEGORY,
@@ -478,6 +475,7 @@ export function Company({ company, productsPerCategoryData }: CompanyProps) {
     },
   });
 
+  console.log('is last', isLastPage);
   const currentCompany: CompanyEntity = useMemo(
     () => currentCompanyRes?.data[0] || company || ({} as CompanyEntity),
     [currentCompanyRes?.data, company],
@@ -531,6 +529,15 @@ export function Company({ company, productsPerCategoryData }: CompanyProps) {
     }
   }, [currentCompany?.logo]);
 
+  useEffect(() => {
+    // Caching product images
+    companyProducts.forEach((category) => {
+      category.products.forEach((product) => {
+        cacheImage(product.image);
+      });
+    });
+  }, [companyProducts]);
+
   return (
     <>
       {loadingProducts && (
@@ -575,7 +582,7 @@ export function Company({ company, productsPerCategoryData }: CompanyProps) {
               {/*    /> */}
               {/*  ))} */}
               {/* </div> */}
-              {!loadingProducts && (
+              {(!loadingProducts) && (
                 <div className="flex-center-center p-l">
                   {isLastPage ? (
                     <h2>No hay más productos</h2>
