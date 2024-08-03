@@ -413,6 +413,7 @@ const MyApp = ({ Component, pageProps }: AppProps<IAppProps>) => {
           <div className="loading">
             <Spin size="large" />
           </div>
+          
         )}
         <ImageCacheProvider>
           <AppLoadingContext.Provider value={{ appLoading, setAppLoading }}>
