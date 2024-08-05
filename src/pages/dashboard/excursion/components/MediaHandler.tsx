@@ -434,8 +434,8 @@ const MediaHandler = ({onChange, medias, disableUpload, logoMedia, flyerMedia, h
                                                 variant="h5">Imagenes {images.length > 0 && (images.length)}</Typography>
                                 </div>
                             </CardHeader>
-                            <CardBody className='p-2'>
-                                <div className='grid lg:grid-cols-4 md:grid-cols-2 gap-2 overflow-y-auto max-h-[600px]'>
+                            <CardBody className='p-2 sm:h-[200px] md:h-[300px] lg:h-[600px]'>
+                                <div className='grid lg:grid-cols-4 md:grid-cols-2 gap-2 overflow-y-auto h-full'>
                                     {imagesMedia.length > 0 && (<>
                                         {imagesMedia.map((image, index) => (
                                             <div key={`image-slide-${index}`}
