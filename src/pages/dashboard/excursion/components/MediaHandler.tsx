@@ -387,7 +387,7 @@ const MediaHandler = ({onChange, medias, disableUpload, logoMedia, flyerMedia, h
                             <CardHeader
                                 className='relative bg-gradient-to-tr from-blue-600 to-blue-400 shadow-blue-500/40 p-2'>
                                 <div className="flex justify-center items-center gap-3">
-                                    <Typography color='white' variant="h5">Flyer:</Typography>
+                                    <Typography color='white' variant="h5">Flyer</Typography>
                                 </div>
                             </CardHeader>
                             <CardBody className='p-4'>
@@ -409,7 +409,6 @@ const MediaHandler = ({onChange, medias, disableUpload, logoMedia, flyerMedia, h
                             </CardBody>
                             <CardFooter className='align-bottom p-2'>
                                 <div className="flex justify-center items-center gap-3">
-                                    {/*<Typography variant="h6">Flyer ({flyer ? 1 : 0}):</Typography>*/}
                                     <IoSearch onClick={toggleSearchMediaModal(ExtraMediaTypesEnum.FLYER)}
                                               className="text-blue-400 w-[23px] h-[23px] cursor-pointer"/>
                                     {!disableUpload && <label>
@@ -431,15 +430,15 @@ const MediaHandler = ({onChange, medias, disableUpload, logoMedia, flyerMedia, h
                                 className='relative bg-gradient-to-tr from-blue-600 to-blue-400 shadow-blue-500/40 p-2'>
                                 <div className="flex justify-center items-center ">
                                     <Typography color='white'
-                                                variant="h5">Imagenes {images.length > 0 && (images.length)}</Typography>
+                                                variant="h5">{images.length > 0 && (images.length)} Imagenes </Typography>
                                 </div>
                             </CardHeader>
                             <CardBody className='p-2'>
-                                <div className='grid lg:grid-cols-4 md:grid-cols-2 gap-2 overflow-y-auto max-h-[600px]'>
+                                <div className='grid lg:grid-cols-4 md:grid-cols-2 gap-6 overflow-y-auto max-h-[600px]'>
                                     {imagesMedia.length > 0 && (<>
                                         {imagesMedia.map((image, index) => (
                                             <div key={`image-slide-${index}`}
-                                                 className="relative col-span-1 row-span-1 w-42 h-44">
+                                                 className="relative col-span-1 row-span-1 h-48 w-48">
                                                 {renderMediaPreview(image)}
                                                 <CgClose
                                                     onClick={() => handleSetActionToConfirm('delete', 'quitar esta imagen')(image)}
@@ -452,7 +451,6 @@ const MediaHandler = ({onChange, medias, disableUpload, logoMedia, flyerMedia, h
                             </CardBody>
                             <CardFooter className='align-baseline p-4'>
                                 <div className="flex justify-center items-center gap-3">
-                                    {/*<Typography variant="h6" className="whitespace-nowrap">Imagenes ({images.length}):</Typography>*/}
                                     <IoSearch onClick={toggleSearchMediaModal(MediaTypeEnum.IMAGE)}
                                               className="text-blue-400 w-[23px] h-[23px] cursor-pointer"/>
                                     {!disableUpload && <label>
@@ -475,7 +473,7 @@ const MediaHandler = ({onChange, medias, disableUpload, logoMedia, flyerMedia, h
                             className='relative bg-gradient-to-tr from-blue-600 to-blue-400 shadow-blue-500/40 p-2'>
                             <div className="flex justify-center items-center ">
                                 <Typography color='white'
-                                            variant="h5">Audios {audios.length > 0 && (audios.length)}</Typography>
+                                            variant="h5">{audios.length > 0 && (audios.length)} Audios</Typography>
                             </div>
                         </CardHeader>
                         <CardBody className="p-2 ">
@@ -483,7 +481,7 @@ const MediaHandler = ({onChange, medias, disableUpload, logoMedia, flyerMedia, h
                                 {audios.map((audio, index) => (
                                     <div key={`audio-${index}`} className="relative">
                                         <div
-                                            className="relative col-span-1 row-span-1 w-42 h-44"
+                                            className="relative col-span-1 row-span-1 w-42 h-32"
 
                                         >
                                         <AudioPlayer
