@@ -434,12 +434,12 @@ const MediaHandler = ({onChange, medias, disableUpload, logoMedia, flyerMedia, h
                                                 variant="h5">Imagenes {images.length > 0 && (images.length)}</Typography>
                                 </div>
                             </CardHeader>
-                            <CardBody className='p-2 sm:h-[200px] md:h-[300px] lg:h-[600px]'>
-                                <div className='grid lg:grid-cols-4 md:grid-cols-2 gap-2 overflow-y-auto h-full'>
+                            <CardBody className='p-2'>
+                                <div className='grid lg:grid-cols-4 md:grid-cols-2 gap-6 overflow-y-auto max-h-[600px]'>
                                     {imagesMedia.length > 0 && (<>
                                         {imagesMedia.map((image, index) => (
                                             <div key={`image-slide-${index}`}
-                                                 className="relative col-span-1 row-span-1 w-42 h-44">
+                                                 className="relative col-span-1 row-span-1 h-48 w-48">
                                                 {renderMediaPreview(image)}
                                                 <CgClose
                                                     onClick={() => handleSetActionToConfirm('delete', 'quitar esta imagen')(image)}
@@ -475,7 +475,7 @@ const MediaHandler = ({onChange, medias, disableUpload, logoMedia, flyerMedia, h
                             className='relative bg-gradient-to-tr from-blue-600 to-blue-400 shadow-blue-500/40 p-2'>
                             <div className="flex justify-center items-center ">
                                 <Typography color='white'
-                                            variant="h5">Audios {audios.length > 0 && (audios.length)}</Typography>
+                                            variant="h5">{audios.length > 0 && (audios.length)} Audios</Typography>
                             </div>
                         </CardHeader>
                         <CardBody className="p-2 ">
@@ -483,7 +483,7 @@ const MediaHandler = ({onChange, medias, disableUpload, logoMedia, flyerMedia, h
                                 {audios.map((audio, index) => (
                                     <div key={`audio-${index}`} className="relative">
                                         <div
-                                            className="relative col-span-1 row-span-1 w-42 h-44"
+                                            className="relative col-span-1 row-span-1 w-42 h-32"
 
                                         >
                                         <AudioPlayer
