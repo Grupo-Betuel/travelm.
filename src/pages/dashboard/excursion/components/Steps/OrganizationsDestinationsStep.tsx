@@ -3,6 +3,7 @@ import OrganizationHandler from "../OrganizationHandler";
 import {IExcursion} from "../../../../../models/excursionModel";
 import {OrganizationCard} from "../OrganizationCard";
 import {IOrganization} from "../../../../../models/organizationModel";
+import {Typography} from "@material-tailwind/react";
 
 export interface IOrganizationsDestinationsStepProps {
     excursionData: IExcursion;
@@ -29,7 +30,13 @@ export const OrganizationsDestinationsStep = (
 
     return (
         <div>
-            <h1>Organizations</h1>
+            <Typography
+                className="ml-1 mb-2"
+                variant="h6"
+                color="blue-gray"
+            >
+                {type === 'destinations' ? 'Destinations' : 'Organizations'}
+            </Typography>
             <OrganizationHandler
                 isMultiple={true}
                 onSelect={onSelectOrganization}

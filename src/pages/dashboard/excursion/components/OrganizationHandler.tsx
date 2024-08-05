@@ -58,9 +58,8 @@ const OrganizationHandler: React.FC<IOrganizationSelectorProps> = (
 
             {organizationForm}
 
-
             {selected && !!selected.length &&
-                <div className="flex justify-around gap-3 !overflow-x-scroll p-4 py-10 h-[400px]">
+                <div className="flex space-x-2 gap-3 overflow-auto p-4 py-10 h-auto">
                     {selected?.map((entity, index) => (
                         <OrganizationCard
                             onEdit={onEditOrganization}

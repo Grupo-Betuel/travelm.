@@ -38,7 +38,7 @@ export function SignIn() {
 
     return (
         <section className="m-8 flex gap-4">
-            <AlertWithContent open={inValid} setOpen={setInValid} content={"Usuario o contraseña incorrectos"}/>
+            <AlertWithContent open={inValid} setOpen={setInValid} content={"Usuario o contraseña incorrectos"} type="warning"/>
             <div className="w-full lg:w-3/5 mt-24">
                 <div className="text-center">
                     <Typography variant="h2" className="font-bold mb-4">Iniciar sesion</Typography>
