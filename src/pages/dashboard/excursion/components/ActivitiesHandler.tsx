@@ -3,11 +3,11 @@ import {Button, Input, Typography} from '@material-tailwind/react';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import MediaHandler, {IActivityHandled} from "./MediaHandler";
-import DatePicker from "../../../../components/DatePicker";
-import {IActivity} from "../../../../models/activitiesModel";
-import {getCrudService} from "../../../../api/services/CRUD.service";
-import {CommonConfirmActions, CommonConfirmActionsDataTypes} from "../../../../models/common";
-import {useConfirmAction} from "../../../../hooks/useConfirmActionHook"; // Include the Quill stylesheet
+import DatePicker from "@/components/DatePicker";
+import {IActivity} from "@/models/activitiesModel";
+import {getCrudService} from "@/api/services/CRUD.service";
+import {CommonConfirmActions, CommonConfirmActionsDataTypes} from "@/models/common";
+import {useConfirmAction} from "@/hooks/useConfirmActionHook"; // Include the Quill stylesheet
 
 
 interface ActivitiesHandlerProps {

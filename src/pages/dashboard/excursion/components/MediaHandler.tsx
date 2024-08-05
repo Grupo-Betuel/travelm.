@@ -380,7 +380,7 @@ const MediaHandler = ({onChange, medias, disableUpload, logoMedia, flyerMedia, h
 
                 </>
             </div>
-            <div className='lg:flex gap-2 '>
+            <div className='lg:flex gap-4 '>
                 {(!handle || handle.flyer) && (
                     <div className='lg:w-1/3'>
                         <Card className=''>
@@ -391,7 +391,7 @@ const MediaHandler = ({onChange, medias, disableUpload, logoMedia, flyerMedia, h
                                 </div>
                             </CardHeader>
                             <CardBody className='p-4'>
-                                <div className='overflow-hidden max-h-[600px]'>
+                                <div className='overflow-hidden max-h-[460px]'>
                                     {oneFlyer.length > 0 && (<>
                                             {oneFlyer.map((image, index) => (
                                                 <div key={`image-slide-${index}`}
@@ -434,11 +434,11 @@ const MediaHandler = ({onChange, medias, disableUpload, logoMedia, flyerMedia, h
                                 </div>
                             </CardHeader>
                             <CardBody className='p-2'>
-                                <div className='grid lg:grid-cols-4 md:grid-cols-2 gap-6 overflow-y-auto max-h-[600px]'>
+                                <div className='grid lg:grid-cols-4 md:grid-cols-2 gap-6 mx-4 overflow-y-auto max-h-[460px]'>
                                     {imagesMedia.length > 0 && (<>
                                         {imagesMedia.map((image, index) => (
                                             <div key={`image-slide-${index}`}
-                                                 className="relative col-span-1 row-span-1 h-48 w-48">
+                                                 className="relative col-span-1 row-span-1 gap-2 h-36 w-36">
                                                 {renderMediaPreview(image)}
                                                 <CgClose
                                                     onClick={() => handleSetActionToConfirm('delete', 'quitar esta imagen')(image)}
