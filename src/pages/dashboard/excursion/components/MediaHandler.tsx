@@ -23,9 +23,10 @@ import {AiOutlineCloudUpload} from "react-icons/ai";
 import {CgClose} from "react-icons/cg";
 import {IoSearch} from "react-icons/io5";
 import {IMG_CONSTANTS} from "@/constants/img.utils";
+import organizations from "@/pages/dashboard/organizations/organizations";
 
 
-const renderMediaPreview = (media: IMediaFile): JSX.Element => {
+const renderMediaPreview = (media: IMedia): JSX.Element => {
     const mediaType = media.type;
     console.log(media)
     switch (mediaType) {
@@ -36,9 +37,6 @@ const renderMediaPreview = (media: IMediaFile): JSX.Element => {
                 <AppImage
                     src={media.content}
                     alt={media.title}
-                    // caption={{
-                    //     title: `${media.title.replace(/\.[^/.]+$/, '')}`,
-                    // }}
                 />
             </>
         case 'video':
@@ -236,6 +234,7 @@ const MediaHandler = ({onChange, medias, disableUpload, logoMedia, flyerMedia, h
         }
     }
     const oneFlyer = flyer ? [flyer] : [];
+    const avatarLogo : IMedia | undefined = logoMedia || logo;
     const allImagesMedia = useMemo(() => {
         return flyer ? [flyer, ...images] : images;
     }, [images, flyer])
@@ -244,6 +243,7 @@ const MediaHandler = ({onChange, medias, disableUpload, logoMedia, flyerMedia, h
         return images ? [...images] : images;
     }, [images])
 
+    console.log('organization',medias)
     const [searchMediaModal, setSearchMediaModal] = useState(false);
     const [selectedMediaSelectorType, setSelectedMediaSelectorType] = useState<MediaTypeEnum | ExtraMediaTypesEnum>();
 
@@ -311,26 +311,26 @@ const MediaHandler = ({onChange, medias, disableUpload, logoMedia, flyerMedia, h
 
     return (
         <div className="space-y-2 p-2">
-            <div className='lg:flex mb-10 space-x-2'>
-                {(handle?.logo) && <>
-                    <div className="flex items-center gap-5">
-                        <div className="flex flex-col items-center gap-2">
-                            <Avatar src={logo?.content || logoMedia?.content || IMG_CONSTANTS.LOGO_PLACEHOLDER}
-                                    size="lg"/>
-                            <Typography variant="h6">Logo</Typography>
-
-                        </div>
-                        <IoSearch onClick={toggleSearchMediaModal(ExtraMediaTypesEnum.LOGO)}
-                                  className="text-blue-400 w-[23px] h-[23px] cursor-pointer"/>
-                        {!disableUpload && <label>
-                            <input type="file" className="hidden absolute -z-10" placeholder="flyer" accept="image/*"
-                                   onChange={handleLogoChange}/>
-                            <AiOutlineCloudUpload className="h-10 cursor-pointer text-blue-400 w-[26px]"/>
-                        </label>}
-                    </div>
-                </>
-                }
+            <div className=''>
                 <>
+                {/*{(handle?.logo) && <>*/}
+                {/*    <div className="flex items-center gap-5">*/}
+                {/*        <div className="flex flex-col items-center gap-2">*/}
+                {/*            <Avatar src={logo?.content || logoMedia?.content || IMG_CONSTANTS.LOGO_PLACEHOLDER}*/}
+                {/*                    size="lg"/>*/}
+                {/*            <Typography variant="h6">Logo</Typography>*/}
+
+                {/*        </div>*/}
+                {/*        <IoSearch onClick={toggleSearchMediaModal(ExtraMediaTypesEnum.LOGO)}*/}
+                {/*                  className="text-blue-400 w-[23px] h-[23px] cursor-pointer"/>*/}
+                {/*        {!disableUpload && <label>*/}
+                {/*            <input type="file" className="hidden absolute -z-10" placeholder="flyer" accept="image/*"*/}
+                {/*                   onChange={handleLogoChange}/>*/}
+                {/*            <AiOutlineCloudUpload className="h-10 cursor-pointer text-blue-400 w-[26px]"/>*/}
+                {/*        </label>}*/}
+                {/*    </div>*/}
+                {/*</>*/}
+                {/*}*/}
                 {/*{(!handle || handle.flyer) && <>*/}
                 {/*    <div className="flex items-center gap-5">*/}
                 {/*        <Typography variant="h6">Flyer ({flyer ? 1 : 0}):</Typography>*/}
@@ -381,6 +381,45 @@ const MediaHandler = ({onChange, medias, disableUpload, logoMedia, flyerMedia, h
                 </>
             </div>
             <div className='lg:flex gap-4 '>
+                {(handle?.logo) && (
+                    <div className='w-full'>
+                        <Card className=''>
+                            <CardHeader className='rounded-full overflow-hidden flex items-center justify-center'>
+                                <div className="flex justify-center items-center gap-3">
+                                {(logoMedia?.content || logo?.content) ? (
+                                    <div className="rounded-full overflow-hidden w-full h-full flex items-center justify-center">
+                                        {renderMediaPreview(avatarLogo as IMedia)}
+                                    </div>
+                                ) : (
+                                    <Avatar src={IMG_CONSTANTS.LOGO_PLACEHOLDER} size="xxl" />
+                                )}
+                                </div>
+                            </CardHeader>
+                            <CardBody className='p-2 flex flex-col item-center'>
+                                {/* Logo a la izquierda */}
+                                {/*<div className='items-center'>*/}
+                                    <Typography variant="h6" className='mb-2 text-center'>
+                                        {logoMedia?.content ? '' : 'Logo'}
+                                    </Typography>
+                                {/*</div>*/}
+                                {/* Botones a la derecha, uno encima del otro */}
+                                <div className="flex flex-items justify-center items-center gap-3">
+                                    <IoSearch onClick={toggleSearchMediaModal(ExtraMediaTypesEnum.LOGO)}
+                                              className="text-blue-400 w-[23px] h-[23px] cursor-pointer" />
+                                    {!disableUpload && (
+                                        <label>
+                                            <input type="file" className="hidden absolute -z-10" placeholder="flyer"
+                                                   accept="image/*" onChange={handleLogoChange} />
+                                            <AiOutlineCloudUpload className="h-10 cursor-pointer text-blue-400 w-[26px]" />
+
+                                        </label>
+                                    )}
+                                </div>
+                            </CardBody>
+                        </Card>
+                    </div>
+                )}
+
                 {(!handle || handle.flyer) && (
                     <div className='lg:w-1/3'>
                         <Card className=''>
@@ -423,6 +462,8 @@ const MediaHandler = ({onChange, medias, disableUpload, logoMedia, flyerMedia, h
                         </Card>
                     </div>
                 )}
+
+
                 {(!handle || handle.images) && (<>
                     <div className='w-2/3'>
                         <Card className=''>
