@@ -52,12 +52,12 @@ export const FinanceHandler = (
                     onChange={handleOnChangeFinance}
                     className="mb-4"
                 />
+            </div>
                 <Button
                     className={"whitespace-nowrap"}
                     onClick={toggleCost}
                     color={enableCost ? 'red' : 'green'}>
                     {enableCost ? 'Quitar Costo' : 'Agregar Costo'}</Button>
-            </div>
             {enableCost && <Input
                 type="number"
                 label="Cost"
