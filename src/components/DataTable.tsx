@@ -436,6 +436,7 @@ export function DataTable<T>(
                     placeholder="Buscar..."
                     value={searchTerm}
                     onChange={handleSearchChange}
+                    icon={<i className="fas fa-heart" />}
                 />
             </div>
             <div className="flex gap-4">
@@ -447,6 +448,7 @@ export function DataTable<T>(
                                 label={option.label}
                                 value={filters[option.key] || ''}
                                 onChange={(e) => handleFilterChange(option.key, [e.target.value])}
+                                // icon={<i className="fas fa-heart" />}
                             />
                         )}
                         {option.type === 'select' && (
