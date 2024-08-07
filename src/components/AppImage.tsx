@@ -25,7 +25,7 @@ export function AppImage(
         <>
             <figure className={`relative h-full w-auto ${className || ''} hover:opacity-90`} onClick={handleOpen}>
                 <img
-                    className="h-full w-full rounded-xl object-cover object-center cursor-pointer"
+                    className="h-full w-full rounded-xl object-cover cursor-pointer"
                     src={src}
                     alt={alt}
                 />

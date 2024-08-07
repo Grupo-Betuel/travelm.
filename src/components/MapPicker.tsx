@@ -4,8 +4,8 @@ import {ILocation} from '../models/ordersModels';
 import {Input} from "@material-tailwind/react";
 
 const containerStyle = {
-    width: '400px',
-    height: '400px'
+    width: '80%',
+    height: '60vh'
 };
 
 const center = {
@@ -26,27 +26,9 @@ const MapPicker: React.FC<MapPickerProps> = ({onLocationSelect}) => {
 
     const onLoad = (mapInstance: google.maps.Map) => {
         mapRef.current = mapInstance;
-        // mapInstance.addListener('mouseover', () => {
-        //     // @ts-ignore
-        //     mapInstance.getDiv().style.cursor = 'pointer';
-        // });
-        // mapInstance.addListener('mouseout', () => {
-        //     // @ts-ignore
-        //     mapInstance.getDiv().style.cursor = '';
-        // });
     };
 
     const onMarkerSelected = (e: google.maps.MapMouseEvent) => {
-        // const location: ILocation = {
-        //     latitude: e?.latLng?.lat() || 0,
-        //     longitude: e?.latLng?.lng() || 0,
-        //     address: '',
-        //     city: '',
-        //     country: '',
-        //     province: '',
-        //     description: '',
-        //     link: ''
-        // };
 
         onPlaceSelected({geometry: {location: e.latLng} as google.maps.places.PlaceResult})
     }
@@ -94,23 +76,8 @@ const MapPicker: React.FC<MapPickerProps> = ({onLocationSelect}) => {
             >
                 <input
                     type="text"
-                    placeholder="Search for a place"
-                    style={{
-                        boxSizing: `border-box`,
-                        border: `1px solid transparent`,
-                        width: `240px`,
-                        height: `32px`,
-                        padding: `0 12px`,
-                        borderRadius: `3px`,
-                        boxShadow: `0 2px 6px rgba(0, 0, 0, 0.3)`,
-                        fontSize: `14px`,
-                        outline: `none`,
-                        textOverflow: `ellipses`,
-                        position: `absolute`,
-                        left: `50%`,
-                        marginLeft: `-120px`,
-                        zIndex: 99999999
-                    }}
+                    placeholder="Buscar un lugar"
+                    className="w-full md:w-96 p-3 border border-gray-300 rounded-full shadow-md outline-none text-gray-800 placeholder-gray-500 transition-all focus:border-blue-500 focus:ring-2 focus:ring-blue-400 focus:ring-opacity-50"
                 />
             </Autocomplete>
             <GoogleMap

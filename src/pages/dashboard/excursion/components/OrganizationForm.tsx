@@ -215,29 +215,34 @@ export const OrganizationForm: React.FC<OrganizationHandlerProps> = (
 
     console.log('organization user', organizationUser)
     const form = (
-        <div className="space-y-4">
-            <MediaHandler logoMedia={organization.logo} medias={organization.medias} onChange={handleLogoChange} handle={{logo: true}}/>
-            {/*<div className="flex items-center space-x-4">*/}
-            {/*    <Avatar src={organization.logo?.content} size="lg"/>*/}
-            {/*    <input type="file" accept="image/*"*/}
-            {/*           onChange={(e: any) => handleLogoChange(e.target.files?.[0])}/>*/}
-            {/*</div>*/}
+        <div className="space-y-4 px-20">
+            <div className='flex gap-4'>
+                <div className='flex flex-col '>
+                    <MediaHandler logoMedia={organization.logo} medias={organization.medias} onChange={handleLogoChange}
+                                  handle={{logo: true}}/>
+                </div>
+                <div className='flex flex-col gap-4 w-2/3'>
+                    <Input label="Name" name="name" value={organization.name} onChange={handleInputChange}/>
+                    <Select
+                        label="Type"
+                        name="type"
+                        value={organization.type}
+                        onChange={(value) => handleInputChange({target: {value: value, name: 'type'}} as any)}
+                        className="mb-4"
+                    >
+                        {organizationTypeList.map((type) => (
+                            <Option key={type} value={type}>{type}</Option>
+                        ))}
+                    </Select>
+                    <Textarea label="Description" name="description" value={organization.description}
+                              onChange={handleInputChange}/>
+                </div>
+                <div className='w-1/6'>
 
-            <Input label="Name" name="name" value={organization.name} onChange={handleInputChange}/>
-            <Select
-                label="Type"
-                name="type"
-                value={organization.type}
-                onChange={(value) => handleInputChange({target: {value: value, name: 'type'}} as any)}
-                className="mb-4"
-            >
-                {organizationTypeList.map((type) => (
-                    <Option key={type} value={type}>{type}</Option>
-                ))}
-            </Select>
-            <Textarea label="Description" name="description" value={organization.description}
-                      onChange={handleInputChange}/>
-            <SocialNetworkForm onChange={handleSocialNetworksChange}/>
+                </div>
+            </div>
+                    <SocialNetworkForm onChange={handleSocialNetworksChange}/>
+
             <MediaHandler handle={{images: true}} onChange={onChangeMedia} medias={organization.medias}/>
             <MapPicker onLocationSelect={handleLocationChange}/>
             <BedroomsHandler bedrooms={organization.bedrooms} updateBedrooms={handleBedrooms}/>
