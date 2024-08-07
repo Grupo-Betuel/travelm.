@@ -26,6 +26,7 @@ import {ICustomComponentDialog, IPathDataParam} from "@/models/common";
 import {getCrudService} from "@/api/services/CRUD.service";
 import UserForm from "../../users/components/UserForm";
 import IUser, {UserRoleTypes, UserTypes} from "../../../../models/interfaces/userModel";
+import {ISocialNetwork} from "@/models/ISocialNetwork";
 
 export interface OrganizationHandlerProps {
     dialog?: ICustomComponentDialog;
@@ -155,6 +156,13 @@ export const OrganizationForm: React.FC<OrganizationHandlerProps> = (
         });
     }
 
+    const handleSocialNetworks = (socialNetworks: ISocialNetwork[]) => {
+        setOrganization({
+            ...organization,
+            socialNetworks,
+            });
+    }
+
     const handleEntryFee = (fee: IFinance) => {
         if (!fee.price) return;
         setOrganization({
@@ -242,7 +250,8 @@ export const OrganizationForm: React.FC<OrganizationHandlerProps> = (
                     <Textarea label="Description" name="description" value={organization.description}
                               onChange={handleInputChange}/>
 
-                    {showSocialNetworkForm && <SocialNetworkForm onChange={handleSocialNetworksChange}/>}
+                    {showSocialNetworkForm && <SocialNetworkForm socialNetworks={organization.socialNetworks}
+                                                                 updateSocialNetworks={handleSocialNetworks}/>}
                     {showBedroomsHandler &&
                         <BedroomsHandler bedrooms={organization.bedrooms} updateBedrooms={handleBedrooms}/>}
                     {showMediaHandler &&
@@ -254,20 +263,20 @@ export const OrganizationForm: React.FC<OrganizationHandlerProps> = (
                         className={`w-full ${showSocialNetworkForm ? 'bg-red-500' : 'bg-blue-500'} text-white`}
                         onClick={() => setShowSocialNetworkForm(!showSocialNetworkForm)}
                     >
-                        {showSocialNetworkForm ? 'Cancelar Red Social' : 'Añadir Red Social'}
+                        {showSocialNetworkForm ? 'Quitar Red Social' : 'Añadir Red Social'}
                     </Button>
                     <Button
                         className={`w-full ${showMediaHandler ? 'bg-red-500' : 'bg-blue-500'} text-white`}
                         onClick={() => setShowMediaHandler(!showMediaHandler)}
                     >
-                        {showMediaHandler ? 'Cancelar' : 'Añadir Imágenes'}
+                        {showMediaHandler ? 'Quitar Imagenes' : 'Añadir Imágenes'}
                     </Button>
                     {/*{organization.type === 'hotel' && (*/}
                         <Button
                             className={`w-full ${showBedroomsHandler ? 'bg-red-500' : 'bg-blue-500'} text-white`}
                             onClick={() => setShowBedroomsHandler(!showBedroomsHandler)}
                         >
-                            {showBedroomsHandler ? 'Cancelar' : 'Añadir Habitaciones'}
+                            {showBedroomsHandler ? 'Quitar Habitaciones' : 'Añadir Habitaciones'}
                         </Button>
                     {/*)}*/}
                 </div>

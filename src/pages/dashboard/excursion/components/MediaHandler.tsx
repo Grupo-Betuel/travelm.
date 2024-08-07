@@ -464,7 +464,7 @@ const MediaHandler = ({onChange, medias, disableUpload, logoMedia, flyerMedia, h
                 {/*)}*/}
 
 
-                <div className={`${(!handle || handle.flyer) ? 'w-2/3' : 'w-full'}`}>
+                <div className={`${(!handle || handle.flyer) ? 'w-2/3' : 'w-full mt-4'}`}>
                     {(!handle || handle.images) && (<>
                         <Card className=''>
                             <CardHeader
