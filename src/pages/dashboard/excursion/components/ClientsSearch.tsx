@@ -24,6 +24,7 @@ export const ClientsSearch = () => {
                 options={clientOptions}
                 label="Select Organiazation"
                 multiple={true}
+
             />
         </div>
     )

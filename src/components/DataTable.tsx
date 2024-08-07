@@ -259,7 +259,7 @@ export function DataTable<T>(
         onSelect
     }: DataTableProps<T>) {
     const [searchTerm, setSearchTerm] = useState('');
-    const [filters, setFilters] = useState<Record<keyof T, any>>({});
+    const [filters, setFilters] = useState<Record<keyof T, any>>({} as Record<keyof T, any>);
     const [sortConfig, setSortConfig] = useState<{ key: keyof T, direction: 'ascending' | 'descending' } | null>(null);
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage, setItemsPerPage] = useState(5);
@@ -427,15 +427,34 @@ export function DataTable<T>(
         );
     };
 
+    const handleClear = (key : any) => {
+        if (key === 'search') {
+            setSearchTerm('');
+        } else {
+            setFilters((prevFilters) => ({
+                ...prevFilters,
+                [key]: '',
+            }));
+        }
+    };
+
     return (
         <div className="flex flex-col gap-4 mb-4">
             <div className="mb-1 flex flex-col gap-6">
                 <Input
+                    crossOrigin={false}
                     label="Buscar"
                     size="lg"
                     placeholder="Buscar..."
                     value={searchTerm}
                     onChange={handleSearchChange}
+                    icon={
+                        <i
+                            className="fas fa-refresh cursor-pointer"
+                            onClick={() => handleClear('search')}
+                        />
+
+                    }
                 />
             </div>
             <div className="flex gap-4">
@@ -443,10 +462,18 @@ export function DataTable<T>(
                     <div key={`${option.key as string}-${index}`}>
                         {option.type === 'text' && (
                             <Input
+                                crossOrigin={false}
                                 size="lg"
                                 label={option.label}
                                 value={filters[option.key] || ''}
                                 onChange={(e) => handleFilterChange(option.key, [e.target.value])}
+                                icon={
+                                    <i
+                                        className="fas fa-refresh cursor-pointer"
+                                        onClick={() => handleClear(option.key)}
+                                    />
+
+                                }
                             />
                         )}
                         {option.type === 'select' && (
