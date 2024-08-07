@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 import {Button, Input, Typography} from '@material-tailwind/react';
-import {IBedroom} from "../../../../models/bedroomModel";
-import {getCrudService} from "../../../../api/services/CRUD.service";
+import {IBedroom} from "@/models/bedroomModel";
+import {getCrudService} from "@/api/services/CRUD.service";
 import {CommonConfirmActions, CommonConfirmActionsDataTypes} from "../../../../models/common";
 import {useConfirmAction} from "../../../../hooks/useConfirmActionHook";
 

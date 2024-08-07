@@ -21,11 +21,13 @@ import createEntityApiSlice from "../api/entityApiSlice";
 import {IClient} from "./clientModel";
 import IUser from "./interfaces/userModel";
 import {ITransportResource} from "./transportResourcesModel";
+import {ISocialNetwork} from "@/models/ISocialNetwork";
 
 export type EntityModels = {
     finances: IFinance,
     projections: IProjection,
     organizations: IOrganization,
+    socialNetworks: ISocialNetwork,
     reviews: IReview,
     transports: ITransport,
     foods: IFood,

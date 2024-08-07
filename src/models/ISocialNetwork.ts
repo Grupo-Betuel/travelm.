@@ -3,4 +3,7 @@ export class ISocialNetwork {
     username: string = '';
     url: string = '';
     company: string = '';
+
+
 }
+
