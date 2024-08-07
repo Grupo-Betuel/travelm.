@@ -213,13 +213,18 @@ export const OrganizationForm: React.FC<OrganizationHandlerProps> = (
     }
 
 
-    console.log('organization user', organizationUser)
+    console.log('organization user', organization)
+    const [showSocialNetworkForm, setShowSocialNetworkForm] = useState(false);
+    const [showMediaHandler, setShowMediaHandler] = useState(false);
+    const [showBedroomsHandler, setShowBedroomsHandler] = useState(false);
+
     const form = (
-        <div className="space-y-4 px-20">
+        <div className="space-y-4 w-4/5 mx-auto">
             <div className='flex gap-4'>
-                <div className='flex flex-col '>
+                <div className='flex flex-col max-w-[230px] space-y-4'>
                     <MediaHandler logoMedia={organization.logo} medias={organization.medias} onChange={handleLogoChange}
                                   handle={{logo: true}}/>
+                    <FinanceHandler finance={organization.entryFee || {} as IFinance} updateFinance={handleEntryFee}/>
                 </div>
                 <div className='flex flex-col gap-4 w-2/3'>
                     <Input label="Name" name="name" value={organization.name} onChange={handleInputChange}/>
@@ -236,17 +241,43 @@ export const OrganizationForm: React.FC<OrganizationHandlerProps> = (
                     </Select>
                     <Textarea label="Description" name="description" value={organization.description}
                               onChange={handleInputChange}/>
-                </div>
-                <div className='w-1/6'>
 
+                    {showSocialNetworkForm && <SocialNetworkForm onChange={handleSocialNetworksChange}/>}
+                    {showBedroomsHandler &&
+                        <BedroomsHandler bedrooms={organization.bedrooms} updateBedrooms={handleBedrooms}/>}
+                    {showMediaHandler &&
+                        <MediaHandler handle={{images: true}} onChange={onChangeMedia} medias={organization.medias}/>}
+                    <MapPicker onLocationSelect={handleLocationChange}/>
+                </div>
+                <div className='w-1/6 flex flex-col items-center gap-2'>
+                    <Button
+                        className={`w-full ${showSocialNetworkForm ? 'bg-red-500' : 'bg-blue-500'} text-white`}
+                        onClick={() => setShowSocialNetworkForm(!showSocialNetworkForm)}
+                    >
+                        {showSocialNetworkForm ? 'Cancelar Red Social' : 'Añadir Red Social'}
+                    </Button>
+                    <Button
+                        className={`w-full ${showMediaHandler ? 'bg-red-500' : 'bg-blue-500'} text-white`}
+                        onClick={() => setShowMediaHandler(!showMediaHandler)}
+                    >
+                        {showMediaHandler ? 'Cancelar' : 'Añadir Imágenes'}
+                    </Button>
+                    {/*{organization.type === 'hotel' && (*/}
+                        <Button
+                            className={`w-full ${showBedroomsHandler ? 'bg-red-500' : 'bg-blue-500'} text-white`}
+                            onClick={() => setShowBedroomsHandler(!showBedroomsHandler)}
+                        >
+                            {showBedroomsHandler ? 'Cancelar' : 'Añadir Habitaciones'}
+                        </Button>
+                    {/*)}*/}
                 </div>
             </div>
-                    <SocialNetworkForm onChange={handleSocialNetworksChange}/>
 
-            <MediaHandler handle={{images: true}} onChange={onChangeMedia} medias={organization.medias}/>
-            <MapPicker onLocationSelect={handleLocationChange}/>
-            <BedroomsHandler bedrooms={organization.bedrooms} updateBedrooms={handleBedrooms}/>
-            <FinanceHandler finance={organization.entryFee || {} as IFinance} updateFinance={handleEntryFee}/>
+
+            {/*<SocialNetworkForm onChange={handleSocialNetworksChange}/>*/}
+            {/*<MediaHandler handle={{images: true}} onChange={onChangeMedia} medias={organization.medias}/>*/}
+            {/*<BedroomsHandler bedrooms={organization.bedrooms} updateBedrooms={handleBedrooms}/>*/}
+            {/*<FinanceHandler finance={organization.entryFee || {} as IFinance} updateFinance={handleEntryFee}/>*/}
             {enableUserIsActive && <Button
                 onClick={toggleOrganizationUserDialog}>{organizationUser ? 'Editar Usuario' : 'Habilitar Usuario'}</Button>}
             {/*<ContactForm onChange={handleContactChange}/>*/}

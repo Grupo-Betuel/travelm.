@@ -4,8 +4,8 @@ import {ILocation} from '../models/ordersModels';
 import {Input} from "@material-tailwind/react";
 
 const containerStyle = {
-    width: '80%',
-    height: '60vh'
+    width: '100%',
+    height: '50vh'
 };
 
 const center = {
@@ -77,7 +77,7 @@ const MapPicker: React.FC<MapPickerProps> = ({onLocationSelect}) => {
                 <input
                     type="text"
                     placeholder="Buscar un lugar"
-                    className="w-full md:w-96 p-3 border border-gray-300 rounded-full shadow-md outline-none text-gray-800 placeholder-gray-500 transition-all focus:border-blue-500 focus:ring-2 focus:ring-blue-400 focus:ring-opacity-50"
+                    className="w-full p-2 border border-gray-300 rounded-md shadow-md outline-none text-gray-800 placeholder-gray-500 transition-all focus:border-gray-900 focus:ring-2 focus:ring-gray-400 focus:ring-opacity-50"
                 />
             </Autocomplete>
             <GoogleMap
