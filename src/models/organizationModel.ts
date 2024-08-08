@@ -20,7 +20,6 @@ export enum OrganizationTypesEnum {
 export interface IOrganization extends BaseModel {
     type: OrganizationTypesEnum;
     name: string;
-    email: string;
     description: string;
     logo: IMedia;
     socialNetworks: ISocialNetwork[];
@@ -29,7 +28,7 @@ export interface IOrganization extends BaseModel {
     reviews: IReview[];
     bedrooms: IBedroom[];
     entryFee?: IFinance;
-    sessionId: string;
+    sessionId?: string;
 }
 
 

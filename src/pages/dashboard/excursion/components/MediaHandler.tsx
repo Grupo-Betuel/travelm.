@@ -243,7 +243,7 @@ const MediaHandler = ({onChange, medias, disableUpload, logoMedia, flyerMedia, h
         return images ? [...images] : images;
     }, [images])
 
-    console.log('organization', medias)
+    // console.log('organization', medias)
     const [searchMediaModal, setSearchMediaModal] = useState(false);
     const [selectedMediaSelectorType, setSelectedMediaSelectorType] = useState<MediaTypeEnum | ExtraMediaTypesEnum>();
 

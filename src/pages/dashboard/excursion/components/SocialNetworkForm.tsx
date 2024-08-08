@@ -17,7 +17,6 @@ const emptySocialNetwork: ISocialNetwork = {
     type: "instagram",
     username: "",
     url: "",
-    company: "",
 };
 
 const SocialNetworkForm: React.FC<SocialNetworkFormProps> = ({
@@ -63,21 +62,6 @@ const SocialNetworkForm: React.FC<SocialNetworkFormProps> = ({
         setEditSocialNetworkIndex(index);
     };
 
-    // Agregar una nueva red social al estado
-    const handleAddSocialNetwork = () => {
-        // Verifica si hay datos en los campos
-        if (!socialNetworkForm.username || !socialNetworkForm.url) {
-            alert("Por favor, completa los campos antes de agregar.");
-            return;
-        }
-
-        // Añadir la nueva red social a la lista
-        updateSocialNetworks([...socialNetworks, socialNetworkForm]);
-
-        // Limpiar el formulario después de añadir
-        cleanSocialNetworkHandler();
-    };
-
     // Manejar la cancelación del formulario
     const handleCancel = () => {
         cleanSocialNetworkHandler();
@@ -109,6 +93,7 @@ const SocialNetworkForm: React.FC<SocialNetworkFormProps> = ({
                     ))}
                 </Select>
                 <Input
+                    crossOrigin={false}
                     label="Username"
                     name="username"
                     value={socialNetworkForm.username}
@@ -116,26 +101,21 @@ const SocialNetworkForm: React.FC<SocialNetworkFormProps> = ({
                     className="col-span-2 md:col-span-1" // Full width on small screens, half on medium and larger screens
                 />
                 <Input
+                    crossOrigin={false}
                     label="URL"
                     name="url"
                     value={socialNetworkForm.url}
                     onChange={handleOnChangeNetworks}
                     className="col-span-2 md:col-span-1" // Full width on small screens, half on medium and larger screens
                 />
-                <Input
-                    label="Company"
-                    name="company"
-                    value={socialNetworkForm.company}
-                    onChange={handleOnChangeNetworks}
-                    className="col-span-2 md:col-span-1" // Full width on small screens, half on medium and larger screens
-                />
+                <div className="grid grid-cols-2 gap-4">
                 <Button
                     color="blue"
-                    onClick={handleAddSocialNetwork}
+                    onClick={handleAddOrUpdateSocialNetworks}
                     disabled={!socialNetworkForm.username || !socialNetworkForm.url}
                     className="col-span-2 md:col-span-1 " // Full width on small screens, right-aligned on medium and larger screens
                 >
-                    {editSocialNetworkIndex !== null ? "Update" : "Add Social Network"}
+                    {editSocialNetworkIndex !== null ? "Actualizar" : "Agregar"}
                 </Button>
                 <Button
                     color="red"
@@ -145,6 +125,7 @@ const SocialNetworkForm: React.FC<SocialNetworkFormProps> = ({
                 >
                     Cancel
                 </Button>
+                </div>
             </div>
 
             <div className="grid gap-y-6 gap-x-6 md:grid-cols-2 xl:grid-cols-3">
