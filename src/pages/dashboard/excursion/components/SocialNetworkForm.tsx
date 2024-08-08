@@ -109,6 +109,7 @@ const SocialNetworkForm: React.FC<SocialNetworkFormProps> = ({
                     ))}
                 </Select>
                 <Input
+                    crossOrigin={false}
                     label="Username"
                     name="username"
                     value={socialNetworkForm.username}
@@ -116,6 +117,7 @@ const SocialNetworkForm: React.FC<SocialNetworkFormProps> = ({
                     className="col-span-2 md:col-span-1" // Full width on small screens, half on medium and larger screens
                 />
                 <Input
+                    crossOrigin={false}
                     label="URL"
                     name="url"
                     value={socialNetworkForm.url}
@@ -123,6 +125,7 @@ const SocialNetworkForm: React.FC<SocialNetworkFormProps> = ({
                     className="col-span-2 md:col-span-1" // Full width on small screens, half on medium and larger screens
                 />
                 <Input
+                    crossOrigin={false}
                     label="Company"
                     name="company"
                     value={socialNetworkForm.company}
