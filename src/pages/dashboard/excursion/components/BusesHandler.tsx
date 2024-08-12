@@ -10,6 +10,7 @@ import _ from 'lodash';
 import {getCrudService} from "../../../../api/services/CRUD.service";
 import {CommonConfirmActions, CommonConfirmActionsDataTypes} from "../../../../models/common";
 import {useConfirmAction} from "../../../../hooks/useConfirmActionHook";
+import {BASIC_CONSTANTS} from "@/constants/basic.constants";
 
 interface BusHandlerProps {
     buses: IBus[];
@@ -130,11 +131,11 @@ const BusHandler: React.FC<BusHandlerProps> = ({buses, updateBuses}) => {
                        name={"description"}
                        onChange={handleInputChange}/>
 
-                <Button color="blue" onClick={addBus}>{editingIndex !== null ? 'Save Changes' : 'Add Bus'}</Button>
+                <Button color="blue" onClick={addBus}>{editingIndex !== null ? `${BASIC_CONSTANTS.SAVE_TEXT}` : `${BASIC_CONSTANTS.ADD_TEXT}`}</Button>
 
                 {hasContent && (
                     <Button color="red" onClick={handleCancel}>
-                        Cancel
+                        {BASIC_CONSTANTS.CANCEL_TEXT}
                     </Button>
                 )}
             </div>
@@ -149,10 +150,10 @@ const BusHandler: React.FC<BusHandlerProps> = ({buses, updateBuses}) => {
                         </div>
                         <CardFooter className="p-2">
                             <div className="flex mt-4 gap-2">
-                                <Button variant='outlined' color="green"
-                                        onClick={() => startEditing(index)}>Edit</Button>
+                                <Button variant='outlined' color="blue"
+                                        onClick={() => startEditing(index)}>{BASIC_CONSTANTS.EDIT_TEXT}</Button>
                                 <Button variant="outlined" color="red"
-                                        onClick={() => handleSetActionToConfirm('delete', 'Eliminar Bus')(bus)}>Delete</Button>
+                                        onClick={() => handleSetActionToConfirm('delete', 'Eliminar Bus')(bus)}>{BASIC_CONSTANTS.DELETE_TEXT}</Button>
                             </div>
                         </CardFooter>
                     </Card>
