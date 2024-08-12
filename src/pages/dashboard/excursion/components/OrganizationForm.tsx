@@ -28,7 +28,6 @@ import UserForm from "../../users/components/UserForm";
 import IUser, {UserRoleTypes, UserTypes} from "../../../../models/interfaces/userModel";
 import {ISocialNetwork} from "@/models/ISocialNetwork";
 import ContactForm from "@/pages/dashboard/excursion/components/ContactForm";
-import {IContact} from "@/models/contactModel";
 
 export interface OrganizationHandlerProps {
     dialog?: ICustomComponentDialog;
@@ -66,7 +65,6 @@ export const OrganizationForm: React.FC<OrganizationHandlerProps> = (
         onUpdate,
         organizationData
     }) => {
-    console.log('organizationData', organizationData)
 
     const [organization, setOrganization] = useState<IOrganization>(emptyOrganization);
     const {data: organizationUserData} = userService.useFetchAllTravelUsers({organization: organization?._id}, {skip: !organization?._id});
@@ -83,12 +81,19 @@ export const OrganizationForm: React.FC<OrganizationHandlerProps> = (
 
     const handleInputChange = (event: React.ChangeEvent<any>): void => {
         const {name, value} = event.target;
+
+        if (name === "type" && (value === OrganizationTypesEnum.HOTEL || value === OrganizationTypesEnum.TOURIST_SPOT)) {
+            setShowBedroomsHandler(true);
+        } else if (name === "type") {
+            setShowBedroomsHandler(false);
+            handleBedrooms([]);
+        }
+
         setOrganization((prevFormData) => ({
             ...prevFormData,
             [name]: value,
         }));
     };
-
 
     const handleLocationChange = (location: ILocation): void => {
         setOrganization({
@@ -109,21 +114,12 @@ export const OrganizationForm: React.FC<OrganizationHandlerProps> = (
         }
     };
 
-    // const handleSocialNetworksChange = (socialNetworks: any[]): void => {
-    //     setOrganization((prevFormData) => ({
-    //         ...prevFormData,
-    //         socialNetworks,
-    //     }));
-    // };
-
     const handleSocialNetworksChange = (socialNetworks: ISocialNetwork[]) => {
         setOrganization((prevFormData) => ({
             ...prevFormData,
             socialNetworks,
         }));
-        console.log('socialNetworks',socialNetworks)
-        console.log('from socialNetwork',organization)
-    }
+    };
     const handleMediasChange = (medias: any[]): void => {
         setOrganization((prevFormData) => ({
             ...prevFormData,
@@ -139,7 +135,6 @@ export const OrganizationForm: React.FC<OrganizationHandlerProps> = (
             ...contact,
             },
         }));
-        console.log('from Contact',organization)
     };
 
     const handleSubmit = async () => {
@@ -170,7 +165,6 @@ export const OrganizationForm: React.FC<OrganizationHandlerProps> = (
         });
     }
 
-
     const handleEntryFee = (fee: IFinance) => {
         if (!fee.price) return;
         setOrganization({
@@ -183,8 +177,6 @@ export const OrganizationForm: React.FC<OrganizationHandlerProps> = (
         if (organizationData) {
             setOrganization(organizationData)
         }
-        console.log('organizationData', organizationData)
-        console.log('organization', organization)
     }, [organizationData]);
 
     const enableUserIsActive = useMemo(() => !!organization._id, [organization]);
@@ -204,13 +196,11 @@ export const OrganizationForm: React.FC<OrganizationHandlerProps> = (
         }
 
         const {data: createdUser} = await addUser(userData);
-        // console.log('created user', createdUser);
         setOrganizationUser({...createdUser, password: ''} as IUser);
     }
 
     const onUpdateOrganizationUser = async (user: IUser) => {
         const {data: updatedUser} = await updateUser(user);
-        // console.log('updated user', updatedUser);
         setOrganizationUser({...updatedUser, password: ''} as IUser);
     }
 
@@ -230,11 +220,10 @@ export const OrganizationForm: React.FC<OrganizationHandlerProps> = (
         toggleOrganizationUserDialog();
     }
 
-
-    // console.log('organization user', organization)
     const [showSocialNetworkForm, setShowSocialNetworkForm] = useState(false);
     const [showMediaHandler, setShowMediaHandler] = useState(false);
     const [showBedroomsHandler, setShowBedroomsHandler] = useState(false);
+    const [showCostHandler, setShowCostHandler] = useState(false);
 
     const form = (
         <div className="space-y-4 w-4/5 mx-auto">
@@ -246,7 +235,6 @@ export const OrganizationForm: React.FC<OrganizationHandlerProps> = (
                 </div>
                 <div className='flex flex-col gap-4 w-2/3'>
                     <div className='grid grid-cols-2 gap-4 '>
-
                     <Input  label="Name" name="name" value={organization.name}
                            onChange={handleInputChange}/>
                     <Select
@@ -263,12 +251,9 @@ export const OrganizationForm: React.FC<OrganizationHandlerProps> = (
                     </div>
                     <Textarea label="Description" name="description" value={organization.description}
                               onChange={handleInputChange}/>
-
                     <ContactForm contact={organization.contact} updateContact={handleContactChange} />
-                    {/*<MapPicker onLocationSelect={handleLocationChange}/>*/}
-                    {showSocialNetworkForm && <SocialNetworkForm socialNetworks={organization.socialNetworks}
-                                                                 updateSocialNetworks={handleSocialNetworksChange}/>}
-
+                    {showSocialNetworkForm &&
+                        <SocialNetworkForm socialNetworks={organization.socialNetworks} updateSocialNetworks={handleSocialNetworksChange}/>}
                     {showBedroomsHandler &&
                         <BedroomsHandler bedrooms={organization.bedrooms} updateBedrooms={handleBedrooms}/>}
                     {showMediaHandler &&
@@ -294,13 +279,16 @@ export const OrganizationForm: React.FC<OrganizationHandlerProps> = (
                     >
                         {showMediaHandler ? 'Quitar Imagenes' : 'Añadir Imágenes'}
                     </Button>
-                    {/*{organization.type === 'hotel' && (*/}
-                    <Button
-                        className={`w-full ${showBedroomsHandler ? 'bg-red-500' : 'bg-blue-500'} text-white`}
-                        onClick={() => setShowBedroomsHandler(!showBedroomsHandler)}
-                    >
-                        {showBedroomsHandler ? 'Quitar Habitaciones' : 'Añadir Habitaciones'}
-                    </Button>
+                    {/*boton Para Costos de pareja y niños*/}
+                    {/*{(organization.type === OrganizationTypesEnum.TRANSPORT ||*/}
+                    {/*    organization.type === OrganizationTypesEnum.TOURIST_SPOT ||*/}
+                    {/*    organization.type === OrganizationTypesEnum.HOTEL) && (*/}
+                    {/*    <Button*/}
+                    {/*        className={`w-full ${showCostHandler ? 'bg-red-500' : 'bg-blue-500'} text-white`}*/}
+                    {/*        onClick={() => setShowCostHandler(!showCostHandler)}*/}
+                    {/*    >*/}
+                    {/*        {showCostHandler ? 'Quitar Costos' : 'Niños - Parejas'}*/}
+                    {/*    </Button>*/}
                     {/*)}*/}
                 </div>
             </div>
