@@ -131,6 +131,15 @@ const TransportResourceHandler: React.FC<TransportResourceHandlerProps> = ({
             return;
         }
 
+        // Verificar si ya existe un conductor con el mismo número de teléfono
+        const driverPhone = newTransportResource.driver?.phone;
+        const isDuplicatePhone = transportResources.some(resource => resource.driver?.phone === driverPhone);
+
+        if (isDuplicatePhone) {
+            alert('Ya existe un conductor con este número de teléfono');
+            return;
+        }
+
         const updatedTransportResources = [...transportResources];
 
         if (editingIndex !== null) {
