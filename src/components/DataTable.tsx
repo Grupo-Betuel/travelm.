@@ -222,13 +222,12 @@ import {
     ArrowDownIcon,
     ArrowLeftIcon,
     ArrowRightIcon,
-    ArrowUpIcon, BackspaceIcon, ChevronDoubleLeftIcon,
+    ArrowUpIcon, ChevronDoubleLeftIcon,
     ChevronDoubleRightIcon
 } from "@heroicons/react/20/solid";
 import SearchableSelect from './SearchableSelect';
 import _ from "lodash";
 import {ChevronLeftIcon, ChevronRightIcon} from "@heroicons/react/24/outline";
-import {asType} from "@material-tailwind/react/types/components/typography";
 
 export type IFilterOptionItem = { label: string, value: string | number };
 
@@ -281,7 +280,7 @@ export function DataTable<T>(
         }));
     };
 
-    const handleSort = (key: keyof T ) => {
+    const handleSort = (key: keyof T) => {
         setSortConfig(prevConfig => {
             if (prevConfig && prevConfig.key === key && prevConfig.direction === 'ascending') {
                 return {key, direction: 'descending'};
@@ -428,7 +427,7 @@ export function DataTable<T>(
         );
     };
 
-    const handleClear = (key : keyof T | 'search') => {
+    const handleClear = (key : any) => {
         if (key === 'search') {
             setSearchTerm('');
         } else {
@@ -450,9 +449,11 @@ export function DataTable<T>(
                     value={searchTerm}
                     onChange={handleSearchChange}
                     icon={
-                    searchTerm ? (
-                        <BackspaceIcon className="h-5 w-5" onClick={() => handleClear('search')}/>
-                        ): null
+                        <i
+                            className="fas fa-refresh cursor-pointer"
+                            onClick={() => handleClear('search')}
+                        />
+
                     }
                 />
             </div>
@@ -467,9 +468,11 @@ export function DataTable<T>(
                                 value={filters[option.key] || ''}
                                 onChange={(e) => handleFilterChange(option.key, [e.target.value])}
                                 icon={
-                                    filters[option.key] ? (
-                                        <BackspaceIcon className="h-5 w-5" onClick={() => handleClear(option.key)}/>
-                                    ): null
+                                    <i
+                                        className="fas fa-refresh cursor-pointer"
+                                        onClick={() => handleClear(option.key)}
+                                    />
+
                                 }
                             />
                         )}
@@ -478,7 +481,7 @@ export function DataTable<T>(
                                 multiple
                                 label={option.label}
                                 options={option.options || []}
-                                onSelect={(selectedValues: any[]) => handleFilterChange(option.key, selectedValues.map(value => value.value))}
+                                onSelect={(selectedValues) => handleFilterChange(option.key, selectedValues.map(value => value.value))}
                                 displayProperty="label"
                                 className="min-w-[200px]"
                             />
@@ -528,7 +531,6 @@ export function DataTable<T>(
                         por pagina:
                     </Typography>
                     <Input
-                        crossOrigin={false}
                         width={"50px"}
                         type="number"
                         value={itemsPerPage}

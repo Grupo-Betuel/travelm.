@@ -7,7 +7,6 @@ import {
     Option,
 } from "@material-tailwind/react";
 import { ISocialNetwork } from "@/models/ISocialNetwork";
-import {BASIC_CONSTANTS} from "@/constants/basic.constants";
 
 interface SocialNetworkFormProps {
     socialNetworks: ISocialNetwork[];
@@ -18,6 +17,7 @@ const emptySocialNetwork: ISocialNetwork = {
     type: "instagram",
     username: "",
     url: "",
+    company: "",
 };
 
 const SocialNetworkForm: React.FC<SocialNetworkFormProps> = ({
@@ -63,6 +63,21 @@ const SocialNetworkForm: React.FC<SocialNetworkFormProps> = ({
         setEditSocialNetworkIndex(index);
     };
 
+    // Agregar una nueva red social al estado
+    const handleAddSocialNetwork = () => {
+        // Verifica si hay datos en los campos
+        if (!socialNetworkForm.username || !socialNetworkForm.url) {
+            alert("Por favor, completa los campos antes de agregar.");
+            return;
+        }
+
+        // Añadir la nueva red social a la lista
+        updateSocialNetworks([...socialNetworks, socialNetworkForm]);
+
+        // Limpiar el formulario después de añadir
+        cleanSocialNetworkHandler();
+    };
+
     // Manejar la cancelación del formulario
     const handleCancel = () => {
         cleanSocialNetworkHandler();
@@ -94,7 +109,6 @@ const SocialNetworkForm: React.FC<SocialNetworkFormProps> = ({
                     ))}
                 </Select>
                 <Input
-                    crossOrigin={false}
                     label="Username"
                     name="username"
                     value={socialNetworkForm.username}
@@ -102,21 +116,26 @@ const SocialNetworkForm: React.FC<SocialNetworkFormProps> = ({
                     className="col-span-2 md:col-span-1" // Full width on small screens, half on medium and larger screens
                 />
                 <Input
-                    crossOrigin={false}
                     label="URL"
                     name="url"
                     value={socialNetworkForm.url}
                     onChange={handleOnChangeNetworks}
                     className="col-span-2 md:col-span-1" // Full width on small screens, half on medium and larger screens
                 />
-                <div className="grid grid-cols-2 gap-4">
+                <Input
+                    label="Company"
+                    name="company"
+                    value={socialNetworkForm.company}
+                    onChange={handleOnChangeNetworks}
+                    className="col-span-2 md:col-span-1" // Full width on small screens, half on medium and larger screens
+                />
                 <Button
                     color="blue"
-                    onClick={handleAddOrUpdateSocialNetworks}
+                    onClick={handleAddSocialNetwork}
                     disabled={!socialNetworkForm.username || !socialNetworkForm.url}
                     className="col-span-2 md:col-span-1 " // Full width on small screens, right-aligned on medium and larger screens
                 >
-                    {editSocialNetworkIndex !== null ? BASIC_CONSTANTS.UPDATE_TEXT : BASIC_CONSTANTS.ADD_TEXT}
+                    {editSocialNetworkIndex !== null ? "Update" : "Add Social Network"}
                 </Button>
                 <Button
                     color="red"
@@ -124,9 +143,8 @@ const SocialNetworkForm: React.FC<SocialNetworkFormProps> = ({
                     disabled={!socialNetworkForm.username && !socialNetworkForm.url}
                     className="col-span-2 md:col-span-1 md:col-start-2" // Full width on small screens, right-aligned on medium and larger screens
                 >
-                    {BASIC_CONSTANTS.CANCEL_TEXT}
+                    Cancel
                 </Button>
-                </div>
             </div>
 
             <div className="grid gap-y-6 gap-x-6 md:grid-cols-2 xl:grid-cols-3">
@@ -143,13 +161,13 @@ const SocialNetworkForm: React.FC<SocialNetworkFormProps> = ({
                                 color="red"
                                 onClick={() => handleDeleteSocialNetwork(index)}
                             >
-                                {BASIC_CONSTANTS.DELETE_TEXT}
+                                Delete
                             </Button>
                             <Button
                                 color="blue"
                                 onClick={() => editSocialNetworksMode(index)}
                             >
-                                {BASIC_CONSTANTS.EDIT_TEXT}
+                                Edit
                             </Button>
                         </div>
                     </div>

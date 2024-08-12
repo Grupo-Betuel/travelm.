@@ -1,39 +1,37 @@
 import React from 'react';
-import { GoogleMap, LoadScript, Marker, Autocomplete, Libraries } from '@react-google-maps/api';
-import { ILocation } from '../models/ordersModels';
-import { Input } from "@material-tailwind/react";
+import {GoogleMap, LoadScript, Marker, Autocomplete, Libraries} from '@react-google-maps/api';
+import {ILocation} from '../models/ordersModels';
+import {Input} from "@material-tailwind/react";
 
 const containerStyle = {
     width: '100%',
     height: '50vh'
 };
 
+const center = {
+    lat: -3.745,
+    lng: -38.523
+};
+
 interface MapPickerProps {
-    initialLocation: {
-        latitude: number;
-        longitude: number;
-    };
     onLocationSelect: (location: ILocation) => void;
 }
 
 const mapLibraries: Libraries = ['places'];
 
-const MapPicker: React.FC<MapPickerProps> = ({ initialLocation, onLocationSelect }) => {
-    const [marker, setMarker] = React.useState({
-        lat: initialLocation.latitude,
-        lng: initialLocation.longitude
-    });
-
-    const mapRef = React.useRef<google.maps.Map | null>(null);
-    const autocomplete = React.useRef<any>(null);
+const MapPicker: React.FC<MapPickerProps> = ({onLocationSelect}) => {
+    const [marker, setMarker] = React.useState(center);
+    const mapRef = React.useRef<any>(null);
+    const autocomplete = React.useRef<any>(null)
 
     const onLoad = (mapInstance: google.maps.Map) => {
         mapRef.current = mapInstance;
     };
 
     const onMarkerSelected = (e: google.maps.MapMouseEvent) => {
-        onPlaceSelected({ geometry: { location: e.latLng } as google.maps.places.PlaceResult });
-    };
+
+        onPlaceSelected({geometry: {location: e.latLng} as google.maps.places.PlaceResult})
+    }
 
     const onPlaceSelected = (placeData?: any) => {
         if (autocomplete.current !== null) {
@@ -41,9 +39,9 @@ const MapPicker: React.FC<MapPickerProps> = ({ initialLocation, onLocationSelect
             if (place.geometry && place.geometry.location) {
                 const lat = place.geometry.location.lat();
                 const lng = place.geometry.location.lng();
-                const link = place.place_id
-                    ? `https://www.google.com/maps/place/?q=place_id:${place.place_id}`
-                    : `https://www.google.com/maps/place/?q=${lat},${lng}`;
+                const link = place.place_id ?
+                    `https://www.google.com/maps/place/?q=place_id:${place.place_id}` :
+                    `https://www.google.com/maps/place/?q=${lat},${lng}`;
                 const location: ILocation = {
                     link,
                     latitude: lat,
@@ -55,18 +53,21 @@ const MapPicker: React.FC<MapPickerProps> = ({ initialLocation, onLocationSelect
                     description: '',
                 };
 
+                // setMarker(place.geometry.location.toJSON());
                 onLocationSelect(location);
-                setMarker({ lat, lng });
+                setMarker({lat: place.geometry.location.lat(), lng: place.geometry.location.lng()});
                 mapRef.current?.panTo(place.geometry.location);
             }
         }
     };
 
+    // @ts-ignore
     return (
         <LoadScript
             googleMapsApiKey="AIzaSyAJMQBQHGFFFYkG7G4JeabqyjrCDpu3Mwc"
             libraries={mapLibraries}
         >
+
             <Autocomplete
                 onLoad={(auto) => {
                     autocomplete.current = auto;
@@ -82,14 +83,16 @@ const MapPicker: React.FC<MapPickerProps> = ({ initialLocation, onLocationSelect
             <GoogleMap
                 onLoad={onLoad}
                 mapContainerStyle={containerStyle}
-                center={marker}
+                center={center}
                 zoom={15}
                 onClick={onMarkerSelected}
             >
-                <Marker position={marker} />
+                <Marker position={marker}/>
             </GoogleMap>
         </LoadScript>
     );
 }
 
 export default MapPicker;
+
+

@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { Input, List, ListItem } from '@material-tailwind/react';
-import {BackspaceIcon} from "@heroicons/react/20/solid";
 
 export interface IOption<T = any> {
     label: string;
@@ -110,9 +109,11 @@ function SearchableSelect<T>({
                     setSearchTerm(''); // Clear search term on focus to show all options
                 }}
                 icon={
-                    (searchTerm && displayValue)   ? (
-                        <BackspaceIcon className="h-5 w-5" onClick={handleClear}/>
-                    ): null
+                    <i
+                        className="fas fa-refresh cursor-pointer"
+                        onClick={handleClear}
+                    />
+
                 }
                 placeholder={!isFocused && multiple ? displayValue : ''}
             />
