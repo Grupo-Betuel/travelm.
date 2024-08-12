@@ -7,6 +7,7 @@ import {
     Option,
 } from "@material-tailwind/react";
 import { ISocialNetwork } from "@/models/ISocialNetwork";
+import {BASIC_CONSTANTS} from "@/constants/basic.constants";
 
 interface SocialNetworkFormProps {
     socialNetworks: ISocialNetwork[];
@@ -115,7 +116,7 @@ const SocialNetworkForm: React.FC<SocialNetworkFormProps> = ({
                     disabled={!socialNetworkForm.username || !socialNetworkForm.url}
                     className="col-span-2 md:col-span-1 " // Full width on small screens, right-aligned on medium and larger screens
                 >
-                    {editSocialNetworkIndex !== null ? "Actualizar" : "Agregar"}
+                    {editSocialNetworkIndex !== null ? BASIC_CONSTANTS.UPDATE_TEXT : BASIC_CONSTANTS.ADD_TEXT}
                 </Button>
                 <Button
                     color="red"
@@ -123,7 +124,7 @@ const SocialNetworkForm: React.FC<SocialNetworkFormProps> = ({
                     disabled={!socialNetworkForm.username && !socialNetworkForm.url}
                     className="col-span-2 md:col-span-1 md:col-start-2" // Full width on small screens, right-aligned on medium and larger screens
                 >
-                    Cancel
+                    {BASIC_CONSTANTS.CANCEL_TEXT}
                 </Button>
                 </div>
             </div>
@@ -142,13 +143,13 @@ const SocialNetworkForm: React.FC<SocialNetworkFormProps> = ({
                                 color="red"
                                 onClick={() => handleDeleteSocialNetwork(index)}
                             >
-                                Delete
+                                {BASIC_CONSTANTS.DELETE_TEXT}
                             </Button>
                             <Button
                                 color="blue"
                                 onClick={() => editSocialNetworksMode(index)}
                             >
-                                Edit
+                                {BASIC_CONSTANTS.EDIT_TEXT}
                             </Button>
                         </div>
                     </div>
