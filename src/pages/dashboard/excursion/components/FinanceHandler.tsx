@@ -1,6 +1,7 @@
-import {Button, Input, Option, Select} from "@material-tailwind/react";
+import {Button, Input, Menu, MenuHandler, MenuList, MenuItem, Select, Option} from "@material-tailwind/react";
 import React, {useEffect} from "react";
 import {financeTypes, FinanceTypes, IFinance} from "@/models/financeModel";
+import {PlusCircleIcon, TrashIcon} from "@heroicons/react/20/solid";
 
 export interface IFinanceProps {
     finance: IFinance;
@@ -9,25 +10,22 @@ export interface IFinanceProps {
     enabledCost?: boolean;
 }
 
-export const FinanceHandler = (
-    {
-        finance,
-        updateFinance,
-        type: financeType,
-        enabledCost
-    }: IFinanceProps
-) => {
-
+export const FinanceHandler = ({
+                                   finance,
+                                   updateFinance,
+                                   type: financeType,
+                                   enabledCost,
+                               }: IFinanceProps) => {
     const [enableCost, setEnableCost] = React.useState(false);
-    const [enableCouples, setEnableCouples] = React.useState(false);
+    const [enableRates, setEnableRates] = React.useState(false);
     const [enableChildren, setEnableChildren] = React.useState(false);
 
     const toggleCost = () => setEnableCost(!enableCost);
-    const toggleCouples = () => setEnableCouples(!enableCost);
-    const toggleChildren = () => setEnableChildren(!enableCost);
+    const toggleRates = () => setEnableRates(!enableRates);
+    const toggleChildren = () => setEnableChildren(!enableChildren);
 
     const handleOnChangeFinance = ({target: {name, value, type}}: any) => {
-        if (type === 'number') {
+        if (type === "number") {
             value = Number(value);
         }
         updateFinance({
@@ -35,7 +33,7 @@ export const FinanceHandler = (
             type: financeType || finance.type,
             [name]: value,
         });
-    }
+    };
 
     useEffect(() => {
         setEnableCost(!!enabledCost);
@@ -46,107 +44,131 @@ export const FinanceHandler = (
             updateFinance({...finance, type: financeType});
         }
     }, [financeType]);
-    console.log(financeType);
+
     return (
-        <div className="flex flex-col gap-5 w-full">
-            <div className="flex w-full justify-between gap-3">
+        <div className="w-full space-y-4">
+            <div className="flex items-center space-x-2">
                 <Input
                     crossOrigin={false}
                     type="number"
                     label="Price"
                     name="price"
-                    value={finance?.price || ''}
+                    value={finance?.price || ""}
                     onChange={handleOnChangeFinance}
-                    className="mb-4 flex-grow"
+                    containerProps={{className: "max-w-1/2 min-w-[50%]"}}
                 />
+                <Menu>
+                    <MenuHandler>
+                        <Button variant="outlined" color="blue" className="flex items-center z-40 p-2">
+                            <PlusCircleIcon className="h-6 w-6"/>
+                        </Button>
+                    </MenuHandler>
+                    <MenuList className="p-2 z-[99999]">
+                        {!enableCost && (
+                            <MenuItem onClick={toggleCost}>
+                                Agregar Costos
+                            </MenuItem>
+                        )}
+                        {!enableRates && (
+                            <MenuItem onClick={toggleRates}>
+                                Precio en Pareja
+                            </MenuItem>
+                        )}
+                        {!enableChildren && (
+                            <MenuItem onClick={toggleChildren}>
+                                Precio para Niños
+                            </MenuItem>
+                        )}
+                    </MenuList>
+                </Menu>
             </div>
-            <Button
-                className={"whitespace-nowrap"}
-                onClick={toggleCost}
-                color={enableCost ? 'red' : 'green'}>
-                {enableCost ? 'Quitar Costo' : 'Agregar Costo'}
-            </Button>
-            <div className='flex flex-wrap gap-2 '>
-            {enableCost &&
-                <div className="flex flex-wrap gap-2">
-                    {/*<Button*/}
-                    {/*    className=""*/}
-                    {/*    onClick={toggleCost}*/}
-                    {/*    color="red"*/}
-                    {/*>*/}
-                    {/*    Cancelar*/}
-                    {/*</Button>*/}
+
+            {enableCost && (
+                <div className="flex items-center gap-2">
                     <Input
                         crossOrigin={false}
                         type="number"
                         label="Cost"
                         name="cost"
-                        value={finance?.cost || ''}
+                        value={finance?.cost || ""}
                         onChange={handleOnChangeFinance}
-                        className="mb-4 "
+                        containerProps={{
+                            className: "min-w-[50%] max-w-1/2",
+                        }}
                     />
+                    <Button
+                        onClick={toggleCost}
+                        color="red"
+                    >
+                        <TrashIcon className="h-5 w-5"/>
+                    </Button>
                 </div>
-            }
+            )}
 
-                {enableCost &&
+            <div className="flex flex-col gap-3">
+                {enableRates && (
                     <div className="flex items-center gap-2">
-                        {/*{enableCouples &&*/}
-                            <Input
-                                crossOrigin={false}
-                                type="number"
-                                label="Couples"
-                                name="couples"
-                                value={finance?.couples || ''}
-                                onChange={handleOnChangeFinance}
-                                className="mb-4"
-                            />
-                        {/*}*/}
-                        {/*<Button*/}
-                        {/*    className="whitespace-nowrap"*/}
-                        {/*    onClick={toggleCouples}*/}
-                        {/*    color={enableCouples ? 'red' : 'green'}*/}
-                        {/*>*/}
-                        {/*    {enableCouples ? 'Cancelar' : 'Agregar Couples'}*/}
-                        {/*</Button>*/}
+                        <Input
+                            crossOrigin={false}
+                            type="number"
+                            label="Couples"
+                            name="couples"
+                            value={finance?.couple || ""}
+                            onChange={handleOnChangeFinance}
+                            containerProps={{
+                                className: "max-w-1/2 min-w-[50%]",
+                            }}
+                        />
+                        <Button
+                            onClick={toggleRates}
+                            color="red"
+                        >
+                            <TrashIcon className="h-5 w-5"/>
+                        </Button>
                     </div>
-                }
-                {enableCost &&
+                )}
+
+                {enableChildren && (
                     <div className="flex items-center gap-2">
-                        {/*{enableChildren &&*/}
-                            <Input
-                                crossOrigin={false}
-                                type="number"
-                                label="Children"
-                                name="children"
-                                value={finance?.children || ''}
-                                onChange={handleOnChangeFinance}
-                                className="mb-4 flex-grow"
-                            />
-                        {/*}*/}
-                        {/*<Button*/}
-                        {/*    className="whitespace-nowrap"*/}
-                        {/*    onClick={toggleChildren}*/}
-                        {/*    color={enableChildren ? 'red' : 'green'}*/}
-                        {/*>*/}
-                        {/*    {enableChildren ? 'Cancelar' : 'Agregar Children'}*/}
-                        {/*</Button>*/}
+                        <Input
+                            crossOrigin={false}
+                            type="number"
+                            label="Children"
+                            name="children"
+                            value={finance?.children || ""}
+                            onChange={handleOnChangeFinance}
+                            containerProps={{
+                                className: "max-w-1/2 min-w-[50%]",
+                            }}
+                        />
+                        <Button
+                            onClick={toggleChildren}
+                            color="red"
+                        >
+                            <TrashIcon className="h-5 w-5"/>
+                        </Button>
                     </div>
-                }
+                )}
             </div>
-            {!financeType &&
+
+            {!financeType && (
                 <Select
                     label="Type"
                     name="type"
                     disabled={!!financeType}
                     value={financeType || finance?.type}
-                    onChange={(value) => updateFinance({...finance, type: value as FinanceTypes})}
+                    onChange={(value) =>
+                        updateFinance({...finance, type: value as FinanceTypes})
+                    }
                     className="mb-4"
                 >
                     {financeTypes.map((type) => (
-                        <Option key={type} value={type}>{type}</Option>
+                        <Option key={type} value={type}>
+                            {type}
+                        </Option>
                     ))}
                 </Select>
-            }
+            )}
         </div>
     );
-}
+};

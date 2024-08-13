@@ -4,7 +4,7 @@ export const financeTypes = ['transport', 'food', 'excursion', 'resort', 'servic
 export interface IFinance {
     price: number;
     children?: number;
-    couples?: number;
+    couple?: number;
     cost?: number;
     type: FinanceTypes;
 }

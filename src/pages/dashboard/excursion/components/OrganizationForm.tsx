@@ -228,14 +228,14 @@ export const OrganizationForm: React.FC<OrganizationHandlerProps> = (
     const form = (
         <div className="space-y-4 w-4/5 mx-auto">
             <div className='flex gap-4'>
-                <div className='flex flex-col max-w-[230px] space-y-4'>
+                <div className='flex flex-col relative w-1/5 space-y-4'>
                     <MediaHandler logoMedia={organization.logo} medias={organization.medias} onChange={handleLogoChange}
                                   handle={{logo: true}}/>
                     <FinanceHandler finance={organization.entryFee || {} as IFinance} updateFinance={handleEntryFee}/>
                 </div>
                 <div className='flex flex-col gap-4 w-2/3'>
                     <div className='grid grid-cols-2 gap-4 '>
-                    <Input  label="Name" name="name" value={organization.name}
+                    <Input crossOrigin={false} label="Name" name="name" value={organization.name}
                            onChange={handleInputChange}/>
                     <Select
                         label="Type"
