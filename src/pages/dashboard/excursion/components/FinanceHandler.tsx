@@ -59,8 +59,8 @@ export const FinanceHandler = ({
                 />
                 <Menu>
                     <MenuHandler>
-                        <Button variant="outlined" color="blue" className="flex items-center z-40 p-2">
-                            <PlusCircleIcon className="h-6 w-6"/>
+                        <Button color="blue" className="flex items-center z-40 p-2">
+                            <PlusCircleIcon className="h-5 w-6"/>
                         </Button>
                     </MenuHandler>
                     <MenuList className="p-2 z-[99999]">
@@ -99,8 +99,9 @@ export const FinanceHandler = ({
                     <Button
                         onClick={toggleCost}
                         color="red"
+                        className='flex items-center p-2'
                     >
-                        <TrashIcon className="h-5 w-5"/>
+                        <TrashIcon className="h-5 w-6"/>
                     </Button>
                 </div>
             )}
@@ -122,8 +123,9 @@ export const FinanceHandler = ({
                         <Button
                             onClick={toggleRates}
                             color="red"
+                            className='p-2'
                         >
-                            <TrashIcon className="h-5 w-5"/>
+                            <TrashIcon className="h-5 w-6"/>
                         </Button>
                     </div>
                 )}
@@ -144,8 +146,9 @@ export const FinanceHandler = ({
                         <Button
                             onClick={toggleChildren}
                             color="red"
+                            className='p-2'
                         >
-                            <TrashIcon className="h-5 w-5"/>
+                            <TrashIcon className="h-5 w-6"/>
                         </Button>
                     </div>
                 )}
