@@ -23,6 +23,7 @@ import BusHandler from "./BusesHandler";
 import SearchableSelect, {IOption} from "../../../../components/SearchableSelect";
 import {serviceStatusList} from "@/models/serviceModel";
 import {BASIC_CONSTANTS} from "@/constants/basic.constants";
+import {AlertWithContent} from "@/components/AlertWithContent";
 
 interface TransportResourceHandlerProps {
     transportResources: ITransportResource[];
@@ -51,6 +52,7 @@ const TransportResourceHandler: React.FC<TransportResourceHandlerProps> = ({
     const {data: busesData, isLoading: isLoadingBuses} = busesService.useFetchAllBuses();
 
     const {data: existingDriver} = userService.useFetchAllTravelUsers({phone: newTransportResource.driver?.phone}, {skip: (newTransportResource.driver?.phone?.length || 0) < 11});
+    const [inValid, setInValid] = React.useState(false);
 
     useEffect(() => {
         if (busesData) {
@@ -127,7 +129,7 @@ const TransportResourceHandler: React.FC<TransportResourceHandlerProps> = ({
         console.log(newTransportResource);
         if (Object.keys(newTransportResource.bus).length === 0) {
             // Si 'bus' está vacío, muestra una alerta y retorna
-            alert('No hay datos para guardar en bus');
+            setInValid(true)
             return;
         }
 
@@ -136,7 +138,7 @@ const TransportResourceHandler: React.FC<TransportResourceHandlerProps> = ({
         const isDuplicatePhone = transportResources.some(resource => resource.driver?.phone === driverPhone);
 
         if (isDuplicatePhone) {
-            alert('Ya existe un conductor con este número de teléfono');
+            setInValid(true)
             return;
         }
 
@@ -194,6 +196,7 @@ const TransportResourceHandler: React.FC<TransportResourceHandlerProps> = ({
 
     return (
         <div className="flex flex-col gap-3">
+            <AlertWithContent open={inValid} setOpen={setInValid} content={"Telefono ya registrado o datos incompletos"} type="warning"/>
             <h2>{editingIndex !== null ? 'Edit Transport Resource' : 'Add New Transport Resource'}</h2>
             <div className="flex flex-col flex-wrap gap-4">
                 <Typography variant="h6">Guagua: </Typography>
