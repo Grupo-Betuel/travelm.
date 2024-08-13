@@ -1,6 +1,6 @@
 // BusHandler.tsx
-import React, {useState} from 'react';
-import {Button, Input, Card, CardBody} from '@material-tailwind/react';
+import React, {useEffect, useState} from 'react';
+import {Button, Input, Card, CardBody, CardFooter, Typography} from '@material-tailwind/react';
 import {IBus} from "../../../../models/busesModel";
 import IUser from "../../../../models/interfaces/userModel";
 import {IFinance} from "../../../../models/financeModel";
@@ -10,6 +10,7 @@ import _ from 'lodash';
 import {getCrudService} from "../../../../api/services/CRUD.service";
 import {CommonConfirmActions, CommonConfirmActionsDataTypes} from "../../../../models/common";
 import {useConfirmAction} from "../../../../hooks/useConfirmActionHook";
+import {BASIC_CONSTANTS} from "@/constants/basic.constants";
 
 interface BusHandlerProps {
     buses: IBus[];
@@ -27,8 +28,17 @@ const busesService = getCrudService('buses');
 const BusHandler: React.FC<BusHandlerProps> = ({buses, updateBuses}) => {
     const [newBus, setNewBus] = useState<IBus>(emptyBus);
     const [editingIndex, setEditingIndex] = useState<number | null>(null);
+    const [hasContent, setHasContent] = useState(false);
     const [updateBus, {isLoading: isUpdating}] = busesService.useUpdateBuses();
     const [deleteBusById, {isLoading: isDeleting}] = busesService.useDeleteBuses();
+
+    useEffect(() => {
+        setHasContent(
+            Object.values(newBus).some(value => value !== '' && value !== 0)
+        );
+    }, [newBus]);
+
+
     const onConfirmAction = (type?: CommonConfirmActions, data?: CommonConfirmActionsDataTypes<IBus>) => {
         switch (type) {
             case 'delete':
@@ -41,11 +51,6 @@ const BusHandler: React.FC<BusHandlerProps> = ({buses, updateBuses}) => {
 
     }
 
-    const {
-        handleSetActionToConfirm,
-        resetActionToConfirm,
-        ConfirmDialog
-    } = useConfirmAction<CommonConfirmActions, CommonConfirmActionsDataTypes<IBus>>(onConfirmAction, onDeniedAction);
 
     const handleInputChange = ({target: {value, name, type}}: any) => {
         if (type === 'tel') {
@@ -59,11 +64,10 @@ const BusHandler: React.FC<BusHandlerProps> = ({buses, updateBuses}) => {
         setNewBus(newInfo);
     };
 
-    const handleFinanceChange = (finance: IFinance) => {
-        setNewBus({
-            ...newBus,
-            finance
-        });
+    const handleCancel = () => {
+        setNewBus(emptyBus);
+        setEditingIndex(null);
+        setHasContent(false);
     };
 
     const addBus = () => {
@@ -103,41 +107,55 @@ const BusHandler: React.FC<BusHandlerProps> = ({buses, updateBuses}) => {
         setEditingIndex(null);
     };
 
+    const {
+        handleSetActionToConfirm,
+        ConfirmDialog
+    } = useConfirmAction<CommonConfirmActions, CommonConfirmActionsDataTypes<IBus>>(onConfirmAction, onDeniedAction);
+
     return (
-        <div className="flex flex-col gap-3">
+        <div className="flex flex-col w-full gap-3 h-[70vh] overflow-y-auto overflow-x-hidden">
             <h2>{editingIndex !== null ? 'Edit Bus' : 'Add New Bus'}</h2>
-            <div className="flex flex-wrap gap-4">
-                <Input type="text"
+            <div className="flex flex-wrap gap-4 w-full px-2">
+                <Input crossOrigin={false} type="text"
                        label="Model"
                        value={newBus.model}
                        name="model"
                        onChange={handleInputChange}/>
-                <Input type="number" label="Capacity" value={newBus.capacity.toString()}
+                <Input crossOrigin={false} type="number" label="Capacity" value={newBus.capacity.toString()}
                        name="capacity"
                        onChange={handleInputChange}/>
-                <Input type="text" label="Color" value={newBus.color}
+                <Input crossOrigin={false} type="text" label="Color" value={newBus.color}
                        name="color"
                        onChange={handleInputChange}/>
-                <Input type="text" label="Description" value={newBus.description}
+                <Input crossOrigin={false} type="text" label="Description" value={newBus.description}
                        name={"description"}
                        onChange={handleInputChange}/>
 
-                <Button color="blue" onClick={addBus}>{editingIndex !== null ? 'Save Changes' : 'Add Bus'}</Button>
+                <Button color="blue" onClick={addBus}>{editingIndex !== null ? `${BASIC_CONSTANTS.SAVE_TEXT}` : `${BASIC_CONSTANTS.ADD_TEXT}`}</Button>
+
+                {hasContent && (
+                    <Button color="red" onClick={handleCancel}>
+                        {BASIC_CONSTANTS.CANCEL_TEXT}
+                    </Button>
+                )}
             </div>
-            {/*<FinanceHandler finance={newBus.finance} type="transport" updateFinance={handleFinanceChange}/>*/}
-            {/*<Button color="blue" onClick={addOrEditBus}>{editingIndex !== null ? 'Save Changes' : 'Add Bus'}</Button>*/}
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-2 gap-4">
                 {buses.map((bus, index) => (
-                    <Card key={index} className="p-4 my-2 flex">
-                        <p>Model: {bus.model}</p>
-                        <p>Capacity: {bus.capacity}</p>
-                        <p>Color: {bus.color}</p>
-                        <p>Description: {bus.description}</p>
-                        {/*{bus.finance?.cost ? <p>Cost: {bus.finance.cost}</p> : null}*/}
-                        {/*<p>Price: RD${bus.finance?.price?.toLocaleString()}</p>*/}
-                        <Button variant="text" color="green" onClick={() => startEditing(index)}>Edit</Button>
-                        <Button variant="text" color="red"
-                                onClick={() => handleSetActionToConfirm('delete', 'Eliminar Bus')(bus)}>Delete</Button>
+                    <Card key={index} className="p-4 my-2 flex flex-col justify-between">
+                        <div>
+                            <Typography variant='h6'>Model: {bus.model}</Typography>
+                            <p>Capacity: {bus.capacity}</p>
+                            <p>Color: {bus.color}</p>
+                            <p>Description: {bus.description}</p>
+                        </div>
+                        <CardFooter className="p-2">
+                            <div className="flex mt-4 gap-2">
+                                <Button variant='outlined' color="blue"
+                                        onClick={() => startEditing(index)}>{BASIC_CONSTANTS.EDIT_TEXT}</Button>
+                                <Button variant="outlined" color="red"
+                                        onClick={() => handleSetActionToConfirm('delete', 'Eliminar Bus')(bus)}>{BASIC_CONSTANTS.DELETE_TEXT}</Button>
+                            </div>
+                        </CardFooter>
                     </Card>
                 ))}
             </div>

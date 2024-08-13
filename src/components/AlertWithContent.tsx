@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useMemo} from "react";
 import { Alert, Typography } from "@material-tailwind/react";
 
 function Icon() {
@@ -28,30 +28,30 @@ interface AlertWithContentProps<T> {
 }
 const alertTypes = {
     warning: {
-        color: 'yellow-600',
+        color: 'bg-yellow-600',
         icon: <Icon />, // Puedes definir diferentes iconos si lo deseas
         title: 'Warning',
     },
     success: {
-        color: 'green-600',
+        color: 'bg-green-600',
         icon: <Icon />, // Cambia el icono para éxito
         title: 'Success',
     },
     error: {
-        color: 'red-600',
+        color: 'bg-red-600',
         icon: <Icon />, // Cambia el icono para error
         title: 'Error',
     },
 };
 
 export function AlertWithContent<T>({content, open, setOpen, type}: AlertWithContentProps<T>) {
-    const alertType = alertTypes[type];
+    const alertType = useMemo(() => alertTypes[type], [type]);
     console.log(alertType.color);
     return (
         <>
             <Alert
                 open={open}
-                className={`w-96 h-32 bg-${alertType.color} bg-opacity-90 fixed bottom-10 left-10 z-50`}
+                className={`w-96 h-32 ${alertType.color} bg-opacity-90 fixed bottom-10 left-10 z-50`}
                 icon={alertType.icon}
                 onClose={() => setOpen(false)}
             >
