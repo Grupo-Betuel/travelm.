@@ -368,6 +368,7 @@ export const ClientsExcursionTable = (
 
             const updatedClient: IClient = {
                 ...client,
+                currentService: updatedService,
                 services: client.services.map(s => s.excursionId === excursion._id ? updatedService : s) as IService[]
             };
 
