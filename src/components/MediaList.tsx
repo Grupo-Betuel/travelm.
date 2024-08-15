@@ -59,7 +59,7 @@ export const MediaList: React.FC<MediaListProps> = ({onSelect, multiple, mediaTy
     useEffect(() => {
         mediaType && setSelectedType(mediaType || selectedType);
     }, [mediaType]);
-        // console.log('Aver',mediaByTypeData)
+    // console.log('Aver',mediaByTypeData)
     const onConfirmAction = (type?: CommonConfirmActions, data?: IMedia) => {
         if (type === 'delete') {
             handleDeleteMedia(data as IMedia);
@@ -171,46 +171,45 @@ export const MediaList: React.FC<MediaListProps> = ({onSelect, multiple, mediaTy
 
 
     return (
-        <div className="p-4 h-[70vh]">
-            <div className="w-full flex justify-between items-center pb-4">
+        <div className="p-4 h-[70vh] w-full ">
+            <div className="relative w-full flex justify-between items-center pb-2 overflow-hidden">
+                <Button
+                    variant={"text"}
+                    color="blue"
+                    className="flex items-center gap-2 "
+                    onClick={refetchCurrentMediaType}>
+                    <label className="flex items-center gap-2">
+                        <input
+                            type="file"
+                            className="hidden absolute -z-10"
+                            multiple
+                            accept={currentAcceptType}
+                            onChange={uploadMedia}
+                        />
+                        Subir
+                        <AiOutlineCloudUpload className="h-10 cursor-pointer text-blue-400 w-[21px]"/>
+                    </label>
+                </Button>
+                <Button
+                    variant={"text"}
+                    color="blue"
+                    className="flex items-center gap-2 "
+                    onClick={refetchCurrentMediaType}>
+                    Recargar
+                    <IoReload className="w-[18px] h-[18px]"/>
+                </Button>
+            </div>
+            <div className="sticky top-0 w-full bg-white z-10 pb-4">
                 <Input
                     crossOrigin={false}
                     type="text"
                     label="Buscar"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full p-2 border rounded mb-4 mr-4"
+                    className="w-full p-2 border rounded mb-4"
                 />
-                <div className="flex items-center gap-2">
-                    <Button
-                        variant={"text"}
-                        color="blue"
-                        className="flex items-center gap-2 "
-                        onClick={refetchCurrentMediaType}>
-                        <label className="flex items-center gap-2">
-                            <input
-                                type="file"
-                                className="hidden absolute -z-10"
-                                multiple
-                                accept={currentAcceptType}
-                                onChange={uploadMedia}
-                            />
-                            Subir
-                            <AiOutlineCloudUpload className="h-10 cursor-pointer text-blue-400 w-[21px]"/>
-                        </label>
-                    </Button>
-                    <Button
-                        variant={"text"}
-                        color="blue"
-                        className="flex items-center gap-2 "
-                        onClick={refetchCurrentMediaType}>
-                        Recargar
-                        <IoReload className="w-[18px] h-[18px]"/>
-                    </Button>
-                </div>
             </div>
-
-            <div>
+            <div className="h-[calc(100%-8rem)] overflow-y-auto">
                 <Tabs value={selectedType}>
                     <TabsHeader>
                         <Tab value={MediaTypeEnum.IMAGE} onClick={onSelectTab(MediaTypeEnum.IMAGE)}>
@@ -241,15 +240,12 @@ export const MediaList: React.FC<MediaListProps> = ({onSelect, multiple, mediaTy
                                     <div className="absolute top-2 right-2">
                                         <Menu>
                                             <MenuHandler>
-
-                                                {/*<Bars3Icon className="h-6 w-6 text-gray-500"/>*/}
-                                                <BiDotsVertical className="h-6 w-6 text-gray-500" />
+                                                <BiDotsVertical className="h-6 w-6 text-gray-500"/>
                                             </MenuHandler>
                                             <MenuList className='z-[9999]'>
                                                 <MenuItem
                                                     onClick={(e) => {
                                                         e.stopPropagation();
-                                                        console.log('delete', media);
                                                         handleSetActionToConfirm('delete')(media);
                                                     }}
                                                 >
@@ -268,32 +264,31 @@ export const MediaList: React.FC<MediaListProps> = ({onSelect, multiple, mediaTy
                                             </MenuList>
                                         </Menu>
                                     </div>
-
                                     <p className="whitespace-pre-line line-clamp-1 !w-[106%]">{media.title}</p>
                                 </div>
                             ))}
                         </TabPanel>
                     </TabsBody>
                 </Tabs>
-
-                {renameModalOpen && (
-                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-                        <div className="bg-white p-4 rounded-xl w-[300px]">
-                            <h3 className="text-lg font-semibold mb-4">Renombrar Media</h3>
-                            <input
-                                type="text"
-                                value={newTitle}
-                                onChange={(e) => setNewTitle(e.target.value)}
-                                className="w-full p-2 border rounded"
-                            />
-                            <div className="flex justify-end gap-2 mt-4">
-                                <Button onClick={() => setRenameModalOpen(false)} variant="text">{BASIC_CONSTANTS.CANCEL_TEXT}</Button>
-                                <Button onClick={handleRename} color="blue">{BASIC_CONSTANTS.SAVE_TEXT}</Button>
-                            </div>
+            </div>
+            {renameModalOpen && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+                    <div className="bg-white p-4 rounded-xl w-[300px]">
+                        <h3 className="text-lg font-semibold mb-4">Renombrar Media</h3>
+                        <input
+                            type="text"
+                            value={newTitle}
+                            onChange={(e) => setNewTitle(e.target.value)}
+                            className="w-full p-2 border rounded"
+                        />
+                        <div className="flex justify-end gap-2 mt-4">
+                            <Button onClick={() => setRenameModalOpen(false)}
+                                    variant="text">{BASIC_CONSTANTS.CANCEL_TEXT}</Button>
+                            <Button onClick={handleRename} color="blue">{BASIC_CONSTANTS.SAVE_TEXT}</Button>
                         </div>
                     </div>
-                )}
-            </div>
+                </div>
+            )}
             <ConfirmDialog/>
         </div>
 

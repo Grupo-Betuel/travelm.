@@ -601,7 +601,7 @@ const MediaHandler = ({onChange, medias, disableUpload, logoMedia, flyerMedia, h
                         Confirmación
                     </Typography>
                 </DialogHeader>
-                <DialogBody className="overflow-y-scroll max-h-[80dvh]">
+                <DialogBody className="max-h-[80dvh]">
                     <MediaList
                         mediaType={selectedMediaSelectorType === ExtraMediaTypesEnum.FLYER || selectedMediaSelectorType === ExtraMediaTypesEnum.LOGO ?
                             MediaTypeEnum.IMAGE
