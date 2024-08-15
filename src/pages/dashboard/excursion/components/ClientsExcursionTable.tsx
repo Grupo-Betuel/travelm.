@@ -436,7 +436,7 @@ export const ClientsExcursionTable = (
 
     const renderRow = (client: IClient, index: number, selected: boolean, onSelect: (checked: boolean) => void) => {
         const noService = "No Service"
-        const serviceStatus = client.currentService.status;
+        const serviceStatus = client.currentService?.status;
         const statusColor = getStatusColor(serviceStatus || noService);
         const service = client.currentService;
         const bedroomOptions: IOption[] = (bedrooms?.map((b) => ({
