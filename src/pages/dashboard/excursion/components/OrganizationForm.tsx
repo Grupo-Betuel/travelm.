@@ -69,7 +69,7 @@ export const OrganizationForm: React.FC<OrganizationHandlerProps> = (
     const {data: organizationUserData} = userService.useFetchAllTravelUsers({organization: organization?._id}, {skip: !organization?._id});
     const [isOrganizationUserDialogOpen, setIsOrganizationUserDialogOpen] = useState(false);
     const [addUser] = userService.useAddTravelUsers();
-    const [updateUser] = userService.useUpdateTravelUsers('organization');
+    const [updateUser] = userService.useUpdateTravelUsers();
     const [organizationUser, setOrganizationUser] = useState<IUser>()
 
     useEffect(() => {
@@ -197,6 +197,7 @@ export const OrganizationForm: React.FC<OrganizationHandlerProps> = (
     }
 
     const onSubmitOrganizationUser = async (user: IUser) => {
+
         if (!organization._id) {
             // TODO: TOAST ALERT THE ORGANIZATION MUST BE CREATED FIRST
             return;

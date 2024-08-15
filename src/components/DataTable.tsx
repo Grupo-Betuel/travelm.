@@ -247,6 +247,7 @@ interface DataTableProps<T> {
     renderRow: (item: T, index: number, selected: boolean, onSelect: (checked: boolean) => void) => React.ReactNode;
     enableSelection?: boolean;
     onSelect?: (selectedItems: T[]) => void;
+    selectedItems?: T[];
 }
 
 export function DataTable<T>(
@@ -256,14 +257,19 @@ export function DataTable<T>(
         filterOptions,
         renderRow,
         enableSelection = false,
-        onSelect
+        onSelect,
+        selectedItems,
     }: DataTableProps<T>) {
     const [searchTerm, setSearchTerm] = useState('');
     const [filters, setFilters] = useState<Record<keyof T, any>>({});
     const [sortConfig, setSortConfig] = useState<{ key: keyof T, direction: 'ascending' | 'descending' } | null>(null);
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage, setItemsPerPage] = useState(5);
-    const [selectedItems, setSelectedItems] = useState<Set<T>>(new Set());
+    const [selectedItemsData, setSelectedItemsData] = useState<Set<T>>(new Set());
+
+    React.useEffect(() => {
+        setSelectedItemsData(new Set(selectedItems));
+    }, [selectedItems]);
 
     const handleSearchChange = (event: ChangeEvent<HTMLInputElement>) => {
         const val = event.target.value.toLowerCase();
@@ -290,13 +296,14 @@ export function DataTable<T>(
     };
 
     const handleSelect = (item: T, checked: boolean) => {
-        setSelectedItems(prevSelectedItems => {
+        setSelectedItemsData(prevSelectedItems => {
             const newSelectedItems = new Set(prevSelectedItems);
             if (checked) {
                 newSelectedItems.add(item);
             } else {
                 newSelectedItems.delete(item);
             }
+
             if (onSelect) {
                 onSelect(Array.from(newSelectedItems));
             }
@@ -486,7 +493,7 @@ export function DataTable<T>(
                     {paginatedData.map((item, index) => renderRow(
                         item,
                         index,
-                        selectedItems.has(item),
+                        selectedItemsData.has(item),
                         (checked) => handleSelect(item, checked)
                     ))}
                     </tbody>

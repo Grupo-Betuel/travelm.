@@ -201,7 +201,6 @@ export const ClientsExcursionTable = (
 
 
     const handleDeletePayment = (payment: IPayment) => {
-        console.log('delete payment', payment, selectedClient)
         if (selectedClient) {
             payment._id && deletePayment(payment._id);
 
@@ -283,7 +282,7 @@ export const ClientsExcursionTable = (
     }, [clients, bedrooms, excursion]);
 
 
-    const onChangeBedroom = (client: IClient) => (value?: string) => {
+    const onChangeBedroom = (client: IClient) => (value?: string, currentSelect?: any) => {
         const bedroom = bedrooms?.find(b => b._id === value);
         const service = client.currentService;
         if (!service) {
@@ -291,10 +290,11 @@ export const ClientsExcursionTable = (
             return;
         }
 
-        const updatedService = {...service, bedroom};
+        const updatedService = {...service, bedroom: bedroom || null};
 
         const updatedClient: IClient = {
             ...client,
+            currentService: updatedService,
             services: client.services.map(s => s.excursionId === excursion._id ? updatedService : s) as IService[]
         };
 
@@ -347,7 +347,6 @@ export const ClientsExcursionTable = (
 
 
     const onSelectClient = (sclients: IClient[]) => {
-        console.log('selected clients', sclients);
         setSelectedClients(sclients);
     }
 
@@ -377,6 +376,8 @@ export const ClientsExcursionTable = (
 
 
         onUpdateClient(mapClients);
+        setSelectedClients([])
+
     }
 
     const onChangeClientsServiceStatus = (options: IOption<ServiceStatusTypes>[]) => {
@@ -514,7 +515,7 @@ export const ClientsExcursionTable = (
                                 selectedValues={clientBedroom ? [clientBedroom] : undefined}
                                 label="Habitación"
                                 options={bedroomOptions}
-                                onSelect={(selectedValues: IOption[]) => onChangeBedroom(client)(selectedValues[0].value)}
+                                onSelect={(selectedValues: IOption[], currentSelect?: IOption) => onChangeBedroom(client)(selectedValues[0]?.value, currentSelect)}
                                 displayProperty="label"
                                 className="min-w-[200px]"
                             />
@@ -604,11 +605,13 @@ export const ClientsExcursionTable = (
                         <SearchableSelect
                             label="Cambiar Habitacion"
                             options={bedroomsOptions}
+                            selectedValues={[]}
                             onSelect={onChangeClientsBedrooms}
                             className="min-w-[200px]"
                         />
                     </div>}
                 <DataTable<IClient>
+                    selectedItems={selectedClients}
                     enableSelection
                     onSelect={onSelectClient}
                     data={clients}

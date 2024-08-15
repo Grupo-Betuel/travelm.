@@ -14,7 +14,7 @@ export type ServiceDetailActionsDataTypes = IPayment
 export interface IService extends BaseModel {
     status: ServiceStatusTypes;
     payments: IPayment[];
-    bedroom?: IBedroom;
+    bedroom?: IBedroom | null;
     type: ServiceTypes;
     finance: IFinance;
     serviceId?: string;
