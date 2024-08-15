@@ -70,7 +70,7 @@ export const OrganizationForm: React.FC<OrganizationHandlerProps> = (
     const {data: organizationUserData} = userService.useFetchAllTravelUsers({organization: organization?._id}, {skip: !organization?._id});
     const [isOrganizationUserDialogOpen, setIsOrganizationUserDialogOpen] = useState(false);
     const [addUser] = userService.useAddTravelUsers();
-    const [updateUser] = userService.useUpdateTravelUsers('organization');
+    const [updateUser] = userService.useUpdateTravelUsers();
     const [organizationUser, setOrganizationUser] = useState<IUser>()
 
     useEffect(() => {
@@ -81,13 +81,6 @@ export const OrganizationForm: React.FC<OrganizationHandlerProps> = (
 
     const handleInputChange = (event: React.ChangeEvent<any>): void => {
         const {name, value} = event.target;
-
-        if (name === "type" && (value === OrganizationTypesEnum.HOTEL || value === OrganizationTypesEnum.TOURIST_SPOT)) {
-            setShowBedroomsHandler(true);
-        } else if (name === "type") {
-            setShowBedroomsHandler(false);
-            handleBedrooms([]);
-        }
 
         setOrganization((prevFormData) => ({
             ...prevFormData,
@@ -131,19 +124,22 @@ export const OrganizationForm: React.FC<OrganizationHandlerProps> = (
         setOrganization((prevFormData) => ({
             ...prevFormData,
             contact: {
-            ...prevFormData.contact.location,
-            ...contact,
+                ...prevFormData.contact.location,
+                ...contact,
             },
         }));
     };
 
     const handleSubmit = async () => {
-        if (organization._id) {
-            onUpdate && onUpdate(organization);
-        } else {
-            onCreate && onCreate(organization);
+        const organizationInfo = structuredClone(organization);
+        if (!bedroomsIsShown ){
+            organizationInfo.bedrooms && delete organizationInfo.bedrooms;
         }
-
+        if (organizationInfo._id) {
+            onUpdate && onUpdate(organizationInfo);
+        } else {
+            onCreate && onCreate(organizationInfo);
+        }
         dialog?.handler();
     };
 
@@ -222,8 +218,9 @@ export const OrganizationForm: React.FC<OrganizationHandlerProps> = (
 
     const [showSocialNetworkForm, setShowSocialNetworkForm] = useState(false);
     const [showMediaHandler, setShowMediaHandler] = useState(false);
-    const [showBedroomsHandler, setShowBedroomsHandler] = useState(false);
     const [showCostHandler, setShowCostHandler] = useState(false);
+
+    const bedroomsIsShown = useMemo(() => organization.type === OrganizationTypesEnum.HOTEL || organization.type === OrganizationTypesEnum.TOURIST_SPOT, [organization.type]);
 
     const form = (
         <div className="space-y-4 w-4/5 mx-auto">
@@ -235,32 +232,33 @@ export const OrganizationForm: React.FC<OrganizationHandlerProps> = (
                 </div>
                 <div className='flex flex-col gap-4 w-2/3'>
                     <div className='grid grid-cols-2 gap-4 '>
-                    <Input crossOrigin={false} label="Name" name="name" value={organization.name}
-                           onChange={handleInputChange}/>
-                    <Select
-                        label="Type"
-                        name="type"
-                        value={organization.type}
-                        onChange={(value) => handleInputChange({target: {value: value, name: 'type'}} as any)}
-                        className="mb-4"
-                    >
-                        {organizationTypeList.map((type) => (
-                            <Option key={type} value={type}>{type}</Option>
-                        ))}
-                    </Select>
+                        <Input crossOrigin={false} label="Name" name="name" value={organization.name}
+                               onChange={handleInputChange}/>
+                        <Select
+                            label="Type"
+                            name="type"
+                            value={organization.type}
+                            onChange={(value) => handleInputChange({target: {value: value, name: 'type'}} as any)}
+                            className="mb-4"
+                        >
+                            {organizationTypeList.map((type) => (
+                                <Option key={type} value={type}>{type}</Option>
+                            ))}
+                        </Select>
                     </div>
                     <Textarea label="Description" name="description" value={organization.description}
                               onChange={handleInputChange}/>
-                    <ContactForm contact={organization.contact} updateContact={handleContactChange} />
+                    <ContactForm contact={organization.contact} updateContact={handleContactChange}/>
                     {showSocialNetworkForm &&
-                        <SocialNetworkForm socialNetworks={organization.socialNetworks} updateSocialNetworks={handleSocialNetworksChange}/>}
-                    {showBedroomsHandler &&
+                        <SocialNetworkForm socialNetworks={organization.socialNetworks}
+                                           updateSocialNetworks={handleSocialNetworksChange}/>}
+                    {bedroomsIsShown &&
                         <BedroomsHandler bedrooms={organization.bedrooms} updateBedrooms={handleBedrooms}/>}
                     {showMediaHandler &&
                         <MediaHandler handle={{images: true}} onChange={onChangeMedia} medias={organization.medias}/>}
                     <MapPicker
                         initialLocation={{
-                            latitude:  organizationData?.contact?.location?.latitude || 18.485424,
+                            latitude: organizationData?.contact?.location?.latitude || 18.485424,
                             longitude: organizationData?.contact?.location?.longitude || -70.00008070000001,
                         }}
                         onLocationSelect={handleLocationChange}

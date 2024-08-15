@@ -23,6 +23,7 @@ import {useAuth} from "@/context/authContext";
 import {parseMultipleFilesToMedia} from "@/utils/media.utils";
 import {Bars3Icon} from "@heroicons/react/20/solid";
 import {BASIC_CONSTANTS} from "@/constants/basic.constants";
+import {BiDotsVertical} from "react-icons/bi";
 
 export interface MediaListProps {
     multiple?: boolean;
@@ -240,7 +241,9 @@ export const MediaList: React.FC<MediaListProps> = ({onSelect, multiple, mediaTy
                                     <div className="absolute top-2 right-2">
                                         <Menu>
                                             <MenuHandler>
-                                                <Bars3Icon className="h-6 w-6 text-gray-500"/>
+
+                                                {/*<Bars3Icon className="h-6 w-6 text-gray-500"/>*/}
+                                                <BiDotsVertical className="h-6 w-6 text-gray-500" />
                                             </MenuHandler>
                                             <MenuList className='z-[9999]'>
                                                 <MenuItem
