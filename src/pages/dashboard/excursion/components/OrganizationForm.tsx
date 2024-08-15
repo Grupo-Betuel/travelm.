@@ -65,14 +65,16 @@ export const OrganizationForm: React.FC<OrganizationHandlerProps> = (
         onUpdate,
         organizationData
     }) => {
-
+    console.log('organizationData', organizationData)
     const [organization, setOrganization] = useState<IOrganization>(emptyOrganization);
     const {data: organizationUserData} = userService.useFetchAllTravelUsers({organization: organization?._id}, {skip: !organization?._id});
     const [isOrganizationUserDialogOpen, setIsOrganizationUserDialogOpen] = useState(false);
     const [addUser] = userService.useAddTravelUsers();
     const [updateUser] = userService.useUpdateTravelUsers();
     const [organizationUser, setOrganizationUser] = useState<IUser>()
-
+    // if(organizationData){
+    //     setOrganization(organizationData)
+    // }
     useEffect(() => {
         organizationUserData?.[0] && setOrganizationUser(organizationUserData?.[0])
     }, [organizationUserData]);
@@ -113,12 +115,18 @@ export const OrganizationForm: React.FC<OrganizationHandlerProps> = (
             socialNetworks,
         }));
     };
-    const handleMediasChange = (medias: any[]): void => {
-        setOrganization((prevFormData) => ({
-            ...prevFormData,
-            medias,
+    const handleMediasChange = (data: IMediaHandled): void => {
+        const { audios = [], images = [], videos = [] } = data;
+
+        setOrganization(prevState => ({
+            ...prevState,
+            medias: [
+                ...audios,
+                ...images,
+                ...videos,
+            ],
         }));
-    };
+    }
 
     const handleContactChange = (contact: any): void => {
         setOrganization((prevFormData) => ({
@@ -143,16 +151,6 @@ export const OrganizationForm: React.FC<OrganizationHandlerProps> = (
         dialog?.handler();
     };
 
-    const onChangeMedia = (data: IMediaHandled) => {
-        setOrganization({
-            ...organization,
-            medias: [
-                ...data.audios,
-                ...data.images,
-                ...data.videos,
-            ]
-        })
-    }
 
     const handleBedrooms = (bedrooms: IBedroom[]) => {
         setOrganization({
@@ -217,10 +215,20 @@ export const OrganizationForm: React.FC<OrganizationHandlerProps> = (
     }
 
     const [showSocialNetworkForm, setShowSocialNetworkForm] = useState(false);
+
     const [showMediaHandler, setShowMediaHandler] = useState(false);
-    const [showCostHandler, setShowCostHandler] = useState(false);
 
     const bedroomsIsShown = useMemo(() => organization.type === OrganizationTypesEnum.HOTEL || organization.type === OrganizationTypesEnum.TOURIST_SPOT, [organization.type]);
+
+    useEffect(() => {
+        if (organization.medias.some(media => media.type === 'image')) {
+            setShowMediaHandler(true);
+        }
+    }, [organization.medias]);
+
+    const imagesIsShown = useMemo(() => {
+        return organization.medias.some(media => media.type === 'image');
+    }, [organization.medias]);
 
     const form = (
         <div className="space-y-4 w-4/5 mx-auto">
@@ -253,9 +261,14 @@ export const OrganizationForm: React.FC<OrganizationHandlerProps> = (
                         <SocialNetworkForm socialNetworks={organization.socialNetworks}
                                            updateSocialNetworks={handleSocialNetworksChange}/>}
                     {bedroomsIsShown &&
-                        <BedroomsHandler bedrooms={organization.bedrooms} updateBedrooms={handleBedrooms}/>}
-                    {showMediaHandler &&
-                        <MediaHandler handle={{images: true}} onChange={onChangeMedia} medias={organization.medias}/>}
+                        <BedroomsHandler bedrooms={organization.bedrooms || []} updateBedrooms={handleBedrooms}/>}
+                    {(imagesIsShown || showMediaHandler) && (
+                        <MediaHandler
+                            handle={{ images: true }}
+                            onChange={handleMediasChange}
+                            medias={organization.medias}
+                        />
+                    )}
                     <MapPicker
                         initialLocation={{
                             latitude: organizationData?.contact?.location?.latitude || 18.485424,
@@ -274,26 +287,16 @@ export const OrganizationForm: React.FC<OrganizationHandlerProps> = (
                     <Button
                         className={`w-full ${showMediaHandler ? 'bg-red-500' : 'bg-blue-500'} text-white`}
                         onClick={() => setShowMediaHandler(!showMediaHandler)}
+                        disabled={imagesIsShown} // Deshabilitar botón si ya hay imágenes
                     >
-                        {showMediaHandler ? 'Quitar Imagenes' : 'Añadir Imágenes'}
+                        {showMediaHandler ? 'Quitar Imágenes' : 'Añadir Imágenes'}
                     </Button>
-                    {/*boton Para Costos de pareja y niños*/}
-                    {/*{(organization.type === OrganizationTypesEnum.TRANSPORT ||*/}
-                    {/*    organization.type === OrganizationTypesEnum.TOURIST_SPOT ||*/}
-                    {/*    organization.type === OrganizationTypesEnum.HOTEL) && (*/}
-                    {/*    <Button*/}
-                    {/*        className={`w-full ${showCostHandler ? 'bg-red-500' : 'bg-blue-500'} text-white`}*/}
-                    {/*        onClick={() => setShowCostHandler(!showCostHandler)}*/}
-                    {/*    >*/}
-                    {/*        {showCostHandler ? 'Quitar Costos' : 'Niños - Parejas'}*/}
-                    {/*    </Button>*/}
-                    {/*)}*/}
                 </div>
             </div>
 
 
             {/*<SocialNetworkForm onChange={handleSocialNetworksChange}/>*/}
-            {/*<MediaHandler handle={{images: true}} onChange={onChangeMedia} medias={organization.medias}/>*/}
+            {/*<MediaHandler handle={{images: true}} onChange={handleMediasChange} medias={organization.medias}/>*/}
             {/*<BedroomsHandler bedrooms={organization.bedrooms} updateBedrooms={handleBedrooms}/>*/}
             {/*<FinanceHandler finance={organization.entryFee || {} as IFinance} updateFinance={handleEntryFee}/>*/}
             {enableUserIsActive && <Button

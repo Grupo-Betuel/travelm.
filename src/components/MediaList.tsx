@@ -59,7 +59,7 @@ export const MediaList: React.FC<MediaListProps> = ({onSelect, multiple, mediaTy
     useEffect(() => {
         mediaType && setSelectedType(mediaType || selectedType);
     }, [mediaType]);
-        console.log('Aver',mediaByTypeData)
+        // console.log('Aver',mediaByTypeData)
     const onConfirmAction = (type?: CommonConfirmActions, data?: IMedia) => {
         if (type === 'delete') {
             handleDeleteMedia(data as IMedia);
