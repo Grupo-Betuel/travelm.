@@ -24,6 +24,7 @@ import {parseMultipleFilesToMedia} from "@/utils/media.utils";
 import {Bars3Icon} from "@heroicons/react/20/solid";
 import {BASIC_CONSTANTS} from "@/constants/basic.constants";
 import {BiDotsVertical} from "react-icons/bi";
+import {TbDots, TbDotsVertical} from "react-icons/tb";
 
 export interface MediaListProps {
     multiple?: boolean;
@@ -205,7 +206,7 @@ export const MediaList: React.FC<MediaListProps> = ({onSelect, multiple, mediaTy
                     <IoReload className="w-[18px] h-[18px]"/>
                 </Button>
             </div>
-            <div className="sticky top-0 w-full bg-white z-10 pb-4">
+            <div className="sticky w-full bg-white z-10 pb-4">
                 <Input
                     crossOrigin={false}
                     type="text"
@@ -232,47 +233,56 @@ export const MediaList: React.FC<MediaListProps> = ({onSelect, multiple, mediaTy
                         </Tab>
                     </TabsHeader>
                     <TabsBody>
-                        <TabPanel
-                            value={selectedType}
-                            className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-4"
-                        >
-                            {filteredMedias.map((media) => (
-                                <div
-                                    key={media._id}
-                                    className={`p-2 border rounded-xl cursor-pointer relative bg-gray-50 ${selectedMedias.includes(media) ? "!bg-blue-200" : ""}`}
-                                    onClick={() => handleSelect(media)}
-                                >
-                                    <div className="absolute top-2 right-2">
-                                        <Menu>
-                                            <MenuHandler>
-                                                <BiDotsVertical className="h-6 w-6 text-gray-500"/>
-                                            </MenuHandler>
-                                            <MenuList className="z-[9999] w-48 absolute">
-                                                <MenuItem
-                                                    onClick={(e) => {
-                                                        e.stopPropagation();
-                                                        handleSetActionToConfirm('delete')(media);
-                                                    }}
-                                                >
-                                                    {BASIC_CONSTANTS.DELETE_TEXT}
-                                                </MenuItem>
-                                                <MenuItem
-                                                    onClick={(e) => {
-                                                        e.stopPropagation();
-                                                        setMediaToRename(media);
-                                                        setNewTitle(media.title);
-                                                        setRenameModalOpen(true);
-                                                    }}
-                                                >
-                                                    Renombrar
-                                                </MenuItem>
-                                            </MenuList>
-                                        </Menu>
+                        <TabPanel value={selectedType}>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-4">
+
+                                {filteredMedias.map((media) => (
+                                    <div
+                                        key={media._id}
+                                        className={`p-2 border rounded-xl cursor-pointer bg-gray-50 ${selectedMedias.includes(media) ? "!bg-blue-200" : ""}`}
+                                        onClick={() => handleSelect(media)}>
+
+                                        <div className="z-[9999]">
+                                            <Menu
+                                                animate={{mount: {scale: 1}, unmount: {scale: 0.9}}}
+                                            >
+                                                <MenuHandler>
+                                                    <div className='relative end-0'>
+                                                        <button
+                                                            className="absolute right-1 p-1 bg-white rounded-full shadow hover:shadow-lg">
+                                                            <TbDotsVertical className="w-6 h-6 text-gray-600"/>
+                                                        </button>
+                                                    </div>
+                                                </MenuHandler>
+                                                <MenuList
+                                                    className="absolute z-[9999] bg-white shadow-lg rounded-lg p-2">
+                                                    <MenuItem
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            handleSetActionToConfirm('delete')(media);
+                                                        }}
+                                                    >
+                                                        {BASIC_CONSTANTS.DELETE_TEXT}
+                                                    </MenuItem>
+                                                    <MenuItem
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            setMediaToRename(media);
+                                                            setNewTitle(media.title);
+                                                            setRenameModalOpen(true);
+                                                        }}
+                                                    >
+                                                        Renombrar
+                                                    </MenuItem>
+                                                </MenuList>
+                                            </Menu>
+                                        </div>
+                                        {renderMedia(media)}
+                                        {/*{renderMedia(media)}*/}
+                                        <p className="whitespace-pre-line line-clamp-1 !w-[106%]">{media.title}</p>
                                     </div>
-                                    {renderMedia(media)}
-                                    <p className="whitespace-pre-line line-clamp-1 !w-[106%]">{media.title}</p>
-                                </div>
-                            ))}
+                                ))}
+                            </div>
                         </TabPanel>
                     </TabsBody>
                 </Tabs>
