@@ -317,7 +317,7 @@ const Messaging: React.FC<IMessaging> = (
                             <SearchableSelect<IWsGroup>
                                 multiple
                                 options={seedData.groups?.filter(item => !item.subject?.toLowerCase()?.includes('sin filtro'))}
-                                displayProperty="subject"
+                                displayProperty="title"
                                 label="Selecciona un grupo"
                                 disabled={fetchingSeed === 'groups'}
                                 onSelect={handleGroupSelection}
