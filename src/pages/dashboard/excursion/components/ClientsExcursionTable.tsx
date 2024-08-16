@@ -194,9 +194,14 @@ export const ClientsExcursionTable = (
 
     const handleDeleteClient = (client: IClient) => () => {
         const updatedClients = clients.filter(c => c._id !== client._id);
+        const updatedClient = {
+            ...client,
+            services: client.services.filter(s => s.excursionId !== excursion._id) as IService[]
+        }
+        onUpdateClient(updatedClient);
         updateExcursion({
             clients: updatedClients
-        });
+        }, { isOptimistic: true, avoidConfirm: true });
     };
 
 
