@@ -122,11 +122,17 @@ export const MediaList: React.FC<MediaListProps> = ({onSelect, multiple, mediaTy
                 <img src={media.content} className="w-full rounded-xl" alt={media.title}/>
             </div>;
         } else if (media.type === MediaTypeEnum.VIDEO) {
-            return <FaVideo className="text-4xl"/>;
+            return <div className="w-full h-[100px] flex items-center justify-center  overflow-hidden">
+                <FaVideo className="text-4xl"/>
+            </div>;
         } else if (media.type === MediaTypeEnum.AUDIO) {
-            return <FaMusic className="text-4xl"/>;
+            return <div className="w-full h-[100px] flex items-center justify-center  overflow-hidden">
+                <FaMusic className="text-4xl"/>;
+            </div>;
         } else {
-            return <FaFileAlt className="text-4xl"/>;
+            return <div className="w-full h-[100px] flex items-center justify-center  overflow-hidden">
+                <FaFileAlt className="text-4xl"/>
+            </div>;
         }
     };
 
@@ -236,13 +242,12 @@ export const MediaList: React.FC<MediaListProps> = ({onSelect, multiple, mediaTy
                                     className={`p-2 border rounded-xl cursor-pointer relative bg-gray-50 ${selectedMedias.includes(media) ? "!bg-blue-200" : ""}`}
                                     onClick={() => handleSelect(media)}
                                 >
-                                    {renderMedia(media)}
                                     <div className="absolute top-2 right-2">
                                         <Menu>
                                             <MenuHandler>
                                                 <BiDotsVertical className="h-6 w-6 text-gray-500"/>
                                             </MenuHandler>
-                                            <MenuList className='z-[9999]'>
+                                            <MenuList className="z-[9999] w-48 absolute">
                                                 <MenuItem
                                                     onClick={(e) => {
                                                         e.stopPropagation();
@@ -264,6 +269,7 @@ export const MediaList: React.FC<MediaListProps> = ({onSelect, multiple, mediaTy
                                             </MenuList>
                                         </Menu>
                                     </div>
+                                    {renderMedia(media)}
                                     <p className="whitespace-pre-line line-clamp-1 !w-[106%]">{media.title}</p>
                                 </div>
                             ))}
