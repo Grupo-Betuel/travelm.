@@ -216,7 +216,7 @@ export const MediaList: React.FC<MediaListProps> = ({onSelect, multiple, mediaTy
                     className="w-full p-2 border rounded mb-4"
                 />
             </div>
-            <div className="h-[calc(100%-8rem)] overflow-y-auto">
+            <div className="overflow-y-auto h-[calc(100%-8rem)]">
                 <Tabs value={selectedType}>
                     <TabsHeader>
                         <Tab value={MediaTypeEnum.IMAGE} onClick={onSelectTab(MediaTypeEnum.IMAGE)}>
