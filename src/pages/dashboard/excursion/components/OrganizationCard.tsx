@@ -91,25 +91,6 @@ export const OrganizationCard: React.FC<OrganizationCardProps> = ({onEdit, organ
                             {network.type === 'twitter' && <FaTwitter className="text-blue-600 text-lg"/>}
                         </a>
                     ))}
-                    {/*Codigo sustituido por boton mas estetico conservando la funcionalidad*/}
-                    {/*{!!(organization.contact?.location?.link || organization.contact?.location?.link) &&*/}
-                    {/*    <div className="flex items-center gap-2">*/}
-                    {/*        <GrLocation color="red" className="w-16 h-16"/>*/}
-                    {/*        {*/}
-                    {/*            organization.contact?.location?.link ?*/}
-
-                    {/*                <Link target={"_blank"} to={organization.contact?.location?.link}*/}
-                    {/*                      className="font-light text-blue-500 whitespace-pre-line line-clamp-1">*/}
-                    {/*                    {organization.contact.location.address}*/}
-                    {/*                </Link>*/}
-                    {/*                : organization.contact?.location?.address &&*/}
-                    {/*                <span*/}
-                    {/*                    className="font-light whitespace-pre-line line-clamp-1">*/}
-                    {/*            {organization.contact.location.address}*/}
-                    {/*        </span>*/}
-                    {/*        }*/}
-                    {/*    </div>*/}
-                    {/*}*/}
 
                 </div>
             </CardBody>
