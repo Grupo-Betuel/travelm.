@@ -467,7 +467,7 @@ export function DataTable<T>(
                                 value={filters[option.key] || ''}
                                 onChange={(e) => handleFilterChange(option.key, [e.target.value])}
                                 icon={
-                                    (filters[option.key] || '') ? (
+                                    (filters[option.key]) ? (
                                         <BackspaceIcon className="h-5 w-5" onClick={() => handleClear(option.key)}/>
                                     ): null
                                 }
