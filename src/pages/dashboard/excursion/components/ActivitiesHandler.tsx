@@ -227,9 +227,9 @@ const ActivitiesHandler: React.FC<ActivitiesHandlerProps> = ({activities, update
                     </Card>
                 ))}
             </div>
-            <Dialog open={isDialogOpen} handler={setIsDialogOpen} className='h-[90vh] overflow-y-auto'>
+            <Dialog open={isDialogOpen} handler={setIsDialogOpen} className=' '>
                 <DialogHeader>Descripción Completa</DialogHeader>
-                <DialogBody divider>
+                <DialogBody divider className='h-[70vh] overflow-y-auto'>
                     <div dangerouslySetInnerHTML={{ __html: selectedDescription }} />
                 </DialogBody>
                 <DialogFooter>
