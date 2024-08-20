@@ -6,8 +6,8 @@ import imageCompression from 'browser-image-compression';
 // Function to compress the image
 const compressImage = async (file: File): Promise<File> => {
     const options = {
-        maxSizeMB: 0.400, // Maximum size in MB
-        maxWidthOrHeight: 800, // Maximum width or height in pixels
+        maxSizeMB: 1.000, // Maximum size in MB
+        maxWidthOrHeight: 1080, // Maximum width or height in pixels
         useWebWorker: true,
     };
     try {
