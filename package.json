@@ -15,6 +15,7 @@
     "@reduxjs/toolkit": "^2.2.4",
     "apexcharts": "3.44.0",
     "axios": "^1.6.8",
+    "browser-image-compression": "^2.0.2",
     "date-fns": "^3.6.0",
     "js-cookie": "^3.0.5",
     "jwt-decode": "^4.0.0",
