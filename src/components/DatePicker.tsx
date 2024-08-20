@@ -13,9 +13,10 @@ export interface ICustomDatePickerProps {
     onChange: (date?: Date) => any;
     date?: Date;
     label?: string;
+    disabled?: boolean;
 }
 
-export default function DatePicker({onChange, date, label}: ICustomDatePickerProps) {
+export default function DatePicker({onChange, date, label, disabled}: ICustomDatePickerProps) {
     return (
         <Popover placement="bottom">
             <PopoverHandler>
@@ -24,6 +25,7 @@ export default function DatePicker({onChange, date, label}: ICustomDatePickerPro
                     label={label}
                     onChange={() => null}
                     value={date ? format(date, "dd / MM / yyyy") : ""}
+                    disabled={disabled}
                 />
             </PopoverHandler>
             <PopoverContent className="z-[9999]">
