@@ -110,7 +110,7 @@ function SearchableSelect<T>({
                     setSearchTerm(''); // Clear search term on focus to show all options
                 }}
                 icon={
-                    (searchTerm && displayValue)   ? (
+                    (searchTerm || displayValue)   ? (
                         <BackspaceIcon className="h-5 w-5" onClick={handleClear}/>
                     ): null
                 }

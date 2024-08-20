@@ -28,7 +28,7 @@ import organizations from "@/pages/dashboard/organizations/organizations";
 
 const renderMediaPreview = (media: IMedia): JSX.Element => {
     const mediaType = media.type;
-    console.log(media)
+    // console.log(media)
     switch (mediaType) {
         case 'image':
             // @ts-ignore
@@ -601,7 +601,7 @@ const MediaHandler = ({onChange, medias, disableUpload, logoMedia, flyerMedia, h
                         Confirmación
                     </Typography>
                 </DialogHeader>
-                <DialogBody className="overflow-y-scroll max-h-[80dvh]">
+                <DialogBody className="max-h-[80dvh]">
                     <MediaList
                         mediaType={selectedMediaSelectorType === ExtraMediaTypesEnum.FLYER || selectedMediaSelectorType === ExtraMediaTypesEnum.LOGO ?
                             MediaTypeEnum.IMAGE

@@ -75,6 +75,7 @@ const ExcursionStepper: React.FC = () => {
 
     useEffect(() => {
         if (createdExcursion && createdExcursion._id) {
+            console.log('createdExcursion', createdExcursion);
             navigate('/dashboard/excursions/handler/' + createdExcursion._id, {replace: true});
             setExcursion(createdExcursion);
         }
@@ -309,32 +310,40 @@ const ExcursionStepper: React.FC = () => {
     }
 
     useEffect(() => {
+        console.log('excursion =>', excursion);
+        const isTitleValid = !!excursion.title;
+        const isDescriptionValid = !!excursion.description;
+        const isStartDateValid = !!excursion.startDate;
+        const isEndDateValid = !!excursion.endDate;
+        const areDestinationsValid = excursion.destinations && excursion.destinations.length > 0;
+        const isFlyerValid = !!excursion.flyer;
+        const isTransportValid = !!excursion.transport;
+        const isFinanceValid = !!excursion.finance;
+        console.log('Flyer Valid:', isFlyerValid);
+
         if (
-            // excursion.organizations && excursion.organizations.length > 0 &&
-            // excursion.activities && excursion.activities.length > 0 &&
-            // excursion.foods && excursion.foods.length > 0 &&
-            // excursion.projections && excursion.projections.length > 0 &&
-            excursion.title &&
-            excursion.description &&
-            excursion.startDate &&
-            excursion.endDate &&
-            excursion.destinations &&
-            excursion.destinations.length > 0 &&
-            excursion.flyer &&
-            excursion.transport &&
-            excursion.finance
+            isTitleValid &&
+            isDescriptionValid &&
+            isStartDateValid &&
+            isEndDateValid &&
+            areDestinationsValid &&
+            isFlyerValid &&
+            isTransportValid &&
+            isFinanceValid
         ) {
+            console.log('completed');
             if (excursion.status !== 'completed') {
                 setExcursion({...excursion, status: ExcursionStatusEnum.COMPLETED});
             }
         } else {
-            console.log('draft')
+            console.log('draft');
             if (excursion.status !== 'draft') {
                 setExcursion({...excursion, status: ExcursionStatusEnum.DRAFT});
             }
         }
 
     }, [excursion]);
+
 
     useEffect(() => {
         console.log('excursionData =>', excursionData)
