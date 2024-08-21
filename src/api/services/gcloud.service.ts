@@ -1,19 +1,43 @@
 import axios from "axios";
 import axiosInstance from "../axios.service";
 
-export const uploadGCloudImage = async (file: any, selectedTag: string = 'media', type: string = 'image/png') => {
-    const filename = encodeURIComponent(file.name);
-    const res = await axiosInstance.get(`/gcloud/upload-url/${filename}/${selectedTag}/${type.replace('/', '^')}`);
-    const {url, fields} = await res.data;
-    // @ts-ignore
-    const formData = new FormData();
+import imageCompression from 'browser-image-compression';
 
-    Object.entries({...fields, file}).forEach(([key, value]: any) => {
-        formData.append(key, value);
-    });
-
-    return await axios.post(url, formData);
+// Function to compress the image
+const compressImage = async (file: File): Promise<File> => {
+    const options = {
+        maxSizeMB: 1.000, // Maximum size in MB
+        maxWidthOrHeight: 1080, // Maximum width or height in pixels
+        useWebWorker: true,
+    };
+    try {
+        return await imageCompression(file, options);
+    } catch (error) {
+        console.error("Error compressing the image:", error);
+        return file;
+    }
 };
+
+export const uploadGCloudImage = async (file: File, selectedTag: string = 'media', type: string = 'image/png') => {
+    try {
+        const compressedFile = await compressImage(file);
+        console.log('file', file)
+        const filename = encodeURIComponent(compressedFile.name);
+        const res = await axiosInstance.get(`/gcloud/upload-url/${filename}/${selectedTag}/${type.replace('/', '^')}`);
+        const { url, fields } = res.data;
+        const formData = new FormData();
+
+        Object.entries({ ...fields, file: compressedFile }).forEach(([key, value]: any) => {
+            formData.append(key, value);
+        });
+
+        return await axios.post(url, formData);
+    } catch (error) {
+        console.error("Error uploading the image:", error);
+        throw error;
+    }
+};
+
 
 export const gcloudPublicURL = "https://storage.googleapis.com/betuel-tech-photos/"
 export const gcloudAuthenticatedURL = "https://storage.cloud.google.com/betuel-tech-photos/"
