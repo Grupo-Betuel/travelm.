@@ -358,8 +358,8 @@ export function DataTable<T>(
 
     const renderPagination = () => {
         const pageNumbers = [];
-        const startPage = Math.max(1, currentPage - 3);
-        const endPage = Math.min(totalPages, currentPage + 3);
+        const startPage = Math.max(1, currentPage - 1);
+        const endPage = Math.min(totalPages, currentPage + 2);
 
         for (let i = startPage; i <= endPage; i++) {
             pageNumbers.push(i);
@@ -395,7 +395,7 @@ export function DataTable<T>(
                         size="sm"
                         color={currentPage === page ? "blue" : "gray"}
                         variant="outlined"
-                        className="rounded-full"
+                        className="rounded-full w-10 flex items-center justify-center"
                         ripple
                         onClick={() => handlePageChange(page)}
                     >
