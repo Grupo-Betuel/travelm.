@@ -14,7 +14,7 @@ import {
     Typography
 } from "@material-tailwind/react";
 import {ArrowDownIcon, ChevronDownIcon, PencilIcon, TrashIcon, UserIcon} from "@heroicons/react/20/solid";
-import ClientForm from "./ClientForm";
+import ClientForm, {emptyClient} from "./ClientForm";
 import PaymentHandler from "./PaymentsHandler";
 import {BiDollar, BiPlus, BiSearch, BiSync} from "react-icons/bi";
 import {ClientsSearch} from "./ClientsSearch";
@@ -93,8 +93,8 @@ export const ClientsExcursionTable = (
     const [deletePayment] = paymentService.useDeletePayments();
     const [updateService] = serviceService.useUpdateServices();
     const toggleHandleClient = () => {
+        setClientToEdit(emptyClient);
         setIsNewClientOpen(!isNewClientOpen);
-        setClientToEdit(undefined);
     };
 
     const toggleAssignGroupModal = () => {
