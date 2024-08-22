@@ -22,6 +22,8 @@ import {IMedia} from "../models/mediaModel";
 import {IClient} from "../models/clientModel";
 import IUser from "../models/interfaces/userModel";
 import {ITransportResource} from "../models/transportResourcesModel";
+import {IExpense} from "@/models/interfaces/ExpensesModel";
+import {ISocialNetwork} from "@/models/ISocialNetwork";
 
 export const EntityApiStores: EntityStores = {
     contacts: createEntityApiSlice<IContact & BaseModel>('contacts'),
@@ -39,10 +41,12 @@ export const EntityApiStores: EntityStores = {
     activities: createEntityApiSlice<IActivity & BaseModel>('activities'),
     services: createEntityApiSlice<IService & BaseModel>('services'),
     payments: createEntityApiSlice<IPayment & BaseModel>('payments'),
+    travelExpenses: createEntityApiSlice<IExpense>('travelExpenses'),
     medias: createEntityApiSlice<IMedia & BaseModel>('medias'),
-    travelClients: createEntityApiSlice<IClient & BaseModel>('travelClients'),
+    travelClients: createEntityApiSlice<IClient>('travelClients'),
     travelUsers: createEntityApiSlice<IUser & BaseModel>('travelUsers'),
     transportResources: createEntityApiSlice<ITransportResource & BaseModel>('transportResources'),
+    socialNetworks: createEntityApiSlice<ISocialNetwork & BaseModel>('socialNetworks'),
 }
 
 const storeReducer: any = {};

@@ -1,5 +1,5 @@
-import React, {useMemo} from "react";
-import {Typography, Card, CardBody, CardHeader} from "@material-tailwind/react";
+import React, {useMemo, useState} from "react";
+import {Typography, Card, CardBody, CardHeader, Button} from "@material-tailwind/react";
 import {IFinance} from "../../../../models/financeModel";
 import {IClient} from "../../../../models/clientModel";
 import {IProjection} from "../../../../models/projectionModel";
@@ -22,24 +22,31 @@ import {FaMountain, FaPlaceOfWorship} from "react-icons/fa";
 import {FaMountainCity, FaMountainSun} from "react-icons/fa6";
 import {GiMountainCave, GiMountainClimbing, GiTravelDress, GiTripwire} from "react-icons/gi";
 import {RiTravestiLine} from "react-icons/ri";
+import {IExpense} from "@/models/interfaces/ExpensesModel";
+import {ExpenseDialog} from "@/pages/dashboard/excursion/components/ExpensesDialog";
 
 interface IFinanceDetailsProps {
     finance: IFinance;
+    expenses?: IExpense[];
     clients: IClient[];
     projections: IProjection[];
     excursionId: string;
     destinations: IOrganization[];
     transport: ITransport;
+    dialog?: () => void;
 }
 
 export const FinanceDetails = ({
                                    finance,
                                    clients,
+                                   expenses = [],
                                    projections,
                                    excursionId,
                                    destinations,
+                                   dialog,
                                    transport
                                }: IFinanceDetailsProps) => {
+
     // Calculate profit
     const profit = useMemo(() => finance.price - (finance?.cost || 0), [finance]);
 
@@ -81,7 +88,6 @@ export const FinanceDetails = ({
     const gainingAmount = useMemo(() => (totalReceived - totalTransportCost) - totalDestinationsPerClient, [totalReceived, totalTransportCost, totalDestinationsPerClient]);
 
 
-
     // Count clients by service stage related to the excursionId
     const clientCounts = useMemo(() => {
         return clients.reduce((counts, client) => {
@@ -105,12 +111,11 @@ export const FinanceDetails = ({
     }, [transport]);
 
 
-
     // Calculate the expected gaining amount
     const expectedGainingAmount = useMemo(() => (profit * clients.length) - investedInFreeClients, [profit, clients]);
 
     // totoalGainingAmountWithoutExpenses
-    const totalGainingAmountWithoutExpenses = useMemo(() => gainingAmount - investedInFreeClients,[gainingAmount, investedInFreeClients])
+    const totalGainingAmountWithoutExpenses = useMemo(() => gainingAmount - investedInFreeClients, [gainingAmount, investedInFreeClients])
     return (
         <Card className="mt-10">
             <CardHeader color="blue" className="p-4">
@@ -162,7 +167,8 @@ export const FinanceDetails = ({
                             <Typography className="font-normal text-blue-gray-600">
                                 <Typography><b>Total estimado a pagar:</b> RD$ {totalDestinationsToPay.toLocaleString()}
                                 </Typography>
-                                <Typography><b>Total actual por clientes pagos y reservados:</b> RD$ {totalDestinationsPerClient.toLocaleString()}</Typography>
+                                <Typography><b>Total actual por clientes pagos y
+                                    reservados:</b> RD$ {totalDestinationsPerClient.toLocaleString()}</Typography>
                             </Typography>
                         }
                     />
@@ -177,11 +183,14 @@ export const FinanceDetails = ({
                         icon={<BiDollar className="w-6 h-6 text-white"/>}
                         footer={
                             <Typography className="font-normal text-blue-gray-600">
-                                <Typography><b>Gastos en clientes gratis:</b> RD$ {investedInFreeClients.toLocaleString()}</Typography>
-                                <Typography><b>Ganancia Esperada:</b> RD$ {expectedGainingAmount.toLocaleString()}</Typography>
+                                <Typography><b>Gastos en clientes
+                                    gratis:</b> RD$ {investedInFreeClients.toLocaleString()}</Typography>
+                                <Typography><b>Ganancia Esperada:</b> RD$ {expectedGainingAmount.toLocaleString()}
+                                </Typography>
                                 <Typography><b>Ganancia actual:</b> RD$ {gainingAmount.toLocaleString()}</Typography>
                                 <Typography><b>Pagos Extra:</b> RD$ {extraPayments.toLocaleString()}</Typography>
-                                <Typography><b>Ganancia total:</b> RD$ {totalGainingAmountWithoutExpenses.toLocaleString()}</Typography>
+                                <Typography><b>Ganancia
+                                    total:</b> RD$ {totalGainingAmountWithoutExpenses.toLocaleString()}</Typography>
                                 <Typography><b>Total Recibido:</b> RD$ {totalReceived.toLocaleString()}</Typography>
                             </Typography>
                         }
@@ -203,6 +212,19 @@ export const FinanceDetails = ({
                                 <Typography><b>Gratis:</b> {clientCounts['free'] || 0}</Typography>
                                 <Typography><b>Cancelados:</b> {clientCounts['canceled'] || 0}</Typography>
                             </Typography>
+                        }
+                    />
+                    <StatisticsCard
+                        title="Gastos"
+                        value={<div className="font-bold">{clients.length}</div>}
+                        icon={<BanknotesIcon className="w-6 h-6 text-white"/>}
+                        footer={
+                            <>
+                                <Typography className="font-normal text-blue-gray-600">
+                                    <Typography><b>Gastos Pendientes:</b> </Typography>
+                                </Typography>
+                                <Button className="btn btn-primary" onClick={dialog}>Gastos</Button>
+                            </>
                         }
                     />
                 </div>

@@ -8,10 +8,12 @@ export interface IFinanceProps {
     updateFinance: (finance: IFinance) => void;
     type?: FinanceTypes;
     enabledCost?: boolean;
+    options?: boolean;
 }
 
 export const FinanceHandler = ({
                                    finance,
+                                   options,
                                    updateFinance,
                                    type: financeType,
                                    enabledCost,
@@ -57,30 +59,32 @@ export const FinanceHandler = ({
                     onChange={handleOnChangeFinance}
                     containerProps={{className: "max-w-1/2 min-w-[50%]"}}
                 />
-                <Menu>
-                    <MenuHandler>
-                        <Button color="blue" className="flex items-center z-40 p-2">
-                            <PlusCircleIcon className="h-5 w-6"/>
-                        </Button>
-                    </MenuHandler>
-                    <MenuList className="p-2 z-[99999]">
-                        {!enableCost && (
-                            <MenuItem onClick={toggleCost}>
-                                Agregar Costos
-                            </MenuItem>
-                        )}
-                        {!enableRates && (
-                            <MenuItem onClick={toggleRates}>
-                                Precio en Pareja
-                            </MenuItem>
-                        )}
-                        {!enableChildren && (
-                            <MenuItem onClick={toggleChildren}>
-                                Precio para Niños
-                            </MenuItem>
-                        )}
-                    </MenuList>
-                </Menu>
+                {options && (
+                    <Menu>
+                        <MenuHandler>
+                            <Button color="blue" className="flex items-center z-40 p-2">
+                                <PlusCircleIcon className="h-5 w-6"/>
+                            </Button>
+                        </MenuHandler>
+                        <MenuList className="p-2 z-[99999]">
+                            {!enableCost && (
+                                <MenuItem onClick={toggleCost}>
+                                    Agregar Costos
+                                </MenuItem>
+                            )}
+                            {!enableRates && (
+                                <MenuItem onClick={toggleRates}>
+                                    Precio en Pareja
+                                </MenuItem>
+                            )}
+                            {!enableChildren && (
+                                <MenuItem onClick={toggleChildren}>
+                                    Precio para Niños
+                                </MenuItem>
+                            )}
+                        </MenuList>
+                    </Menu>
+                )}
             </div>
 
             {enableCost && (

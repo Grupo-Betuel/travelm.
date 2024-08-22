@@ -237,7 +237,7 @@ const TransportResourceHandler: React.FC<TransportResourceHandlerProps> = ({
 
             </div>
             <Typography variant="h6">Finanzas: </Typography>
-            <FinanceHandler finance={newTransportResource.finance} type="transport"
+            <FinanceHandler enabledCost={true} finance={newTransportResource.finance} type="transport"
                             updateFinance={handleFinanceChange}/>
             <Button color="blue"
                     onClick={addOrEditTransportResource}>{editingIndex !== null ? `${BASIC_CONSTANTS.SAVE_TEXT}` : 'Add Transport Resource'}</Button>

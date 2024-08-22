@@ -22,6 +22,7 @@ import {IClient} from "./clientModel";
 import IUser from "./interfaces/userModel";
 import {ITransportResource} from "./transportResourcesModel";
 import {ISocialNetwork} from "@/models/ISocialNetwork";
+import {IExpense} from "@/models/interfaces/ExpensesModel";
 
 export type EntityModels = {
     finances: IFinance,
@@ -40,6 +41,7 @@ export type EntityModels = {
     contacts: IContact,
     services: IService,
     payments: IPayment,
+    travelExpenses: IExpense,
     medias: IMedia,
     travelClients: IClient,
     travelUsers: IUser,
