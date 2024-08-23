@@ -22,12 +22,16 @@ import {BiDollar, BiEdit, BiTrash} from "react-icons/bi";
 import {useConfirmAction} from "@/hooks/useConfirmActionHook";
 import {CommonConfirmActions, CommonConfirmActionsDataTypes} from "@/models/common";
 import {getCrudService} from "@/api/services/CRUD.service";
+import {IExcursion} from "@/models/excursionModel";
+import {IUpdateClientExtra} from "@/pages/dashboard/excursion/components/ClientsExcursionTable";
 
 interface ExpenseDialogProps {
     isOpen: boolean;
     handleClose: () => void;
     expenses: IExpense[];
     addExpense: (expense: IExpense) => void;
+    excursion?: IExcursion;
+    onUpdateExcursion: (excursion: Partial<IExcursion>, extra?: IUpdateClientExtra) => void;
 }
 
 const DefaultExpense: IExpense = {
@@ -48,6 +52,8 @@ export const ExpenseDialog: React.FC<ExpenseDialogProps> = ({
                                                                 handleClose,
                                                                 expenses,
                                                                 addExpense,
+                                                                excursion,
+                                                                onUpdateExcursion,
                                                             }) => {
     const [newExpense, setNewExpense] = useState<IExpense>(DefaultExpense);
     const [isEditing, setIsEditing] = useState(false);
@@ -96,6 +102,7 @@ export const ExpenseDialog: React.FC<ExpenseDialogProps> = ({
         const filteredExpenses = expenses.filter((E) => E._id !== expense._id);
         setSelectedExpense(null);
         expense._id && deleteExpense(expense._id);
+        onUpdateExcursion({expenses: filteredExpenses}, {isOptimistic: true, avoidConfirm: true });
     };
 
     const onConfirmAction = (type?: CommonConfirmActions, data?: IExpense) => {

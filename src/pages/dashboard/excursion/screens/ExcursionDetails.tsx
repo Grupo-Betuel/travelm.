@@ -304,6 +304,8 @@ export const ExcursionDetails: React.FC = () => {
             />
             <ExpenseDialog
                 isOpen={isExpenseDialogOpen}
+                excursion={excursion}
+                onUpdateExcursion={onUpdateExcursion}
                 handleClose={toggleExpenseDialog}
                 expenses={excursion.expenses || []}
                 addExpense={addExpense}
