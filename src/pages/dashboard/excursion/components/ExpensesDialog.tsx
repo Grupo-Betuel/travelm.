@@ -86,6 +86,7 @@ export const ExpenseDialog: React.FC<ExpenseDialogProps> = ({
     const handleCancelEdit = () => {
         setNewExpense(DefaultExpense);
         setIsEditing(false);
+        handleClose();
     };
 
     const onUpdateFinances = (financeUpdate: Partial<IFinance>) => {
@@ -116,6 +117,8 @@ export const ExpenseDialog: React.FC<ExpenseDialogProps> = ({
         resetActionToConfirm,
         ConfirmDialog
     } = useConfirmAction<CommonConfirmActions, CommonConfirmActionsDataTypes<IExpense>>(onConfirmAction);
+
+    const newExpenseHasContent = newExpense.title.trim() !== '' || newExpense.description.trim() !== '' || newExpense.finance.price > 0;
 
     return (
         <>
@@ -215,7 +218,7 @@ export const ExpenseDialog: React.FC<ExpenseDialogProps> = ({
                 </DialogBody>
                 <DialogFooter>
                     <div className="flex gap-2">
-                        {isEditing && (
+                        {(isEditing || newExpenseHasContent)  && (
                             <Button variant="text" color="red" onClick={handleCancelEdit}>
                                 Cancelar
                             </Button>
