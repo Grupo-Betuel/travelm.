@@ -4,6 +4,7 @@ import {ExcursionDetailActions, ExcursionDetailActionsDataTypes, IExcursion} fro
 import {IBedroom} from "./bedroomModel";
 import {BaseModel} from "./interfaces/BaseModel";
 import {IOption} from "../components/SearchableSelect";
+import {IComments} from "@/models/commentModel";
 
 export type ServiceStatusTypes = 'paid' | 'reserved' | 'interested' | 'canceled' | 'free';
 export type ServiceTypes = 'excursion' | 'flight' | 'resort' | 'hotel';
@@ -19,6 +20,8 @@ export interface IService extends BaseModel {
     finance: IFinance;
     serviceId?: string;
     excursionId?: string;
+    comments?: IComments[];
+    seats: number;
 }
 
 export const serviceStatusLabels: { [N in ServiceStatusTypes]: string } = {

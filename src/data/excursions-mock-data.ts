@@ -7,7 +7,7 @@ import {IContact} from "../models/contactModel";
 import {ILocation} from "../models/ordersModels";
 import {IActivity} from "../models/activitiesModel";
 import {IReview} from "../models/reviewsModel";
-import {IComment} from "../models/commentModel";
+import {IComments} from "../models/commentModel";
 import {ISocialNetwork} from "../models/ISocialNetwork";
 import {IOrganization} from "../models/organizationModel";
 import {IBus} from "../models/busesModel";
@@ -185,7 +185,7 @@ export const mockMediaAudio: IMedia = {
     title: 'Anuncio'
 };
 
-export const mockComment: IComment = {
+export const mockComment: IComments = {
     text: 'Great experience!',
     medias: [mockMedia]
 };

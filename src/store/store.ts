@@ -12,7 +12,7 @@ import {IProjection} from "../models/projectionModel";
 import {IFood} from "../models/foodModel";
 import {IBedroom} from "../models/bedroomModel";
 import {IExcursion} from "../models/excursionModel";
-import {IComment} from "../models/commentModel";
+import {IComments} from "../models/commentModel";
 import {ICheckpoint} from "../models/checkpointModel";
 import {IBus} from "../models/busesModel";
 import {IActivity} from "../models/activitiesModel";
@@ -35,7 +35,7 @@ export const EntityApiStores: EntityStores = {
     foods: createEntityApiSlice<IFood & BaseModel>('foods'),
     bedrooms: createEntityApiSlice<IBedroom & BaseModel>('bedrooms'),
     excursions: createEntityApiSlice<IExcursion & BaseModel>('excursions'),
-    comments: createEntityApiSlice<IComment & BaseModel>('comments'),
+    comments: createEntityApiSlice<IComments & BaseModel>('comments'),
     checkpoints: createEntityApiSlice<ICheckpoint & BaseModel>('checkpoints'),
     buses: createEntityApiSlice<IBus & BaseModel>('buses'),
     activities: createEntityApiSlice<IActivity & BaseModel>('activities'),

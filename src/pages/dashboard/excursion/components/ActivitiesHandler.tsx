@@ -211,7 +211,7 @@ const ActivitiesHandler: React.FC<ActivitiesHandlerProps> = ({activities, update
                                 <Button
                                     variant="outlined"
                                     color="red"
-                                    onClick={() => handleSetActionToConfirm('delete', 'Eliminar Habitacion')(activity)}
+                                    onClick={() => handleSetActionToConfirm('delete', 'Eliminar Actividad')(activity)}
                                 >
                                     Delete
                                 </Button>

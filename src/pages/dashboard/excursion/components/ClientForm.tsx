@@ -64,6 +64,7 @@ const ClientForm: React.FC<ClientFormProps> = (
     useEffect(() => {
         if (initialClient) {
             setClient(initialClient);
+            setService(initialClient.services?.[0]);
         }
     }, [initialClient]);
 
@@ -78,6 +79,7 @@ const ClientForm: React.FC<ClientFormProps> = (
             }
 
             const relatedService = foundClient.services.find(s => s.excursionId === service?.excursionId);
+            console.log('relatedService', relatedService);
             if (relatedService) {
                 setService(relatedService);
             }

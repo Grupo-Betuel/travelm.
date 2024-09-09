@@ -1,6 +1,11 @@
 import {IMedia} from "./mediaModel";
+import IUser from "@/models/interfaces/userModel";
 
-export interface IComment {
+export interface IComments {
     text: string;
-    medias: IMedia[];
+    medias?: IMedia[];
+    createDate: Date;
+    author?: IUser;
+
 }
+

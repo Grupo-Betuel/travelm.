@@ -112,7 +112,11 @@ export const FinanceDetails = ({
             clients.reduce((counts, client) => {
                 const service = client.services.find((service) => service.excursionId === excursionId);
                 if (service) {
-                    counts[service.status] = (counts[service.status] || 0) + 1;
+                    const seats = service.seats || 0; // Fallback to 0 if seats is undefined or falsy
+                    console.log("Service found:", seats); // Debugging line
+                    counts[service.status] = (counts[service.status] || 0) + seats;
+                } else {
+                    console.log("No service found for client:", client); // Debugging line
                 }
                 return counts;
             }, {} as Record<string, number>),
@@ -137,10 +141,17 @@ export const FinanceDetails = ({
 
     console.log('expenses',expenses)
 
+    const totalSeats = useMemo(() => {
+        return clients.reduce((total, client) => {
+            const service = client.services.find((service) => service.excursionId === excursionId);
+            return total + (service?.seats || 0);
+        }, 0);
+    }, [clients, excursionId]);
+
     // Calculate the expected gaining amount
     const expectedGainingAmount = useMemo(
-        () => profit * clients.length - investedInFreeClients,
-        [profit, clients, investedInFreeClients]
+        () => profit * totalSeats - investedInFreeClients,
+        [profit, totalSeats, investedInFreeClients]
     );
     // totoal GainingAmountWithoutExpenses
     const totalGainingAmountWithoutExpenses = useMemo(
