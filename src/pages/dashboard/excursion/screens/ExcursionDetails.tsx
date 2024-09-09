@@ -30,7 +30,7 @@ import {IoReload} from "react-icons/io5";
 import {FaWhatsapp} from "react-icons/fa";
 import {useAppLoading} from "@/context/appLoadingContext";
 import ExcursionDetailsSkeleton from "../../../../components/ExcursionDetailsSkeleton";
-import {IExpense} from "@/models/interfaces/ExpensesModel";
+import {IExpense} from "@/models/ExpensesModel";
 import {ExpenseDialog} from "@/pages/dashboard/excursion/components/ExpensesDialog";
 
 const excursionService = getCrudService('excursions');

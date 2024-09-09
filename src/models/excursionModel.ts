@@ -10,7 +10,7 @@ import {IFood} from "./foodModel";
 import {IProjection} from "./projectionModel";
 import {BaseModel} from "./interfaces/BaseModel";
 import {IBedroom} from "./bedroomModel";
-import {IExpense} from "@/models/interfaces/ExpensesModel";
+import {IExpense} from "@/models/ExpensesModel";
 
 export type ExcursionDetailActions = 'remove-client' | 'add-client' | 'update-client' | 'update';
 export type ExcursionDetailActionsDataTypes = IClient | Partial<IExcursion> | Partial<IClient>[];

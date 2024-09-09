@@ -14,7 +14,7 @@ import {
     Card,
 } from "@material-tailwind/react";
 
-import {IExpense} from "@/models/interfaces/ExpensesModel";
+import {IExpense} from "@/models/ExpensesModel";
 import {FinanceHandler} from "@/pages/dashboard/excursion/components/FinanceHandler";
 import {FinanceTypes, IFinance} from "@/models/financeModel";
 

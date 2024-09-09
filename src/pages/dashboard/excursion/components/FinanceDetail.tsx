@@ -14,7 +14,7 @@ import {
 } from "react-icons/md";
 import {UserGroupIcon} from "@heroicons/react/20/solid";
 import {TbBus} from "react-icons/tb";
-import {IExpense} from "@/models/interfaces/ExpensesModel";
+import {IExpense} from "@/models/ExpensesModel";
 
 
 interface IFinanceDetailsProps {

@@ -22,7 +22,7 @@ import {IMedia} from "../models/mediaModel";
 import {IClient} from "../models/clientModel";
 import IUser from "../models/interfaces/userModel";
 import {ITransportResource} from "../models/transportResourcesModel";
-import {IExpense} from "@/models/interfaces/ExpensesModel";
+import {IExpense} from "@/models/ExpensesModel";
 import {ISocialNetwork} from "@/models/ISocialNetwork";
 
 export const EntityApiStores: EntityStores = {
