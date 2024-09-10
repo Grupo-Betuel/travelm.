@@ -1,11 +1,11 @@
 import React, {ReactNode, useEffect, useMemo, useState} from 'react';
 import {Input, Button, Dialog, DialogHeader, DialogBody, DialogFooter, Typography} from "@material-tailwind/react";
-import {IClient} from "../../../../models/clientModel";
+import {IClient} from "@/models/clientModel";
 import InputMask from "react-input-mask";
 import ServiceHandler from "./ServiceHandler";
-import {IService} from "../../../../models/serviceModel";
-import {getCrudService} from "../../../../api/services/CRUD.service";
-import {ICustomComponentDialog} from "../../../../models/common";
+import {IService} from "@/models/serviceModel";
+import {getCrudService} from "@/api/services/CRUD.service";
+import {ICustomComponentDialog} from "@/models/common";
 
 interface ClientFormProps {
     initialClient?: IClient;
@@ -60,11 +60,10 @@ const ClientForm: React.FC<ClientFormProps> = (
     const onUpdateSingleService = (s: IService) => {
         setClient({...client, services: [s]});
     }
-
     useEffect(() => {
         if (initialClient) {
             setClient(initialClient);
-            setService(initialClient.services?.[0]);
+            setService(initialClient.currentService); // Use currentService to avoid mixing data
         }
     }, [initialClient]);
 
@@ -97,7 +96,7 @@ const ClientForm: React.FC<ClientFormProps> = (
     const mergeClientServices = (clientData: IClient = client): IService[] => {
         if (!service) return clientData.services || [];
         const exist = clientData.services?.find(s => s.excursionId === service?.excursionId);
-        return clientData.services && exist ? clientData.services : clientData.services ? [...clientData.services, service] : [service];
+        return clientData.services && exist ? clientData.services : [...(clientData.services || []), service];
     };
 
     useEffect(() => {
@@ -141,6 +140,7 @@ const ClientForm: React.FC<ClientFormProps> = (
             </InputMask>
             <div className="flex gap-3 items-center">
                 <Input
+                    crossOrigin={"true"}
                     label="Nombre"
                     name="firstName"
                     value={client.firstName}
@@ -148,6 +148,7 @@ const ClientForm: React.FC<ClientFormProps> = (
 
                 />
                 <Input
+                    crossOrigin={"true"}
                     label="Apellido"
                     name="lastName"
                     value={client.lastName}
@@ -173,10 +174,6 @@ const ClientForm: React.FC<ClientFormProps> = (
     const dialogHandler = () => {
         dialog?.handler && dialog.handler();
         setClient(emptyClient);
-        // setService({
-        //     ...(serviceData || {}),
-        //     payments: [],
-        // } as IService);
     }
 
     return (
