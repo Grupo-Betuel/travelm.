@@ -1,6 +1,6 @@
 import {Button, Input, Menu, MenuHandler, MenuList, MenuItem, Select, Option} from "@material-tailwind/react";
 import React, {useEffect} from "react";
-import {financeTypes, FinanceTypes, IFinance} from "@/models/financeModel";
+import {FinanceOptionEnum, financeTypes, FinanceTypes, IFinance} from "@/models/financeModel";
 import {PlusCircleIcon, TrashIcon} from "@heroicons/react/20/solid";
 
 export interface IFinanceProps {
@@ -8,7 +8,7 @@ export interface IFinanceProps {
     updateFinance: (finance: IFinance) => void;
     type?: FinanceTypes;
     enabledCost?: boolean;
-    options?: boolean;
+    options?: FinanceOptionEnum[];
 }
 
 export const FinanceHandler = ({
@@ -38,8 +38,12 @@ export const FinanceHandler = ({
     };
 
     useEffect(() => {
-        setEnableCost(!!enabledCost);
-    }, [enabledCost]);
+        if (!options) return
+
+        setEnableCost(options.includes(FinanceOptionEnum.COST));
+        setEnableRates(options.includes(FinanceOptionEnum.COUPLE));
+        setEnableChildren(options.includes(FinanceOptionEnum.CHILDREN));
+    }, [options]);
 
     useEffect(() => {
         if (financeType) {

@@ -90,9 +90,12 @@ export const FinanceDetails = ({
     );
 
     //calculate total expenses extra
-    const totalExpenses = expenses?.length ?? 0;
-    const totalAmount = expenses?.reduce((acc, expense) => acc + (expense.finance?.price ?? 0), 0);
+    const totalExpenses = useMemo(() => expenses?.length ?? 0, [expenses]);
 
+    const totalAmount = useMemo(
+        () => expenses?.reduce((acc, expense) => acc + (expense.finance?.price ?? 0), 0),
+        [expenses]
+    );
     // Calculate total to pay for destinations
     const destinationsPrice = useMemo(
         () => destinations.reduce((total, destination) => total + (destination.entryFee?.price || 0), 0),
