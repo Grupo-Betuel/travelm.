@@ -65,7 +65,6 @@ export const OrganizationForm: React.FC<OrganizationHandlerProps> = (
         onUpdate,
         organizationData
     }) => {
-    console.log('organizationData', organizationData)
     const [organization, setOrganization] = useState<IOrganization>(emptyOrganization);
     const {data: organizationUserData} = userService.useFetchAllTravelUsers({organization: organization?._id}, {skip: !organization?._id});
     const [isOrganizationUserDialogOpen, setIsOrganizationUserDialogOpen] = useState(false);

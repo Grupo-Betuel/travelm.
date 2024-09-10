@@ -119,7 +119,6 @@ const ServiceHandler: React.FC<ServiceFormProps> = ({services, onUpdateSingleSer
         return response;
     }, [newService?.payments]);
 
-    console.log('service prueba', services)
     return (
         <div className="flex flex-col gap-4">
             <div className="flex flex-col gap-4 rounded-md">

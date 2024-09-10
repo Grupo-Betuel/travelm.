@@ -116,7 +116,6 @@ export const FinanceDetails = ({
                 const service = client.services.find((service) => service.excursionId === excursionId);
                 if (service) {
                     const seats = service.seats || 0; // Fallback to 0 if seats is undefined or falsy
-                    console.log("Service found:", seats); // Debugging line
                     counts[service.status] = (counts[service.status] || 0) + seats;
                 } else {
                     console.log("No service found for client:", client); // Debugging line
@@ -141,8 +140,6 @@ export const FinanceDetails = ({
         );
         return Math.ceil(totalAmount / totalCapacity);
     }, [transport]);
-
-    console.log('expenses',expenses)
 
     const totalSeats = useMemo(() => {
         return clients.reduce((total, client) => {

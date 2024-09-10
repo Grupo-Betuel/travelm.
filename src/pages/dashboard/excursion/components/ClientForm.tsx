@@ -77,11 +77,6 @@ const ClientForm: React.FC<ClientFormProps> = (
                 setClient({ ...foundClient, services: newServices });
             }
 
-            const relatedService = foundClient.services.find(s => s.excursionId === service?.excursionId);
-            console.log('relatedService', relatedService);
-            if (relatedService) {
-                setService(relatedService);
-            }
         } else if (client.phone.length === 11) {
             setClient({ ...emptyClient, phone: client.phone });
         }

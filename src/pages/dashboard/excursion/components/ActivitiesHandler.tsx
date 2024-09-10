@@ -131,7 +131,6 @@ const ActivitiesHandler: React.FC<ActivitiesHandlerProps> = ({activities, update
     }
 
     // (date: Date) => setActivityForm({ ...activityForm, date })
-    console.log('activities', activities.map ((a) => a.date));
     return (
         <div className="flex flex-col gap-5 pb-10">
             <div className="border-2 rounded-lg p-4">

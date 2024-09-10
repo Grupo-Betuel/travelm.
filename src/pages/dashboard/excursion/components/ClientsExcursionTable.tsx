@@ -211,7 +211,6 @@ export const ClientsExcursionTable = (
 
 
     const handleDeletePayment = (payment: IPayment) => {
-        console.log('delete payment', payment, selectedClient)
         if (selectedClient) {
             payment._id && deletePayment(payment._id);
 
@@ -357,7 +356,6 @@ export const ClientsExcursionTable = (
 
 
     const onSelectClient = (sclients: IClient[]) => {
-        console.log('selected clients', sclients);
         setSelectedClients(sclients);
     }
 
@@ -481,10 +479,6 @@ export const ClientsExcursionTable = (
         };
 
         const handleDialogOpen = () => setIsDialogOpen(!isDialogOpen);
-
-        console.log('serviceC', serviceC);
-        console.log('client', client);
-        console.log('comments', serviceC?.comments);
 
         return (
             <tr key={`${client._id}-${index}`}>
