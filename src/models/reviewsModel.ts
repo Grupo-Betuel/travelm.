@@ -1,8 +1,8 @@
 import {IClient} from "./clientModel";
-import {IComments} from "./commentModel";
+import {IComment} from "./commentModel";
 
 export interface IReview {
     client: IClient;
-    comments: IComments;
+    comments: IComment;
     stars: number;
 }

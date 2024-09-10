@@ -15,7 +15,7 @@ import {
 } from "@material-tailwind/react";
 import MediaHandler, { IMediaHandled } from "@/pages/dashboard/excursion/components/MediaHandler";
 import { IMedia } from "@/models/mediaModel";
-import { IComments } from "@/models/commentModel";
+import { IComment } from "@/models/commentModel";
 import { PencilIcon, TrashIcon } from "@heroicons/react/20/solid";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination } from "swiper/modules";
@@ -25,8 +25,8 @@ import DatePicker from "@/components/DatePicker";
 interface CommentDialogProps {
     open: boolean;
     onClose: () => void;
-    initialComments?: IComments[];
-    updateComments: (comments: IComments[]) => void;
+    initialComments?: IComment[];
+    updateComments: (comments: IComment[]) => void;
 }
 
 export const CommentDialog: React.FC<CommentDialogProps> = ({
@@ -35,8 +35,8 @@ export const CommentDialog: React.FC<CommentDialogProps> = ({
                                                                 initialComments = [],
                                                                 updateComments,
                                                             }) => {
-    const [comments, setComments] = useState<IComments[]>(initialComments);
-    const [currentComment, setCurrentComment] = useState<IComments | null>(null);
+    const [comments, setComments] = useState<IComment[]>(initialComments);
+    const [currentComment, setCurrentComment] = useState<IComment | null>(null);
     const [newCommentText, setNewCommentText] = useState<string>("");
     const [medias, setMedias] = useState<IMedia[]>([]);
 
@@ -59,7 +59,7 @@ export const CommentDialog: React.FC<CommentDialogProps> = ({
             setComments(updatedComments);
         } else {
             // Add new comment
-            const newComment: IComments = {
+            const newComment: IComment = {
                 text: newCommentText,
                 medias: medias,
                 createDate: new Date(),
@@ -73,7 +73,7 @@ export const CommentDialog: React.FC<CommentDialogProps> = ({
         setMedias([]); // Reset the medias state
     };
 
-    const handleEdit = (comment: IComments) => {
+    const handleEdit = (comment: IComment) => {
         setCurrentComment(comment);
         setNewCommentText(comment.text);
         setMedias(comment.medias || []);

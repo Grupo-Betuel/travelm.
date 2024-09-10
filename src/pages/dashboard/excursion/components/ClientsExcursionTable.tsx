@@ -36,7 +36,7 @@ import {IService, serviceStatusLabels, serviceStatusList, ServiceStatusTypes} fr
 import {getCrudService} from "@/api/services/CRUD.service";
 import ServiceHandler from "./ServiceHandler";
 import {CommentDialog} from "@/pages/dashboard/excursion/components/CommentDialog";
-import {IComments} from "@/models/commentModel"; // Assuming the path to DataPagination
+import {IComment} from "@/models/commentModel"; // Assuming the path to DataPagination
 
 export interface IUpdateClientExtra extends IConfirmActionExtraParams {
     isOptimistic?: boolean;
@@ -148,7 +148,7 @@ export const ClientsExcursionTable = (
         toggleHandleClient();
     };
 
-    const emptyComment: IComments = {
+    const emptyComment: IComment = {
         text: '',
         medias: [],
         createDate: new Date()
@@ -431,7 +431,7 @@ export const ClientsExcursionTable = (
         updatedService?._id && updateService({_id: updatedService._id, ...updatedService});
     }
 
-    const handleCommentChange = (client: IClient, updatedComments: IComments[]) => {
+    const handleCommentChange = (client: IClient, updatedComments: IComment[]) => {
         const service = getService(client);
 
         if (!service) {
@@ -476,7 +476,7 @@ export const ClientsExcursionTable = (
 
         const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
 
-        const handleCommentChangeWrapper = (updatedComments: IComments[]) => {
+        const handleCommentChangeWrapper = (updatedComments: IComment[]) => {
             handleCommentChange(client, updatedComments);
         };
 

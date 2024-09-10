@@ -8,7 +8,7 @@ import {IProjection} from "./projectionModel";
 import {IFood} from "./foodModel";
 import {IBedroom} from "./bedroomModel";
 import {IExcursion} from "./excursionModel";
-import {IComments} from "./commentModel";
+import {IComment} from "./commentModel";
 import {ICheckpoint} from "./checkpointModel";
 import {IBus} from "./busesModel";
 import {IActivity} from "./activitiesModel";
@@ -34,7 +34,7 @@ export type EntityModels = {
     foods: IFood,
     bedrooms: IBedroom,
     excursions: IExcursion,
-    comments: IComments,
+    comments: IComment,
     checkpoints: ICheckpoint,
     buses: IBus,
     activities: IActivity,
