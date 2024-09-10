@@ -28,7 +28,6 @@ import organizations from "@/pages/dashboard/organizations/organizations";
 
 const renderMediaPreview = (media: IMedia): JSX.Element => {
     const mediaType = media.type;
-    // console.log(media)
     switch (mediaType) {
         case 'image':
             // @ts-ignore
@@ -243,7 +242,6 @@ const MediaHandler = ({onChange, medias, disableUpload, logoMedia, flyerMedia, h
         return images ? [...images] : images;
     }, [images])
 
-    // console.log('organization', medias)
     const [searchMediaModal, setSearchMediaModal] = useState(false);
     const [selectedMediaSelectorType, setSelectedMediaSelectorType] = useState<MediaTypeEnum | ExtraMediaTypesEnum>();
 

@@ -3,6 +3,6 @@ import {IComment} from "./commentModel";
 
 export interface IReview {
     client: IClient;
-    comment: IComment;
+    comments: IComment;
     stars: number;
 }

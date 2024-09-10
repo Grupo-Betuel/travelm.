@@ -30,6 +30,8 @@ import {IoReload} from "react-icons/io5";
 import {FaWhatsapp} from "react-icons/fa";
 import {useAppLoading} from "@/context/appLoadingContext";
 import ExcursionDetailsSkeleton from "../../../../components/ExcursionDetailsSkeleton";
+import {IExpense} from "@/models/ExpensesModel";
+import {ExpenseForm} from "@/pages/dashboard/excursion/components/ExpensesHandler";
 
 const excursionService = getCrudService('excursions');
 const clientService = getCrudService('travelClients');
@@ -43,6 +45,9 @@ export const ExcursionDetails: React.FC = () => {
     const ownerOrganization = useMemo(() => excursion.owner, [excursion.owner]);
     const toggleWsMessaging = () => setWsMessagingIsOpen(!wsMessagingIsOpen);
     const {setAppIsLoading} = useAppLoading();
+
+    const [isExpenseDialogOpen, setIsExpenseDialogOpen] = useState(false);
+    const toggleExpenseDialog = () => setIsExpenseDialogOpen(!isExpenseDialogOpen);
 
     const {
         data: excursionData,
@@ -194,6 +199,13 @@ export const ExcursionDetails: React.FC = () => {
         }, [] as IBedroom[]);
     }, [excursion.destinations]);
 
+    const addExpense = (expense: IExpense) => {
+        const updatedExpenses = [...(excursion.expenses || []), expense];
+        const updatedExcursion: IExcursion = { ...excursion, expenses: updatedExpenses };
+        setExcursion(updatedExcursion);
+        updateExcursion({ _id: excursion._id || '', expenses: updatedExpenses });
+    };
+
     console.log(ownerOrganization?.sessionId);
 
     if (
@@ -203,6 +215,7 @@ export const ExcursionDetails: React.FC = () => {
             <ExcursionDetailsSkeleton/>
         </div>
     );
+
 
     return (
         <div className="container mx-auto relative flex flex-col gap-5">
@@ -283,9 +296,20 @@ export const ExcursionDetails: React.FC = () => {
             <FinanceDetails
                 transport={excursion.transport}
                 destinations={excursion.destinations}
+                expenses={excursion.expenses}
                 finance={excursion.finance}
                 clients={excursion.clients || []}
                 projections={excursion.projections} excursionId={excursion._id as string}
+                dialog={toggleExpenseDialog}
+            />
+            <ExpenseForm
+                isDialog={true}
+                isOpen={isExpenseDialogOpen}
+                excursion={excursion}
+                onUpdateExcursion={onUpdateExcursion}
+                handleClose={toggleExpenseDialog}
+                expenses={excursion.expenses || []}
+                addExpense={addExpense}
             />
             {!!excursionBedrooms?.length && <BedroomDetails excursion={excursion}/>}
             {/*{!!excursion.activities.length && <ActivityDetails activities={excursion.activities}/>}*/}

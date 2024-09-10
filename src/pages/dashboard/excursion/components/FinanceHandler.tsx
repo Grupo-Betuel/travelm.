@@ -1,6 +1,6 @@
 import {Button, Input, Menu, MenuHandler, MenuList, MenuItem, Select, Option} from "@material-tailwind/react";
 import React, {useEffect} from "react";
-import {financeTypes, FinanceTypes, IFinance} from "@/models/financeModel";
+import {FinanceOptionEnum, financeTypes, FinanceTypes, IFinance} from "@/models/financeModel";
 import {PlusCircleIcon, TrashIcon} from "@heroicons/react/20/solid";
 
 export interface IFinanceProps {
@@ -8,10 +8,12 @@ export interface IFinanceProps {
     updateFinance: (finance: IFinance) => void;
     type?: FinanceTypes;
     enabledCost?: boolean;
+    options?: FinanceOptionEnum[];
 }
 
 export const FinanceHandler = ({
                                    finance,
+                                   options,
                                    updateFinance,
                                    type: financeType,
                                    enabledCost,
@@ -36,8 +38,12 @@ export const FinanceHandler = ({
     };
 
     useEffect(() => {
-        setEnableCost(!!enabledCost);
-    }, [enabledCost]);
+        if (!options) return
+
+        setEnableCost(options.includes(FinanceOptionEnum.COST));
+        setEnableRates(options.includes(FinanceOptionEnum.COUPLE));
+        setEnableChildren(options.includes(FinanceOptionEnum.CHILDREN));
+    }, [options]);
 
     useEffect(() => {
         if (financeType) {
@@ -57,30 +63,32 @@ export const FinanceHandler = ({
                     onChange={handleOnChangeFinance}
                     containerProps={{className: "max-w-1/2 min-w-[50%]"}}
                 />
-                <Menu>
-                    <MenuHandler>
-                        <Button color="blue" className="flex items-center z-40 p-2">
-                            <PlusCircleIcon className="h-5 w-6"/>
-                        </Button>
-                    </MenuHandler>
-                    <MenuList className="p-2 z-[99999]">
-                        {!enableCost && (
-                            <MenuItem onClick={toggleCost}>
-                                Agregar Costos
-                            </MenuItem>
-                        )}
-                        {!enableRates && (
-                            <MenuItem onClick={toggleRates}>
-                                Precio en Pareja
-                            </MenuItem>
-                        )}
-                        {!enableChildren && (
-                            <MenuItem onClick={toggleChildren}>
-                                Precio para Niños
-                            </MenuItem>
-                        )}
-                    </MenuList>
-                </Menu>
+                {options && (
+                    <Menu>
+                        <MenuHandler>
+                            <Button color="blue" className="flex items-center z-40 p-2">
+                                <PlusCircleIcon className="h-5 w-6"/>
+                            </Button>
+                        </MenuHandler>
+                        <MenuList className="p-2 z-[99999]">
+                            {!enableCost && (
+                                <MenuItem onClick={toggleCost}>
+                                    Agregar Costos
+                                </MenuItem>
+                            )}
+                            {!enableRates && (
+                                <MenuItem onClick={toggleRates}>
+                                    Precio en Pareja
+                                </MenuItem>
+                            )}
+                            {!enableChildren && (
+                                <MenuItem onClick={toggleChildren}>
+                                    Precio para Niños
+                                </MenuItem>
+                            )}
+                        </MenuList>
+                    </Menu>
+                )}
             </div>
 
             {enableCost && (
