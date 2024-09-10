@@ -46,7 +46,6 @@ const alertTypes = {
 
 export function AlertWithContent<T>({content, open, setOpen, type}: AlertWithContentProps<T>) {
     const alertType = useMemo(() => alertTypes[type], [type]);
-    console.log(alertType.color);
     return (
         <>
             <Alert

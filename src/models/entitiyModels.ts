@@ -22,7 +22,7 @@ import {IClient} from "./clientModel";
 import IUser from "./interfaces/userModel";
 import {ITransportResource} from "./transportResourcesModel";
 import {ISocialNetwork} from "@/models/ISocialNetwork";
-import {IExpense} from "@/models/interfaces/ExpensesModel";
+import {IExpense} from "@/models/ExpensesModel";
 
 export type EntityModels = {
     finances: IFinance,

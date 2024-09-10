@@ -9,6 +9,7 @@ export interface IClient extends BaseModel {
     stage?: string;
     email: string;
     services: IService[];
+    currentService?: IService;
     socialNetworks: ISocialNetwork[];
     relatedCompanies?: string,
 }

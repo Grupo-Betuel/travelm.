@@ -14,7 +14,7 @@ import {
 } from "react-icons/md";
 import {UserGroupIcon} from "@heroicons/react/20/solid";
 import {TbBus} from "react-icons/tb";
-import {IExpense} from "@/models/interfaces/ExpensesModel";
+import {IExpense} from "@/models/ExpensesModel";
 
 
 interface IFinanceDetailsProps {
@@ -90,9 +90,12 @@ export const FinanceDetails = ({
     );
 
     //calculate total expenses extra
-    const totalExpenses = expenses?.length ?? 0;
-    const totalAmount = expenses?.reduce((acc, expense) => acc + (expense.finance?.price ?? 0), 0);
+    const totalExpenses = useMemo(() => expenses?.length ?? 0, [expenses]);
 
+    const totalAmount = useMemo(
+        () => expenses?.reduce((acc, expense) => acc + (expense.finance?.price ?? 0), 0),
+        [expenses]
+    );
     // Calculate total to pay for destinations
     const destinationsPrice = useMemo(
         () => destinations.reduce((total, destination) => total + (destination.entryFee?.price || 0), 0),
@@ -112,7 +115,10 @@ export const FinanceDetails = ({
             clients.reduce((counts, client) => {
                 const service = client.services.find((service) => service.excursionId === excursionId);
                 if (service) {
-                    counts[service.status] = (counts[service.status] || 0) + 1;
+                    const seats = service.seats || 0; // Fallback to 0 if seats is undefined or falsy
+                    counts[service.status] = (counts[service.status] || 0) + seats;
+                } else {
+                    console.log("No service found for client:", client); // Debugging line
                 }
                 return counts;
             }, {} as Record<string, number>),
@@ -135,12 +141,17 @@ export const FinanceDetails = ({
         return Math.ceil(totalAmount / totalCapacity);
     }, [transport]);
 
-    console.log('expenses',expenses)
+    const totalSeats = useMemo(() => {
+        return clients.reduce((total, client) => {
+            const service = client.services.find((service) => service.excursionId === excursionId);
+            return total + (service?.seats || 0);
+        }, 0);
+    }, [clients, excursionId]);
 
     // Calculate the expected gaining amount
     const expectedGainingAmount = useMemo(
-        () => profit * clients.length - investedInFreeClients,
-        [profit, clients, investedInFreeClients]
+        () => profit * totalSeats - investedInFreeClients,
+        [profit, totalSeats, investedInFreeClients]
     );
     // totoal GainingAmountWithoutExpenses
     const totalGainingAmountWithoutExpenses = useMemo(

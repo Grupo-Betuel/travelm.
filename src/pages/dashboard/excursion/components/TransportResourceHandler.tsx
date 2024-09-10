@@ -126,7 +126,6 @@ const TransportResourceHandler: React.FC<TransportResourceHandlerProps> = ({
 
     const addOrEditTransportResource = () => {
         // Verificar si el recurso de transporte nuevo tiene datos válidos
-        console.log(newTransportResource);
         if (Object.keys(newTransportResource.bus).length === 0) {
             // Si 'bus' está vacío, muestra una alerta y retorna
             setInValid(true)

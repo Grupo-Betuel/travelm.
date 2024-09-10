@@ -28,13 +28,15 @@ import {UserRoleTypes, UserTypes} from "../../../../models/interfaces/userModel"
 import ProtectedElement from "../../../../components/ProtectedElement";
 import {AiFillFileAdd} from "react-icons/ai";
 import {CgAssign} from "react-icons/cg";
-import {IExcursion} from "../../../../models/excursionModel";
+import {IExcursion} from "@/models/excursionModel";
 import {DataPagination} from "../../../../components/DataPagination";
-import {DataTable, IFilterOption, IFilterOptionItem} from "../../../../components/DataTable";
-import {IPayment} from "../../../../models/PaymentModel";
-import {IService, serviceStatusLabels, serviceStatusList, ServiceStatusTypes} from "../../../../models/serviceModel";
-import {getCrudService} from "../../../../api/services/CRUD.service";
-import ServiceHandler from "./ServiceHandler"; // Assuming the path to DataPagination
+import {DataTable, IFilterOption, IFilterOptionItem} from "@/components/DataTable";
+import {IPayment} from "@/models/PaymentModel";
+import {IService, serviceStatusLabels, serviceStatusList, ServiceStatusTypes} from "@/models/serviceModel";
+import {getCrudService} from "@/api/services/CRUD.service";
+import ServiceHandler from "./ServiceHandler";
+import {CommentDialog} from "@/pages/dashboard/excursion/components/CommentDialog";
+import {IComment} from "@/models/commentModel"; // Assuming the path to DataPagination
 
 export interface IUpdateClientExtra extends IConfirmActionExtraParams {
     isOptimistic?: boolean;
@@ -146,6 +148,12 @@ export const ClientsExcursionTable = (
         toggleHandleClient();
     };
 
+    const emptyComment: IComment = {
+        text: '',
+        medias: [],
+        createDate: new Date()
+    }
+
 
     const excursionService: IService = useMemo(() => ({
         type: 'excursion',
@@ -153,6 +161,8 @@ export const ClientsExcursionTable = (
         excursionId: excursion._id,
         payments: [],
         finance: excursion.finance,
+        seats: 1,
+        comment: [emptyComment]
     }) as IService, [excursion]);
 
     const selectedService: IService = useMemo(() => {
@@ -201,7 +211,6 @@ export const ClientsExcursionTable = (
 
 
     const handleDeletePayment = (payment: IPayment) => {
-        console.log('delete payment', payment, selectedClient)
         if (selectedClient) {
             payment._id && deletePayment(payment._id);
 
@@ -347,7 +356,6 @@ export const ClientsExcursionTable = (
 
 
     const onSelectClient = (sclients: IClient[]) => {
-        console.log('selected clients', sclients);
         setSelectedClients(sclients);
     }
 
@@ -421,27 +429,56 @@ export const ClientsExcursionTable = (
         updatedService?._id && updateService({_id: updatedService._id, ...updatedService});
     }
 
+    const handleCommentChange = (client: IClient, updatedComments: IComment[]) => {
+        const service = getService(client);
+
+        if (!service) {
+            // TODO: toast service not found
+            return;
+        }
+
+        // Update the service with the new array of comments
+        const updatedService = { ...service, comments: updatedComments };
+        const updatedClient: IClient = {
+            ...client,
+            services: client.services.map(s => s.excursionId === excursion._id ? updatedService : s) as IService[]
+        };
+
+        // Update the client and service with the new comments
+        onUpdateClient(updatedClient, { isOptimistic: true, avoidConfirm: true });
+        updatedService?._id && updateService({ _id: updatedService._id, ...updatedService });
+    };
+
 
     useEffect(() => {
         if (selectedClient) {
             const clientData = clients.find(c => c._id === selectedClient._id);
             if (JSON.stringify(clientData) !== JSON.stringify(selectedClient)) {
+                console.log('Updating selectedClient state', clientData);
                 setSelectedClient(clientData || selectedClient);
             }
         }
     }, [clients]);
 
     const renderRow = (client: IClient, index: number, selected: boolean, onSelect: (checked: boolean) => void) => {
-        const noService = "No Service"
+        const noService = "No Service";
         const serviceStatus = getServiceStatus(client);
         const statusColor = getStatusColor(serviceStatus || noService);
-        const service = getService(client);
+        const serviceC = getService(client);
         const bedroomOptions: IOption[] = (bedrooms?.map((b) => ({
             label: `${b.name} | ${b.zone}`,
             value: b._id
-        })) || []) as IOption[]
-        const totalAmount = service?.payments?.reduce((a, b) => a + b.amount, 0) || 0
-        const clientBedroom = bedroomOptions.find(b => b.value === service?.bedroom?._id);
+        })) || []) as IOption[];
+        const totalAmount = serviceC?.payments?.reduce((a, b) => a + b.amount, 0) || 0;
+        const clientBedroom = bedroomOptions.find(b => b.value === serviceC?.bedroom?._id);
+
+        const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
+
+        const handleCommentChangeWrapper = (updatedComments: IComment[]) => {
+            handleCommentChange(client, updatedComments);
+        };
+
+        const handleDialogOpen = () => setIsDialogOpen(!isDialogOpen);
 
         return (
             <tr key={`${client._id}-${index}`}>
@@ -456,6 +493,7 @@ export const ClientsExcursionTable = (
                 <td>
                     {editClientIndex === index ? (
                         <Input
+                            crossOrigin={true}
                             type="text"
                             value={editedClients[index]?.firstName || client.firstName}
                             onChange={(e) => handleInputChange(e.target.value, index, 'firstName')}
@@ -494,15 +532,24 @@ export const ClientsExcursionTable = (
                                 {serviceStatusList.map(status => (
                                     <MenuItem key={`s-status-${status.value}`}
                                               onClick={() => onChangeServiceStatus(client, status)}>
-                                        {/*{status.label}*/}
                                         <Chip color={getStatusColor(status.value)}
                                               value={status.label}/>
                                     </MenuItem>
                                 ))}
                             </MenuList>
                         </Menu>
-                        <Typography variant="paragraph">RD${totalAmount.toLocaleString()}</Typography>
-
+                        <div className='flex justify-center items-center'>
+                            <Typography variant="paragraph">RD${totalAmount.toLocaleString()}</Typography>
+                            <IconButton variant="text" color="blue" size="sm" onClick={handleDialogOpen}>
+                                <PencilIcon className="h-5 w-5"/>
+                            </IconButton>
+                            <CommentDialog
+                                open={isDialogOpen}
+                                onClose={() => setIsDialogOpen(false)}
+                                initialComments={serviceC?.comments || []}
+                                updateComments={handleCommentChangeWrapper}
+                            />
+                        </div>
                     </div>
                 </td>
                 {bedroomsExist && (
@@ -530,166 +577,164 @@ export const ClientsExcursionTable = (
                         <IconButton variant="text" color="red" size="sm" onClick={handleDeleteClient(client)}>
                             <TrashIcon className="h-5 w-5"/>
                         </IconButton>
-                        {/*<ProtectedElement roles={[UserRoleTypes.ADMIN]}>*/}
-                        {/*    <IconButton variant="text" color="light-blue" size="sm">*/}
-                        {/*        <UserIcon className="h-5 w-5"/>*/}
-                        {/*    </IconButton>*/}
-                        {/*</ProtectedElement>*/}
                     </div>
                 </td>
             </tr>
         );
     };
 
-    return (
-        <Card className="mt-10">
-            <CardHeader variant="gradient" color="blue" className="p-3">
-                <div className="flex justify-between items-center gap-3">
-                    <Typography variant="h4" color="white">
-                        Clientes
-                    </Typography>
-                    <div className="flex items-center">
-                        <ProtectedElement roles={[UserRoleTypes.ADMIN]} userTypes={[UserTypes.AGENCY]}>
-                            <Button variant="text" color="white" className="flex items-center gap-3"
-                                    onClick={toggleClientSearch}>
-                                <BiSearch size="18px"/>
-                                <Typography className="capitalize font-bold">Buscar otros clientes</Typography>
-                            </Button>
-                        </ProtectedElement>
-                        <Button className="flex items-center gap-3" variant="text" color="white"
-                                onClick={toggleHandleClient}>
-                            <BiPlus size="18px"/>
-                            <Typography className="capitalize font-bold">Agregar Clientes</Typography>
-                        </Button>
-                    </div>
-                </div>
-                <ProtectedElement roles={[UserRoleTypes.ADMIN]} userTypes={[UserTypes.AGENCY]}>
-                    <div className="flex items-center px-4 justify-between bg-green-400 rounded-md shadow-lg">
-                        <p>Opciones de Whatsapp: {excursion.whatsappGroupID?.slice(0, 5)}</p>
+
+    return (<>
+            <Card className="mt-10">
+                <CardHeader variant="gradient" color="blue" className="p-3">
+                    <div className="flex justify-between items-center gap-3">
+                        <Typography variant="h4" color="white">
+                            Clientes
+                        </Typography>
                         <div className="flex items-center">
-                            <Button variant="text" color="white" className="flex items-center gap-3"
-                                    onClick={toggleAssignGroupModal}>
-                                <CgAssign size="18px"/>
-                                <Typography className="capitalize font-bold">Asignar Grupo de WS</Typography>
+                            <ProtectedElement roles={[UserRoleTypes.ADMIN]} userTypes={[UserTypes.AGENCY]}>
+                                <Button variant="text" color="white" className="flex items-center gap-3"
+                                        onClick={toggleClientSearch}>
+                                    <BiSearch size="18px"/>
+                                    <Typography className="capitalize font-bold">Buscar otros clientes</Typography>
+                                </Button>
+                            </ProtectedElement>
+                            <Button className="flex items-center gap-3" variant="text" color="white"
+                                    onClick={toggleHandleClient}>
+                                <BiPlus size="18px"/>
+                                <Typography className="capitalize font-bold">Agregar Clientes</Typography>
                             </Button>
-                            {!excursion.whatsappGroupID && (
-                                <Button variant="text" color="white" className="flex items-center gap-3"
-                                        onClick={handleWsGroupAction('create-ws-group')}>
-                                    <AiFillFileAdd size="18px"/>
-                                    <Typography className="capitalize font-bold">Crear Grupo de WS</Typography>
-                                </Button>
-                            )}
-                            {excursion.whatsappGroupID && (
-                                <Button variant="text" color="white" className="flex items-center gap-3"
-                                        onClick={handleWsGroupAction('sync-ws-group')}>
-                                    <BiSync size="18px"/>
-                                    <Typography className="capitalize font-bold">Sync Grupo de WS</Typography>
-                                </Button>
-                            )}
                         </div>
                     </div>
-                </ProtectedElement>
-            </CardHeader>
-            <CardBody className="overflow-x-auto">
-                {!!selectedClients.length &&
-                    <div className="flex items-center gap-3 pb-5 ">
-                        <SearchableSelect<IOption<ServiceStatusTypes>>
-                            label="Cambiar Estado"
-                            options={serviceStatusList}
-                            onSelect={onChangeClientsServiceStatus}
-                            className="min-w-[200px]"
-                        />
-                        <SearchableSelect
-                            label="Cambiar Habitacion"
-                            options={bedroomsOptions}
-                            onSelect={onChangeClientsBedrooms}
-                            className="min-w-[200px]"
-                        />
-                    </div>}
-                <DataTable<IClient>
-                    enableSelection
-                    onSelect={onSelectClient}
-                    data={clients}
-                    columns={columns}
-                    filterOptions={filterOptions}
-                    renderRow={renderRow}
-                />
-            </CardBody>
-            <ClientForm
-                initialClient={clientToEdit}
-                dialog={{
-                    open: isNewClientOpen,
-                    handler: toggleHandleClient,
-                }}
-                enableService
-                serviceData={excursionService}
-                onSubmit={handleAddClient}
-            />
-            <Dialog open={isClientSearchOpen} handler={toggleClientSearch}>
-                <DialogHeader>
-                    <Typography variant="h4">Buscar otros clientes</Typography>
-                </DialogHeader>
-                <DialogBody>
-                    <ClientsSearch/>
-                </DialogBody>
-                <DialogFooter>
-                    <Button variant="text" size="lg" color="red" onClick={toggleClientSearch}>Cerrar</Button>
-                    <Button variant="text" size="lg" color="blue" onClick={toggleClientSearch}>Agregar</Button>
-                </DialogFooter>
-            </Dialog>
-            {selectedClient && (
-                <Dialog open={isModalOpen} handler={() => setModalOpen(false)} dismiss={{enabled: false}}>
-                    <DialogHeader>
-                        <Typography variant="h4">Pagos de {selectedClient?.firstName || ''}</Typography>
-                    </DialogHeader>
-                    <DialogBody className="overflow-y-scroll max-h-[80dvh]">
-                        {selectedService ? (
-                            <PaymentHandler
-                                enableAddPayment={selectedService.status !== 'paid'}
-                                payments={selectedService.payments}
-                                onDeletePayment={handleDeletePayment}
-                                onUpdatePayment={handleUpdatePayment}
-                                onChangePayment={handleChangePayment}
+                    <ProtectedElement roles={[UserRoleTypes.ADMIN]} userTypes={[UserTypes.AGENCY]}>
+                        <div className="flex items-center px-4 justify-between bg-green-400 rounded-md shadow-lg">
+                            <p>Opciones de Whatsapp: {excursion.whatsappGroupID?.slice(0, 5)}</p>
+                            <div className="flex items-center">
+                                <Button variant="text" color="white" className="flex items-center gap-3"
+                                        onClick={toggleAssignGroupModal}>
+                                    <CgAssign size="18px"/>
+                                    <Typography className="capitalize font-bold">Asignar Grupo de WS</Typography>
+                                </Button>
+                                {!excursion.whatsappGroupID && (
+                                    <Button variant="text" color="white" className="flex items-center gap-3"
+                                            onClick={handleWsGroupAction('create-ws-group')}>
+                                        <AiFillFileAdd size="18px"/>
+                                        <Typography className="capitalize font-bold">Crear Grupo de WS</Typography>
+                                    </Button>
+                                )}
+                                {excursion.whatsappGroupID && (
+                                    <Button variant="text" color="white" className="flex items-center gap-3"
+                                            onClick={handleWsGroupAction('sync-ws-group')}>
+                                        <BiSync size="18px"/>
+                                        <Typography className="capitalize font-bold">Sync Grupo de WS</Typography>
+                                    </Button>
+                                )}
+                            </div>
+                        </div>
+                    </ProtectedElement>
+                </CardHeader>
+                <CardBody className="overflow-x-auto">
+                    {!!selectedClients.length &&
+                        <div className="flex items-center gap-3 pb-5 ">
+                            <SearchableSelect<IOption<ServiceStatusTypes>>
+                                label="Cambiar Estado"
+                                options={serviceStatusList}
+                                onSelect={onChangeClientsServiceStatus}
+                                className="min-w-[200px]"
                             />
-                        ) : (
-                            <Typography>No Service</Typography>
-                        )}
+                            <SearchableSelect
+                                label="Cambiar Habitacion"
+                                options={bedroomsOptions}
+                                onSelect={onChangeClientsBedrooms}
+                                className="min-w-[200px]"
+                            />
+                        </div>}
+                    <DataTable<IClient>
+                        enableSelection
+                        onSelect={onSelectClient}
+                        data={clients}
+                        columns={columns}
+                        filterOptions={filterOptions}
+                        renderRow={renderRow}
+                    />
+                </CardBody>
+                <ClientForm
+                    initialClient={clientToEdit}
+                    dialog={{
+                        open: isNewClientOpen,
+                        handler: toggleHandleClient,
+                    }}
+                    enableService
+                    serviceData={excursionService}
+                    onSubmit={handleAddClient}
+                />
+                <Dialog open={isClientSearchOpen} handler={toggleClientSearch}>
+                    <DialogHeader>
+                        <Typography variant="h4">Buscar otros clientes</Typography>
+                    </DialogHeader>
+                    <DialogBody>
+                        <ClientsSearch/>
                     </DialogBody>
                     <DialogFooter>
-                        <Button variant="text" size="lg" color="red" onClick={() => setModalOpen(false)}>Cerrar</Button>
+                        <Button variant="text" size="lg" color="red" onClick={toggleClientSearch}>Cerrar</Button>
+                        <Button variant="text" size="lg" color="blue" onClick={toggleClientSearch}>Agregar</Button>
                     </DialogFooter>
                 </Dialog>
-            )}
-            <Dialog open={assignWsGroupModal} handler={toggleAssignGroupModal}>
-                <DialogHeader>Asignar grupo</DialogHeader>
-                <DialogBody>
-                    <div className="flex items-center">
-                        <SearchableSelect<IWsGroup>
-                            options={seedData.groups.filter(item => !item.subject?.toLowerCase()?.includes('sin filtro'))}
-                            displayProperty="subject"
-                            label="Selecciona un grupo"
-                            disabled={wsLoading}
-                            onSelect={handleWsGroupSelection}
-                        />
-                        <Button loading={wsLoading} disabled={wsLoading} onClick={loadWsGroups} color="blue"
-                                variant="text">
-                            <IoReload/>
+                {selectedClient && (
+                    <Dialog open={isModalOpen} handler={() => setModalOpen(false)} dismiss={{enabled: false}}>
+                        <DialogHeader>
+                            <Typography variant="h4">Pagos de {selectedClient?.firstName || ''}</Typography>
+                        </DialogHeader>
+                        <DialogBody className="overflow-y-scroll max-h-[80dvh]">
+                            {selectedService ? (
+                                <PaymentHandler
+                                    enableAddPayment={selectedService.status !== 'paid'}
+                                    payments={selectedService.payments}
+                                    onDeletePayment={handleDeletePayment}
+                                    onUpdatePayment={handleUpdatePayment}
+                                    onChangePayment={handleChangePayment}
+                                />
+                            ) : (
+                                <Typography>No Service</Typography>
+                            )}
+                        </DialogBody>
+                        <DialogFooter>
+                            <Button variant="text" size="lg" color="red"
+                                    onClick={() => setModalOpen(false)}>Cerrar</Button>
+                        </DialogFooter>
+                    </Dialog>
+                )}
+                <Dialog open={assignWsGroupModal} handler={toggleAssignGroupModal}>
+                    <DialogHeader>Asignar grupo</DialogHeader>
+                    <DialogBody>
+                        <div className="flex items-center">
+                            <SearchableSelect<IWsGroup>
+                                options={seedData.groups.filter(item => !item.subject?.toLowerCase()?.includes('sin filtro'))}
+                                displayProperty="subject"
+                                label="Selecciona un grupo"
+                                disabled={wsLoading}
+                                onSelect={handleWsGroupSelection}
+                            />
+                            <Button loading={wsLoading} disabled={wsLoading} onClick={loadWsGroups} color="blue"
+                                    variant="text">
+                                <IoReload/>
+                            </Button>
+                        </div>
+                    </DialogBody>
+                    <DialogFooter>
+                        <Button variant="text" size="lg" color="red" onClick={toggleAssignGroupModal}>Cerrar</Button>
+                        <Button
+                            variant="text"
+                            size="lg"
+                            color="blue"
+                            onClick={handleWsGroupAction('assign-ws-group')}
+                            disabled={!selectedWsGroup}
+                        >
+                            Asignar
                         </Button>
-                    </div>
-                </DialogBody>
-                <DialogFooter>
-                    <Button variant="text" size="lg" color="red" onClick={toggleAssignGroupModal}>Cerrar</Button>
-                    <Button
-                        variant="text"
-                        size="lg"
-                        color="blue"
-                        onClick={handleWsGroupAction('assign-ws-group')}
-                        disabled={!selectedWsGroup}
-                    >
-                        Asignar
-                    </Button>
-                </DialogFooter>
-            </Dialog>
-        </Card>
+                    </DialogFooter>
+                </Dialog>
+            </Card>
+        </>
     );
 };

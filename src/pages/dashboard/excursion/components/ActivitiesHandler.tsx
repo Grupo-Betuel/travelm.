@@ -12,7 +12,7 @@ import {
 } from '@material-tailwind/react';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
-import MediaHandler, {IActivityHandled} from "./MediaHandler";
+import MediaHandler, {IMediaHandled} from "./MediaHandler";
 import DatePicker from "@/components/DatePicker";
 import {IActivity} from "@/models/activitiesModel";
 import {getCrudService} from "@/api/services/CRUD.service";
@@ -100,7 +100,7 @@ const ActivitiesHandler: React.FC<ActivitiesHandlerProps> = ({activities, update
         activity._id && deleteActivity(activity._id as string);
     };
 
-    const onMediaSubmit = (data: IActivityHandled) => {
+    const onMediaSubmit = (data: IMediaHandled) => {
         const updatedMedia = {
             ...activityForm,
             ...data
@@ -131,7 +131,6 @@ const ActivitiesHandler: React.FC<ActivitiesHandlerProps> = ({activities, update
     }
 
     // (date: Date) => setActivityForm({ ...activityForm, date })
-    console.log('activities', activities.map ((a) => a.date));
     return (
         <div className="flex flex-col gap-5 pb-10">
             <div className="border-2 rounded-lg p-4">
@@ -211,7 +210,7 @@ const ActivitiesHandler: React.FC<ActivitiesHandlerProps> = ({activities, update
                                 <Button
                                     variant="outlined"
                                     color="red"
-                                    onClick={() => handleSetActionToConfirm('delete', 'Eliminar Habitacion')(activity)}
+                                    onClick={() => handleSetActionToConfirm('delete', 'Eliminar Actividad')(activity)}
                                 >
                                     Delete
                                 </Button>
