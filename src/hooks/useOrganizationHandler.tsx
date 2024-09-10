@@ -1,9 +1,9 @@
-import {IOrganization, OrganizationTypesEnum} from "../models/organizationModel";
-import {IMedia, IMediaFile} from "../models/mediaModel";
+import {IOrganization, OrganizationTypesEnum} from "@/models/organizationModel";
+import {IMedia, IMediaFile} from "@/models/mediaModel";
 import {useGCloudMediaHandler} from "./useGCloudMedediaHandler";
 import React, {useEffect, useState} from "react";
-import {getCrudService} from "../api/services/CRUD.service";
-import {OrganizationForm} from "../pages/dashboard/excursion/components/OrganizationForm";
+import {getCrudService} from "@/api/services/CRUD.service";
+import {OrganizationForm} from "@/pages/dashboard/excursion/components/OrganizationForm";
 
 export interface IOrganizationHandlerProps {
     onSelect?: (selected: IOrganization[]) => void;

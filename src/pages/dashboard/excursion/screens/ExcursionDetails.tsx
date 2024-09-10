@@ -31,7 +31,7 @@ import {FaWhatsapp} from "react-icons/fa";
 import {useAppLoading} from "@/context/appLoadingContext";
 import ExcursionDetailsSkeleton from "../../../../components/ExcursionDetailsSkeleton";
 import {IExpense} from "@/models/ExpensesModel";
-import {ExpenseDialog} from "@/pages/dashboard/excursion/components/ExpensesDialog";
+import {ExpenseForm} from "@/pages/dashboard/excursion/components/ExpensesHandler";
 
 const excursionService = getCrudService('excursions');
 const clientService = getCrudService('travelClients');
@@ -302,7 +302,8 @@ export const ExcursionDetails: React.FC = () => {
                 projections={excursion.projections} excursionId={excursion._id as string}
                 dialog={toggleExpenseDialog}
             />
-            <ExpenseDialog
+            <ExpenseForm
+                isDialog={true}
                 isOpen={isExpenseDialogOpen}
                 excursion={excursion}
                 onUpdateExcursion={onUpdateExcursion}
