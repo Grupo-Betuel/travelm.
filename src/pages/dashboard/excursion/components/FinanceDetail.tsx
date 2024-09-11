@@ -150,7 +150,7 @@ export const FinanceDetails = ({
 
     // Calculate the expected gaining amount
     const expectedGainingAmount = useMemo(
-        () => profit * totalSeats - investedInFreeClients,
+        () => (profit * totalSeats) - investedInFreeClients,
         [profit, totalSeats, investedInFreeClients]
     );
     // totoal GainingAmountWithoutExpenses

@@ -35,7 +35,7 @@ import {IPayment} from "@/models/PaymentModel";
 import {IService, serviceStatusLabels, serviceStatusList, ServiceStatusTypes} from "@/models/serviceModel";
 import {getCrudService} from "@/api/services/CRUD.service";
 import ServiceHandler from "./ServiceHandler";
-import {CommentDialog} from "@/pages/dashboard/excursion/components/CommentDialog";
+import {CommentForm} from "@/pages/dashboard/excursion/components/CommentHandler";
 import {IComment} from "@/models/commentModel"; // Assuming the path to DataPagination
 
 export interface IUpdateClientExtra extends IConfirmActionExtraParams {
@@ -505,6 +505,7 @@ export const ClientsExcursionTable = (
                 <td>
                     {editClientIndex === index ? (
                         <Input
+                            crossOrigin={true}
                             type="text"
                             value={editedClients[index]?.phone || client.phone}
                             onChange={(e) => handleInputChange(e.target.value, index, 'phone')}
@@ -543,7 +544,8 @@ export const ClientsExcursionTable = (
                             <IconButton variant="text" color="blue" size="sm" onClick={handleDialogOpen}>
                                 <PencilIcon className="h-5 w-5"/>
                             </IconButton>
-                            <CommentDialog
+                            <CommentForm
+                                isDialog={true}
                                 open={isDialogOpen}
                                 onClose={() => setIsDialogOpen(false)}
                                 initialComments={serviceC?.comments || []}
