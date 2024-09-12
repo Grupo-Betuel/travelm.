@@ -27,6 +27,7 @@ import FinancesHandlerStep from "../components/Steps/FinancesHandlerStep";
 import {IStep} from "@/models/common";
 import {AppStepper} from "@/components/AppStepper";
 import {useAppLoading} from "@/context/appLoadingContext";
+import {CheckpointHandlerStep} from "@/pages/dashboard/excursion/components/Steps/CheckpointHandlerStep";
 
 
 const excursionService = getCrudService("excursions");
@@ -284,6 +285,12 @@ const ExcursionStepper: React.FC = () => {
             label: 'Transporte',
             icon: <UserIcon className="max-w-[20px]"/>,
             component: <TransportHandlerStep excursionData={excursion} updateExcursion={updateExcursionData}/>,
+        },
+        {
+            properties: ['checkpoints'],
+            label: 'checkpoints',
+            icon: <UserIcon className="max-w-[20px]"/>,
+            component: <CheckpointHandlerStep excursionData={excursion} updateExcursion={updateExcursionData}/>,
         },
         {
             properties: ['finance'],

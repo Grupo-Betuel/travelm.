@@ -316,7 +316,6 @@ export const ExcursionDetails: React.FC = () => {
             {/*<ProjectionsCharts projections={excursion.projections}/>*/}
             {!!excursion.checkpoints?.length &&
                 <div>
-
                     <Swiper
                         modules={[Navigation, Pagination]}
                         spaceBetween={10}
