@@ -1,5 +1,5 @@
 import React, {useEffect, useMemo, useState} from 'react';
-import {Button, Input, Option, Select, Typography} from '@material-tailwind/react';
+import {Button, Input, Option, Select, Textarea, Typography} from '@material-tailwind/react';
 import {
     IService,
     ServiceDetailActions,
@@ -28,6 +28,7 @@ const emptyService: IService = {
     type: 'excursion',
     payments: [],
     finance: {price: 0, type: 'service'},
+    seats: 1,
 }
 
 export const paymentService = getCrudService('payments');
@@ -130,18 +131,33 @@ const ServiceHandler: React.FC<ServiceFormProps> = ({services, onUpdateSingleSer
                         onChange={(e) => handleServiceChange('type', e)}
                     >
                         {SERVICE_CONSTANTS.TYPES.map(type => (
-                            <Option key={type} value={type}>{serviceStatusLabels[type]}</Option>
+                            <Option key={type} value={type}>{serviceStatusLabels?[type] : ''}</Option>
                         ))}
                     </Select>}
                     <Select
                         label="Estado del Servicio"
-                        value={newService.status}
+                        value={service?.status || newService.status}
                         onChange={(e) => handleServiceChange('status', e)}
                     >
                         {SERVICE_CONSTANTS.STATUS_TYPES.map(status => (
                             <Option key={status} value={status}>{status}</Option>
                         ))}
                     </Select>
+                    <Input
+                        crossOrigin={"true"}
+                        type="number"
+                        label="Cantidad De Asientos"
+                        value={service?.seats || newService.seats}
+                        // disabled={!!service?.seats}
+                        onChange={(e) => {
+                            const value = parseInt(e.target.value, 10);
+                            if (value >= 1) {
+                                handleServiceChange('seats', value);
+                            }
+                        }}
+                        step={1}
+                        min={1}
+                    />
                 </div>
 
                 {!service?.finance?.price &&

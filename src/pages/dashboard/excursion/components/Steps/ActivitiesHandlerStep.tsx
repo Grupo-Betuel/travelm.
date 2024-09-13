@@ -1,8 +1,8 @@
 import React from 'react';
 import 'react-quill/dist/quill.snow.css';
 import ActivitiesHandler from "../ActivitiesHandler";
-import {IExcursion} from "../../../../../models/excursionModel";
-import {IActivity} from "../../../../../models/activitiesModel"; // Include the Quill stylesheet
+import {IExcursion} from "@/models/excursionModel";
+import {IActivity} from "@/models/activitiesModel";
 
 
 interface ActivitiesStepProps {

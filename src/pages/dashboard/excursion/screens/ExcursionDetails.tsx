@@ -3,33 +3,35 @@ import {Button, Card, CardBody, CardHeader, Typography} from "@material-tailwind
 import {Link, useParams} from 'react-router-dom';
 import {StarIcon} from "@heroicons/react/24/solid";
 import {Swiper, SwiperSlide} from 'swiper/react';
-import {mockExcursion} from "../../../../data/excursions-mock-data";
-import {ExcursionDetailActions, ExcursionDetailActionsDataTypes, IExcursion} from "../../../../models/excursionModel";
+import {mockExcursion} from "@/data/excursions-mock-data";
+import {ExcursionDetailActions, ExcursionDetailActionsDataTypes, IExcursion} from "@/models/excursionModel";
 import {EffectCoverflow, Navigation, Pagination} from "swiper/modules";
 import {ClientsExcursionTable} from "../components/ClientsExcursionTable";
 import {FinanceDetails} from "../components/FinanceDetail";
 import {ActivityDetails} from "../components/ActivityList";
 import {ProjectionsCharts} from "../components/ProjectionCharts";
 import {OrganizationCard} from "../components/OrganizationCard";
-import {useRenderMedia} from "../../../../hooks/useRenderMedia";
+import {useRenderMedia} from "@/hooks/useRenderMedia";
 import AudioPlayer from "../components/AudioCard";
 import {CheckpointForm} from "../components/CheckpointForm";
-import {ICheckpoint} from "../../../../models/checkpointModel";
-import {TravelMap} from "../../../../components/TravelMap";
-import {getCrudService} from "../../../../api/services/CRUD.service";
-import {IClient} from "../../../../models/clientModel";
-import {useConfirmAction} from "../../../../hooks/useConfirmActionHook";
-import {EXCURSION_CONSTANTS} from "../../../../constants/excursion.constant";
-import {CLIENTS_CONSTANTS} from "../../../../constants/clients.constant";
-import {IBedroom} from "../../../../models/bedroomModel";
+import {ICheckpoint} from "@/models/checkpointModel";
+import {TravelMap} from "@/components/TravelMap";
+import {getCrudService} from "@/api/services/CRUD.service";
+import {IClient} from "@/models/clientModel";
+import {useConfirmAction} from "@/hooks/useConfirmActionHook";
+import {EXCURSION_CONSTANTS} from "@/constants/excursion.constant";
+import {CLIENTS_CONSTANTS} from "@/constants/clients.constant";
+import {IBedroom} from "@/models/bedroomModel";
 import {BedroomDetails} from "../components/BedroomsDetails";
 import Messaging from "../../../../components/WhatsappMessageHandler";
-import {UserRoleTypes, UserTypes} from "../../../../models/interfaces/userModel";
+import {UserRoleTypes, UserTypes} from "@/models/interfaces/userModel";
 import ProtectedElement from "../../../../components/ProtectedElement";
 import {IoReload} from "react-icons/io5";
 import {FaWhatsapp} from "react-icons/fa";
-import {useAppLoading} from "../../../../context/appLoadingContext";
+import {useAppLoading} from "@/context/appLoadingContext";
 import ExcursionDetailsSkeleton from "../../../../components/ExcursionDetailsSkeleton";
+import {IExpense} from "@/models/ExpensesModel";
+import {ExpenseForm} from "@/pages/dashboard/excursion/components/ExpensesHandler";
 
 const excursionService = getCrudService('excursions');
 const clientService = getCrudService('travelClients');
@@ -43,6 +45,9 @@ export const ExcursionDetails: React.FC = () => {
     const ownerOrganization = useMemo(() => excursion.owner, [excursion.owner]);
     const toggleWsMessaging = () => setWsMessagingIsOpen(!wsMessagingIsOpen);
     const {setAppIsLoading} = useAppLoading();
+
+    const [isExpenseDialogOpen, setIsExpenseDialogOpen] = useState(false);
+    const toggleExpenseDialog = () => setIsExpenseDialogOpen(!isExpenseDialogOpen);
 
     const {
         data: excursionData,
@@ -195,6 +200,13 @@ export const ExcursionDetails: React.FC = () => {
         }, [] as IBedroom[]);
     }, [excursion.destinations]);
 
+    const addExpense = (expense: IExpense) => {
+        const updatedExpenses = [...(excursion.expenses || []), expense];
+        const updatedExcursion: IExcursion = {...excursion, expenses: updatedExpenses};
+        setExcursion(updatedExcursion);
+        updateExcursion({_id: excursion._id || '', expenses: updatedExpenses});
+    };
+
     console.log(ownerOrganization?.sessionId);
 
     if (
@@ -204,6 +216,7 @@ export const ExcursionDetails: React.FC = () => {
             <ExcursionDetailsSkeleton/>
         </div>
     );
+
 
     return (
         <div className="container mx-auto relative flex flex-col gap-5">
@@ -284,41 +297,72 @@ export const ExcursionDetails: React.FC = () => {
             <FinanceDetails
                 transport={excursion.transport}
                 destinations={excursion.destinations}
+                expenses={excursion.expenses}
                 finance={excursion.finance}
                 clients={excursion.clients || []}
                 projections={excursion.projections} excursionId={excursion._id as string}
+                dialog={toggleExpenseDialog}
+            />
+            <ExpenseForm
+                isDialog={true}
+                isOpen={isExpenseDialogOpen}
+                excursion={excursion}
+                onUpdateExcursion={onUpdateExcursion}
+                handleClose={toggleExpenseDialog}
+                expenses={excursion.expenses || []}
+                addExpense={addExpense}
             />
             {!!excursionBedrooms?.length && <BedroomDetails excursion={excursion}/>}
             {/*{!!excursion.activities.length && <ActivityDetails activities={excursion.activities}/>}*/}
             {/*<ProjectionsCharts projections={excursion.projections}/>*/}
-            {!!excursion.checkpoints?.length &&
-                <div>
+            {!!excursion.checkpoints?.length && (
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-3"> {/* Para dividir en 3 columnas */}
+                    {excursion.checkpoints.map((checkpoint, index) => (
+                        <Card key={index} className="flex flex-col">
+                            <CardBody>
+                                <Typography variant="h6" color="blue-gray" className="mb-2">
+                                    {checkpoint.description}
+                                </Typography>
+                                <Typography variant="small" color="gray" className="mb-4">
+                                    {checkpoint.location.address}, {checkpoint.location.city},{" "}
+                                    {checkpoint.location.province}, {checkpoint.location.country}
+                                </Typography>
 
-                    <Swiper
-                        modules={[Navigation, Pagination]}
-                        spaceBetween={10}
-                        slidesPerView={1}
-                        navigation
-                        pagination={{clickable: true}}
-                        className="relative h-[300px] w-full"
-                    >
-                        {excursion.checkpoints.map((checkpoint, index) => (
-                            <SwiperSlide key={index}>
-                                <Card>
-                                    <CardHeader>
-                                        <TravelMap location={checkpoint.location}/>
-                                    </CardHeader>
-                                    <CardBody>
-                                        <Typography>{checkpoint.description}</Typography>
-                                        <Button color="orange" onClick={() => editCheckpoint(checkpoint)}>Edit</Button>
-                                    </CardBody>
-                                </Card>
-                            </SwiperSlide>
-                        ))}
-                    </Swiper>
+                                {/* Mostrar lista de buses */}
+                                {!!checkpoint.buses?.length && (
+                                    <div className="mb-4">
+                                        <Typography variant="h6" color="blue-gray">
+                                            Buses Disponibles:
+                                        </Typography>
+                                        <ul className="list-disc ml-4">
+                                            {checkpoint.buses.map((bus, busIndex) => (
+                                                <li key={busIndex}>
+                                                    <Typography variant="small" color="gray">
+                                                        Modelo: {bus.model}, Capacidad: {bus.capacity}, Color: {bus.color}
+                                                    </Typography>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                )}
 
+                                <div className="mt-auto"> {/* Asegura que el botón esté en la parte inferior */}
+                                    <Button
+                                        size="sm"
+                                        color="blue"
+                                        variant="outlined"
+                                        onClick={() => window.open(checkpoint.location.link, "_blank")}
+                                        className="w-full"
+                                    >
+                                        Ver en Google Maps
+                                    </Button>
+                                </div>
+                            </CardBody>
+                        </Card>
+                    ))}
                 </div>
-            }
+            )}
+
 
             {/* Organization, Destination, and TransportStep Information Cards */}
             <div>

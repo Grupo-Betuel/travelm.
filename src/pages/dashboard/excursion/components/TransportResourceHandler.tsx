@@ -7,20 +7,23 @@ import {
     DialogBody,
     DialogFooter,
     DialogHeader,
-    Typography
+    Typography, CardFooter, MenuItem, Chip
 } from '@material-tailwind/react';
 import InputMask from "react-input-mask";
 import _ from 'lodash';
 import {getCrudService} from "../../../../api/services/CRUD.service";
 import {CommonConfirmActions, CommonConfirmActionsDataTypes} from "../../../../models/common";
 import {useConfirmAction} from "../../../../hooks/useConfirmActionHook";
-import {ITransportResource} from "../../../../models/transportResourcesModel";
+import {busList, ITransportResource} from "../../../../models/transportResourcesModel";
 import {IFinance} from "../../../../models/financeModel";
 import {IBus} from "../../../../models/busesModel";
 import {FinanceHandler} from "./FinanceHandler";
 import IUser, {UserTypes} from "../../../../models/interfaces/userModel";
 import BusHandler from "./BusesHandler";
 import SearchableSelect, {IOption} from "../../../../components/SearchableSelect";
+import {serviceStatusList} from "@/models/serviceModel";
+import {BASIC_CONSTANTS} from "@/constants/basic.constants";
+import {AlertWithContent} from "@/components/AlertWithContent";
 
 interface TransportResourceHandlerProps {
     transportResources: ITransportResource[];
@@ -49,6 +52,7 @@ const TransportResourceHandler: React.FC<TransportResourceHandlerProps> = ({
     const {data: busesData, isLoading: isLoadingBuses} = busesService.useFetchAllBuses();
 
     const {data: existingDriver} = userService.useFetchAllTravelUsers({phone: newTransportResource.driver?.phone}, {skip: (newTransportResource.driver?.phone?.length || 0) < 11});
+    const [inValid, setInValid] = React.useState(false);
 
     useEffect(() => {
         if (busesData) {
@@ -121,7 +125,24 @@ const TransportResourceHandler: React.FC<TransportResourceHandlerProps> = ({
     };
 
     const addOrEditTransportResource = () => {
+        // Verificar si el recurso de transporte nuevo tiene datos válidos
+        if (Object.keys(newTransportResource.bus).length === 0) {
+            // Si 'bus' está vacío, muestra una alerta y retorna
+            setInValid(true)
+            return;
+        }
+
+        // Verificar si ya existe un conductor con el mismo número de teléfono
+        const driverPhone = newTransportResource.driver?.phone;
+        const isDuplicatePhone = transportResources.some(resource => resource.driver?.phone === driverPhone);
+
+        if (isDuplicatePhone) {
+            setInValid(true)
+            return;
+        }
+
         const updatedTransportResources = [...transportResources];
+
         if (editingIndex !== null) {
             updatedTransportResources[editingIndex] = newTransportResource;
         } else {
@@ -174,6 +195,7 @@ const TransportResourceHandler: React.FC<TransportResourceHandlerProps> = ({
 
     return (
         <div className="flex flex-col gap-3">
+            <AlertWithContent open={inValid} setOpen={setInValid} content={"Telefono ya registrado o datos incompletos"} type="warning"/>
             <h2>{editingIndex !== null ? 'Edit Transport Resource' : 'Add New Transport Resource'}</h2>
             <div className="flex flex-col flex-wrap gap-4">
                 <Typography variant="h6">Guagua: </Typography>
@@ -214,28 +236,34 @@ const TransportResourceHandler: React.FC<TransportResourceHandlerProps> = ({
 
             </div>
             <Typography variant="h6">Finanzas: </Typography>
-            <FinanceHandler finance={newTransportResource.finance} type="transport"
+            <FinanceHandler enabledCost={true} finance={newTransportResource.finance} type="transport"
                             updateFinance={handleFinanceChange}/>
             <Button color="blue"
-                    onClick={addOrEditTransportResource}>{editingIndex !== null ? 'Save Changes' : 'Add Transport Resource'}</Button>
+                    onClick={addOrEditTransportResource}>{editingIndex !== null ? `${BASIC_CONSTANTS.SAVE_TEXT}` : 'Add Transport Resource'}</Button>
             <div className="grid grid-cols-3 gap-4">
                 {transportResources.map((bus, index) => (
-                    <Card key={index} className="p-4 my-2 flex">
-                        <p>Conductor: {bus.driver?.firstName || 'No hay'}</p>
-                        <p>Capacity: {bus.bus.capacity}</p>
-                        <p>Color: {bus.bus.color}</p>
-                        <p>Description: {bus.bus.description}</p>
-                        {bus.finance?.cost ? <p>Cost: {bus.finance.cost}</p> : null}
-                        <p>Price: RD${bus.finance?.price?.toLocaleString()}</p>
-                        <Button variant="text" color="green" onClick={() => startEditing(index)}>Edit</Button>
-                        <Button variant="text" color="red"
-                                onClick={() => handleSetActionToConfirm('delete', 'Delete Transport Resource')(bus)}>Delete</Button>
+                    <Card key={index} className="p-4 my-2 flex flex-col justify-between">
+                        <Typography variant='h6'>Conductor: {bus.driver?.firstName}</Typography>
+                        {busList.map((busItem) => (
+                            <Typography variant='paragraph' key={busItem.value}>
+                                {busItem.label}: {bus.bus[busItem.value]}
+                            </Typography>
+                        ))}
+                        {bus.finance?.cost ? <Typography variant='h6'>Cost: {bus.finance.cost}</Typography> : null}
+                        <Typography variant='h6'>Price: RD${bus.finance?.price?.toLocaleString()}</Typography>
+
+                        <CardFooter className="p-2">
+                            <div className="flex mt-4 gap-2">
+                                <Button variant='outlined' color="green" onClick={() => startEditing(index)}>{BASIC_CONSTANTS.EDIT_TEXT}</Button>
+                                <Button variant="outlined" color="red" onClick={() => handleSetActionToConfirm('delete', 'Delete Transport Resource')(bus)}>{BASIC_CONSTANTS.DELETE_TEXT}</Button>
+                            </div>
+                        </CardFooter>
                     </Card>
                 ))}
             </div>
             <ConfirmDialog/>
 
-            <Dialog open={isBusDialogOpen} handler={setIsBusDialogOpen}>
+            <Dialog size="md" open={isBusDialogOpen} handler={setIsBusDialogOpen}>
                 <DialogHeader>
                     Add/Edit Bus
                 </DialogHeader>
@@ -243,8 +271,8 @@ const TransportResourceHandler: React.FC<TransportResourceHandlerProps> = ({
                     <BusHandler buses={buses || []} updateBuses={updateBuses}/>
                 </DialogBody>
                 <DialogFooter>
-                    <Button variant="text" color="red" onClick={() => setIsBusDialogOpen(false)}>Cancel</Button>
-                    <Button variant="text" color="green" onClick={() => setIsBusDialogOpen(false)}>Save</Button>
+                    <Button variant="text" color="red" onClick={() => setIsBusDialogOpen(false)}>{BASIC_CONSTANTS.CANCEL_TEXT}</Button>
+                    <Button variant="text" color="green" onClick={() => setIsBusDialogOpen(false)}>{BASIC_CONSTANTS.SAVE_TEXT}</Button>
                 </DialogFooter>
             </Dialog>
         </div>

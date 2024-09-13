@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 import {Button, Input, Typography} from '@material-tailwind/react';
-import {IBedroom} from "../../../../models/bedroomModel";
-import {getCrudService} from "../../../../api/services/CRUD.service";
+import {IBedroom} from "@/models/bedroomModel";
+import {getCrudService} from "@/api/services/CRUD.service";
 import {CommonConfirmActions, CommonConfirmActionsDataTypes} from "../../../../models/common";
 import {useConfirmAction} from "../../../../hooks/useConfirmActionHook";
 
@@ -124,9 +124,9 @@ const BedroomsHandler: React.FC<BedroomsHandlerProps> = ({bedrooms, updateBedroo
                 <Button color="blue"
                         onClick={handleAddOrUpdateBedroom}>{editBedroomIndex !== undefined ? 'Actualizar' : 'Crear'} Habitacion</Button>
             </div>
-            <div className="grid gap-y-6 gap-x-6 md:grid-cols-2 xl:grid-cols-5">
+            <div className="grid gap-y-6 gap-x-6 md:grid-cols-2 xl:grid-cols-3">
                 {(bedrooms || []).map((bedroom, index) => (
-                    <div key={index} className="mt-2 bg-gray-100 p-2 rounded-xl p-4">
+                    <div key={index} className="mt-2 bg-gray-100 rounded-xl p-4">
                         <Typography variant="h6">Nombre: {bedroom.name}</Typography>
                         <Typography variant="h6">Capacidad: {bedroom.capacity}</Typography>
                         <Typography variant="h6">Planta: {bedroom.level}</Typography>

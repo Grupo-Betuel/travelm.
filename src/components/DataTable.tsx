@@ -222,12 +222,13 @@ import {
     ArrowDownIcon,
     ArrowLeftIcon,
     ArrowRightIcon,
-    ArrowUpIcon, ChevronDoubleLeftIcon,
+    ArrowUpIcon, BackspaceIcon, ChevronDoubleLeftIcon,
     ChevronDoubleRightIcon
 } from "@heroicons/react/20/solid";
 import SearchableSelect from './SearchableSelect';
 import _ from "lodash";
 import {ChevronLeftIcon, ChevronRightIcon} from "@heroicons/react/24/outline";
+import {asType} from "@material-tailwind/react/types/components/typography";
 
 export type IFilterOptionItem = { label: string, value: string | number };
 
@@ -261,7 +262,7 @@ export function DataTable<T>(
         selectedItems,
     }: DataTableProps<T>) {
     const [searchTerm, setSearchTerm] = useState('');
-    const [filters, setFilters] = useState<Record<keyof T, any>>({});
+    const [filters, setFilters] = useState<Record<keyof T, any>>({} as Record<keyof T, any>);
     const [sortConfig, setSortConfig] = useState<{ key: keyof T, direction: 'ascending' | 'descending' } | null>(null);
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage, setItemsPerPage] = useState(5);
@@ -286,7 +287,7 @@ export function DataTable<T>(
         }));
     };
 
-    const handleSort = (key: keyof T) => {
+    const handleSort = (key: keyof T ) => {
         setSortConfig(prevConfig => {
             if (prevConfig && prevConfig.key === key && prevConfig.direction === 'ascending') {
                 return {key, direction: 'descending'};
@@ -364,8 +365,8 @@ export function DataTable<T>(
 
     const renderPagination = () => {
         const pageNumbers = [];
-        const startPage = Math.max(1, currentPage - 3);
-        const endPage = Math.min(totalPages, currentPage + 3);
+        const startPage = Math.max(1, currentPage - 1);
+        const endPage = Math.min(totalPages, currentPage + 2);
 
         for (let i = startPage; i <= endPage; i++) {
             pageNumbers.push(i);
@@ -401,7 +402,7 @@ export function DataTable<T>(
                         size="sm"
                         color={currentPage === page ? "blue" : "gray"}
                         variant="outlined"
-                        className="rounded-full"
+                        className="rounded-full w-10 flex items-center justify-center"
                         ripple
                         onClick={() => handlePageChange(page)}
                     >
@@ -434,15 +435,32 @@ export function DataTable<T>(
         );
     };
 
+    const handleClear = (key : keyof T | 'search') => {
+        if (key === 'search') {
+            setSearchTerm('');
+        } else {
+            setFilters((prevFilters) => ({
+                ...prevFilters,
+                [key]: '',
+            }));
+        }
+    };
+
     return (
         <div className="flex flex-col gap-4 mb-4">
             <div className="mb-1 flex flex-col gap-6">
                 <Input
+                    crossOrigin={false}
                     label="Buscar"
                     size="lg"
                     placeholder="Buscar..."
                     value={searchTerm}
                     onChange={handleSearchChange}
+                    icon={
+                    searchTerm ? (
+                        <BackspaceIcon className="h-5 w-5" onClick={() => handleClear('search')}/>
+                        ): null
+                    }
                 />
             </div>
             <div className="flex gap-4">
@@ -450,10 +468,16 @@ export function DataTable<T>(
                     <div key={`${option.key as string}-${index}`}>
                         {option.type === 'text' && (
                             <Input
+                                crossOrigin={false}
                                 size="lg"
                                 label={option.label}
                                 value={filters[option.key] || ''}
                                 onChange={(e) => handleFilterChange(option.key, [e.target.value])}
+                                icon={
+                                    (filters[option.key]) ? (
+                                        <BackspaceIcon className="h-5 w-5" onClick={() => handleClear(option.key)}/>
+                                    ): null
+                                }
                             />
                         )}
                         {option.type === 'select' && (
@@ -461,7 +485,7 @@ export function DataTable<T>(
                                 multiple
                                 label={option.label}
                                 options={option.options || []}
-                                onSelect={(selectedValues) => handleFilterChange(option.key, selectedValues.map(value => value.value))}
+                                onSelect={(selectedValues: any[]) => handleFilterChange(option.key, selectedValues.map(value => value.value))}
                                 displayProperty="label"
                                 className="min-w-[200px]"
                             />
@@ -511,6 +535,7 @@ export function DataTable<T>(
                         por pagina:
                     </Typography>
                     <Input
+                        crossOrigin={false}
                         width={"50px"}
                         type="number"
                         value={itemsPerPage}

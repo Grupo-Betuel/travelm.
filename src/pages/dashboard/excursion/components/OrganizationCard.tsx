@@ -1,4 +1,4 @@
-import React, {useMemo} from 'react';
+import React, {useMemo, useState} from 'react';
 import {Card, CardBody, Typography, Avatar, CardHeader, CardFooter, Button} from "@material-tailwind/react";
 import {Swiper, SwiperSlide} from 'swiper/react';
 import 'swiper/css';
@@ -11,6 +11,7 @@ import {TravelMap} from "../../../../components/TravelMap";
 import {IMG_CONSTANTS} from "../../../../constants/img.utils";
 import {Link} from "react-router-dom";
 import {GrLocation} from "react-icons/gr";
+import {AlertWithContent} from "@/components/AlertWithContent";
 
 interface OrganizationCardProps {
     organization: IOrganization;
@@ -35,6 +36,17 @@ export const OrganizationCard: React.FC<OrganizationCardProps> = ({onEdit, organ
     const handleOnEdit = () => {
         onEdit && onEdit(organization);
     }
+    const [alertVisible, setAlertVisible] = useState(false);
+    const handleCopyToClipboard = (text : string) => {
+        navigator.clipboard.writeText(text)
+            .then(() => {
+                setAlertVisible(true);
+                setTimeout(() => {
+                    setAlertVisible(false);
+                }, 2000); // La alerta será visible durante 2 segundos
+            })
+            .catch(err => console.error('Error copying text: ', err));
+    };
 
     return (
         <Card className={`${className} min-w-[250px]`}>
@@ -79,29 +91,37 @@ export const OrganizationCard: React.FC<OrganizationCardProps> = ({onEdit, organ
                             {network.type === 'twitter' && <FaTwitter className="text-blue-600 text-lg"/>}
                         </a>
                     ))}
-                    {!!(organization.contact?.location?.link || organization.contact?.location?.link) &&
-                        <div className="flex items-center gap-2">
-                            <GrLocation color="red" className="w-16 h-16"/>
-                            {
-                                organization.contact?.location?.link ?
-
-                                    <Link target={"_blank"} to={organization.contact?.location?.link}
-                                          className="font-light text-blue-500 whitespace-pre-line line-clamp-1">
-                                        {organization.contact.location.address}
-                                    </Link>
-                                    : organization.contact?.location?.address &&
-                                    <span
-                                        className="font-light whitespace-pre-line line-clamp-1">
-                                {organization.contact.location.address}
-                            </span>
-                            }
-                        </div>
-                    }
 
                 </div>
             </CardBody>
-            <CardFooter className="flex justify-between flex-row-reverse pt-0">
-                {onEdit && <Button className="justify-self-end" variant="text" color="blue"
+            <CardFooter className="flex justify-between pt-0">
+                {/*Funcionalidad de ubicacion mejor posicionada*/}
+                {!!(organization.contact?.location?.link || organization.contact?.location?.address) &&
+                    <div className="flex">
+                        {
+                            organization.contact?.location?.link ?
+                                <Button
+                                    variant="outlined"
+                                    color="blue"
+                                    onClick={() => window.open(organization.contact?.location?.link, '_blank')}
+                                    className="text-blue-500 whitespace-pre-line line-clamp-1 px-4">
+                                    {/*{organization.contact.location.address}*/}
+                                    Ubicacion
+                                </Button>
+                                : organization.contact?.location?.address &&
+                                <Button
+                                    variant="outlined"
+                                    color="blue"
+                                    onClick={() => handleCopyToClipboard(organization.contact?.location?.address as string)}
+                                    className="whitespace-pre-line line-clamp-1 px-4">
+                                    Direccion
+                                </Button>
+
+                        }
+                    </div>
+                }
+                <AlertWithContent content='Direccion Copiada en el portapapeles' open={alertVisible} setOpen={setAlertVisible} type="success"/>
+                {onEdit && <Button className="px-4" variant="outlined" color="blue"
                                    onClick={handleOnEdit}>Editar</Button>}
             </CardFooter>
         </Card>

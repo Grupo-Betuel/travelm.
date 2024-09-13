@@ -3,7 +3,7 @@ import {Button, Card, CardBody, CardHeader, Typography} from '@material-tailwind
 import {UserIcon} from '@heroicons/react/20/solid';
 import ExcursionGeneralInfo from '../components/ExcursionGeneralnfo';
 import {MediaHandlerStep} from '../components/Steps/MediaHandlerStep';
-import {ExcursionStatusEnum, IExcursion} from '../../../../models/excursionModel';
+import {ExcursionStatusEnum, IExcursion} from '@/models/excursionModel';
 import {
     validateStep1,
     validateStep2,
@@ -12,21 +12,22 @@ import {
     validateStep5,
     validateStep6,
     validateStep7
-} from "../../../../utils/excursionStepperValidations";
+} from "@/utils/excursionStepperValidations";
 import {OrganizationsDestinationsStep} from "../components/Steps/OrganizationsDestinationsStep";
 import ActivitiesHandlerStep from "../components/Steps/ActivitiesHandlerStep";
 import FoodsHandlerStep from "../components/Steps/FoodsHandlerStep";
 import {ProjectHandlerStep} from "../components/Steps/ProjectionsHandlerStep";
 import {TransportHandlerStep} from "../components/Steps/TransportHandlerStep";
-import {getCrudService} from "../../../../api/services/CRUD.service";
+import {getCrudService} from "@/api/services/CRUD.service";
 import {useNavigate, useParams} from "react-router-dom";
-import {EXCURSION_CONSTANTS} from "../../../../constants/excursion.constant";
-import {useGCloudMediaHandler} from "../../../../hooks/useGCloudMedediaHandler";
-import {IMediaFile} from "../../../../models/mediaModel";
+import {EXCURSION_CONSTANTS} from "@/constants/excursion.constant";
+import {useGCloudMediaHandler} from "@/hooks/useGCloudMedediaHandler";
+import {IMediaFile} from "@/models/mediaModel";
 import FinancesHandlerStep from "../components/Steps/FinancesHandlerStep";
-import {IStep} from "../../../../models/common";
-import {AppStepper} from "../../../../components/AppStepper";
-import {useAppLoading} from "../../../../context/appLoadingContext";
+import {IStep} from "@/models/common";
+import {AppStepper} from "@/components/AppStepper";
+import {useAppLoading} from "@/context/appLoadingContext";
+import {CheckpointHandlerStep} from "@/pages/dashboard/excursion/components/Steps/CheckpointHandlerStep";
 
 
 const excursionService = getCrudService("excursions");
@@ -75,6 +76,7 @@ const ExcursionStepper: React.FC = () => {
 
     useEffect(() => {
         if (createdExcursion && createdExcursion._id) {
+            console.log('createdExcursion', createdExcursion);
             navigate('/dashboard/excursions/handler/' + createdExcursion._id, {replace: true});
             setExcursion(createdExcursion);
         }
@@ -285,6 +287,12 @@ const ExcursionStepper: React.FC = () => {
             component: <TransportHandlerStep excursionData={excursion} updateExcursion={updateExcursionData}/>,
         },
         {
+            properties: ['checkpoints'],
+            label: 'checkpoints',
+            icon: <UserIcon className="max-w-[20px]"/>,
+            component: <CheckpointHandlerStep excursionData={excursion} updateExcursion={updateExcursionData}/>,
+        },
+        {
             properties: ['finance'],
             label: 'Finanzas',
             icon: <UserIcon className="max-w-[20px]"/>,
@@ -309,32 +317,40 @@ const ExcursionStepper: React.FC = () => {
     }
 
     useEffect(() => {
+        console.log('excursion =>', excursion);
+        const isTitleValid = !!excursion.title;
+        const isDescriptionValid = !!excursion.description;
+        const isStartDateValid = !!excursion.startDate;
+        const isEndDateValid = !!excursion.endDate;
+        const areDestinationsValid = excursion.destinations && excursion.destinations.length > 0;
+        const isFlyerValid = !!excursion.flyer;
+        const isTransportValid = !!excursion.transport;
+        const isFinanceValid = !!excursion.finance;
+        console.log('Flyer Valid:', isFlyerValid);
+
         if (
-            // excursion.organizations && excursion.organizations.length > 0 &&
-            // excursion.activities && excursion.activities.length > 0 &&
-            // excursion.foods && excursion.foods.length > 0 &&
-            // excursion.projections && excursion.projections.length > 0 &&
-            excursion.title &&
-            excursion.description &&
-            excursion.startDate &&
-            excursion.endDate &&
-            excursion.destinations &&
-            excursion.destinations.length > 0 &&
-            excursion.flyer &&
-            excursion.transport &&
-            excursion.finance
+            isTitleValid &&
+            isDescriptionValid &&
+            isStartDateValid &&
+            isEndDateValid &&
+            areDestinationsValid &&
+            isFlyerValid &&
+            isTransportValid &&
+            isFinanceValid
         ) {
+            console.log('completed');
             if (excursion.status !== 'completed') {
                 setExcursion({...excursion, status: ExcursionStatusEnum.COMPLETED});
             }
         } else {
-            console.log('draft')
+            console.log('draft');
             if (excursion.status !== 'draft') {
                 setExcursion({...excursion, status: ExcursionStatusEnum.DRAFT});
             }
         }
 
     }, [excursion]);
+
 
     useEffect(() => {
         console.log('excursionData =>', excursionData)
