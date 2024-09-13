@@ -168,6 +168,7 @@ export const ExcursionDetails: React.FC = () => {
             }
 
             if (!isOptimistic) {
+
                 const {data} = await updateClient({_id: client._id, ...client})
                 client = {
                     ...client,

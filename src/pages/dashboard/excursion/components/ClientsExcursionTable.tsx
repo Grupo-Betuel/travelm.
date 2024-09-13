@@ -99,6 +99,26 @@ export const ClientsExcursionTable = (
         setIsNewClientOpen(!isNewClientOpen);
     };
 
+    const handleCommentChange = (client: IClient, updatedComments: IComment[]) => {
+        const service = getService(client);
+
+        if (!service) {
+            // TODO: toast service not found
+            return;
+        }
+
+        // Update the service with the new array of comments
+        const updatedService = { ...service, comments: updatedComments };
+        const updatedClient: IClient = {
+            ...client,
+            services: client.services.map(s => s.excursionId === excursion._id ? updatedService : s) as IService[]
+        };
+
+        // Update the client and service with the new comments
+        onUpdateClient(updatedClient, { isOptimistic: true, avoidConfirm: true });
+        updatedService?._id && updateService({ _id: updatedService._id, ...updatedService });
+    };
+
     const toggleAssignGroupModal = () => {
         setSelectedWsGroup(null);
         setAssignWsGroupModal(!assignWsGroupModal);
@@ -204,9 +224,14 @@ export const ClientsExcursionTable = (
 
     const handleDeleteClient = (client: IClient) => () => {
         const updatedClients = clients.filter(c => c._id !== client._id);
+        const updatedClient = {
+            ...client,
+            services: client.services.filter(s => s.excursionId !== excursion._id) as IService[]
+        }
+        onUpdateClient(updatedClient);
         updateExcursion({
             clients: updatedClients
-        });
+        }, { isOptimistic: true, avoidConfirm: true });
     };
 
 
@@ -292,18 +317,19 @@ export const ClientsExcursionTable = (
     }, [clients, bedrooms, excursion]);
 
 
-    const onChangeBedroom = (client: IClient) => (value?: string) => {
+    const onChangeBedroom = (client: IClient) => (value?: string, currentSelect?: any) => {
         const bedroom = bedrooms?.find(b => b._id === value);
-        const service = getService(client);
+        const service = client.currentService;
         if (!service) {
             // TODO: toast service not found
             return;
         }
 
-        const updatedService = {...service, bedroom};
+        const updatedService = {...service, bedroom: bedroom || null};
 
         const updatedClient: IClient = {
             ...client,
+            currentService: updatedService,
             services: client.services.map(s => s.excursionId === excursion._id ? updatedService : s) as IService[]
         };
 
@@ -367,7 +393,7 @@ export const ClientsExcursionTable = (
         }
 
         const mapClients = selectedClients.map(client => {
-            const service = getService(client);
+            const service = client.currentService;
             const updatedService = {...service, bedroom};
             if (!service) {
                 // TODO: toast service not found
@@ -376,6 +402,7 @@ export const ClientsExcursionTable = (
 
             const updatedClient: IClient = {
                 ...client,
+                currentService: updatedService,
                 services: client.services.map(s => s.excursionId === excursion._id ? updatedService : s) as IService[]
             };
 
@@ -384,6 +411,8 @@ export const ClientsExcursionTable = (
 
 
         onUpdateClient(mapClients);
+        setSelectedClients([])
+
     }
 
     const onChangeClientsServiceStatus = (options: IOption<ServiceStatusTypes>[]) => {
@@ -393,7 +422,7 @@ export const ClientsExcursionTable = (
         }
 
         const mapClients: IClient[] = selectedClients.map(client => {
-            const service = getService(client);
+            const service = client.currentService;
             if (!service) {
                 return;
             }
@@ -413,7 +442,7 @@ export const ClientsExcursionTable = (
 
     const onChangeServiceStatus = (client: IClient, option: IOption<ServiceStatusTypes>) => {
         const status = option.value;
-        const service = getService(client);
+        const service = client.currentService;
         if (!service) {
             // TODO: toast service not found
             return;
@@ -422,6 +451,7 @@ export const ClientsExcursionTable = (
 
         const updatedClient: IClient = {
             ...client,
+            currentService: updatedService,
             services: client.services.map(s => s.excursionId === excursion._id ? updatedService : s) as IService[]
         };
 
@@ -429,42 +459,21 @@ export const ClientsExcursionTable = (
         updatedService?._id && updateService({_id: updatedService._id, ...updatedService});
     }
 
-    const handleCommentChange = (client: IClient, updatedComments: IComment[]) => {
-        const service = getService(client);
-
-        if (!service) {
-            // TODO: toast service not found
-            return;
-        }
-
-        // Update the service with the new array of comments
-        const updatedService = { ...service, comments: updatedComments };
-        const updatedClient: IClient = {
-            ...client,
-            services: client.services.map(s => s.excursionId === excursion._id ? updatedService : s) as IService[]
-        };
-
-        // Update the client and service with the new comments
-        onUpdateClient(updatedClient, { isOptimistic: true, avoidConfirm: true });
-        updatedService?._id && updateService({ _id: updatedService._id, ...updatedService });
-    };
-
 
     useEffect(() => {
         if (selectedClient) {
             const clientData = clients.find(c => c._id === selectedClient._id);
             if (JSON.stringify(clientData) !== JSON.stringify(selectedClient)) {
-                console.log('Updating selectedClient state', clientData);
                 setSelectedClient(clientData || selectedClient);
             }
         }
     }, [clients]);
 
     const renderRow = (client: IClient, index: number, selected: boolean, onSelect: (checked: boolean) => void) => {
-        const noService = "No Service";
-        const serviceStatus = getServiceStatus(client);
+        const noService = "No Service"
+        const serviceStatus = client.currentService?.status;
         const statusColor = getStatusColor(serviceStatus || noService);
-        const serviceC = getService(client);
+        const serviceC = client.currentService;
         const bedroomOptions: IOption[] = (bedrooms?.map((b) => ({
             label: `${b.name} | ${b.zone}`,
             value: b._id
@@ -561,7 +570,7 @@ export const ClientsExcursionTable = (
                                 selectedValues={clientBedroom ? [clientBedroom] : undefined}
                                 label="Habitación"
                                 options={bedroomOptions}
-                                onSelect={(selectedValues: IOption[]) => onChangeBedroom(client)(selectedValues[0].value)}
+                                onSelect={(selectedValues: IOption[], currentSelect?: IOption) => onChangeBedroom(client)(selectedValues[0]?.value, currentSelect)}
                                 displayProperty="label"
                                 className="min-w-[200px]"
                             />

@@ -38,6 +38,7 @@ export interface IWsGroup {
     subject: string;
     participants: IWsUser[];
     id?: string;
+    title?: string;
     description?: string;
     createAt?: any;
 }

@@ -198,6 +198,7 @@ export const OrganizationForm: React.FC<OrganizationHandlerProps> = (
     }
 
     const onSubmitOrganizationUser = async (user: IUser) => {
+
         if (!organization._id) {
             // TODO: TOAST ALERT THE ORGANIZATION MUST BE CREATED FIRST
             return;
