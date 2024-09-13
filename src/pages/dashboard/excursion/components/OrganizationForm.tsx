@@ -16,7 +16,7 @@ import MediaHandler, {IMediaHandled} from "./MediaHandler";
 import MapPicker from "../../../../components/MapPicker";
 import BedroomsHandler from "./BedroomssHandler";
 import {FinanceHandler} from "./FinanceHandler";
-import {IFinance} from "@/models/financeModel";
+import {FinanceOptionEnum, IFinance} from "@/models/financeModel";
 import React, {useEffect, useMemo, useState} from "react";
 import {IOrganization, organizationTypeList, OrganizationTypesEnum} from "@/models/organizationModel";
 import {ILocation} from "@/models/ordersModels";
@@ -236,7 +236,7 @@ export const OrganizationForm: React.FC<OrganizationHandlerProps> = (
                 <div className='flex flex-col relative w-1/5 space-y-4'>
                     <MediaHandler logoMedia={organization.logo} medias={organization.medias} onChange={handleLogoChange}
                                   handle={{logo: true}}/>
-                    <FinanceHandler options={true} finance={organization.entryFee || {} as IFinance} updateFinance={handleEntryFee}/>
+                    <FinanceHandler options={[]} finance={organization.entryFee || {} as IFinance} updateFinance={handleEntryFee}/>
                 </div>
                 <div className='flex flex-col gap-4 w-2/3'>
                     <div className='grid grid-cols-2 gap-4 '>

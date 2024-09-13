@@ -38,11 +38,12 @@ export const FinanceHandler = ({
     };
 
     useEffect(() => {
+        console.log("options", options)
         if (!options) return
 
-        setEnableCost(options.includes(FinanceOptionEnum.COST));
-        setEnableRates(options.includes(FinanceOptionEnum.COUPLE));
-        setEnableChildren(options.includes(FinanceOptionEnum.CHILDREN));
+        setEnableCost(!!options?.includes(FinanceOptionEnum.COST));
+        setEnableRates(!!options?.includes(FinanceOptionEnum.COUPLE));
+        setEnableChildren(!!options?.includes(FinanceOptionEnum.CHILDREN));
     }, [options]);
 
     useEffect(() => {
