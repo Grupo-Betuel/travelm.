@@ -201,9 +201,9 @@ export const ExcursionDetails: React.FC = () => {
 
     const addExpense = (expense: IExpense) => {
         const updatedExpenses = [...(excursion.expenses || []), expense];
-        const updatedExcursion: IExcursion = { ...excursion, expenses: updatedExpenses };
+        const updatedExcursion: IExcursion = {...excursion, expenses: updatedExpenses};
         setExcursion(updatedExcursion);
-        updateExcursion({ _id: excursion._id || '', expenses: updatedExpenses });
+        updateExcursion({_id: excursion._id || '', expenses: updatedExpenses});
     };
 
     console.log(ownerOrganization?.sessionId);
@@ -314,33 +314,54 @@ export const ExcursionDetails: React.FC = () => {
             {!!excursionBedrooms?.length && <BedroomDetails excursion={excursion}/>}
             {/*{!!excursion.activities.length && <ActivityDetails activities={excursion.activities}/>}*/}
             {/*<ProjectionsCharts projections={excursion.projections}/>*/}
-            {!!excursion.checkpoints?.length &&
-                <div>
-                    <Swiper
-                        modules={[Navigation, Pagination]}
-                        spaceBetween={10}
-                        slidesPerView={1}
-                        navigation
-                        pagination={{clickable: true}}
-                        className="relative h-[300px] w-full"
-                    >
-                        {excursion.checkpoints.map((checkpoint, index) => (
-                            <SwiperSlide key={index}>
-                                <Card>
-                                    <CardHeader>
-                                        <TravelMap location={checkpoint.location}/>
-                                    </CardHeader>
-                                    <CardBody>
-                                        <Typography>{checkpoint.description}</Typography>
-                                        <Button color="orange" onClick={() => editCheckpoint(checkpoint)}>Edit</Button>
-                                    </CardBody>
-                                </Card>
-                            </SwiperSlide>
-                        ))}
-                    </Swiper>
+            {!!excursion.checkpoints?.length && (
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-3"> {/* Para dividir en 3 columnas */}
+                    {excursion.checkpoints.map((checkpoint, index) => (
+                        <Card key={index} className="flex flex-col">
+                            <CardBody>
+                                <Typography variant="h6" color="blue-gray" className="mb-2">
+                                    {checkpoint.description}
+                                </Typography>
+                                <Typography variant="small" color="gray" className="mb-4">
+                                    {checkpoint.location.address}, {checkpoint.location.city},{" "}
+                                    {checkpoint.location.province}, {checkpoint.location.country}
+                                </Typography>
 
+                                {/* Mostrar lista de buses */}
+                                {!!checkpoint.buses?.length && (
+                                    <div className="mb-4">
+                                        <Typography variant="h6" color="blue-gray">
+                                            Buses Disponibles:
+                                        </Typography>
+                                        <ul className="list-disc ml-4">
+                                            {checkpoint.buses.map((bus, busIndex) => (
+                                                <li key={busIndex}>
+                                                    <Typography variant="small" color="gray">
+                                                        Modelo: {bus.model}, Capacidad: {bus.capacity}, Color: {bus.color}
+                                                    </Typography>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                )}
+
+                                <div className="mt-auto"> {/* Asegura que el botón esté en la parte inferior */}
+                                    <Button
+                                        size="sm"
+                                        color="blue"
+                                        variant="outlined"
+                                        onClick={() => window.open(checkpoint.location.link, "_blank")}
+                                        className="w-full"
+                                    >
+                                        Ver en Google Maps
+                                    </Button>
+                                </div>
+                            </CardBody>
+                        </Card>
+                    ))}
                 </div>
-            }
+            )}
+
 
             {/* Organization, Destination, and TransportStep Information Cards */}
             <div>

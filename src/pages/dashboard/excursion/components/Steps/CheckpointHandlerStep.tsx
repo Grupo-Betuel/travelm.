@@ -18,7 +18,7 @@ export const CheckpointHandlerStep: React.FC<CheckpointFormProps> = ({ excursion
     const [currentLocation, setCurrentLocation] = useState<ILocation | null>(null);
 
     useEffect(() => {
-        setLocalCheckpoints(excursionData.checkpoints || []);
+        setLocalCheckpoints(excursionData.checkpoints);
     }, [excursionData]);
 
     // Handle location change
