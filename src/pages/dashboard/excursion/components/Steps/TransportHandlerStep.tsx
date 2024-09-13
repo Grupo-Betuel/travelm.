@@ -1,9 +1,9 @@
 import React from "react";
 import OrganizationHandler from "../OrganizationHandler";
-import {IExcursion} from "../../../../../models/excursionModel";
-import {IOrganization, OrganizationTypesEnum} from "../../../../../models/organizationModel";
+import {IExcursion} from "@/models/excursionModel";
+import {IOrganization, OrganizationTypesEnum} from "@/models/organizationModel";
 import TransportResourceHandler from "../TransportResourceHandler";
-import {ITransportResource} from "../../../../../models/transportResourcesModel";
+import {ITransportResource} from "@/models/transportResourcesModel";
 
 export interface ITransportHandlerStepProps {
     excursionData: IExcursion;
