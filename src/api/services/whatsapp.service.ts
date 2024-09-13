@@ -141,23 +141,48 @@ export const getScheduleStatus = async (
 export const sendWhatsappMessage = async (
     sessionId: string,
     contacts: (IClient | IWsUser)[],
-    message: IWhatsappMessage
+    message: IWhatsappMessage | IWhatsappMessage[]
 ) => {
+
+    const formData = new FormData();
+    const messages = Array.isArray(message) ? message : [message];
+
+    messages.forEach((message, index) => {
+
+        if (message.media) {
+            const {content, type, name} = message.media;
+            if (content instanceof Blob) {
+                formData.append('media', content, name);
+                message.media = {
+                    ...message.media,
+                    content: index.toString(),
+                }
+            }
+        }
+    });
+
+    formData.append('messages', JSON.stringify(messages));
+    formData.append('contacts', JSON.stringify(contacts));
+    formData.append('sessionId', sessionId);
+
+
     try {
         return await (await fetch(
             `${import.meta.env.VITE_PROMOTION_API}whatsapp/message`,
             {
                 method: "POST",
-                headers: {
-                    Accept: "application/json",
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    sessionId,
-                    message,
-                    contacts: contacts.filter((item) => !!item),
-                    delay: 10,
-                }),
+                // headers: {
+                //     Accept: "application/json",
+                //     "Content-Type": "application/json",
+                // },
+
+                // body: JSON.stringify({
+                //     sessionId,
+                //     message,
+                //     contacts: contacts.filter((item) => !!item),
+                //     delay: 10,
+                // }),
+                body: formData
             }
         )).json();
     } catch (e) {
