@@ -6,6 +6,7 @@ import ServiceHandler from "./ServiceHandler";
 import {IService} from "@/models/serviceModel";
 import {getCrudService} from "@/api/services/CRUD.service";
 import {ICustomComponentDialog} from "@/models/common";
+import ContactForm from "@/pages/dashboard/excursion/components/ContactForm";
 
 interface ClientFormProps {
     initialClient?: IClient;
@@ -149,6 +150,16 @@ const ClientForm: React.FC<ClientFormProps> = (
                     value={client.lastName}
                     onChange={handleChange}
                 />
+            </div>
+                <Input
+                    crossOrigin={"true"}
+                    label="Correo"
+                    name="email"
+                    value={client.email}
+                    onChange={handleChange}
+                />
+            <div>
+                {/*<ContactForm contact={organization.contact} updateContact={handleContactChange}/>*/}
             </div>
             {enableService && <ServiceHandler
                 service={service}

@@ -147,25 +147,20 @@ export const ClientsExcursionTable = (
     };
 
     const handleToggleCoordinator = (client: IClient) => {
-        const service = getService(client); // Obtener el servicio actual del cliente
+        // Verificar si existe currentService
+        if (!client.currentService) return;
 
-        if (!service) {
-            // TODO: toast service not found
-            return;
-        }
-
-        // Alternar el valor de isCoordinator
-        const updatedService = { ...service, isCoordinator: !service.isCoordinator };
-
-        // Actualizar el cliente con el nuevo servicio
-        const updatedClient: IClient = {
+        // Clonar el cliente y su currentService, alternar isCoordinator
+        const updatedClient = {
             ...client,
-            services: client.services.map(s => s.excursionId === excursion._id ? updatedService : s) as IService[]
+            currentService: {
+                ...client.currentService,
+                isCoordinator: !client.currentService.isCoordinator // Cambiar el estado
+            }
         };
+        onUpdateClient(updatedClient);
 
-        // Actualizar el cliente y el servicio con el nuevo estado de isCoordinator
-        onUpdateClient(updatedClient, { isOptimistic: true, avoidConfirm: true });
-        updatedService._id && updateService({ _id: updatedService._id, ...updatedService });
+        // Llamar la función para actualizar el cliente
     };
 
     const toggleEdit = (index: number, client: IClient) => {
@@ -617,10 +612,10 @@ export const ClientsExcursionTable = (
                         <IconButton variant="text" color="blue" size="sm" onClick={() => openModal(client)}>
                             <BiDollar className="h-5 w-5" />
                         </IconButton>
-                        <IconButton variant="text" color="blue" size="sm" onClick={() => handleClientToEdit(client)}>
+                        <IconButton variant="text" color="blue" size="sm" onClick={handleClientToEdit(client)}>
                             <PencilIcon className="h-5 w-5" />
                         </IconButton>
-                        <IconButton variant="text" color="red" size="sm" onClick={() => handleDeleteClient(client)}>
+                        <IconButton variant="text" color="red" size="sm" onClick={handleDeleteClient(client)}>
                             <TrashIcon className="h-5 w-5" />
                         </IconButton>
                     </div>

@@ -5,18 +5,21 @@ import {IClient} from "@/models/clientModel";
 import {IoReload} from "react-icons/io5";
 import ProtectedElement from "../../../../components/ProtectedElement";
 import {UserRoleTypes} from "../../../../models/interfaces/userModel";
+import {useClientHandler} from "@/hooks/useClientHandler";
+import {BiUser} from "react-icons/bi";
 
 export const ClientsList: React.FC = () => {
     const {
-        organizationForm,
-        toggleHandleOrganization,
-        setSelectedOrganization,
-        organizations,
-        refetchOrganizations,
-        onEditOrganization,
-        onDeleteOrganization
-    } = useOrganizationHandler({});
+        clientForm,
+        toggleHandleClient,
+        setSelectedClient,
+        clientList,
+        refetchClients,
+        onEditClient,
+        onDeleteClient
+    } = useClientHandler({});
 
+    console.log('client', clientList);
     return (
         <div>
             <Card>
@@ -25,19 +28,19 @@ export const ClientsList: React.FC = () => {
                         <Typography variant="h4" color="white">
                             Clientes
                         </Typography>
-                        <Button variant="text" color="white" onClick={refetchOrganizations}>
+                        <Button variant="text" color="white" onClick={refetchClients}>
                             <IoReload className="w-[18px] h-[18px] cursor-pointer"/>
                         </Button>
                     </div>
                     <ProtectedElement roles={[UserRoleTypes.ADMIN]}>
-                        <Button color="blue" onClick={toggleHandleOrganization}>Crear Cliente</Button>
+                        <Button color="blue" onClick={toggleHandleClient}>Crear Cliente</Button>
                     </ProtectedElement>
                 </CardHeader>
                 <CardBody className="overflow-x-scroll px-0 pt-0 pb-2">
                     <table className="w-full min-w-[640px] table-auto">
                         <thead>
                         <tr>
-                            {["Logo", "Nombre", "Email", "Tipo", "Acciones"].map((el) => (
+                            {["","Telefono", "Nombre","Apellido", "Email", "Acciones"].map((el) => (
                                 <th
                                     key={el}
                                     className="border-b border-blue-gray-50 py-3 px-5 text-left"
@@ -53,29 +56,39 @@ export const ClientsList: React.FC = () => {
                         </tr>
                         </thead>
                         <tbody>
-                        {organizations?.map(
-                            (organization: IOrganization, key: number) => {
-                                const className = `py-3 px-5 ${
-                                    key === organizations.length - 1
-                                        ? ""
-                                        : "border-b border-blue-gray-50"
-                                }`;
-                                const {logo, name, email, type} = organization;
+                        {clientList?.map(
+                            (client: IClient, key: number) => {
+                                const className = "py-3 px-5";
+                                const { phone, firstName,lastName, email} = client;
 
                                 return (
-                                    <tr key={`${name}-${key}`}>
+                                    <tr key={`${firstName}-${key}`}>
                                         <td className={className}>
                                             <div className="flex items-center gap-4">
-                                                <Avatar src={logo?.content} alt={name} size="sm" variant="rounded"/>
+                                                <BiUser className="w-6 h-6"/>
                                             </div>
                                         </td>
                                         <td className={className}>
                                             <Typography
                                                 variant="small"
                                                 color="blue-gray"
-                                                className="font-semibold"
+                                                className="font-semibold w-28"
                                             >
-                                                {name}
+                                                {phone}
+                                            </Typography>
+                                        </td>
+                                        <td className={className}>
+                                            <Typography
+                                                variant="small"
+                                                color="blue-gray"
+                                                className="font-semibold w-28"
+                                            >
+                                                {firstName}
+                                            </Typography>
+                                        </td>
+                                        <td className={className}>
+                                            <Typography className="text-xs font-semibold text-blue-gray-600">
+                                                {lastName}
                                             </Typography>
                                         </td>
                                         <td className={className}>
@@ -84,16 +97,11 @@ export const ClientsList: React.FC = () => {
                                             </Typography>
                                         </td>
                                         <td className={className}>
-                                            <Typography className="text-xs font-semibold text-blue-gray-600">
-                                                {type}
-                                            </Typography>
-                                        </td>
-                                        <td className={className}>
                                             <div className="flex items-center gap-2">
                                                 <Button color="blue" size="sm"
-                                                        onClick={() => onEditOrganization(organization)}>Editar</Button>
+                                                        onClick={() => onEditClient(client)}>Editar</Button>
                                                 <Button color="red" size="sm"
-                                                        onClick={() => onDeleteOrganization(organization)}>Eliminar</Button>
+                                                        onClick={() => onDeleteClient(client)}>Eliminar</Button>
                                             </div>
                                         </td>
                                     </tr>
@@ -104,7 +112,7 @@ export const ClientsList: React.FC = () => {
                     </table>
                 </CardBody>
             </Card>
-            {organizationForm}
+            {clientForm}
         </div>
     );
 }

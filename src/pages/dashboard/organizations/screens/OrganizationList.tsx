@@ -16,7 +16,7 @@ export const OrganizationList: React.FC = () => {
         onEditOrganization,
         onDeleteOrganization
     } = useOrganizationHandler({});
-
+    console.log('organizations', organizations);
     return (
         <div>
             <Card>
