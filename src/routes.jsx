@@ -11,6 +11,7 @@ import {SignIn, SignUp} from "@/pages/auth";
 import Excursions from "@/pages/dashboard/excursion/excursions";
 import {CgOrganisation} from "react-icons/cg";
 import Organizations from "@/pages/dashboard/organizations/organizations";
+import Clients from "@/pages/dashboard/clients/clients";
 
 const icon = {
     className: "w-5 h-5 text-inherit",
@@ -32,6 +33,14 @@ export const routes = [
                 name: 'Organizaciones',
                 path: '/organizations/*',
                 element: Organizations,
+                roles: ['admin'],
+                userTypes: ['agency'],
+            },
+            {
+                icon: <CgOrganisation {...icon} />,
+                name: 'Clientes',
+                path: '/clients/*',
+                element: Clients,
                 roles: ['admin'],
                 userTypes: ['agency'],
             },
