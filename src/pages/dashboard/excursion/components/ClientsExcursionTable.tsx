@@ -13,7 +13,14 @@ import {
     Input, Menu, MenuHandler, MenuItem, MenuList,
     Typography
 } from "@material-tailwind/react";
-import {ArrowDownIcon, ChevronDownIcon, PencilIcon, TrashIcon, UserIcon} from "@heroicons/react/20/solid";
+import {
+    AcademicCapIcon,
+    ArrowDownIcon,
+    ChevronDownIcon,
+    PencilIcon,
+    TrashIcon,
+    UserIcon
+} from "@heroicons/react/20/solid";
 import ClientForm, {emptyClient} from "./ClientForm";
 import PaymentHandler from "./PaymentsHandler";
 import {BiDollar, BiPlus, BiSearch, BiSync} from "react-icons/bi";
@@ -91,7 +98,6 @@ export const ClientsExcursionTable = (
         fetchWsSeedData,
     } = useWhatsapp(whatsappSessionKeys.betueltravel);
 
-
     const [deletePayment] = paymentService.useDeletePayments();
     const [updateService] = serviceService.useUpdateServices();
     const toggleHandleClient = () => {
@@ -138,6 +144,28 @@ export const ClientsExcursionTable = (
     const openModal = (client: IClient) => {
         setSelectedClient(client);
         setModalOpen(true);
+    };
+
+    const handleToggleCoordinator = (client: IClient) => {
+        const service = getService(client); // Obtener el servicio actual del cliente
+
+        if (!service) {
+            // TODO: toast service not found
+            return;
+        }
+
+        // Alternar el valor de isCoordinator
+        const updatedService = { ...service, isCoordinator: !service.isCoordinator };
+
+        // Actualizar el cliente con el nuevo servicio
+        const updatedClient: IClient = {
+            ...client,
+            services: client.services.map(s => s.excursionId === excursion._id ? updatedService : s) as IService[]
+        };
+
+        // Actualizar el cliente y el servicio con el nuevo estado de isCoordinator
+        onUpdateClient(updatedClient, { isOptimistic: true, avoidConfirm: true });
+        updatedService._id && updateService({ _id: updatedService._id, ...updatedService });
     };
 
     const toggleEdit = (index: number, client: IClient) => {
@@ -380,7 +408,6 @@ export const ClientsExcursionTable = (
 
     const [selectedClients, setSelectedClients] = useState<IClient[]>([]);
 
-
     const onSelectClient = (sclients: IClient[]) => {
         setSelectedClients(sclients);
     }
@@ -579,14 +606,22 @@ export const ClientsExcursionTable = (
                 )}
                 <td>
                     <div className="flex items-center px-2 justify-end gap-1">
+                        <IconButton
+                            variant="text"
+                            color={client.currentService?.isCoordinator ? "yellow" : "blue"}
+                            size="sm"
+                            onClick={() => handleToggleCoordinator(client)}
+                        >
+                            <AcademicCapIcon className="h-5 w-5" />
+                        </IconButton>
                         <IconButton variant="text" color="blue" size="sm" onClick={() => openModal(client)}>
-                            <BiDollar className="h-5 w-5"/>
+                            <BiDollar className="h-5 w-5" />
                         </IconButton>
-                        <IconButton variant="text" color="blue" size="sm" onClick={handleClientToEdit(client)}>
-                            <PencilIcon className="h-5 w-5"/>
+                        <IconButton variant="text" color="blue" size="sm" onClick={() => handleClientToEdit(client)}>
+                            <PencilIcon className="h-5 w-5" />
                         </IconButton>
-                        <IconButton variant="text" color="red" size="sm" onClick={handleDeleteClient(client)}>
-                            <TrashIcon className="h-5 w-5"/>
+                        <IconButton variant="text" color="red" size="sm" onClick={() => handleDeleteClient(client)}>
+                            <TrashIcon className="h-5 w-5" />
                         </IconButton>
                     </div>
                 </td>

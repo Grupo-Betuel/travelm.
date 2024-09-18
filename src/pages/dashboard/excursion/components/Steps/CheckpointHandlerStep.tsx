@@ -16,9 +16,9 @@ export const CheckpointHandlerStep: React.FC<CheckpointFormProps> = ({ excursion
     const [selectedBuses, setSelectedBuses] = useState<IBus[]>([]);
     const [description, setDescription] = useState<string>('');
     const [currentLocation, setCurrentLocation] = useState<ILocation | null>(null);
-
     useEffect(() => {
-        setLocalCheckpoints(excursionData.checkpoints);
+    const checkpoins = excursionData.checkpoints;
+        setLocalCheckpoints(checkpoins || []);
     }, [excursionData]);
 
     // Handle location change
@@ -65,7 +65,7 @@ export const CheckpointHandlerStep: React.FC<CheckpointFormProps> = ({ excursion
     const handleSaveCheckpoints = () => {
         updateExcursion({ checkpoints: localCheckpoints });
     };
-
+    console.log('excursiondata',excursionData)
     const availableBuses = excursionData.transport?.transportResources.map(resource => resource.bus) || [];
 
     return (

@@ -288,7 +288,7 @@ const ExcursionStepper: React.FC = () => {
         },
         {
             properties: ['checkpoints'],
-            label: 'Puntos de encuentro',
+            label: 'checkpoints',
             icon: <UserIcon className="max-w-[20px]"/>,
             component: <CheckpointHandlerStep excursionData={excursion} updateExcursion={updateExcursionData}/>,
         },
@@ -405,5 +405,3 @@ const validateStep0 = (formData: IExcursion): string[] => {
 
 
 export default ExcursionStepper;
-
-
