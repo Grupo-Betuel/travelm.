@@ -133,9 +133,6 @@ function ExcursionsList() {
             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                 RD${excursion.finance?.price.toLocaleString()}
             </td>
-            {/*<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">*/}
-            {/*    {excursion.reviews.reduce((acc, review) => acc + review.stars, 0) / excursion.reviews.length || 0}*/}
-            {/*</td>*/}
             <td>
                 <ProtectedElement roles={[UserRoleTypes.ADMIN]} userTypes={[UserTypes.AGENCY]}>
                     <div className="flex items-center">
