@@ -35,7 +35,6 @@ const createIsLoadingSelector2 = (entityName: EntityNames) => createSelector(
                 .map((key) => {
                     const selectEndpoint = entityStore.endpoints[key].select as Function;
                     const stateData = selectEndpoint({} as any)(state);
-                    console.log('key =')
                     return stateData?.status === 'pending';
                 })
                 .reduce((acc, curr) => acc || curr, false);

@@ -6,7 +6,6 @@ export const PROD_SOCKET_URL = 'https://www.betuel-promotions.xyz'
 export const CONNECTED_EVENT = 'connect'
 export const onSocketOnce = (socket: Socket, eventName: string, callback: (data: any) => any) => {
     if (socket) {
-        console.log('event:', eventName);
         socket.removeAllListeners(eventName);
         // socket.once(eventName, callback)
         socket.on(eventName, callback);
