@@ -19,7 +19,6 @@ export const ClientsList: React.FC = () => {
         onDeleteClient
     } = useClientHandler({});
 
-    console.log('client', clientList);
     return (
         <div>
             <Card>

@@ -1,12 +1,13 @@
-import { Avatar, Button, Card, CardBody, CardHeader, Typography } from "@material-tailwind/react";
-import React from "react";
-import { useOrganizationHandler } from "../../../../hooks/useOrganizationHandler";
-import { IOrganization } from "../../../../models/organizationModel";
+import {Avatar, Button, Card, CardBody, CardHeader, Tab, Typography} from "@material-tailwind/react";
+import React, {useMemo} from "react";
+import { useOrganizationHandler } from "@/hooks/useOrganizationHandler";
+import {IOrganization, OrganizationTypesEnum} from "@/models/organizationModel";
 import { IoReload } from "react-icons/io5";
 import ProtectedElement from "../../../../components/ProtectedElement";
-import { UserRoleTypes } from "../../../../models/interfaces/userModel";
+import {UserRoleTypes, UserTypes} from "@/models/interfaces/userModel";
 import { useConfirmAction } from "@/hooks/useConfirmActionHook";
 import { CommonConfirmActions, CommonConfirmActionsDataTypes } from "@/models/common";
+import {DataTable, IDataTableColumn, IFilterOption} from "@/components/DataTable";
 
 export const OrganizationList: React.FC = () => {
     const {
@@ -18,25 +19,102 @@ export const OrganizationList: React.FC = () => {
         onDeleteOrganization
     } = useOrganizationHandler({});
 
-    // Acción confirmada (en este caso, eliminación)
     const onConfirmAction = (type?: CommonConfirmActions, data?: CommonConfirmActionsDataTypes<IOrganization>) => {
         switch (type) {
             case 'delete':
-                onDeleteOrganization(data as IOrganization); // Confirmar la eliminación
+                onDeleteOrganization(data as IOrganization);
                 break;
         }
     };
 
-    // Acción denegada (en este caso, puedes dejarla vacía si no haces nada al cancelar)
     const onDeniedAction = (type?: CommonConfirmActions, data?: CommonConfirmActionsDataTypes<IOrganization>) => {
-        // Lógica opcional si se cancela la acción
+
     };
 
-    // Hook de confirmación
     const {
         handleSetActionToConfirm,
         ConfirmDialog
     } = useConfirmAction<CommonConfirmActions, CommonConfirmActionsDataTypes<IOrganization>>(onConfirmAction, onDeniedAction);
+
+    const filterOptions: IFilterOption<IOrganization>[] = useMemo(() => [
+        {
+            key: 'type',
+            label: 'Filtrar por Tipo',
+            type: 'select',
+            options: Object.values(OrganizationTypesEnum).map(type => ({
+                label: type,
+                value: type
+            }))
+        },
+        {
+            key: 'name',
+            label: 'Filtrar por Nombre',
+            type: 'select',
+            options: Array.from(new Set(organizations.map(org => org.name))).map(name => ({
+                label: name,
+                value: name
+            }))
+        },
+        {
+            key: 'contact',
+            label: 'Filtrar por Email',
+            type: 'select',
+            options: Array.from(new Set(organizations.map(org => org.contact.email))).map(email => ({
+                label: email,
+                value: email
+            }))
+        },
+    ], [organizations]);
+
+    const columns: IDataTableColumn<IOrganization>[] = [
+        { key: 'logo', label: 'Logo' },
+        { key: 'name', label: 'Nombre' },
+        { key: 'contact.email', label: 'Email' },
+        { key: 'type', label: 'Tipo' },
+        { key: 'actions', label: 'Acciones' }
+    ];
+
+    const renderRow = (organization: IOrganization) => {
+        const { logo, name, contact, type } = organization;
+        return (
+            <tr key={organization._id}>
+                <td className="py-3 px-5">
+                    <div className="flex items-center gap-4">
+                        <Avatar src={logo?.content} alt={name} size="sm" variant="rounded" />
+                    </div>
+                </td>
+                <td className="py-3 px-5">
+                    <Typography variant="small" color="blue-gray" className="font-semibold">
+                        {name}
+                    </Typography>
+                </td>
+                <td className="py-3 px-5">
+                    <Typography className="text-xs font-normal text-blue-gray-500">
+                        {contact?.email}
+                    </Typography>
+                </td>
+                <td className="py-3 px-5">
+                    <Typography className="text-xs font-semibold text-blue-gray-600">
+                        {type}
+                    </Typography>
+                </td>
+                <td className="py-3 px-5">
+                    <div className="flex items-center gap-2">
+                        <Button color="blue" size="sm" onClick={() => onEditOrganization(organization)}>
+                            Editar
+                        </Button>
+                        <Button
+                            color="red"
+                            size="sm"
+                            onClick={() => handleSetActionToConfirm('delete')(organization)}
+                        >
+                            Eliminar
+                        </Button>
+                    </div>
+                </td>
+            </tr>
+        );
+    };
 
     return (
         <div>
@@ -47,76 +125,20 @@ export const OrganizationList: React.FC = () => {
                             Organizaciones
                         </Typography>
                         <Button variant="text" color="white" onClick={refetchOrganizations}>
-                            <IoReload className="w-[18px] h-[18px] cursor-pointer" />
+                            <IoReload className="w-[18px] h-[18px] cursor-pointer"/>
                         </Button>
                     </div>
                     <ProtectedElement roles={[UserRoleTypes.ADMIN]}>
                         <Button color="blue" onClick={toggleHandleOrganization}>Crear Organización</Button>
                     </ProtectedElement>
                 </CardHeader>
-                <CardBody className="overflow-x-scroll px-0 pt-0 pb-2">
-                    <table className="w-full min-w-[640px] table-auto">
-                        <thead>
-                        <tr>
-                            {["Logo", "Nombre", "Email", "Tipo", "Acciones"].map((el) => (
-                                <th key={el} className="border-b border-blue-gray-50 py-3 px-5 text-left">
-                                    <Typography variant="small" className="text-[11px] font-bold uppercase text-blue-gray-400">
-                                        {el}
-                                    </Typography>
-                                </th>
-                            ))}
-                        </tr>
-                        </thead>
-                        <tbody>
-                        {organizations?.map((organization: IOrganization, key: number) => {
-                            const className = `py-3 px-5 ${
-                                key === organizations.length - 1 ? "" : "border-b border-blue-gray-50"
-                            }`;
-                            const { logo, name, contact, type } = organization;
-
-                            return (
-                                <tr key={`${name}-${key}`}>
-                                    <td className={className}>
-                                        <div className="flex items-center gap-4">
-                                            <Avatar src={logo?.content} alt={name} size="sm" variant="rounded" />
-                                        </div>
-                                    </td>
-                                    <td className={className}>
-                                        <Typography variant="small" color="blue-gray" className="font-semibold">
-                                            {name}
-                                        </Typography>
-                                    </td>
-                                    <td className={className}>
-                                        <Typography className="text-xs font-normal text-blue-gray-500">
-                                            {contact?.email}
-                                        </Typography>
-                                    </td>
-                                    <td className={className}>
-                                        <Typography className="text-xs font-semibold text-blue-gray-600">
-                                            {type}
-                                        </Typography>
-                                    </td>
-                                    <td className={className}>
-                                        <div className="flex items-center gap-2">
-                                            <Button color="blue" size="sm" onClick={() => onEditOrganization(organization)}>
-                                                Editar
-                                            </Button>
-                                            <Button
-                                                color="red"
-                                                size="sm"
-                                                onClick={() => handleSetActionToConfirm('delete')(
-                                                    organization
-                                                )}
-                                            >
-                                                Eliminar
-                                            </Button>
-                                        </div>
-                                    </td>
-                                </tr>
-                            );
-                        })}
-                        </tbody>
-                    </table>
+                <CardBody className="overflow-x-scroll px-2 pt-4 pb-2">
+                    <DataTable
+                        data={organizations}
+                        columns={columns}
+                        filterOptions={filterOptions}
+                        renderRow={renderRow}
+                    />
                 </CardBody>
             </Card>
             {organizationForm}
