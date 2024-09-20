@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, {useEffect, useMemo, useState} from "react";
 import {
     Button,
     Dialog,
@@ -21,6 +21,8 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination } from "swiper/modules";
 import { AppImage } from "@/components/AppImage";
 import DatePicker from "@/components/DatePicker";
+import {useAuth} from "@/context/authContext";
+import IUser from "@/models/interfaces/userModel";
 
 interface CommentFormProps {
     isDialog?: boolean;
@@ -47,7 +49,7 @@ export const CommentForm: React.FC<CommentFormProps> = ({
     const [currentComment, setCurrentComment] = useState<IComment | null>(null);
     const [newCommentText, setNewCommentText] = useState<string>("");
     const [medias, setMedias] = useState<IMedia[]>([]);
-
+    const { user } = useAuth();
     const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
         setNewCommentText(e.target.value);
     };
@@ -55,6 +57,10 @@ export const CommentForm: React.FC<CommentFormProps> = ({
     const handleMediasChange = (data: IMediaHandled) => {
         setMedias(data.images);
     };
+
+    useEffect(() => {
+        setComments(initialComments || []);
+    }, [initialComments]);
 
     const handleSave = () => {
         if (currentComment) {
@@ -69,7 +75,9 @@ export const CommentForm: React.FC<CommentFormProps> = ({
                 text: newCommentText,
                 medias: medias,
                 createDate: new Date(),
+                author: user as IUser,
             };
+
             setComments([...comments, newComment]);
         }
 

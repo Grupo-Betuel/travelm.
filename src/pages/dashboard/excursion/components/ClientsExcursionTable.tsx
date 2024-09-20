@@ -10,10 +10,10 @@ import {
     DialogBody,
     DialogFooter,
     DialogHeader, IconButton,
-    Input, Menu, MenuHandler, MenuItem, MenuList,
+    Menu, MenuHandler, MenuItem, MenuList,
     Typography
 } from "@material-tailwind/react";
-import {ArrowDownIcon, ChevronDownIcon, PencilIcon, TrashIcon, UserIcon} from "@heroicons/react/20/solid";
+import { ChevronDownIcon, PencilIcon, TrashIcon} from "@heroicons/react/20/solid";
 import ClientForm, {emptyClient} from "./ClientForm";
 import PaymentHandler from "./PaymentsHandler";
 import {BiDollar, BiPlus, BiSearch, BiSync} from "react-icons/bi";
@@ -26,17 +26,15 @@ import {IoReload} from "react-icons/io5";
 import useWhatsapp from "../../../../hooks/UseWhatsapp";
 import {UserRoleTypes, UserTypes} from "../../../../models/interfaces/userModel";
 import ProtectedElement from "../../../../components/ProtectedElement";
-import {AiFillFileAdd} from "react-icons/ai";
+import {AiFillFileAdd, AiOutlineComment} from "react-icons/ai";
 import {CgAssign} from "react-icons/cg";
 import {IExcursion} from "@/models/excursionModel";
-import {DataPagination} from "../../../../components/DataPagination";
 import {DataTable, IFilterOption, IFilterOptionItem} from "@/components/DataTable";
 import {IPayment} from "@/models/PaymentModel";
 import {IService, serviceStatusLabels, serviceStatusList, ServiceStatusTypes} from "@/models/serviceModel";
 import {getCrudService} from "@/api/services/CRUD.service";
-import ServiceHandler from "./ServiceHandler";
 import {CommentForm} from "@/pages/dashboard/excursion/components/CommentHandler";
-import {IComment} from "@/models/commentModel"; // Assuming the path to DataPagination
+import {IComment} from "@/models/commentModel";
 
 export interface IUpdateClientExtra extends IConfirmActionExtraParams {
     isOptimistic?: boolean;
@@ -85,6 +83,33 @@ export const ClientsExcursionTable = (
     const [editedClients, setEditedClients] = useState<{ [key: string]: IClient }>({});
     const [isNewClientOpen, setIsNewClientOpen] = useState<boolean>(false);
     const [assignWsGroupModal, setAssignWsGroupModal] = useState<boolean>(false);
+    const [dialogOpen, setDialogOpen] = useState<boolean>(false);
+    const [comments, setComments] = useState<IComment[]>([]); // Comentarios del servicio
+
+    // Función para abrir el diálogo y cargar los comentarios del cliente seleccionado
+    const openCommentDialog = (client: IClient) => {
+        const service = client.currentService;
+        if (service) {
+            setSelectedClient(client);
+            setComments(service.comments || []); // Cargar comentarios
+            setDialogOpen(true);
+        }
+    };
+
+    // Función para cerrar el diálogo
+    const closeCommentDialog = () => {
+        setDialogOpen(false);
+        setSelectedClient(null);
+        setComments([]); // Limpiar comentarios al cerrar
+    };
+
+    // Función para actualizar los comentarios del cliente seleccionado
+    const handleCommentChangeWrapper = (updatedComments: IComment[]) => {
+        if (selectedClient) {
+            handleCommentChange(selectedClient, updatedComments);
+            setComments(updatedComments); // Actualizar el estado de los comentarios
+        }
+    };
     const {
         seedData,
         loading: wsLoading,
@@ -469,8 +494,124 @@ export const ClientsExcursionTable = (
         }
     }, [clients]);
 
+    // const renderRow = (client: IClient, index: number, selected: boolean, onSelect: (checked: boolean) => void) => {
+    //     const noService = "No Service"
+    //     const serviceStatus = client.currentService?.status;
+    //     const statusColor = getStatusColor(serviceStatus || noService);
+    //     const serviceC = client.currentService;
+    //     const bedroomOptions: IOption[] = (bedrooms?.map((b) => ({
+    //         label: `${b.name} | ${b.zone}`,
+    //         value: b._id
+    //     })) || []) as IOption[];
+    //     const totalAmount = serviceC?.payments?.reduce((a, b) => a + b.amount, 0) || 0;
+    //     const clientBedroom = bedroomOptions.find(b => b.value === serviceC?.bedroom?._id);
+    //
+    //
+    //     const handleCommentChangeWrapper = (updatedComments: IComment[]) => {
+    //         handleCommentChange(client, updatedComments);
+    //     };
+    //
+    //     const handleDialogOpen = () => setIsDialogOpen(!isDialogOpen);
+    //
+    //     return (
+    //         <tr key={`${client._id}-${index}`}>
+    //             <td>
+    //                 <Checkbox
+    //                     color="blue"
+    //                     crossOrigin
+    //                     checked={selected}
+    //                     onChange={(e) => onSelect(e.target.checked)}
+    //                 />
+    //             </td>
+    //             <td>
+    //                 {editClientIndex === index ? (
+    //                     <Input
+    //                         crossOrigin={true}
+    //                         type="text"
+    //                         value={editedClients[index]?.firstName || client.firstName}
+    //                         onChange={(e) => handleInputChange(e.target.value, index, 'firstName')}
+    //                     />
+    //                 ) : (
+    //                     <Typography className="p-3">{client.firstName} {client.lastName}</Typography>
+    //                 )}
+    //             </td>
+    //             <td>
+    //                 {editClientIndex === index ? (
+    //                     <Input
+    //                         crossOrigin={true}
+    //                         type="text"
+    //                         value={editedClients[index]?.phone || client.phone}
+    //                         onChange={(e) => handleInputChange(e.target.value, index, 'phone')}
+    //                     />
+    //                 ) : (
+    //                     <a href={`https://wa.me/${client.phone}`} target="_blank">
+    //                         <Button variant="text">{client.phone}</Button>
+    //                     </a>
+    //                 )}
+    //             </td>
+    //             <td>
+    //                 <div className="flex flex-col items-center">
+    //                     <Menu placement="bottom">
+    //                         <MenuHandler>
+    //                             <Chip color={statusColor}
+    //                                   className="cursor-pointer"
+    //                                   value={
+    //                                       <div className="flex items-center gap-2 justify-between">
+    //                                           {serviceStatus ? serviceStatusLabels[serviceStatus] : noService}
+    //                                           <ChevronDownIcon width={18}/>
+    //                                       </div>
+    //                                   }/>
+    //                         </MenuHandler>
+    //                         <MenuList>
+    //                             {serviceStatusList.map(status => (
+    //                                 <MenuItem key={`s-status-${status.value}`}
+    //                                           onClick={() => onChangeServiceStatus(client, status)}>
+    //                                     <Chip color={getStatusColor(status.value)}
+    //                                           value={status.label}/>
+    //                                 </MenuItem>
+    //                             ))}
+    //                         </MenuList>
+    //                     </Menu>
+    //                     <div className='flex justify-center items-center'>
+    //                         <Typography variant="paragraph">RD${totalAmount.toLocaleString()}</Typography>
+    //                         <IconButton variant="text" color="blue" size="sm" onClick={handleDialogOpen}>
+    //                             <PencilIcon className="h-5 w-5"/>
+    //                         </IconButton>
+    //                     </div>
+    //                 </div>
+    //             </td>
+    //             {bedroomsExist && (
+    //                 <td>
+    //                     <div className="p-4">
+    //                         <SearchableSelect
+    //                             selectedValues={clientBedroom ? [clientBedroom] : undefined}
+    //                             label="Habitación"
+    //                             options={bedroomOptions}
+    //                             onSelect={(selectedValues: IOption[], currentSelect?: IOption) => onChangeBedroom(client)(selectedValues[0]?.value, currentSelect)}
+    //                             displayProperty="label"
+    //                             className="min-w-[200px]"
+    //                         />
+    //                     </div>
+    //                 </td>
+    //             )}
+    //             <td>
+    //                 <div className="flex items-center px-2 justify-end gap-1">
+    //                     <IconButton variant="text" color="blue" size="sm" onClick={() => openModal(client)}>
+    //                         <BiDollar className="h-5 w-5"/>
+    //                     </IconButton>
+    //                     <IconButton variant="text" color="blue" size="sm" onClick={handleClientToEdit(client)}>
+    //                         <PencilIcon className="h-5 w-5"/>
+    //                     </IconButton>
+    //                     <IconButton variant="text" color="red" size="sm" onClick={handleDeleteClient(client)}>
+    //                         <TrashIcon className="h-5 w-5"/>
+    //                     </IconButton>
+    //                 </div>
+    //             </td>
+    //         </tr>
+    //     );
+    // };
     const renderRow = (client: IClient, index: number, selected: boolean, onSelect: (checked: boolean) => void) => {
-        const noService = "No Service"
+        const noService = "No Service";
         const serviceStatus = client.currentService?.status;
         const statusColor = getStatusColor(serviceStatus || noService);
         const serviceC = client.currentService;
@@ -480,14 +621,6 @@ export const ClientsExcursionTable = (
         })) || []) as IOption[];
         const totalAmount = serviceC?.payments?.reduce((a, b) => a + b.amount, 0) || 0;
         const clientBedroom = bedroomOptions.find(b => b.value === serviceC?.bedroom?._id);
-
-        const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
-
-        const handleCommentChangeWrapper = (updatedComments: IComment[]) => {
-            handleCommentChange(client, updatedComments);
-        };
-
-        const handleDialogOpen = () => setIsDialogOpen(!isDialogOpen);
 
         return (
             <tr key={`${client._id}-${index}`}>
@@ -500,30 +633,12 @@ export const ClientsExcursionTable = (
                     />
                 </td>
                 <td>
-                    {editClientIndex === index ? (
-                        <Input
-                            crossOrigin={true}
-                            type="text"
-                            value={editedClients[index]?.firstName || client.firstName}
-                            onChange={(e) => handleInputChange(e.target.value, index, 'firstName')}
-                        />
-                    ) : (
-                        <Typography className="p-3">{client.firstName} {client.lastName}</Typography>
-                    )}
+                    <Typography className="p-3">{client.firstName} {client.lastName}</Typography>
                 </td>
                 <td>
-                    {editClientIndex === index ? (
-                        <Input
-                            crossOrigin={true}
-                            type="text"
-                            value={editedClients[index]?.phone || client.phone}
-                            onChange={(e) => handleInputChange(e.target.value, index, 'phone')}
-                        />
-                    ) : (
-                        <a href={`https://wa.me/${client.phone}`} target="_blank">
-                            <Button variant="text">{client.phone}</Button>
-                        </a>
-                    )}
+                    <a href={`https://wa.me/${client.phone}`} target="_blank">
+                        <Button variant="text">{client.phone}</Button>
+                    </a>
                 </td>
                 <td>
                     <div className="flex flex-col items-center">
@@ -534,32 +649,24 @@ export const ClientsExcursionTable = (
                                       value={
                                           <div className="flex items-center gap-2 justify-between">
                                               {serviceStatus ? serviceStatusLabels[serviceStatus] : noService}
-                                              <ChevronDownIcon width={18}/>
+                                              <ChevronDownIcon width={18} />
                                           </div>
-                                      }/>
+                                      } />
                             </MenuHandler>
                             <MenuList>
                                 {serviceStatusList.map(status => (
                                     <MenuItem key={`s-status-${status.value}`}
                                               onClick={() => onChangeServiceStatus(client, status)}>
-                                        <Chip color={getStatusColor(status.value)}
-                                              value={status.label}/>
+                                        <Chip color={getStatusColor(status.value)} value={status.label} />
                                     </MenuItem>
                                 ))}
                             </MenuList>
                         </Menu>
                         <div className='flex justify-center items-center'>
                             <Typography variant="paragraph">RD${totalAmount.toLocaleString()}</Typography>
-                            <IconButton variant="text" color="blue" size="sm" onClick={handleDialogOpen}>
-                                <PencilIcon className="h-5 w-5"/>
+                            <IconButton variant="text" color="blue" size="sm" onClick={() => openCommentDialog(client)}>
+                                <AiOutlineComment className="h-5 w-5" />
                             </IconButton>
-                            <CommentForm
-                                isDialog={true}
-                                open={isDialogOpen}
-                                onClose={() => setIsDialogOpen(false)}
-                                initialComments={serviceC?.comments || []}
-                                updateComments={handleCommentChangeWrapper}
-                            />
                         </div>
                     </div>
                 </td>
@@ -580,13 +687,13 @@ export const ClientsExcursionTable = (
                 <td>
                     <div className="flex items-center px-2 justify-end gap-1">
                         <IconButton variant="text" color="blue" size="sm" onClick={() => openModal(client)}>
-                            <BiDollar className="h-5 w-5"/>
+                            <BiDollar className="h-5 w-5" />
                         </IconButton>
                         <IconButton variant="text" color="blue" size="sm" onClick={handleClientToEdit(client)}>
-                            <PencilIcon className="h-5 w-5"/>
+                            <PencilIcon className="h-5 w-5" />
                         </IconButton>
                         <IconButton variant="text" color="red" size="sm" onClick={handleDeleteClient(client)}>
-                            <TrashIcon className="h-5 w-5"/>
+                            <TrashIcon className="h-5 w-5" />
                         </IconButton>
                     </div>
                 </td>
@@ -746,6 +853,13 @@ export const ClientsExcursionTable = (
                     </DialogFooter>
                 </Dialog>
             </Card>
+            <CommentForm
+                isDialog={true}
+                open={dialogOpen}
+                onClose={closeCommentDialog}
+                initialComments={comments} // Comentarios cargados del cliente seleccionado
+                updateComments={handleCommentChangeWrapper}
+            />
         </>
     );
 };

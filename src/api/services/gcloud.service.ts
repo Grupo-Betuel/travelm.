@@ -21,7 +21,6 @@ const compressImage = async (file: File): Promise<File> => {
 export const uploadGCloudImage = async (file: File, selectedTag: string = 'media', type: string = 'image/png') => {
     try {
         const compressedFile = await compressImage(file);
-        console.log('file', file)
         const filename = encodeURIComponent(compressedFile.name);
         const res = await axiosInstance.get(`/gcloud/upload-url/${filename}/${selectedTag}/${type.replace('/', '^')}`);
         const { url, fields } = res.data;
