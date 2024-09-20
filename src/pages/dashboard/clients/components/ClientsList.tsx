@@ -1,12 +1,16 @@
-import {Avatar, Button, Card, CardBody, CardHeader, Typography} from "@material-tailwind/react";
-import React from "react";
-import {useOrganizationHandler} from "../../../../hooks/useOrganizationHandler";
+import {Button, Card, CardBody, CardHeader, Typography} from "@material-tailwind/react";
+import React, {useMemo} from "react";
 import {IClient} from "@/models/clientModel";
 import {IoReload} from "react-icons/io5";
 import ProtectedElement from "../../../../components/ProtectedElement";
-import {UserRoleTypes} from "../../../../models/interfaces/userModel";
+import {UserRoleTypes} from "@/models/interfaces/userModel";
 import {useClientHandler} from "@/hooks/useClientHandler";
 import {BiUser} from "react-icons/bi";
+import {CommonConfirmActions, CommonConfirmActionsDataTypes} from "@/models/common";
+import {IOrganization, OrganizationTypesEnum} from "@/models/organizationModel";
+import {useConfirmAction} from "@/hooks/useConfirmActionHook";
+import {DataTable, IDataTableColumn, IFilterOption} from "@/components/DataTable";
+import clients from "@/pages/dashboard/clients/clients";
 
 export const ClientsList: React.FC = () => {
     const {
@@ -19,7 +23,126 @@ export const ClientsList: React.FC = () => {
         onDeleteClient
     } = useClientHandler({});
 
-    console.log('client', clientList);
+    const onConfirmAction = (type?: CommonConfirmActions, data?: CommonConfirmActionsDataTypes<IClient>) => {
+        switch (type) {
+            case 'delete':
+                onDeleteClient(data as IClient);
+                break;
+        }
+    };
+
+    const onDeniedAction = (type?: CommonConfirmActions, data?: CommonConfirmActionsDataTypes<IClient>) => {
+
+    };
+
+    const {
+        handleSetActionToConfirm,
+        ConfirmDialog
+    } = useConfirmAction<CommonConfirmActions, CommonConfirmActionsDataTypes<IClient>>(onConfirmAction, onDeniedAction);
+
+    const filterOptions: IFilterOption<IClient>[] = useMemo(() => [
+        {
+            key: 'firstName',
+            label: 'Filtrar por Nombre',
+            type: 'select',
+            options: Array.from(new Set(clientList.map(client => client.firstName))).map(firstName => ({
+                label: firstName,
+                value: firstName
+            }))
+        },
+        {
+            key: 'lastName',
+            label: 'Filtrar por Apellido',
+            type: 'select',
+            options: Array.from(new Set(clientList.map(client => client.lastName))).map(lastName => ({
+                label: lastName,
+                value: lastName
+            }))
+        },
+        {
+            key: 'phone',
+            label: 'Filtrar por Teléfono',
+            type: 'select',
+            options: Array.from(new Set(clientList.map(client => client.phone))).map(phone => ({
+                label: phone,
+                value: phone
+            }))
+        },
+        {
+            key: 'email',
+            label: 'Filtrar por Email',
+            type: 'select',
+            options: Array.from(new Set(clientList.map(client => client.email))).map(email => ({
+                label: email,
+                value: email
+            }))
+        },
+    ], [clientList]);
+
+    const columns: IDataTableColumn<IClient>[] = [
+        { key: 'icon', label: '' },
+        { key: 'phone', label: 'Telefono' },
+        { key: 'firstName', label: 'Nombre' },
+        { key: 'lastName', label: 'Apellido' },
+        { key: 'email', label: 'Email' },
+        { key: 'actions', label: 'Acciones' }
+    ];
+
+    const renderRow = (client: IClient, key: number) => {
+        const { phone, firstName, lastName, email } = client;
+        return (
+            <tr key={`${firstName}-${key}`}>
+                <td className="py-3 px-5">
+                    <div className="flex items-center gap-4">
+                        <BiUser className="w-6 h-6"/>
+                    </div>
+                </td>
+                <td className="py-3 px-5">
+                    <Typography
+                        variant="small"
+                        color="blue-gray"
+                        className="font-semibold w-28"
+                    >
+                        {phone}
+                    </Typography>
+                </td>
+                <td className="py-3 px-5">
+                    <Typography
+                        variant="small"
+                        color="blue-gray"
+                        className="font-semibold w-28"
+                    >
+                        {firstName}
+                    </Typography>
+                </td>
+                <td className="py-3 px-5">
+                    <Typography className="text-xs font-semibold text-blue-gray-600">
+                        {lastName}
+                    </Typography>
+                </td>
+                <td className="py-3 px-5">
+                    <Typography className="text-xs font-normal text-blue-gray-500">
+                        {email}
+                    </Typography>
+                </td>
+                <td className="py-3 px-5">
+                    <div className="flex items-center gap-2">
+                        <Button color="blue" size="sm" onClick={() => onEditClient(client)}>
+                            Editar
+                        </Button>
+                        <Button
+                            color="red"
+                            size="sm"
+                            onClick={() => handleSetActionToConfirm('delete')(client)}
+                        >
+                            Eliminar
+                        </Button>
+                    </div>
+                </td>
+            </tr>
+        );
+    };
+
     return (
         <div>
             <Card>
@@ -36,83 +159,17 @@ export const ClientsList: React.FC = () => {
                         <Button color="blue" onClick={toggleHandleClient}>Crear Cliente</Button>
                     </ProtectedElement>
                 </CardHeader>
-                <CardBody className="overflow-x-scroll px-0 pt-0 pb-2">
-                    <table className="w-full min-w-[640px] table-auto">
-                        <thead>
-                        <tr>
-                            {["","Telefono", "Nombre","Apellido", "Email", "Acciones"].map((el) => (
-                                <th
-                                    key={el}
-                                    className="border-b border-blue-gray-50 py-3 px-5 text-left"
-                                >
-                                    <Typography
-                                        variant="small"
-                                        className="text-[11px] font-bold uppercase text-blue-gray-400"
-                                    >
-                                        {el}
-                                    </Typography>
-                                </th>
-                            ))}
-                        </tr>
-                        </thead>
-                        <tbody>
-                        {clientList?.map(
-                            (client: IClient, key: number) => {
-                                const className = "py-3 px-5";
-                                const { phone, firstName,lastName, email} = client;
-
-                                return (
-                                    <tr key={`${firstName}-${key}`}>
-                                        <td className={className}>
-                                            <div className="flex items-center gap-4">
-                                                <BiUser className="w-6 h-6"/>
-                                            </div>
-                                        </td>
-                                        <td className={className}>
-                                            <Typography
-                                                variant="small"
-                                                color="blue-gray"
-                                                className="font-semibold w-28"
-                                            >
-                                                {phone}
-                                            </Typography>
-                                        </td>
-                                        <td className={className}>
-                                            <Typography
-                                                variant="small"
-                                                color="blue-gray"
-                                                className="font-semibold w-28"
-                                            >
-                                                {firstName}
-                                            </Typography>
-                                        </td>
-                                        <td className={className}>
-                                            <Typography className="text-xs font-semibold text-blue-gray-600">
-                                                {lastName}
-                                            </Typography>
-                                        </td>
-                                        <td className={className}>
-                                            <Typography className="text-xs font-normal text-blue-gray-500">
-                                                {email}
-                                            </Typography>
-                                        </td>
-                                        <td className={className}>
-                                            <div className="flex items-center gap-2">
-                                                <Button color="blue" size="sm"
-                                                        onClick={() => onEditClient(client)}>Editar</Button>
-                                                <Button color="red" size="sm"
-                                                        onClick={() => onDeleteClient(client)}>Eliminar</Button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                );
-                            }
-                        )}
-                        </tbody>
-                    </table>
+                <CardBody className="overflow-x-scroll px-2 pt-2 pb-2">
+                    <DataTable
+                        data={clientList}
+                        columns={columns}
+                        filterOptions={filterOptions}
+                        renderRow={renderRow}
+                    />
                 </CardBody>
             </Card>
             {clientForm}
+            <ConfirmDialog/>
         </div>
     );
 }
