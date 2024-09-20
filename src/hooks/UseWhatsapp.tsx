@@ -173,7 +173,7 @@ const useWhatsapp = (whatsappSessionId?: string, autologin = false) => {
         }
     }
 
-    const sendMessage = async (sessionId: string, contacts: (IClient | IWsUser)[], message: IWhatsappMessage) => {
+    const sendMessage = async (sessionId: string, contacts: (IClient | IWsUser)[], message: IWhatsappMessage | IWhatsappMessage[]) => {
         const {stopMessagesId} = await sendWhatsappMessage(sessionId, contacts, message);
         setStopMessagingId(stopMessagesId);
     }

@@ -1,3 +1,5 @@
+import {IMedia} from "@/models/mediaModel";
+
 export type WhatsappSessionTypes = 'wpadilla' | 'betuelgroup' | 'betueltravel' | 'bibleAssistant';
 export const whatsappSessionList: WhatsappSessionTypes[] = ['betuelgroup', 'betueltravel', 'wpadilla', 'bibleAssistant']
 export const whatsappSessionKeys: { [K in WhatsappSessionTypes]: WhatsappSessionTypes } = {
@@ -12,10 +14,19 @@ export interface IAudioFile {
     fileName: string
 }
 
+// export interface IMessageMedia {
+//     content: Buffer | string | Blob | ArrayBuffer | null;
+//     type: 'audio' | 'image' | 'video';
+//     caption?: string;
+//     name?: string;
+//     mimetype?: string;
+// }
+
 export interface IWhatsappMessage {
+    // photo?: Blob;
+    // audio?: IAudioFile;
     text?: string;
-    photo?: Blob;
-    audio?: IAudioFile;
+    media?: IMedia;
 }
 
 export const whatsappSessionNames: { [K in WhatsappSessionTypes & any]: string } = {

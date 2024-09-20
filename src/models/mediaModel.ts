@@ -20,7 +20,6 @@ export interface IMedia extends BaseModel {
     tags?: string[];
 }
 
-
 export interface IMediaFile extends IMedia {
     // @ts-ignore
     file: File;

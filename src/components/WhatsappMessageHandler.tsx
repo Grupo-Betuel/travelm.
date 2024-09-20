@@ -7,11 +7,10 @@ import {
     DialogHeader, Spinner,
     Textarea, Typography,
 } from "@material-tailwind/react";
-import InputMask from "react-input-mask";
 import useWhatsapp from "../hooks/UseWhatsapp";
 import {IClient} from "../models/clientModel";
 import {
-    IAudioFile, IWsGroup, IWsLabel,
+    IAudioFile, IWhatsappMessage, IWsGroup, IWsLabel,
     IWsUser,
     WhatsappSeedTypes,
     whatsappSessionKeys, whatsappSessionList, whatsappSessionNames,
@@ -21,8 +20,8 @@ import {ICustomComponentDialog} from "../models/common";
 import SearchableSelect from "./SearchableSelect";
 import {IoReload} from "react-icons/io5";
 import {CgClose} from "react-icons/cg";
-import MediaHandler from "../pages/dashboard/excursion/components/MediaHandler";
-import {AppImage} from "./AppImage";
+import MediaHandler, {IMediaHandled} from "../pages/dashboard/excursion/components/MediaHandler";
+import {IMedia, IMediaFile} from "@/models/mediaModel";
 
 export interface IMessaging {
     dialog?: ICustomComponentDialog;
@@ -41,8 +40,7 @@ const Messaging: React.FC<IMessaging> = (
     const [selectedSession, setSelectedSession] = useState<string | undefined>(sessionId)
     const [message, setMessage] = useState<string>('')
     const [onlySendImagesIds, setOnlySendImagesIds] = useState<string[]>([]);
-    const [photo, setPhoto] = useState<any>()
-    const [audio, setAudio] = useState<IAudioFile>()
+    const [medias, setMedias] = useState<IMediaHandled>()
     const [labeledUsers, setLabeledUsers] = React.useState<IWsUser[]>([]);
     const [groupedUsers, setGroupedUsers] = React.useState<IWsUser[]>([]);
     const [excludedWhatsappUsers, setExcludedWhatsappUsers] = React.useState<IWsUser[]>([]);
@@ -124,43 +122,41 @@ const Messaging: React.FC<IMessaging> = (
 
     const handleSendMessage = (sessionId: string) => async () => {
         const whatsappUsers = getWhatsappUsers();
-        sendMessage(sessionId, whatsappUsers, {text: message, photo, audio});
+        let firstMessage: IWhatsappMessage = {
+            text: message,
+            media: medias?.images[0] || undefined
+        }
+
+        // if(!firstMessage.text  !firstMessage.text.trim()) {
+
+        if(medias?.images[0]) {
+            delete medias?.images[0]
+        }
+
+        const allMedias = Object.keys(medias).map((key) => {
+            const newMedia = medias[key] as IMedia;
+            return newMedia;
+        }).flat();
+
+
+        console.log('all medias', allMedias, medias)
+
+        const messages:  IWhatsappMessage[] = allMedias.map((item: any) => {
+            console.log('item ', item);
+            if(!item || (Array.isArray(item) && !item.length) || JSON.stringify(item) === "{}") return;
+
+            return {media: item} as IWhatsappMessage;
+        }).filter(item => !!item);
+
+        console.log('messages =>', messages);
+
+        await sendMessage(sessionId, whatsappUsers, [firstMessage, ...messages]);
     }
 
     const onChangeMessage = (e: any) => {
         const {value} = e.target;
         setMessage(value);
     }
-
-    /* onSelectPhoto, select the photo to set it in order  we can send it*/
-    const onSelectPhoto = async (event: any) => {
-
-        const {files} = event.target;
-        if (FileReader && files.length) {
-            const fr = new FileReader();
-
-            fr.onload = async () => {
-                setPhoto(fr.result);
-            }
-
-            fr.readAsDataURL(files[0]);
-        }
-    }
-
-    const onSelectAudio = async (event: any) => {
-        const {files} = event.target;
-        if (FileReader && files.length) {
-            const fr = new FileReader();
-            const file = files[0];
-
-            fr.onload = async () => {
-                setAudio({content: fr.result as any, fileName: file.name});
-                // TODO: toast('Audio cargado con exito', {type: 'success'});
-            }
-            fr.readAsDataURL(file);
-        }
-    }
-
 
     const handleLabelSelection = (selectedList: IWsLabel[]) => {
         let labeled: IWsUser[] = [];
@@ -256,9 +252,8 @@ const Messaging: React.FC<IMessaging> = (
         setActionToConfirm(value);
     }
 
-    const handleMedia = (media: any) => {
-        console.log('media', media);
-        // setPhoto(media);
+    const handleMedia = (media: IMediaHandled) => {
+        setMedias(media);
     }
 
     const usersData: IWsUser[] = useMemo(() => {

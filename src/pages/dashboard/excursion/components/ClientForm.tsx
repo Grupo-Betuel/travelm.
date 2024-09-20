@@ -1,4 +1,4 @@
-import React, {ReactNode, useEffect, useMemo, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {Input, Button, Dialog, DialogHeader, DialogBody, DialogFooter, Typography} from "@material-tailwind/react";
 import {IClient} from "@/models/clientModel";
 import InputMask from "react-input-mask";
@@ -74,11 +74,11 @@ const ClientForm: React.FC<ClientFormProps> = (
             const foundClient = existingClients[0];
             if (foundClient) {
                 const newServices = mergeClientServices(foundClient);
-                setClient({ ...foundClient, services: newServices });
+                setClient({...foundClient, services: newServices});
             }
 
         } else if (client.phone.length === 11) {
-            setClient({ ...emptyClient, phone: client.phone });
+            setClient({...emptyClient, phone: client.phone});
         }
     }, [existingClients, client.phone, initialClient?.phone]);
 
@@ -150,6 +150,13 @@ const ClientForm: React.FC<ClientFormProps> = (
                     onChange={handleChange}
                 />
             </div>
+            <Input
+                crossOrigin={"true"}
+                label="Correo"
+                name="email"
+                value={client.email}
+                onChange={handleChange}
+            />
             {enableService && <ServiceHandler
                 service={service}
                 services={client.services}

@@ -21,6 +21,7 @@ export interface IService extends BaseModel {
     serviceId?: string;
     excursionId?: string;
     comments?: IComment[];
+    isCoordinator?: boolean;
     seats: number;
 }
 
