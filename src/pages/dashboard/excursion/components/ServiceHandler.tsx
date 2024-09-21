@@ -118,12 +118,12 @@ const ServiceHandler: React.FC<ServiceFormProps> = ({services, onUpdateSingleSer
 
         return response;
     }, [newService?.payments]);
-
+    console.log('service', service);
     return (
         <div className="flex flex-col gap-4">
             <div className="flex flex-col gap-4 rounded-md">
                 <div className="flex items-center justify-between gap-3">
-                    {!service?.type && <Select
+                    {!service?.type && (<Select
                         className={!!service?.type ? "hidden" : ""}
                         label="Service Type"
                         value={service?.type || newService.type}
@@ -133,7 +133,7 @@ const ServiceHandler: React.FC<ServiceFormProps> = ({services, onUpdateSingleSer
                         {SERVICE_CONSTANTS.TYPES.map(type => (
                             <Option key={type} value={type}>{serviceStatusLabels?[type] : ''}</Option>
                         ))}
-                    </Select>}
+                    </Select>)}
                     <Select
                         label="Estado del Servicio"
                         value={service?.status || newService.status}
@@ -159,41 +159,7 @@ const ServiceHandler: React.FC<ServiceFormProps> = ({services, onUpdateSingleSer
                         min={1}
                     />
                 </div>
-
-                {!service?.finance?.price &&
-                    <Input
-                        type="number"
-                        label="Price"
-                        value={service?.finance?.price || newService.finance?.price}
-                        disabled={!!service?.finance?.price}
-                        onChange={(e) => handleFinanceChange('price', e.target.value)}
-                    />
-                }
-                <Typography variant="h6">Manejar Pagos</Typography>
-                <PaymentHandler
-                    payments={allPayments}
-                    onUpdatePayment={handleUpdatePayment}
-                    onChangePayment={handleUpdatePayment}
-                    onDeletePayment={handleSetActionToConfirm('delete-payment', PAYMENT_CONSTANTS.DELETE_PAYMENT)}
-                />
-                {!service && <Button onClick={addService} color="green" className="w-[100%]">
-                    Add Service
-                </Button>}
             </div>
-
-            <ProtectedElement roles={[UserRoleTypes.ADMIN]} userTypes={[UserTypes.AGENCY]}>
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-4">
-                    {
-                        services.map((service, index) => (
-                            <div key={index} className="relative">
-                                <p>{service.type}</p>
-                                <p>{service.status}</p>
-                                <p>RD$ {service.finance.price.toLocaleString()}</p>
-                            </div>
-                        ))
-                    }
-                </div>
-            </ProtectedElement>
             <ConfirmDialog/>
         </div>
     );
