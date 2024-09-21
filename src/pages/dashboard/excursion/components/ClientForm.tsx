@@ -2,8 +2,6 @@ import React, {useEffect, useState} from 'react';
 import {Input, Button, Dialog, DialogHeader, DialogBody, DialogFooter, Typography} from "@material-tailwind/react";
 import {IClient} from "@/models/clientModel";
 import InputMask from "react-input-mask";
-import ServiceHandler from "./ServiceHandler";
-import {IService} from "@/models/serviceModel";
 import {getCrudService} from "@/api/services/CRUD.service";
 import {ICustomComponentDialog} from "@/models/common";
 
@@ -12,7 +10,6 @@ interface ClientFormProps {
     onSubmit: (client: IClient) => void;
     onDeletePayment?: (payment: any) => void;
     enableService?: boolean;
-    serviceData?: IService;
     dialog?: ICustomComponentDialog;
 }
 
