@@ -180,7 +180,7 @@ export const ClientsExcursionTable = (
             ...client,
             currentService: {
                 ...client.currentService,
-                isCoordinator: !client.currentService.isCoordinator // Cambiar el estado
+                isCoordinator: !client.currentService.isCoordinator
             }
         };
         onUpdateClient(updatedClient);

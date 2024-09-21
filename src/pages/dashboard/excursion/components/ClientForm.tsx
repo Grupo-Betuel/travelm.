@@ -29,12 +29,9 @@ const clientService = getCrudService('travelClients');
 const ClientForm: React.FC<ClientFormProps> = (
     {
         initialClient,
-        serviceData,
-        enableService,
         onSubmit,
         dialog
     }) => {
-    const [service, setService] = useState<IService | undefined>(structuredClone(serviceData));
     const [client, setClient] = useState<IClient>(initialClient || emptyClient);
 
     const {data: existingClients} = clientService.useFetchAllTravelClients({
@@ -53,17 +50,9 @@ const ClientForm: React.FC<ClientFormProps> = (
         setClient({...client, [name]: value});
     };
 
-    const onUpdateServices = (services: IService[]) => {
-        setClient({...client, services});
-    }
-
-    const onUpdateSingleService = (s: IService) => {
-        setClient({...client, services: [s]});
-    }
     useEffect(() => {
         if (initialClient) {
             setClient(initialClient);
-            setService(initialClient.currentService); // Use currentService to avoid mixing data
         }
     }, [initialClient]);
 
@@ -73,8 +62,7 @@ const ClientForm: React.FC<ClientFormProps> = (
         if (existingClients?.length && client.phone.length === 11) {
             const foundClient = existingClients[0];
             if (foundClient) {
-                const newServices = mergeClientServices(foundClient);
-                setClient({...foundClient, services: newServices});
+                setClient({...foundClient});
             }
 
         } else if (client.phone.length === 11) {
@@ -82,33 +70,10 @@ const ClientForm: React.FC<ClientFormProps> = (
         }
     }, [existingClients, client.phone, initialClient?.phone]);
 
-    useEffect(() => {
-        if (serviceData) {
-            setService(structuredClone(serviceData));
-        }
-    }, [serviceData]);
-
-    const mergeClientServices = (clientData: IClient = client): IService[] => {
-        if (!service) return clientData.services || [];
-        const exist = clientData.services?.find(s => s.excursionId === service?.excursionId);
-        return clientData.services && exist ? clientData.services : [...(clientData.services || []), service];
-    };
-
-    useEffect(() => {
-        if (!service) return;
-
-        const newServices = mergeClientServices();
-        setClient({
-            ...client,
-            services: newServices,
-        });
-    }, [service]);
 
     const handleSubmit = () => {
         onSubmit(client);
-
         setClient(structuredClone(emptyClient));
-        setService(undefined);
     };
 
     const form = (
@@ -120,7 +85,7 @@ const ClientForm: React.FC<ClientFormProps> = (
                 type="tel"
                 value={client.phone}
                 onChange={handleChange}
-                maskPlaceholder={null} // This avoids showing underscores or other characters in unfocused state
+                maskPlaceholder={null}
                 alwaysShowMask={false}
             >
                 {
@@ -157,12 +122,6 @@ const ClientForm: React.FC<ClientFormProps> = (
                 value={client.email}
                 onChange={handleChange}
             />
-            {enableService && <ServiceHandler
-                service={service}
-                services={client.services}
-                onUpdateSingleService={onUpdateSingleService}
-                onUpdateServices={onUpdateServices}/>
-            }
             {!dialog && <Button
                 color="blue"
                 onClick={handleSubmit}
