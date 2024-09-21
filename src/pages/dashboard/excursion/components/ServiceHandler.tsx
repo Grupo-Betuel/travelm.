@@ -26,21 +26,20 @@ interface ServiceFormProps {
 const emptyService: IService = {
     status: 'interested',
     type: 'excursion',
-    payments: [],
     finance: {price: 0, type: 'service'},
     seats: 1,
 }
 
-export const paymentService = getCrudService('payments');
+// export const paymentService = getCrudService('payments');
 
 const ServiceHandler: React.FC<ServiceFormProps> = ({services, onUpdateSingleService, service, onUpdateServices}) => {
     const [newService, setNewService] = useState<IService>(emptyService);
-    const [deletePayment] = paymentService.useDeletePayments();
+    // const [deletePayment] = paymentService.useDeletePayments();
 
     const onConfirmAction = (type?: ServiceDetailActions, data?: ServiceDetailActionsDataTypes) => {
         switch (type) {
             case 'delete-payment':
-                handleDeletePayment(data as IPayment);
+                // handleDeletePayment(data as IPayment);
                 break;
         }
     }
@@ -64,35 +63,6 @@ const ServiceHandler: React.FC<ServiceFormProps> = ({services, onUpdateSingleSer
         setNewService({...newService, [field]: value});
     };
 
-    const handleFinanceChange = (field: keyof IFinance, value: any) => {
-        setNewService({
-            ...newService,
-            finance: {...newService.finance, [field]: Number(value)},
-        });
-    };
-
-    const addService = () => {
-        newService.finance = {
-            ...newService.finance,
-            type: 'service',
-        }
-        onUpdateServices([...services, newService]);
-        setNewService(emptyService);
-    };
-
-
-    const handleUpdatePayment = (payments: IPayment[]) => {
-        setNewService({...newService, payments});
-    }
-
-    const handleDeletePayment = (payment: IPayment) => {
-        setNewService({
-            ...newService,
-            payments: newService.payments.filter(p => p._id !== payment._id),
-        });
-        payment._id && deletePayment(payment._id);
-    }
-
     useEffect(() => {
         if (service && onUpdateSingleService) {
             onUpdateSingleService(newService);
@@ -100,24 +70,6 @@ const ServiceHandler: React.FC<ServiceFormProps> = ({services, onUpdateSingleSer
     }, [newService]);
 
 
-    const allPayments = useMemo(() => {
-        // const allData = ([...(service?.payments || []), ...(newService?.payments || [])]);
-        const allData = ([...(newService?.payments || [])]);
-        const unrepeated = new Set(allData.map(item => item._id))
-
-        // const response: IPayment[] = Array.from(unrepeated).map(id => allData.find(item => item._id === id)) as IPayment[];
-        const response: IPayment[] = allData.filter(p => {
-            if (p._id) {
-                return unrepeated.has(p._id);
-            } else if (!p._id) {
-                return true;
-            }
-
-            return false;
-        }) as IPayment[];
-
-        return response;
-    }, [newService?.payments]);
     console.log('service', service);
     return (
         <div className="flex flex-col gap-4">

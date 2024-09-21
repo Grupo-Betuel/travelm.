@@ -106,7 +106,6 @@ const ClientForm: React.FC<ClientFormProps> = (
 
     const handleSubmit = () => {
         onSubmit(client);
-
         setClient(structuredClone(emptyClient));
         setService(undefined);
     };
