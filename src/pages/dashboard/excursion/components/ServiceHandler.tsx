@@ -131,7 +131,7 @@ const ServiceHandler: React.FC<ServiceFormProps> = ({services, onUpdateSingleSer
                         onChange={(e) => handleServiceChange('type', e)}
                     >
                         {SERVICE_CONSTANTS.TYPES.map(type => (
-                            <Option key={type} value={type}>{serviceStatusLabels?[type] : ''}</Option>
+                            <Option key={type} value={type}>{serviceStatusLabels ? [type] : ''}</Option>
                         ))}
                     </Select>)}
                     <Select
@@ -140,7 +140,9 @@ const ServiceHandler: React.FC<ServiceFormProps> = ({services, onUpdateSingleSer
                         onChange={(e) => handleServiceChange('status', e)}
                     >
                         {SERVICE_CONSTANTS.STATUS_TYPES.map(status => (
-                            <Option key={status} value={status}>{status}</Option>
+                            <Option key={status} value={status}>
+                                {serviceStatusLabels[status]}
+                            </Option>
                         ))}
                     </Select>
                     <Input

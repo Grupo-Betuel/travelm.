@@ -12,6 +12,8 @@ export type ServiceTypes = 'excursion' | 'flight' | 'resort' | 'hotel';
 export type ServiceDetailActions = 'delete-payment'
 export type ServiceDetailActionsDataTypes = IPayment
 
+
+
 export interface IService extends BaseModel {
     status: ServiceStatusTypes;
     payments: IPayment[];
