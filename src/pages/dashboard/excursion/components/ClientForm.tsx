@@ -43,8 +43,8 @@ const ClientForm: React.FC<ClientFormProps> = (
         skip: client.phone.length < 11 || initialClient?.phone === client.phone
     });
 
+
     const handleChange = ({target: {value, name, type}}: React.ChangeEvent<HTMLInputElement>) => {
-        // if(!value) return;
         if (type === 'tel') {
             value = value.replace(/[^0-9]/g, '');
             if (value == '1') return;
@@ -61,9 +61,9 @@ const ClientForm: React.FC<ClientFormProps> = (
         setClient({...client, services: [s]});
     }
     useEffect(() => {
-        if (initialClient) {
+        if (initialClient?._id) {
             setClient(initialClient);
-            setService(initialClient.currentService); // Use currentService to avoid mixing data
+            setService(initialClient.currentService);
         }
     }, [initialClient]);
 
@@ -105,8 +105,11 @@ const ClientForm: React.FC<ClientFormProps> = (
     }, [service]);
 
     const handleSubmit = () => {
-        onSubmit(client);
-
+        onSubmit({
+            ...client,
+            currentService: service
+        }
+        );
         setClient(structuredClone(emptyClient));
         setService(undefined);
     };
@@ -120,7 +123,7 @@ const ClientForm: React.FC<ClientFormProps> = (
                 type="tel"
                 value={client.phone}
                 onChange={handleChange}
-                maskPlaceholder={null} // This avoids showing underscores or other characters in unfocused state
+                maskPlaceholder={null}
                 alwaysShowMask={false}
             >
                 {
@@ -157,12 +160,12 @@ const ClientForm: React.FC<ClientFormProps> = (
                 value={client.email}
                 onChange={handleChange}
             />
-            {enableService && <ServiceHandler
+            {enableService && (<ServiceHandler
                 service={service}
                 services={client.services}
                 onUpdateSingleService={onUpdateSingleService}
                 onUpdateServices={onUpdateServices}/>
-            }
+            )}
             {!dialog && <Button
                 color="blue"
                 onClick={handleSubmit}

@@ -39,6 +39,7 @@ export const ExcursionDetails: React.FC = () => {
     const [excursion, setExcursion] = useState<IExcursion>(mockExcursion);
     const {renderMedia} = useRenderMedia();
     const [updateClient, {isLoading: isUpdatingClient}] = clientService.useUpdateTravelClients();
+    const [addClient, {isLoading: isCreatingClient}] = clientService.useAddTravelClients();
     const params = useParams();
     const [updateExcursion, {isLoading: isUpdating, data: updatedExcursion}] = excursionService.useUpdateExcursions();
     const [wsMessagingIsOpen, setWsMessagingIsOpen] = useState(false);
@@ -60,13 +61,14 @@ export const ExcursionDetails: React.FC = () => {
         setAppIsLoading(isLoadingExcursion || isFetchingExcursion);
     }, [isLoadingExcursion, isFetchingExcursion]);
 
+
     const onConfirmAction = (type?: ExcursionDetailActions, data?: ExcursionDetailActionsDataTypes, ...extra: any) => {
         switch (type) {
             case 'update':
                 onUpdateExcursion(data as IExcursion, ...extra);
                 break;
             case 'add-client':
-                onAddClient(data as IClient)
+                onAddClient(data as IClient, ...extra);
                 break;
             case 'update-client':
                 onUpdateClient(data as IClient, ...extra);
@@ -136,19 +138,25 @@ export const ExcursionDetails: React.FC = () => {
         setSelectedCheckpoint(null);
     };
 
-    const onAddClient = (client: IClient) => {
-        // HANDLING COMPANY RELATIONSHIP
-        const updatedClients = [
-            ...excursion.clients,
-            {
-                ...client,
-            }
-        ];
+    const onAddClient = async (newClient: IClient) => {
+        setAppIsLoading(true);
+        console.log('newClient', newClient);
 
-        const newExcursion: IExcursion = {...excursion, clients: updatedClients};
-        setExcursion(newExcursion);
-        updateExcursion({_id: excursion._id || '', clients: updatedClients});
-    }
+        const clientData = {
+            ...newClient,
+        }
+
+        const {data: createdClient} = await addClient(clientData);
+        newClient = {...newClient, ...createdClient};
+
+        const updatedClients = [...excursion.clients, newClient]; // Agregamos el nuevo cliente manteniendo los anteriores
+        setExcursion({
+            ...excursion,
+            clients: updatedClients,
+        });
+
+        setAppIsLoading(false);
+    };
 
     const onUpdateClient = async (client: Partial<IClient> | Partial<IClient>[], isOptimistic?: boolean) => {
         setAppIsLoading(true);
@@ -338,7 +346,8 @@ export const ExcursionDetails: React.FC = () => {
                                             {checkpoint.buses.map((bus, busIndex) => (
                                                 <li key={busIndex}>
                                                     <Typography variant="small" color="gray">
-                                                        Modelo: {bus.model}, Capacidad: {bus.capacity}, Color: {bus.color}
+                                                        Modelo: {bus.model}, Capacidad: {bus.capacity},
+                                                        Color: {bus.color}
                                                     </Typography>
                                                 </li>
                                             ))}
