@@ -40,7 +40,7 @@ import {DataTable, IFilterOption, IFilterOptionItem} from "@/components/DataTabl
 import {IPayment} from "@/models/PaymentModel";
 import {IService, serviceStatusLabels, serviceStatusList, ServiceStatusTypes} from "@/models/serviceModel";
 import {getCrudService} from "@/api/services/CRUD.service";
-import {CommentForm} from "@/pages/dashboard/excursion/components/CommentHandler";
+import {CommentHandler} from "@/pages/dashboard/excursion/components/CommentHandler";
 import {IComment} from "@/models/commentModel";
 
 export interface IUpdateClientExtra extends IConfirmActionExtraParams {
@@ -49,7 +49,7 @@ export interface IUpdateClientExtra extends IConfirmActionExtraParams {
 
 export interface IClientTableProps {
     clients: IClient[];
-    onAddClient: (client: IClient) => void;
+    onAddClient: (client: Partial<IClient>, extra?: IUpdateClientExtra) => void;
     onUpdateClient: (client: Partial<IClient> | Partial<IClient>[], extra?: IUpdateClientExtra) => void;
     updateExcursion: (excursion: Partial<IExcursion>, extra?: IUpdateClientExtra) => any;
     excursion: IExcursion;
@@ -72,6 +72,7 @@ const getStatusColor = (status: string): 'green' | 'yellow' | 'red' | 'gray' | '
 };
 
 const paymentService = getCrudService('payments');
+const commentService = getCrudService('comments');
 const serviceService = getCrudService('services');
 
 export const ClientsExcursionTable = (
@@ -111,12 +112,7 @@ export const ClientsExcursionTable = (
     };
 
     // Función para actualizar los comentarios del cliente seleccionado
-    const handleCommentChangeWrapper = (updatedComments: IComment[]) => {
-        if (selectedClient) {
-            handleCommentChange(selectedClient, updatedComments);
-            setComments(updatedComments); // Actualizar el estado de los comentarios
-        }
-    };
+
     const {
         seedData,
         loading: wsLoading,
@@ -124,6 +120,7 @@ export const ClientsExcursionTable = (
     } = useWhatsapp(whatsappSessionKeys.betueltravel);
 
     const [deletePayment] = paymentService.useDeletePayments();
+    const [deleteComment] = commentService.useDeleteComments();
     const [updateService] = serviceService.useUpdateServices();
     const toggleHandleClient = () => {
         setClientToEdit(emptyClient);
@@ -139,15 +136,15 @@ export const ClientsExcursionTable = (
         }
 
         // Update the service with the new array of comments
-        const updatedService = { ...service, comments: updatedComments };
+        const updatedService = {...service, comments: updatedComments};
         const updatedClient: IClient = {
             ...client,
             services: client.services.map(s => s.excursionId === excursion._id ? updatedService : s) as IService[]
         };
 
         // Update the client and service with the new comments
-        onUpdateClient(updatedClient, { isOptimistic: true, avoidConfirm: true });
-        updatedService?._id && updateService({ _id: updatedService._id, ...updatedService });
+        onUpdateClient(updatedClient, {isOptimistic: true, avoidConfirm: true});
+        updatedService?._id && updateService({_id: updatedService._id, ...updatedService});
     };
 
     const toggleAssignGroupModal = () => {
@@ -180,7 +177,7 @@ export const ClientsExcursionTable = (
             ...client,
             currentService: {
                 ...client.currentService,
-                isCoordinator: !client.currentService.isCoordinator // Cambiar el estado
+                isCoordinator: !client.currentService.isCoordinator
             }
         };
         onUpdateClient(updatedClient);
@@ -237,6 +234,23 @@ export const ClientsExcursionTable = (
         return selectedClient?.services.find(s => s.excursionId === excursion._id) || excursionService;
     }, [selectedClient]);
 
+    const handleUpdateComment = (comments: IComment[]) => {
+        if (!selectedClient || !selectedService) {
+            // TODO: toast error message
+            return;
+        }
+
+        const updatedClient = {
+            ...selectedClient,
+            services: selectedClient.services.map(s =>
+                s._id === selectedService._id ? {...s, comments}
+                    : s
+            ) as IService[]
+        };
+
+        onUpdateClient(updatedClient);
+    };
+
     const handleUpdatePayment = async (payments: IPayment[]) => {
         if (!selectedClient || !selectedService) {
             // TODO: toast error message
@@ -270,6 +284,22 @@ export const ClientsExcursionTable = (
         setSelectedClient(updatedClient);
     };
 
+    const handleChangeComment = async (payments: IComment[]) => {
+        if (!selectedClient) {
+            // TODO: toast error message
+            return;
+        }
+
+        const updatedService = {...selectedService, comments};
+
+        const updatedClient: IClient = {
+            ...selectedClient,
+            services: selectedClient?.services.map(s => s.excursionId === excursion._id ? updatedService : s) || []
+        };
+
+        setSelectedClient(updatedClient);
+    };
+
     const handleDeleteClient = (client: IClient) => () => {
         const updatedClients = clients.filter(c => c._id !== client._id);
         const updatedClient = {
@@ -279,14 +309,13 @@ export const ClientsExcursionTable = (
         onUpdateClient(updatedClient);
         updateExcursion({
             clients: updatedClients
-        }, { isOptimistic: true, avoidConfirm: true });
+        }, {isOptimistic: true, avoidConfirm: true});
     };
 
 
     const handleDeletePayment = (payment: IPayment) => {
         if (selectedClient) {
             payment._id && deletePayment(payment._id);
-
             const updatedPayments = selectedService.payments.filter(p => p._id !== payment._id);
 
             const updatedService = {
@@ -300,6 +329,28 @@ export const ClientsExcursionTable = (
             };
 
             setSelectedClient(updatedClient);
+            onUpdateClient(updatedClient, {isOptimistic: true, avoidConfirm: true});
+        }
+    };
+
+    const handleDeleteComment = (comment: IComment) => {
+        if (selectedClient) {
+            comment._id && deleteComment(comment._id);
+
+            const updatedComments = selectedService?.comments?.filter(c => c._id !== comment._id);
+
+            const updatedService = {
+                ...selectedService,
+                comments: updatedComments,
+            };
+
+            const updatedClient: IClient = {
+                ...selectedClient,
+                services: selectedClient?.services.map(s => s.excursionId === excursion._id ? updatedService : s) || []
+            };
+
+            setSelectedClient(updatedClient);
+
             onUpdateClient(updatedClient, {isOptimistic: true, avoidConfirm: true});
         }
     };
@@ -516,122 +567,6 @@ export const ClientsExcursionTable = (
         }
     }, [clients]);
 
-    // const renderRow = (client: IClient, index: number, selected: boolean, onSelect: (checked: boolean) => void) => {
-    //     const noService = "No Service"
-    //     const serviceStatus = client.currentService?.status;
-    //     const statusColor = getStatusColor(serviceStatus || noService);
-    //     const serviceC = client.currentService;
-    //     const bedroomOptions: IOption[] = (bedrooms?.map((b) => ({
-    //         label: `${b.name} | ${b.zone}`,
-    //         value: b._id
-    //     })) || []) as IOption[];
-    //     const totalAmount = serviceC?.payments?.reduce((a, b) => a + b.amount, 0) || 0;
-    //     const clientBedroom = bedroomOptions.find(b => b.value === serviceC?.bedroom?._id);
-    //
-    //
-    //     const handleCommentChangeWrapper = (updatedComments: IComment[]) => {
-    //         handleCommentChange(client, updatedComments);
-    //     };
-    //
-    //     const handleDialogOpen = () => setIsDialogOpen(!isDialogOpen);
-    //
-    //     return (
-    //         <tr key={`${client._id}-${index}`}>
-    //             <td>
-    //                 <Checkbox
-    //                     color="blue"
-    //                     crossOrigin
-    //                     checked={selected}
-    //                     onChange={(e) => onSelect(e.target.checked)}
-    //                 />
-    //             </td>
-    //             <td>
-    //                 {editClientIndex === index ? (
-    //                     <Input
-    //                         crossOrigin={true}
-    //                         type="text"
-    //                         value={editedClients[index]?.firstName || client.firstName}
-    //                         onChange={(e) => handleInputChange(e.target.value, index, 'firstName')}
-    //                     />
-    //                 ) : (
-    //                     <Typography className="p-3">{client.firstName} {client.lastName}</Typography>
-    //                 )}
-    //             </td>
-    //             <td>
-    //                 {editClientIndex === index ? (
-    //                     <Input
-    //                         crossOrigin={true}
-    //                         type="text"
-    //                         value={editedClients[index]?.phone || client.phone}
-    //                         onChange={(e) => handleInputChange(e.target.value, index, 'phone')}
-    //                     />
-    //                 ) : (
-    //                     <a href={`https://wa.me/${client.phone}`} target="_blank">
-    //                         <Button variant="text">{client.phone}</Button>
-    //                     </a>
-    //                 )}
-    //             </td>
-    //             <td>
-    //                 <div className="flex flex-col items-center">
-    //                     <Menu placement="bottom">
-    //                         <MenuHandler>
-    //                             <Chip color={statusColor}
-    //                                   className="cursor-pointer"
-    //                                   value={
-    //                                       <div className="flex items-center gap-2 justify-between">
-    //                                           {serviceStatus ? serviceStatusLabels[serviceStatus] : noService}
-    //                                           <ChevronDownIcon width={18}/>
-    //                                       </div>
-    //                                   }/>
-    //                         </MenuHandler>
-    //                         <MenuList>
-    //                             {serviceStatusList.map(status => (
-    //                                 <MenuItem key={`s-status-${status.value}`}
-    //                                           onClick={() => onChangeServiceStatus(client, status)}>
-    //                                     <Chip color={getStatusColor(status.value)}
-    //                                           value={status.label}/>
-    //                                 </MenuItem>
-    //                             ))}
-    //                         </MenuList>
-    //                     </Menu>
-    //                     <div className='flex justify-center items-center'>
-    //                         <Typography variant="paragraph">RD${totalAmount.toLocaleString()}</Typography>
-    //                         <IconButton variant="text" color="blue" size="sm" onClick={handleDialogOpen}>
-    //                             <PencilIcon className="h-5 w-5"/>
-    //                         </IconButton>
-    //                     </div>
-    //                 </div>
-    //             </td>
-    //             {bedroomsExist && (
-    //                 <td>
-    //                     <div className="p-4">
-    //                         <SearchableSelect
-    //                             selectedValues={clientBedroom ? [clientBedroom] : undefined}
-    //                             label="Habitación"
-    //                             options={bedroomOptions}
-    //                             onSelect={(selectedValues: IOption[], currentSelect?: IOption) => onChangeBedroom(client)(selectedValues[0]?.value, currentSelect)}
-    //                             displayProperty="label"
-    //                             className="min-w-[200px]"
-    //                         />
-    //                     </div>
-    //                 </td>
-    //             )}
-    //             <td>
-    //                 <div className="flex items-center px-2 justify-end gap-1">
-    //                     <IconButton variant="text" color="blue" size="sm" onClick={() => openModal(client)}>
-    //                         <BiDollar className="h-5 w-5"/>
-    //                     </IconButton>
-    //                     <IconButton variant="text" color="blue" size="sm" onClick={handleClientToEdit(client)}>
-    //                         <PencilIcon className="h-5 w-5"/>
-    //                     </IconButton>
-    //                     <IconButton variant="text" color="red" size="sm" onClick={handleDeleteClient(client)}>
-    //                         <TrashIcon className="h-5 w-5"/>
-    //                     </IconButton>
-    //                 </div>
-    //             </td>
-    //         </tr>
-    //     );
-    // };
     const renderRow = (client: IClient, index: number, selected: boolean, onSelect: (checked: boolean) => void) => {
         const noService = "No Service";
         const serviceStatus = client.currentService?.status;
@@ -671,15 +606,15 @@ export const ClientsExcursionTable = (
                                       value={
                                           <div className="flex items-center gap-2 justify-between">
                                               {serviceStatus ? serviceStatusLabels[serviceStatus] : noService}
-                                              <ChevronDownIcon width={18} />
+                                              <ChevronDownIcon width={18}/>
                                           </div>
-                                      } />
+                                      }/>
                             </MenuHandler>
                             <MenuList>
                                 {serviceStatusList.map(status => (
                                     <MenuItem key={`s-status-${status.value}`}
                                               onClick={() => onChangeServiceStatus(client, status)}>
-                                        <Chip color={getStatusColor(status.value)} value={status.label} />
+                                        <Chip color={getStatusColor(status.value)} value={status.label}/>
                                     </MenuItem>
                                 ))}
                             </MenuList>
@@ -687,7 +622,7 @@ export const ClientsExcursionTable = (
                         <div className='flex justify-center items-center'>
                             <Typography variant="paragraph">RD${totalAmount.toLocaleString()}</Typography>
                             <IconButton variant="text" color="blue" size="sm" onClick={() => openCommentDialog(client)}>
-                                <AiOutlineComment className="h-5 w-5" />
+                                <AiOutlineComment className="h-5 w-5"/>
                             </IconButton>
                         </div>
                     </div>
@@ -714,16 +649,16 @@ export const ClientsExcursionTable = (
                             size="sm"
                             onClick={() => handleToggleCoordinator(client)}
                         >
-                            <AcademicCapIcon className="h-5 w-5" />
+                            <AcademicCapIcon className="h-5 w-5"/>
                         </IconButton>
                         <IconButton variant="text" color="blue" size="sm" onClick={() => openModal(client)}>
-                            <BiDollar className="h-5 w-5" />
+                            <BiDollar className="h-5 w-5"/>
                         </IconButton>
                         <IconButton variant="text" color="blue" size="sm" onClick={handleClientToEdit(client)}>
-                            <PencilIcon className="h-5 w-5" />
+                            <PencilIcon className="h-5 w-5"/>
                         </IconButton>
                         <IconButton variant="text" color="red" size="sm" onClick={handleDeleteClient(client)}>
-                            <TrashIcon className="h-5 w-5" />
+                            <TrashIcon className="h-5 w-5"/>
                         </IconButton>
                     </div>
                 </td>
@@ -883,12 +818,14 @@ export const ClientsExcursionTable = (
                     </DialogFooter>
                 </Dialog>
             </Card>
-            <CommentForm
+            <CommentHandler
                 isDialog={true}
                 open={dialogOpen}
                 onClose={closeCommentDialog}
-                initialComments={comments} // Comentarios cargados del cliente seleccionado
-                updateComments={handleCommentChangeWrapper}
+                initialComments={selectedService.comments}
+                onChangeComments={handleChangeComment}
+                updateComments={handleUpdateComment}
+                onDeleteComments={handleDeleteComment}
             />
         </>
     );
