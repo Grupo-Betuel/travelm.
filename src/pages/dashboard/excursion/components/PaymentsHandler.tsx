@@ -127,6 +127,7 @@ const PaymentHandler: React.FC<PaymentHandlerProps> = (
                     ))}
                 </Select>
                 <Input
+                    crossOrigin={false}
                     type="number"
                     label="Cantidad"
                     value={(editing && editIndex !== null ? payments[editIndex].amount : newPayment.amount).toString()}
