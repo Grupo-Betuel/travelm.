@@ -43,6 +43,7 @@ const ClientForm: React.FC<ClientFormProps> = (
         skip: client.phone.length < 11 || initialClient?.phone === client.phone
     });
 
+
     const handleChange = ({target: {value, name, type}}: React.ChangeEvent<HTMLInputElement>) => {
         // if(!value) return;
         if (type === 'tel') {
@@ -61,7 +62,7 @@ const ClientForm: React.FC<ClientFormProps> = (
         setClient({...client, services: [s]});
     }
     useEffect(() => {
-        if (initialClient) {
+        if (initialClient?._id) {
             setClient(initialClient);
             setService(initialClient.currentService); // Use currentService to avoid mixing data
         }
@@ -105,7 +106,11 @@ const ClientForm: React.FC<ClientFormProps> = (
     }, [service]);
 
     const handleSubmit = () => {
-        onSubmit(client);
+        onSubmit({
+            ...client,
+            currentService: service
+        }
+        );
         setClient(structuredClone(emptyClient));
         setService(undefined);
     };
@@ -156,12 +161,12 @@ const ClientForm: React.FC<ClientFormProps> = (
                 value={client.email}
                 onChange={handleChange}
             />
-            {enableService && <ServiceHandler
+            {enableService && (<ServiceHandler
                 service={service}
                 services={client.services}
                 onUpdateSingleService={onUpdateSingleService}
                 onUpdateServices={onUpdateServices}/>
-            }
+            )}
             {!dialog && <Button
                 color="blue"
                 onClick={handleSubmit}

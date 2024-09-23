@@ -71,21 +71,24 @@ const ServiceHandler: React.FC<ServiceFormProps> = ({services, onUpdateSingleSer
 
 
     console.log('service', service);
+    // temporal fix
+    const  ServiceTypeActions = false;
     return (
         <div className="flex flex-col gap-4">
             <div className="flex flex-col gap-4 rounded-md">
                 <div className="flex items-center justify-between gap-3">
-                    {!service?.type && (<Select
-                        className={!!service?.type ? "hidden" : ""}
-                        label="Service Type"
-                        value={service?.type || newService.type}
-                        placeholder="Selecciona"
-                        onChange={(e) => handleServiceChange('type', e)}
-                    >
-                        {SERVICE_CONSTANTS.TYPES.map(type => (
-                            <Option key={type} value={type}>{serviceStatusLabels ? [type] : ''}</Option>
-                        ))}
-                    </Select>)}
+                    {ServiceTypeActions && (
+                        <Select
+                            label="Service Type"
+                            value={newService.type}
+                            placeholder="Selecciona"
+                            onChange={(e) => handleServiceChange('type', e)}
+                        >
+                            {SERVICE_CONSTANTS.TYPES.map(type => (
+                                <Option key={type} value={type}>{serviceStatusLabels ? [type] : ''}</Option>
+                            ))}
+                        </Select>
+                    )}
                     <Select
                         label="Estado del Servicio"
                         value={service?.status || newService.status}
@@ -101,9 +104,10 @@ const ServiceHandler: React.FC<ServiceFormProps> = ({services, onUpdateSingleSer
                         crossOrigin={"true"}
                         type="number"
                         label="Cantidad De Asientos"
-                        value={service?.seats || newService.seats}
+                        value={newService.seats}
                         // disabled={!!service?.seats}
                         onChange={(e) => {
+                            console.log(e.target.value)
                             const value = parseInt(e.target.value, 10);
                             if (value >= 1) {
                                 handleServiceChange('seats', value);
