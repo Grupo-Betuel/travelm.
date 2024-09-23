@@ -1,20 +1,10 @@
 import React, {useEffect, useMemo, useState} from 'react';
-import {Button, Input, Option, Select, Textarea, Typography} from '@material-tailwind/react';
+import {Input, Option, Select} from '@material-tailwind/react';
 import {
     IService,
-    ServiceDetailActions,
-    ServiceDetailActionsDataTypes,
     serviceStatusLabels
 } from "../../../../models/serviceModel";
-import {IFinance} from "../../../../models/financeModel";
 import {SERVICE_CONSTANTS} from "../../../../constants/service.constant";
-import PaymentHandler from "./PaymentsHandler";
-import {IPayment} from "../../../../models/PaymentModel";
-import {getCrudService} from "../../../../api/services/CRUD.service";
-import {useConfirmAction} from "../../../../hooks/useConfirmActionHook";
-import {PAYMENT_CONSTANTS} from "../../../../constants/payment.constants";
-import ProtectedElement from "../../../../components/ProtectedElement";
-import {UserRoleTypes, UserTypes} from "../../../../models/interfaces/userModel";
 
 interface ServiceFormProps {
     services: IService[];
@@ -26,33 +16,14 @@ interface ServiceFormProps {
 const emptyService: IService = {
     status: 'interested',
     type: 'excursion',
+    payments: [],
     finance: {price: 0, type: 'service'},
     seats: 1,
 }
 
-// export const paymentService = getCrudService('payments');
-
 const ServiceHandler: React.FC<ServiceFormProps> = ({services, onUpdateSingleService, service, onUpdateServices}) => {
     const [newService, setNewService] = useState<IService>(emptyService);
-    // const [deletePayment] = paymentService.useDeletePayments();
 
-    const onConfirmAction = (type?: ServiceDetailActions, data?: ServiceDetailActionsDataTypes) => {
-        switch (type) {
-            case 'delete-payment':
-                // handleDeletePayment(data as IPayment);
-                break;
-        }
-    }
-
-    const onDeniedAction = (type?: ServiceDetailActions, data?: ServiceDetailActionsDataTypes) => {
-
-    }
-
-    const {
-        handleSetActionToConfirm,
-        resetActionToConfirm,
-        ConfirmDialog
-    } = useConfirmAction<ServiceDetailActions, ServiceDetailActionsDataTypes>(onConfirmAction, onDeniedAction);
 
     useEffect(() => {
         if (service) {
@@ -70,7 +41,6 @@ const ServiceHandler: React.FC<ServiceFormProps> = ({services, onUpdateSingleSer
     }, [newService]);
 
 
-    console.log('service', service);
     // temporal fix
     const  ServiceTypeActions = false;
     return (

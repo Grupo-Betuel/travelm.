@@ -138,20 +138,6 @@ export const ExcursionDetails: React.FC = () => {
         setSelectedCheckpoint(null);
     };
 
-    // const onAddClient = (client: IClient) => {
-    //     // HANDLING COMPANY RELATIONSHIP
-    //     const updatedClients = [
-    //         ...excursion.clients,
-    //         {
-    //             ...client,
-    //         }
-    //     ];
-    //
-    //     const newExcursion: IExcursion = {...excursion, clients: updatedClients};
-    //     setExcursion(newExcursion);
-    //     updateExcursion({_id: excursion._id || '', clients: updatedClients});
-    // }
-
     const onAddClient = async (newClient: IClient) => {
         setAppIsLoading(true);
         console.log('newClient', newClient);
@@ -169,9 +155,6 @@ export const ExcursionDetails: React.FC = () => {
             clients: updatedClients,
         });
 
-        // updateExcursion(
-        //     {_id: excursion._id || '', clients: updatedClients} // Enviamos todos los clientes a la API
-        // );
         setAppIsLoading(false);
     };
 

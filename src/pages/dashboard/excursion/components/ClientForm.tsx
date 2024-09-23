@@ -45,7 +45,6 @@ const ClientForm: React.FC<ClientFormProps> = (
 
 
     const handleChange = ({target: {value, name, type}}: React.ChangeEvent<HTMLInputElement>) => {
-        // if(!value) return;
         if (type === 'tel') {
             value = value.replace(/[^0-9]/g, '');
             if (value == '1') return;
@@ -64,7 +63,7 @@ const ClientForm: React.FC<ClientFormProps> = (
     useEffect(() => {
         if (initialClient?._id) {
             setClient(initialClient);
-            setService(initialClient.currentService); // Use currentService to avoid mixing data
+            setService(initialClient.currentService);
         }
     }, [initialClient]);
 
@@ -124,7 +123,7 @@ const ClientForm: React.FC<ClientFormProps> = (
                 type="tel"
                 value={client.phone}
                 onChange={handleChange}
-                maskPlaceholder={null} // This avoids showing underscores or other characters in unfocused state
+                maskPlaceholder={null}
                 alwaysShowMask={false}
             >
                 {

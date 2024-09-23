@@ -286,7 +286,6 @@ export const ClientsExcursionTable = (
     const handleDeletePayment = (payment: IPayment) => {
         if (selectedClient) {
             payment._id && deletePayment(payment._id);
-            if (!selectedService.payments) return
             const updatedPayments = selectedService.payments.filter(p => p._id !== payment._id);
 
             const updatedService = {
