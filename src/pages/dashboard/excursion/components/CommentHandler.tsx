@@ -1,4 +1,4 @@
-import React, {useEffect, useMemo, useState} from "react";
+import React, {useEffect, useState} from "react";
 import {
     Button,
     Dialog,
@@ -11,25 +11,27 @@ import {
     CardBody,
     Typography,
     CardFooter,
-    IconButton,
 } from "@material-tailwind/react";
-import MediaHandler, { IMediaHandled } from "@/pages/dashboard/excursion/components/MediaHandler";
-import { IMedia } from "@/models/mediaModel";
-import { IComment } from "@/models/commentModel";
-import { PencilIcon, TrashIcon } from "@heroicons/react/20/solid";
-import { Swiper, SwiperSlide } from "swiper/react";
-import { Navigation, Pagination } from "swiper/modules";
-import { AppImage } from "@/components/AppImage";
-import DatePicker from "@/components/DatePicker";
+import MediaHandler from "@/pages/dashboard/excursion/components/MediaHandler";
+import {IMedia} from "@/models/mediaModel";
+import {IComment} from "@/models/commentModel";
+import {PencilIcon, TrashIcon} from "@heroicons/react/20/solid";
+import {Swiper, SwiperSlide} from "swiper/react";
+import {Navigation, Pagination} from "swiper/modules";
+import {AppImage} from "@/components/AppImage";
 import {useAuth} from "@/context/authContext";
 import IUser from "@/models/interfaces/userModel";
+import {CommonConfirmActions, CommonConfirmActionsDataTypes} from "@/models/common";
+import {useConfirmAction} from "@/hooks/useConfirmActionHook";
 
-interface CommentFormProps {
+interface CommentHandlerProps {
     isDialog?: boolean;
     open?: boolean;
     onClose: () => void;
     initialComments?: IComment[];
+    onChangeComments: (payments: IComment[]) => void;
     updateComments: (comments: IComment[]) => void;
+    onDeleteComments: (payment: IComment) => void;
 }
 
 const DefaultComment: IComment = {
@@ -38,173 +40,194 @@ const DefaultComment: IComment = {
     createDate: new Date(),
 };
 
-export const CommentForm: React.FC<CommentFormProps> = ({
-                                                            isDialog = false,
-                                                            open = false,
-                                                            onClose,
-                                                            initialComments = [],
-                                                            updateComments,
-                                                        }) => {
+export const CommentHandler: React.FC<CommentHandlerProps> = ({
+                                                                  isDialog = false,
+                                                                  open = false,
+                                                                  onClose,
+                                                                  initialComments = [],
+                                                                  updateComments,
+                                                                  onDeleteComments
+                                                              }) => {
     const [comments, setComments] = useState<IComment[]>(initialComments);
-    const [currentComment, setCurrentComment] = useState<IComment | null>(null);
-    const [newCommentText, setNewCommentText] = useState<string>("");
+    const [newComment, setNewComment] = useState<IComment>(DefaultComment);
+    const [editing, setEditing] = useState<boolean>(false);
+    const [editIndex, setEditIndex] = useState<number | null>(null);
     const [medias, setMedias] = useState<IMedia[]>([]);
-    const { user } = useAuth();
-    const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-        setNewCommentText(e.target.value);
-    };
-
-    const handleMediasChange = (data: IMediaHandled) => {
-        setMedias(data.images);
-    };
+    const [selectedComment, setSelectedComment] = useState<IComment | null>(null);
+    const {user} = useAuth();
 
     useEffect(() => {
-        setComments(initialComments || []);
+        if (initialComments && initialComments.length > 0) {
+            setComments(initialComments);
+        }
     }, [initialComments]);
 
-    const handleSave = () => {
-        if (currentComment) {
-            const updatedComments = comments.map((comment) =>
-                comment.createDate === currentComment.createDate
-                    ? { ...comment, text: newCommentText, medias }
-                    : comment
-            );
+    const handleInputChange = (field: keyof IComment, value: any) => {
+        if (editing && editIndex !== null) {
+            const updatedComments = [...comments];
+            updatedComments[editIndex] = {...updatedComments[editIndex], [field]: value};
             setComments(updatedComments);
         } else {
-            const newComment: IComment = {
-                text: newCommentText,
-                medias: medias,
-                createDate: new Date(),
-                author: user as IUser,
-            };
+            setNewComment({...newComment, [field]: value});
+        }
+    };
 
-            setComments([...comments, newComment]);
+    const handleSave = () => {
+        if (!newComment.text.trim()) {
+            alert("El comentario no puede estar vacío.");
+            return;
         }
 
-        setCurrentComment(null);
-        setNewCommentText("");
+        let updatedComments;
+        if (editing && editIndex !== null) {
+            updatedComments = [...comments];
+            updatedComments[editIndex] = {...newComment, medias};
+            setEditing(false);
+            setEditIndex(null);
+        } else {
+            const newCommentWithMedia = {...newComment, medias, author: user as IUser};
+            updatedComments = [...comments, newCommentWithMedia];
+        }
+
+        setComments(updatedComments);
+        updateComments(updatedComments);
+
+        setNewComment(DefaultComment);
         setMedias([]);
     };
 
-    const handleEdit = (comment: IComment) => {
-        setCurrentComment(comment);
-        setNewCommentText(comment.text);
-        setMedias(comment.medias || []);
+    const startEditing = (index: number) => {
+        setEditIndex(index);
+        setEditing(true);
+        setNewComment(comments[index]);
+        setMedias(comments[index].medias || []);
     };
 
-    const handleDelete = (createDate: Date) => {
-        const updatedComments = comments.filter(
-            (comment) => comment.createDate !== createDate
-        );
-        setComments(updatedComments);
+    const cancelEditing = () => {
+        setEditing(false);
+        setEditIndex(null);
+        setNewComment(DefaultComment);
+        setMedias([]);
     };
 
-    const handleSaveAndClose = () => {
-        updateComments(comments);
-        onClose?.();
+
+    const onConfirmAction = (type?: CommonConfirmActions, data?: CommonConfirmActionsDataTypes<IComment>) => {
+        switch (type) {
+            case 'delete':
+                const updatedComments = comments.filter((c) => c.createDate !== data?.createDate);
+                setComments(updatedComments);
+                updateComments(updatedComments);
+                onDeleteComments(data as IComment);
+                break;
+        }
     };
+
+    const onDeniedAction = (type?: CommonConfirmActions, data?: CommonConfirmActionsDataTypes<IComment>) => {
+        // Acciones si la confirmación fue denegada (opcional)
+    };
+
+    const {
+        handleSetActionToConfirm,
+        resetActionToConfirm,
+        ConfirmDialog
+    } = useConfirmAction<CommonConfirmActions, CommonConfirmActionsDataTypes<IComment>>(onConfirmAction, onDeniedAction);
+
 
     const renderFormContent = () => (
         <>
             <Textarea
-                value={newCommentText}
-                onChange={handleInputChange}
-                label="Comment"
+                value={newComment.text}
+                onChange={(e) => handleInputChange('text', e.target.value)}
+                label="Comentario"
             />
-            <MediaHandler
-                handle={{ images: true }}
-                onChange={handleMediasChange}
-                medias={medias}
-                key={medias.length}
-            />
-            <div className="mt-4">
-                <Button onClick={handleSave} className="bg-blue-500 text-white p-2 rounded-md">
-                    {currentComment ? "Update Comment" : "Add Comment"}
-                </Button>
-            </div>
-            <div className="overflow-y-auto h-[33vh] py-4">
-                <div className="grid gap-y-6 gap-x-6 md:grid-cols-2 xl:grid-cols-2 mt-4">
-                    {(comments || []).map((comment, index) => (
-                        <Card className="bg-gray-100 rounded-xl py-4 mx-0" key={index}>
-                            {!!comment?.medias?.length && (
-                                <CardHeader className="h-32 w-full mx-0">
-                                    <Swiper
-                                        modules={[Navigation, Pagination]}
-                                        navigation
-                                        pagination={{ clickable: true }}
-                                        spaceBetween={5}
-                                        slidesPerView={1}
-                                        className="relative h-full rounded-md"
-                                    >
-                                        {comment.medias.map((image, index) => (
-                                            <SwiperSlide key={index}>
-                                                <AppImage
-                                                    src={image.content}
-                                                    alt={image.title}
-                                                    className="w-full h-full m-0 object-contain rounded-md"
-                                                />
-                                            </SwiperSlide>
-                                        ))}
-                                    </Swiper>
-                                </CardHeader>
-                            )}
+            <MediaHandler onChange={(media) => setMedias(media.images)} handle={{images: true}}/>
+            <Button onClick={handleSave} color={editing ? "blue" : "green"}>
+                {editing ? "Guardar Cambios" : "Agregar Comentario"}
+            </Button>
+            {editing && <Button onClick={cancelEditing} color="red">Cancelar</Button>}
 
-                            <CardBody className="flex flex-col space-y-2">
-                                <Typography variant="h6" className="font-bold line-clamp-2">
-                                    {comment.text}
-                                </Typography>
-                                <DatePicker
-                                    label="Select Date"
-                                    onChange={() => { }}
-                                    date={comment.createDate}
-                                    disabled={true}
-                                />
-                                {comment.author && (
-                                    <Typography variant="h6" className="font-bold line-clamp-2">
-                                        {comment.author.firstName} {comment.author.lastName}
-                                    </Typography>
+            <div className="grid grid-cols-3 gap-4 py-4">
+                {comments.map((comment, index) => (
+                    <Card className="border border-blue-gray-100 shadow-sm h-full space-y-4" key={index}>
+                        {comment.medias && comment.medias.length > 0 && (
+                            <CardHeader className="h-32 w-full mx-0 p-0">
+                                <Swiper modules={[Navigation, Pagination]} navigation pagination={{clickable: true}}
+                                        className="relative h-full rounded-md">
+                                    {comment.medias.map((media, i) => (
+                                        <SwiperSlide key={i}>
+                                            <AppImage src={media.content} alt={media.title}/>
+                                        </SwiperSlide>
+                                    ))}
+                                </Swiper>
+                            </CardHeader>
+                        )}
+                        <CardBody className="p-2 text-right">
+                            <Typography variant="small" className="font-normal text-blue-gray-600">
+                                {comment.text.length > 50 ? `${comment.text.slice(0, 50)}...` : comment.text}
+                            </Typography>
+                            <Typography variant="small" color="blue-gray">
+                                {new Date(comment.createDate).toLocaleDateString()}
+                            </Typography>
+                        </CardBody>
+                        <CardFooter className="border-t border-blue-gray-50 p-2 mt-auto items-end">
+                            <div className="flex space-x-1 justify-end">
+                                {comment.text.length > 50 && (
+                                    <Button variant="text" className="p-2" color="blue"
+                                            onClick={() => setSelectedComment(comment)}>
+                                        Ver más
+                                    </Button>
                                 )}
-                            </CardBody>
-
-                            <CardFooter className="flex justify-between pt-2">
-                                <div className="flex space-x-4">
-                                    <Button
-                                        variant="outlined"
-                                        color="red"
-                                        onClick={() => handleDelete(comment.createDate)}
-                                    >
-                                        Delete
-                                    </Button>
-                                    <Button
-                                        variant="outlined"
-                                        color="blue"
-                                        onClick={() => handleEdit(comment)}
-                                    >
-                                        Editar
-                                    </Button>
-                                </div>
-                            </CardFooter>
-                        </Card>
-                    ))}
-                </div>
+                                <Button variant="text" className="p-2" color="blue" onClick={() => startEditing(index)}>
+                                    <PencilIcon className="w-5 h-5"/>
+                                </Button>
+                                <Button variant="text" className="p-2" color="red"
+                                        onClick={() => handleSetActionToConfirm('delete')(comment)}>
+                                    <TrashIcon className="w-5 h-5"/>
+                                </Button>
+                            </div>
+                        </CardFooter>
+                    </Card>
+                ))}
             </div>
+
         </>
     );
 
     return isDialog ? (
         <Dialog open={open} handler={onClose}>
             <DialogHeader>Comentario</DialogHeader>
-            <DialogBody className="h-[80vh] overflow-hidden">
+            <DialogBody className="h-[70vh] overflow-y-auto space-y-4">
                 {renderFormContent()}
             </DialogBody>
             <DialogFooter className='space-x-4'>
-                <Button onClick={onClose} className="bg-gray-500 text-white p-2 rounded-md">
+                <Button variant="text"  onClick={onClose} color={"red"}>
                     Cancel
                 </Button>
-                <Button onClick={handleSaveAndClose} className="bg-blue-500 text-white p-2 rounded-md">
-                    Save & Close
-                </Button>
             </DialogFooter>
+            {selectedComment && (
+                <Dialog open={true} handler={() => setSelectedComment(null)}>
+                    <DialogHeader>{selectedComment.author?.firstName}</DialogHeader>
+                    <DialogBody divider>
+                        <Typography>{selectedComment.text}</Typography>
+                    </DialogBody>
+                    <Swiper modules={[Navigation, Pagination]} navigation pagination={{clickable: true}}
+                            className="relative h-full rounded-md">
+                        {selectedComment.medias ? (
+                            selectedComment.medias.map((media, i) => (
+                                <SwiperSlide key={i}>
+                                    <AppImage src={media.content} alt={media.title}/>
+                                </SwiperSlide>
+                            ))
+                        ) : undefined
+                        }
+                    </Swiper>
+                    <DialogFooter>
+                        <Button variant="text" color="blue" onClick={() => setSelectedComment(null)}>
+                            Cerrar
+                        </Button>
+                    </DialogFooter>
+                </Dialog>
+            )}
         </Dialog>
     ) : (
         <div className="form-container">
@@ -212,9 +235,6 @@ export const CommentForm: React.FC<CommentFormProps> = ({
             <div className="flex justify-end space-x-2">
                 <Button onClick={onClose} className="bg-gray-500 text-white p-2 rounded-md">
                     Cancel
-                </Button>
-                <Button onClick={handleSaveAndClose} className="bg-blue-500 text-white p-2 rounded-md">
-                    Save & Close
                 </Button>
             </div>
         </div>
