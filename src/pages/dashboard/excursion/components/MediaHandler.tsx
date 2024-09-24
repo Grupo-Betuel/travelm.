@@ -132,6 +132,10 @@ const MediaHandler = ({onChange, medias, disableUpload, logoMedia, flyerMedia, h
             videosData.length && setVideos([...videosData, ...videos]);
             audiosData.length && setAudios([...audiosData, ...audios]);
 
+        } else {
+            images.length && setImages([]);
+            videos.length && setVideos([]);
+            audios.length && setAudios([]);
         }
     }, [medias]);
 
