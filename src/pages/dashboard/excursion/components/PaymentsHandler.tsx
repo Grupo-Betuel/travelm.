@@ -178,15 +178,17 @@ const PaymentHandler: React.FC<PaymentHandlerProps> = (
                         )}
                         <CardBody className="p-2 text-right">
                             <Typography variant="small" className="font-normal text-blue-gray-600">
-                                {`Type: ${payment.type}`}
+                                {`Type: ${paymentTypeLabels[payment.type] || payment.type}`}
                             </Typography>
                             <Typography variant="h5" color="blue-gray">
                                 {`RD$${payment.amount.toLocaleString()}`}
                             </Typography>
                             <Typography variant="small" className="font-normal text-blue-gray-600">
-                                {payment.comment.length > 50
-                                    ? `${payment.comment.slice(0, 50)}...`
-                                    : payment.comment}
+                                {payment?.comment
+                                    ? payment.comment.length > 50
+                                        ? `${payment.comment.slice(0, 50)}...`
+                                        : payment.comment
+                                    : "No comment"}
                             </Typography>
                             <Typography variant="small" color="blue-gray">
                                 {new Date(payment.date).toLocaleDateString()}
@@ -194,7 +196,7 @@ const PaymentHandler: React.FC<PaymentHandlerProps> = (
                         </CardBody>
                         <CardFooter className="border-t border-blue-gray-50 p-2 mt-auto items-end">
                             <div className="flex space-x-1 justify-end">
-                                {payment?.comment?.length > 50 && (
+                                {payment?.comment && payment.comment.length > 50 && (
                                     <Button
                                         variant="text"
                                         className="p-2"
