@@ -88,7 +88,6 @@ const ServiceHandler: React.FC<ServiceFormProps> = ({services, onUpdateSingleSer
                     />
                 </div>
             </div>
-            <ConfirmDialog/>
         </div>
     );
 };

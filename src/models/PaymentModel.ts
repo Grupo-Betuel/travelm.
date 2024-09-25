@@ -7,7 +7,7 @@ export interface IPayment extends BaseModel {
     date: Date;
     amount: number;
     comment?: string;
-    media?: IMedia | IMediaFile;
+    media?: IMedia;
 }
 
 export const paymentTypes: PaymentTypes[] = ['card', 'transfer', 'cash']

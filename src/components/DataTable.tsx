@@ -18,7 +18,7 @@ export interface IFilterOption<T> {
     options?: IFilterOptionItem[];
 }
 
-export type IDataTableColumn<T> = { key: keyof T | string, label: string };
+export type IDataTableColumn<T> = { key: keyof T, label: string };
 
 interface DataTableProps<T> {
     data: T[];
@@ -147,8 +147,18 @@ export function DataTable<T>(
         const startPage = Math.max(1, currentPage - 1);
         const endPage = Math.min(totalPages, currentPage + 2);
 
-        for (let i = startPage; i <= endPage; i++) {
-            pageNumbers.push(i);
+        if (totalPages <= 3) {
+            for (let i = 1; i <= totalPages; i++) {
+                pageNumbers.push(i);
+            }
+        } else {
+            if (currentPage === 1) {
+                pageNumbers.push(1, 2, 3);
+            } else if (currentPage === totalPages) {
+                pageNumbers.push(totalPages - 2, totalPages - 1, totalPages);
+            } else {
+                pageNumbers.push(currentPage - 1, currentPage, currentPage + 1);
+            }
         }
 
         return (
