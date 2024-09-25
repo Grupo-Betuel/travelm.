@@ -11,9 +11,10 @@ import {IProjection} from "./projectionModel";
 import {BaseModel} from "./interfaces/BaseModel";
 import {IBedroom} from "./bedroomModel";
 import {IExpense} from "@/models/ExpensesModel";
+import {IService} from "@/models/serviceModel";
 
-export type ExcursionDetailActions = 'remove-client' | 'add-client' | 'update-client' | 'update';
-export type ExcursionDetailActionsDataTypes = IClient | Partial<IExcursion> | Partial<IClient>[];
+export type ExcursionDetailActions = 'remove-client' | 'add-client' | 'update-client' | 'update' | 'update-service';
+export type ExcursionDetailActionsDataTypes = IClient | Partial<IExcursion> | Partial<IClient>[] | Partial<IService>;
 export enum ExcursionStatusEnum {
     DRAFT = 'draft',
     COMPLETED = 'completed',

@@ -1,5 +1,5 @@
 import React, {useCallback, useEffect, useMemo, useState} from "react";
-import {IClient} from "../../../../models/clientModel";
+import {IClient} from "@/models/clientModel";
 import {
     Button,
     Card,
@@ -11,7 +11,7 @@ import {
     DialogFooter,
     DialogHeader, IconButton,
     Menu, MenuHandler, MenuItem, MenuList,
-    Typography
+    Typography, Tooltip
 } from "@material-tailwind/react";
 import {
     AcademicCapIcon,
@@ -51,6 +51,7 @@ export interface IClientTableProps {
     clients: IClient[];
     onAddClient: (client: Partial<IClient>, extra?: IUpdateClientExtra) => void;
     onUpdateClient: (client: Partial<IClient> | Partial<IClient>[], extra?: IUpdateClientExtra) => void;
+    onUpdateService: (service: Partial<IService> | Partial<IService>[], extra?: IUpdateClientExtra) => void;
     updateExcursion: (excursion: Partial<IExcursion>, extra?: IUpdateClientExtra) => any;
     excursion: IExcursion;
     bedrooms?: IBedroom[];
@@ -82,6 +83,7 @@ export const ClientsExcursionTable = (
         onAddClient,
         excursion,
         onUpdateClient,
+        onUpdateService,
         updateExcursion
     }: IClientTableProps) => {
     const [selectedClient, setSelectedClient] = useState<IClient | null>(null);
@@ -168,21 +170,16 @@ export const ClientsExcursionTable = (
         setModalOpen(true);
     };
 
-    const handleToggleCoordinator = (client: IClient) => {
-        // Verificar si existe currentService
-        if (!client.currentService) return;
+    const handleToggleCoordinator = async (client: IClient) => {
+        const service = getService(client);
+        if (!service) return;
 
-        // Clonar el cliente y su currentService, alternar isCoordinator
-        const updatedClient = {
-            ...client,
-            currentService: {
-                ...client.currentService,
-                isCoordinator: !client.currentService.isCoordinator
-            }
-        };
-        onUpdateClient(updatedClient);
+        const updatedService = {...service, isCoordinator: !service.isCoordinator};
 
-        // Llamar la función para actualizar el cliente
+        if (updatedService._id) {
+            await onUpdateService({_id: updatedService._id, ...updatedService});
+        }
+
     };
 
     const toggleEdit = (index: number, client: IClient) => {
@@ -643,14 +640,28 @@ export const ClientsExcursionTable = (
                 )}
                 <td>
                     <div className="flex items-center px-2 justify-end gap-1">
-                        <IconButton
-                            variant="text"
-                            color={client.currentService?.isCoordinator ? "yellow" : "blue"}
-                            size="sm"
-                            onClick={() => handleToggleCoordinator(client)}
+                        <Tooltip
+                            className="border border-blue-gray-50 bg-white px-4 py-3 shadow-xl shadow-black/10"
+                            content={
+                                <div className="">
+                                    <Typography
+                                        color="blue-gray"
+                                        className="font-extralight opacity-80"
+                                    >
+                                        {client.currentService?.isCoordinator ? 'Este cliente es coordinador' : 'Asignar como coordinador'}
+                                    </Typography>
+                                </div>
+                            }
                         >
-                            <AcademicCapIcon className="h-5 w-5"/>
-                        </IconButton>
+                            <IconButton
+                                variant="text"
+                                color={client.currentService?.isCoordinator ? "yellow" : "blue"}
+                                size="sm"
+                                onClick={() => handleToggleCoordinator(client)}
+                            >
+                                <AcademicCapIcon className="h-5 w-5"/>
+                            </IconButton>
+                        </Tooltip>
                         <IconButton variant="text" color="blue" size="sm" onClick={() => openModal(client)}>
                             <BiDollar className="h-5 w-5"/>
                         </IconButton>
