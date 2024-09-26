@@ -129,6 +129,8 @@ export const ClientsExcursionTable = (
         setIsNewClientOpen(!isNewClientOpen);
     };
 
+
+
     const handleCommentChange = (client: IClient, updatedComments: IComment[]) => {
         const service = getService(client);
 
