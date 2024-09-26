@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, { useEffect, useState } from "react";
 import {
     Dialog,
     DialogHeader,
@@ -13,29 +13,21 @@ import {
     CardFooter,
     Card,
 } from "@material-tailwind/react";
-
-import {IExpense} from "@/models/ExpensesModel";
-import {FinanceHandler} from "@/pages/dashboard/excursion/components/FinanceHandler";
-import {FinanceTypes, IFinance} from "@/models/financeModel";
-
-import {BiDollar, BiEdit, BiTrash} from "react-icons/bi";
-import {useConfirmAction} from "@/hooks/useConfirmActionHook";
-import {CommonConfirmActions, CommonConfirmActionsDataTypes} from "@/models/common";
-import {getCrudService} from "@/api/services/CRUD.service";
-import {IExcursion} from "@/models/excursionModel";
-import {IUpdateClientExtra} from "@/pages/dashboard/excursion/components/ClientsExcursionTable";
+import { IExpense } from "@/models/ExpensesModel";
+import { FinanceHandler } from "@/pages/dashboard/excursion/components/FinanceHandler";
+import { FinanceTypes, IFinance } from "@/models/financeModel";
+import { BiDollar, BiTrash, BiEdit } from "react-icons/bi";
+import {ICustomComponentDialog} from "@/models/common";
+import {emptyClient} from "@/pages/dashboard/excursion/components/ClientForm";
 
 interface ExpenseFormProps {
-    isDialog?: boolean;
-    isOpen: boolean;
-    handleClose: () => void;
-    expenses: IExpense[];
-    addExpense: (expense: IExpense) => void;
-    excursion?: IExcursion;
-    onUpdateExcursion: (excursion: Partial<IExcursion>, extra?: IUpdateClientExtra) => void;
+    initialExpenses: IExpense[];
+    onUpdateExpense: (expenses: IExpense) => void;
+    onDeleteExpense: (expenses: IExpense) => void;
+    dialog? : ICustomComponentDialog;
 }
 
-const DefaultExpense: IExpense = {
+const defaultExpense: IExpense = {
     finance: {
         price: 0,
         type: "excursion" as FinanceTypes,
@@ -46,98 +38,75 @@ const DefaultExpense: IExpense = {
     updateDate: new Date(),
 };
 
-const expensesService = getCrudService("travelExpenses");
-
 export const ExpenseForm: React.FC<ExpenseFormProps> = ({
-                                                            isDialog = false,
-                                                            isOpen,
-                                                            handleClose,
-                                                            expenses,
-                                                            addExpense,
-                                                            excursion,
-                                                            onUpdateExcursion,
+                                                            dialog,
+                                                            initialExpenses,
+                                                            onUpdateExpense,
+                                                            onDeleteExpense,
                                                         }) => {
-    const [newExpense, setNewExpense] = useState<IExpense>(DefaultExpense);
-    const [isEditing, setIsEditing] = useState(false);
+    const [expenses, setExpenses] = useState<IExpense[]>(initialExpenses);
+    const [newExpense, setNewExpense] = useState<IExpense>(defaultExpense);
     const [selectedExpense, setSelectedExpense] = useState<IExpense | null>(null);
 
-    const [deleteExpense] = expensesService.useDeleteTravelExpenses();
-    const [updateExpense] = expensesService.useUpdateTravelExpenses();
+    useEffect(() => {
+        if (initialExpenses && initialExpenses.length > 0) {
+            setExpenses(initialExpenses);
+        }
+    }, [initialExpenses]);
 
-    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-        const {name, value} = e.target;
-        setNewExpense((prev) => ({...prev, [name]: value}));
+    const handleInputChange = (name: string, value: string) => {
+        setNewExpense((prev) => ({ ...prev, [name]: value }));
     };
 
-    const handleAddOrUpdateExpense = () => {
-        if (isEditing && newExpense?._id) {
-            updateExpense({_id: newExpense._id, ...newExpense});
-            setNewExpense(DefaultExpense);
+    const handleSave = () => {
+        if (newExpense._id) {
+            const updatedExpenses = expenses.map((exp) =>
+                exp._id === newExpense._id ? { ...exp, ...newExpense } : exp
+            );
+            setExpenses(updatedExpenses);
+            onUpdateExpense(newExpense);
         } else {
-            addExpense(newExpense);
+            const newExpenses = [...expenses, newExpense];
+            setExpenses(newExpenses);
+            onUpdateExpense(newExpense);
         }
-        setIsEditing(false);
-        handleClose();
+        setNewExpense(defaultExpense);
     };
 
-    const handleEditExpense = (expense: IExpense) => {
+    const startEditing = (expense: IExpense) => {
         setNewExpense(expense);
-        setIsEditing(true);
     };
 
-    const handleCancelEdit = () => {
-        setNewExpense(DefaultExpense);
-        setIsEditing(false);
-        if (handleClose) handleClose();
+    const cancelEditing = () => {
+        setNewExpense(defaultExpense);
     };
 
-    const onUpdateFinances = (financeUpdate: Partial<IFinance>) => {
-        setNewExpense((prev) => ({
-            ...prev,
-            finance: {
-                ...prev.finance,
-                ...financeUpdate,
-            },
-        }));
+    const handleDelete = (expense: IExpense) => {
+        const filteredExpenses = expenses.filter((e) => e._id !== expense._id);
+        setExpenses(filteredExpenses);
+        onDeleteExpense(expense);
     };
-
-    const handleDeleteExpenses = (expense: IExpense) => {
-        const filteredExpenses = expenses.filter((E) => E._id !== expense._id);
-        setSelectedExpense(null);
-        expense._id && deleteExpense(expense._id);
-        onUpdateExcursion({expenses: filteredExpenses}, {isOptimistic: true, avoidConfirm: true});
-    };
-
-    const onConfirmAction = (type?: CommonConfirmActions, data?: IExpense) => {
-        if (type === 'delete') {
-            handleDeleteExpenses(data as IExpense);
-        }
-    };
-
-    const {
-        handleSetActionToConfirm,
-        resetActionToConfirm,
-        ConfirmDialog
-    } = useConfirmAction<CommonConfirmActions, CommonConfirmActionsDataTypes<IExpense>>(onConfirmAction);
-
-    const newExpenseHasContent = newExpense.title.trim() !== '' || newExpense.description.trim() !== '' || newExpense.finance.price > 0;
 
     const renderFormContent = () => (
         <>
             <FinanceHandler
                 enabledCost={false}
                 finance={newExpense.finance}
-                updateFinance={onUpdateFinances}
-                type='excursion'
+                updateFinance={(financeUpdate: Partial<IFinance>) =>
+                    setNewExpense((prev) => ({
+                        ...prev,
+                        finance: { ...prev.finance, ...financeUpdate },
+                    }))
+                }
+                type="excursion"
             />
             <div className="mb-4">
                 <Input
                     crossOrigin={true}
                     label="Nombre del Gasto"
                     type="text"
-                    name="title"
                     value={newExpense.title}
-                    onChange={handleInputChange}
+                    onChange={(e) => handleInputChange('title', e.target.value)}
                     placeholder="Título del Gasto"
                     className="w-full"
                 />
@@ -145,13 +114,21 @@ export const ExpenseForm: React.FC<ExpenseFormProps> = ({
             <div className="mb-4">
                 <Textarea
                     label="Descripción"
-                    name="description"
                     value={newExpense.description}
-                    onChange={handleInputChange}
+                    onChange={(e) => handleInputChange('description', e.target.value)}
                     className="w-full"
                 />
             </div>
-            <Typography variant="h6" className="mb-2">
+            <Button onClick={handleSave} color={newExpense._id ? "blue" : "green"}>
+                {newExpense._id ? "Guardar Cambios" : "Agregar Gasto"}
+            </Button>
+            {newExpense._id && (
+                <Button onClick={cancelEditing} color="red">
+                    Cancelar
+                </Button>
+            )}
+
+            <Typography variant="h6" className="mb-2 mt-4">
                 Gastos Agregados
             </Typography>
             <div className="grid grid-cols-3 gap-4">
@@ -164,7 +141,7 @@ export const ExpenseForm: React.FC<ExpenseFormProps> = ({
                             shadow={false}
                             className="absolute grid h-7 w-7 place-items-center"
                         >
-                            <BiDollar className="w-4 h-4 text-white"/>
+                            <BiDollar className="w-4 h-4 text-white" />
                         </CardHeader>
                         <CardBody className="p-2 text-right">
                             <Typography variant="small" className="font-normal text-blue-gray-600">
@@ -183,31 +160,21 @@ export const ExpenseForm: React.FC<ExpenseFormProps> = ({
                         </CardBody>
                         <CardFooter className="border-t border-blue-gray-50 p-2 mt-auto items-end">
                             <div className="flex space-x-1 justify-end">
-                                {expense.description.length > 200 && (
-                                    <Button
-                                        variant="text"
-                                        className="p-2"
-                                        color="blue"
-                                        onClick={() => setSelectedExpense(expense)}
-                                    >
+                                {expense.description.length > 50 && (
+                                    <Button variant="text" className="p-2" color="blue" onClick={() => setSelectedExpense(expense)}>
                                         Ver más
                                     </Button>
                                 )}
-                                <Button
-                                    variant="text"
-                                    className="p-2"
-                                    color="blue"
-                                    onClick={() => handleEditExpense(expense)}
-                                >
-                                    <BiEdit className="w-5 h-5"/>
+                                <Button variant="text" className="p-2" color="blue" onClick={() => startEditing(expense)}>
+                                    <BiEdit className="w-5 h-5" />
                                 </Button>
                                 <Button
-                                    className="p-2"
                                     variant="text"
+                                    className="p-2"
                                     color="red"
-                                    onClick={() => handleSetActionToConfirm('delete', 'Eliminar Gasto')(expense)}
+                                    onClick={() => handleDelete(expense)}
                                 >
-                                    <BiTrash className="w-5 h-5"/>
+                                    <BiTrash className="w-5 h-5" />
                                 </Button>
                             </div>
                         </CardFooter>
@@ -217,52 +184,44 @@ export const ExpenseForm: React.FC<ExpenseFormProps> = ({
         </>
     );
 
-    return isDialog? (
-        <>
-            <Dialog open={isOpen} handler={handleClose}>
-                <DialogHeader>Gastos</DialogHeader>
-                <DialogBody className="h-[70vh] overflow-y-auto" divider>
-                    {renderFormContent()}
-                </DialogBody>
-                <DialogFooter>
-                    <div className="flex gap-2">
-                        {(isEditing || newExpenseHasContent) && (
-                            <Button variant="text" color="red" onClick={handleCancelEdit}>
-                                Cancelar
-                            </Button>
-                        )}
-                        <Button variant="gradient" color="green" onClick={handleAddOrUpdateExpense}>
-                            {isEditing ? "Actualizar" : "Agregar"}
+    const dialogHandler = () => {
+        dialog?.handler && dialog.handler();
+        setNewExpense(defaultExpense);
+    }
+
+    return dialog ? (
+        <Dialog open={dialog.open} handler={dialogHandler} dismiss={{enabled: false}}>
+            <DialogHeader>Gastos</DialogHeader>
+            <DialogBody className="h-[70vh] overflow-y-auto" divider>
+                {renderFormContent()}
+            </DialogBody>
+            <DialogFooter>
+                <Button variant="text" color="red" onClick={dialogHandler}>
+                    Cancelar
+                </Button>
+            </DialogFooter>
+
+            {/* Dialog to show full description */}
+            {selectedExpense && (
+                <Dialog open={true} handler={() => setSelectedExpense(null)}>
+                    <DialogHeader>{selectedExpense.title}</DialogHeader>
+                    <DialogBody divider>
+                        <Typography>{selectedExpense.description}</Typography>
+                    </DialogBody>
+                    <DialogFooter>
+                        <Button variant="text" color="blue" onClick={() => setSelectedExpense(null)}>
+                            Cerrar
                         </Button>
-                    </div>
-                </DialogFooter>
-                {selectedExpense && (
-                    <Dialog open={true} handler={() => setSelectedExpense(null)}>
-                        <DialogHeader>{selectedExpense.title}</DialogHeader>
-                        <DialogBody divider>
-                            <Typography>{selectedExpense.description}</Typography>
-                        </DialogBody>
-                        <DialogFooter>
-                            <Button variant="text" color="blue" onClick={() => setSelectedExpense(null)}>
-                                Cerrar
-                            </Button>
-                        </DialogFooter>
-                    </Dialog>
-                )}
-            </Dialog>
-            <ConfirmDialog/>
-        </>
-    ): (
+                    </DialogFooter>
+                </Dialog>
+            )}
+        </Dialog>
+    ) : (
         <div className="form-container">
             {renderFormContent()}
             <div className="flex justify-end space-x-2">
-                {(isEditing || newExpenseHasContent) && (
-                    <Button variant="text" color="red" onClick={handleCancelEdit}>
-                        Cancelar
-                    </Button>
-                )}
-                <Button variant="gradient" color="green" onClick={handleAddOrUpdateExpense}>
-                    {isEditing ? "Actualizar" : "Agregar"}
+                <Button onClick={dialogHandler} className="bg-gray-500 text-white p-2 rounded-md">
+                    Cancelar
                 </Button>
             </div>
         </div>
