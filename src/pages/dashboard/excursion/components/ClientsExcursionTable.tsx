@@ -231,21 +231,63 @@ export const ClientsExcursionTable = (
         return selectedClient?.services.find(s => s.excursionId === excursion._id) || excursionService;
     }, [selectedClient]);
 
-    const handleUpdateComment = (comments: IComment[]) => {
+    const handleUpdateComment = (comment: IComment, isOptimistic?: boolean) => {
         if (!selectedClient || !selectedService) {
-            // TODO: toast error message
+            // TODO: mostrar mensaje de error con un toast
             return;
         }
 
-        const updatedClient = {
-            ...selectedClient,
-            services: selectedClient.services.map(s =>
-                s._id === selectedService._id ? {...s, comments}
-                    : s
-            ) as IService[]
+        let updatedComments: IComment[] = selectedService.comments || [];
+
+        if (comment._id) {
+            // Actualiza el comentario si ya existe
+            updatedComments = updatedComments.map(c => c._id === comment._id ? { ...c, ...comment } : c);
+        } else {
+            // Agrega un nuevo comentario si no tiene _id
+            updatedComments = [...updatedComments, comment];
+        }
+
+        const updatedService = {
+            ...selectedService,
+            comments: updatedComments,
         };
 
-        onUpdateClient(updatedClient);
+        const updatedClient: IClient = {
+            ...selectedClient,
+            services: selectedClient.services.map(s =>
+                s._id === selectedService._id ? updatedService : s
+            )
+        };
+
+        setSelectedClient(updatedClient);
+        onUpdateClient(updatedClient, { isOptimistic });
+    };
+
+    const handleDeleteComment = (comment: IComment) => {
+        if (!selectedClient || !selectedService) {
+            // TODO: mostrar mensaje de error con un toast
+            return;
+        }
+
+        // Si el comentario tiene un _id, lo eliminamos
+        comment._id && await deleteComment(comment._id);
+
+        const updatedComments = selectedService.comments?.filter(c => c._id !== comment._id) || [];
+
+        const updatedService = {
+            ...selectedService,
+            comments: updatedComments,
+        };
+
+        const updatedClient: IClient = {
+            ...selectedClient,
+            services: selectedClient.services.map(s =>
+                s._id === selectedService._id ? updatedService : s
+            )
+        };
+
+        setSelectedClient(updatedClient);
+        onUpdateClient(updatedClient, { isOptimistic: true, avoidConfirm: true });
     };
 
     const handleUpdatePayment = async (payments: IPayment[]) => {
@@ -281,21 +323,6 @@ export const ClientsExcursionTable = (
         setSelectedClient(updatedClient);
     };
 
-    const handleChangeComment = async (payments: IComment[]) => {
-        if (!selectedClient) {
-            // TODO: toast error message
-            return;
-        }
-
-        const updatedService = {...selectedService, comments};
-
-        const updatedClient: IClient = {
-            ...selectedClient,
-            services: selectedClient?.services.map(s => s.excursionId === excursion._id ? updatedService : s) || []
-        };
-
-        setSelectedClient(updatedClient);
-    };
 
     const handleDeleteClient = (client: IClient) => () => {
         const updatedClients = clients.filter(c => c._id !== client._id);
@@ -330,27 +357,7 @@ export const ClientsExcursionTable = (
         }
     };
 
-    const handleDeleteComment = (comment: IComment) => {
-        if (selectedClient) {
-            comment._id && deleteComment(comment._id);
 
-            const updatedComments = selectedService?.comments?.filter(c => c._id !== comment._id);
-
-            const updatedService = {
-                ...selectedService,
-                comments: updatedComments,
-            };
-
-            const updatedClient: IClient = {
-                ...selectedClient,
-                services: selectedClient?.services.map(s => s.excursionId === excursion._id ? updatedService : s) || []
-            };
-
-            setSelectedClient(updatedClient);
-
-            onUpdateClient(updatedClient, {isOptimistic: true, avoidConfirm: true});
-        }
-    };
 
     const [clientToEdit, setClientToEdit] = useState<IClient>();
     const handleClientToEdit = (client: IClient) => () => {
