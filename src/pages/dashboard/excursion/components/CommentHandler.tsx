@@ -12,7 +12,7 @@ import {
     Typography,
     CardFooter,
 } from "@material-tailwind/react";
-import MediaHandler from "@/pages/dashboard/excursion/components/MediaHandler";
+import MediaHandler, {IMediaHandled} from "@/pages/dashboard/excursion/components/MediaHandler";
 import {IMedia} from "@/models/mediaModel";
 import {IComment} from "@/models/commentModel";
 import {PencilIcon, TrashIcon} from "@heroicons/react/20/solid";
@@ -23,33 +23,30 @@ import {useAuth} from "@/context/authContext";
 import IUser from "@/models/interfaces/userModel";
 import {CommonConfirmActions, CommonConfirmActionsDataTypes, ICustomComponentDialog} from "@/models/common";
 import {useConfirmAction} from "@/hooks/useConfirmActionHook";
-import {emptyClient} from "@/pages/dashboard/excursion/components/ClientForm";
+import {IPayment} from "@/models/PaymentModel";
 
 interface CommentHandlerProps {
     dialog?: ICustomComponentDialog;
     initialComments?: IComment[];
-    onChangeComments: (payments: IComment[]) => void;
-    updateComments: (comments: IComment[]) => void;
-    onDeleteComments: (payment: IComment) => void;
+    onUpdateComments: (comments: IComment) => void;
+    onDeleteComments: (comment: IComment) => void;
 }
 
 const emptyComment: IComment = {
     text: "",
-    medias: [],
+    medias: undefined,
     createDate: new Date(),
+    author: {} as IUser
 };
 
 export const CommentHandler: React.FC<CommentHandlerProps> = ({
-                                                                  dialog ,
+                                                                  dialog,
                                                                   initialComments = [],
-                                                                  updateComments,
-                                                                  onDeleteComments
+                                                                  onUpdateComments,
+                                                                  onDeleteComments,
                                                               }) => {
     const [comments, setComments] = useState<IComment[]>(initialComments);
     const [newComment, setNewComment] = useState<IComment>(emptyComment);
-    const [editing, setEditing] = useState<boolean>(false);
-    const [editIndex, setEditIndex] = useState<number | null>(null);
-    const [medias, setMedias] = useState<IMedia[]>([]);
     const [selectedComment, setSelectedComment] = useState<IComment | null>(null);
     const {user} = useAuth();
 
@@ -60,74 +57,62 @@ export const CommentHandler: React.FC<CommentHandlerProps> = ({
     }, [initialComments]);
 
     const handleInputChange = (field: keyof IComment, value: any) => {
-        if (editing && editIndex !== null) {
-            const updatedComments = [...comments];
-            updatedComments[editIndex] = {...updatedComments[editIndex], [field]: value};
+        setNewComment({...newComment, [field]: value });
+    };
+
+    const handleMedia = (media: IMediaHandled) => {
+        const images = media.images || [];
+
+        if (newComment._id) {
+            const updatedComments = comments.map(co =>
+                co._id === newComment._id
+                    ? { ...co, medias: [...(co.medias || []), ...images] }
+                    : co
+            );
             setComments(updatedComments);
+            const updatedComment = updatedComments.find(co => co._id === newComment._id);
+            if (updatedComment) {
+                onUpdateComments(updatedComment);
+            }
         } else {
-            setNewComment({...newComment, [field]: value});
+            setNewComment({
+                ...newComment,
+                medias: [...(newComment.medias || []), ...images]
+            });
         }
     };
 
     const handleSave = () => {
-        if (!newComment.text.trim()) {
-            alert("El comentario no puede estar vacío.");
-            return;
-        }
-
-        let updatedComments;
-        if (editing && editIndex !== null) {
-            updatedComments = [...comments];
-            updatedComments[editIndex] = {...newComment, medias};
-            setEditing(false);
-            setEditIndex(null);
+        if (newComment._id) {
+            const updatedComments = comments.map((comment) =>
+                comment._id === newComment._id ? { ...comment, ...newComment } : comment
+            );
+            setComments(updatedComments);
+            const updatedComment = updatedComments.find(comment => comment._id === newComment._id);
+            if (updatedComment) {
+                onUpdateComments(updatedComment);
+            }
         } else {
-            const newCommentWithMedia = {...newComment, medias, author: user as IUser};
-            updatedComments = [...comments, newCommentWithMedia];
+            const newComments = [...comments, newComment];
+            setComments(newComments);
+            onUpdateComments(newComment);
         }
-
-        setComments(updatedComments);
-        updateComments(updatedComments);
-
         setNewComment(emptyComment);
-        setMedias([]);
     };
 
-    const startEditing = (index: number) => {
-        setEditIndex(index);
-        setEditing(true);
-        setNewComment(comments[index]);
-        setMedias(comments[index].medias || []);
+    const startEditing = (comment: IComment) => {
+        setNewComment(comment);
     };
 
     const cancelEditing = () => {
-        setEditing(false);
-        setEditIndex(null);
         setNewComment(emptyComment);
-        setMedias([]);
     };
 
-
-    const onConfirmAction = (type?: CommonConfirmActions, data?: CommonConfirmActionsDataTypes<IComment>) => {
-        switch (type) {
-            case 'delete':
-                const updatedComments = comments.filter((c) => c.createDate !== data?.createDate);
-                setComments(updatedComments);
-                updateComments(updatedComments);
-                onDeleteComments(data as IComment);
-                break;
-        }
+    const handleDelete = (comment: IComment) => {
+        const filteredComments = comments.filter((c) => c._id !== comment._id);
+        setComments(filteredComments);
+        onDeleteComments(comment);
     };
-
-    const onDeniedAction = (type?: CommonConfirmActions, data?: CommonConfirmActionsDataTypes<IComment>) => {
-        // Acciones si la confirmación fue denegada (opcional)
-    };
-
-    const {
-        handleSetActionToConfirm,
-        resetActionToConfirm,
-        ConfirmDialog
-    } = useConfirmAction<CommonConfirmActions, CommonConfirmActionsDataTypes<IComment>>(onConfirmAction, onDeniedAction);
 
 
     const renderFormContent = () => (
@@ -137,11 +122,11 @@ export const CommentHandler: React.FC<CommentHandlerProps> = ({
                 onChange={(e) => handleInputChange('text', e.target.value)}
                 label="Comentario"
             />
-            <MediaHandler onChange={(media) => setMedias(media.images)} handle={{images: true}}/>
-            <Button onClick={handleSave} color={editing ? "blue" : "green"}>
-                {editing ? "Guardar Cambios" : "Agregar Comentario"}
+            <MediaHandler onChange={handleMedia} handle={{images: true}} medias={newComment?.medias ? newComment.medias : undefined}/>
+            <Button onClick={handleSave} color={newComment._id ? "blue" : "green"}>
+                {newComment._id ? "Guardar Cambios" : "Agregar Comentario"}
             </Button>
-            {editing && <Button onClick={cancelEditing} color="red">Cancelar</Button>}
+            {newComment._id && <Button onClick={cancelEditing} color="red">Cancelar</Button>}
 
             <div className="grid grid-cols-3 gap-4 py-4">
                 {comments.map((comment, index) => (
@@ -174,11 +159,11 @@ export const CommentHandler: React.FC<CommentHandlerProps> = ({
                                         Ver más
                                     </Button>
                                 )}
-                                <Button variant="text" className="p-2" color="blue" onClick={() => startEditing(index)}>
+                                <Button variant="text" className="p-2" color="blue" onClick={() => startEditing(comment)}>
                                     <PencilIcon className="w-5 h-5"/>
                                 </Button>
                                 <Button variant="text" className="p-2" color="red"
-                                        onClick={() => handleSetActionToConfirm('delete')(comment)}>
+                                        onClick={() => handleDelete(comment)}>
                                     <TrashIcon className="w-5 h-5"/>
                                 </Button>
                             </div>
@@ -186,23 +171,22 @@ export const CommentHandler: React.FC<CommentHandlerProps> = ({
                     </Card>
                 ))}
             </div>
-
         </>
     );
 
     const dialogHandler = () => {
         dialog?.handler && dialog.handler();
-        setNewComment(emptyComment)
-    }
+        setNewComment(emptyComment);
+    };
 
     return dialog ? (
-        <Dialog open={dialog.open} handler={dialogHandler}>
+        <Dialog open={dialog.open} handler={dialogHandler} dismiss={{enabled : false}}>
             <DialogHeader>Comentario</DialogHeader>
             <DialogBody className="h-[70vh] overflow-y-auto space-y-4">
                 {renderFormContent()}
             </DialogBody>
             <DialogFooter className='space-x-4'>
-                <Button variant="text"  onClick={dialogHandler} color={"red"}>
+                <Button variant="text" onClick={dialogHandler} color={"red"}>
                     Cancel
                 </Button>
             </DialogFooter>

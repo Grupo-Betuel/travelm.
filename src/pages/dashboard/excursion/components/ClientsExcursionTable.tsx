@@ -835,8 +835,8 @@ export const ClientsExcursionTable = (
                     handler: closeCommentDialog
                 }}
                 initialComments={selectedService.comments}
-                onChangeComments={handleChangeComment}
-                updateComments={handleUpdateComment}
+                // onChangeComments={handleChangeComment}
+                onUpdateComments={handleUpdateComment}
                 onDeleteComments={handleDeleteComment}
             />
         </>
