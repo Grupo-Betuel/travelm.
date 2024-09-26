@@ -34,15 +34,19 @@ import {IExpense} from "@/models/ExpensesModel";
 import {ExpenseForm} from "@/pages/dashboard/excursion/components/ExpensesHandler";
 import {SERVICE_CONSTANTS} from "@/constants/service.constant";
 import {IService} from "@/models/serviceModel";
+import {emptyClient} from "@/pages/dashboard/excursion/components/ClientForm";
+import {EXPENSES_CONSTANTS} from "@/constants/expenses.constant";
 
 const excursionService = getCrudService('excursions');
 const clientService = getCrudService('travelClients');
 const serviceService = getCrudService('services');
+const expenseService = getCrudService('travelExpenses');
 export const ExcursionDetails: React.FC = () => {
     const [excursion, setExcursion] = useState<IExcursion>(mockExcursion);
     const {renderMedia} = useRenderMedia();
     const [updateService, {isLoading: isUpdatingService}] = serviceService.useUpdateServices();
     const [updateClient, {isLoading: isUpdatingClient}] = clientService.useUpdateTravelClients();
+    const [deleteExpense, {isLoading: isDropingClient}] = expenseService.useDeleteTravelExpenses();
     const [addClient, {isLoading: isCreatingClient}] = clientService.useAddTravelClients();
     const params = useParams();
     const [updateExcursion, {isLoading: isUpdating, data: updatedExcursion}] = excursionService.useUpdateExcursions();
@@ -82,6 +86,12 @@ export const ExcursionDetails: React.FC = () => {
                 break;
             case 'remove-client':
                 onUpdateExcursion(data as IExcursion);
+                break;
+            case 'update-expense':
+                onExpenseUpdate(data as IExpense, ...extra);
+                break;
+            case 'delete-expense':
+                onExpenseDelete(data as IExpense);
                 break;
         }
     }
@@ -127,18 +137,6 @@ export const ExcursionDetails: React.FC = () => {
         ...excursion.audios // Audios won't display as images but are included for completeness
     ];
 
-    // Function to render media items correctly based on type
-
-    const [checkpoints, setCheckpoints] = useState<ICheckpoint[]>([]);
-    const [selectedCheckpoint, setSelectedCheckpoint] = useState<ICheckpoint | null>(null);
-
-    const editCheckpoint = (checkpoint: ICheckpoint) => setSelectedCheckpoint(checkpoint);
-    const saveCheckpoint = (checkpoint: ICheckpoint) => {
-        const updatedCheckpoints = checkpoints.filter(cp => cp._id !== checkpoint._id);
-        setCheckpoints([...updatedCheckpoints, checkpoint]);
-        setSelectedCheckpoint(null);
-    };
-
     const onAddClient = async (newClient: IClient) => {
         setAppIsLoading(true);
         console.log('newClient', newClient);
@@ -150,7 +148,7 @@ export const ExcursionDetails: React.FC = () => {
         const {data: createdClient} = await addClient(clientData);
         newClient = {...newClient, ...createdClient};
 
-        const updatedClients = [...excursion.clients, newClient]; // Agregamos el nuevo cliente manteniendo los anteriores
+        const updatedClients = [...excursion.clients, newClient];
         setExcursion({
             ...excursion,
             clients: updatedClients,
@@ -235,11 +233,6 @@ export const ExcursionDetails: React.FC = () => {
         }
     };
 
-    React.useEffect(() => {
-        setCheckpoints(excursion.checkpoints);
-    }, []);
-
-
     const excursionBedrooms: IBedroom[] = useMemo(() => {
         return excursion.destinations.reduce((acc, org) => {
             if (!org.bedrooms) return acc;
@@ -247,14 +240,27 @@ export const ExcursionDetails: React.FC = () => {
         }, [] as IBedroom[]);
     }, [excursion.destinations]);
 
-    const addExpense = (expense: IExpense) => {
-        const updatedExpenses = [...(excursion.expenses || []), expense];
-        const updatedExcursion: IExcursion = {...excursion, expenses: updatedExpenses};
-        setExcursion(updatedExcursion);
-        updateExcursion({_id: excursion._id || '', expenses: updatedExpenses});
+
+    const onExpenseUpdate = async (expense: IExpense, isOptimistic?: boolean) => {
+        setAppIsLoading(true);
+
+        let updatedExpenses: IExpense[] = excursion.expenses || [];
+
+        if (expense._id) {
+            updatedExpenses = updatedExpenses.map(e => e._id === expense._id ? { ...e, ...expense } : e);
+        } else {
+            updatedExpenses = [...updatedExpenses, expense];
+        }
+        onUpdateExcursion({ expenses: updatedExpenses });
+
+        setAppIsLoading(false);
     };
 
-    console.log(ownerOrganization?.sessionId);
+    const onExpenseDelete = async (expense: IExpense) => {
+        deleteExpense(expense._id as string);
+        const updatedExpenses = excursion.expenses?.filter(e => e._id !== expense._id) || [];
+        onUpdateExcursion({ expenses: updatedExpenses });
+    };
 
     if (
         !excursion._id
@@ -263,7 +269,6 @@ export const ExcursionDetails: React.FC = () => {
             <ExcursionDetailsSkeleton/>
         </div>
     );
-
 
     return (
         <div className="container mx-auto relative flex flex-col gap-5">
@@ -335,12 +340,12 @@ export const ExcursionDetails: React.FC = () => {
 
             <ClientsExcursionTable
                 bedrooms={excursionBedrooms}
+                excursion={excursion}
+                clients={excursion.clients || []}
                 updateExcursion={handleSetActionToConfirm('update', EXCURSION_CONSTANTS.UPDATE_EXCURSION_TEXT)}
                 onUpdateClient={handleSetActionToConfirm('update-client', CLIENTS_CONSTANTS.UPDATE_CLIENT_TEXT)}
                 onUpdateService={handleSetActionToConfirm('update-service', SERVICE_CONSTANTS.UPDATE_SERVICE_TEXT)}
-                excursion={excursion}
                 onAddClient={handleSetActionToConfirm('add-client', CLIENTS_CONSTANTS.ADD_CLIENT_TEXT)}
-                clients={excursion.clients || []}
             />
             <FinanceDetails
                 transport={excursion.transport}
@@ -352,19 +357,19 @@ export const ExcursionDetails: React.FC = () => {
                 dialog={toggleExpenseDialog}
             />
             <ExpenseForm
-                isDialog={true}
-                isOpen={isExpenseDialogOpen}
-                excursion={excursion}
-                onUpdateExcursion={onUpdateExcursion}
-                handleClose={toggleExpenseDialog}
-                expenses={excursion.expenses || []}
-                addExpense={addExpense}
+                dialog={{
+                    open: isExpenseDialogOpen,
+                    handler: toggleExpenseDialog,
+                }}
+                initialExpenses={excursion.expenses || []}
+                onUpdateExpense={handleSetActionToConfirm('update-expense', EXPENSES_CONSTANTS.UPDATE_EXPENSES_TEXT)}
+                onDeleteExpense={handleSetActionToConfirm('delete-expense', EXPENSES_CONSTANTS.DELETE_EXPENSES_TEXT)}
             />
             {!!excursionBedrooms?.length && <BedroomDetails excursion={excursion}/>}
             {/*{!!excursion.activities.length && <ActivityDetails activities={excursion.activities}/>}*/}
             {/*<ProjectionsCharts projections={excursion.projections}/>*/}
             {!!excursion.checkpoints?.length && (
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-3"> {/* Para dividir en 3 columnas */}
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
                     {excursion.checkpoints.map((checkpoint, index) => (
                         <Card key={index} className="flex flex-col">
                             <CardBody>
@@ -411,7 +416,6 @@ export const ExcursionDetails: React.FC = () => {
                     ))}
                 </div>
             )}
-
 
             {/* Organization, Destination, and TransportStep Information Cards */}
             <div>
