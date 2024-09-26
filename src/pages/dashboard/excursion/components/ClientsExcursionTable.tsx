@@ -830,9 +830,10 @@ export const ClientsExcursionTable = (
                 </Dialog>
             </Card>
             <CommentHandler
-                isDialog={true}
-                open={dialogOpen}
-                onClose={closeCommentDialog}
+                dialog={{
+                    open: dialogOpen,
+                    handler: closeCommentDialog
+                }}
                 initialComments={selectedService.comments}
                 onChangeComments={handleChangeComment}
                 updateComments={handleUpdateComment}

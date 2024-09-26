@@ -21,35 +21,32 @@ import {Navigation, Pagination} from "swiper/modules";
 import {AppImage} from "@/components/AppImage";
 import {useAuth} from "@/context/authContext";
 import IUser from "@/models/interfaces/userModel";
-import {CommonConfirmActions, CommonConfirmActionsDataTypes} from "@/models/common";
+import {CommonConfirmActions, CommonConfirmActionsDataTypes, ICustomComponentDialog} from "@/models/common";
 import {useConfirmAction} from "@/hooks/useConfirmActionHook";
+import {emptyClient} from "@/pages/dashboard/excursion/components/ClientForm";
 
 interface CommentHandlerProps {
-    isDialog?: boolean;
-    open?: boolean;
-    onClose: () => void;
+    dialog?: ICustomComponentDialog;
     initialComments?: IComment[];
     onChangeComments: (payments: IComment[]) => void;
     updateComments: (comments: IComment[]) => void;
     onDeleteComments: (payment: IComment) => void;
 }
 
-const DefaultComment: IComment = {
+const emptyComment: IComment = {
     text: "",
     medias: [],
     createDate: new Date(),
 };
 
 export const CommentHandler: React.FC<CommentHandlerProps> = ({
-                                                                  isDialog = false,
-                                                                  open = false,
-                                                                  onClose,
+                                                                  dialog ,
                                                                   initialComments = [],
                                                                   updateComments,
                                                                   onDeleteComments
                                                               }) => {
     const [comments, setComments] = useState<IComment[]>(initialComments);
-    const [newComment, setNewComment] = useState<IComment>(DefaultComment);
+    const [newComment, setNewComment] = useState<IComment>(emptyComment);
     const [editing, setEditing] = useState<boolean>(false);
     const [editIndex, setEditIndex] = useState<number | null>(null);
     const [medias, setMedias] = useState<IMedia[]>([]);
@@ -92,7 +89,7 @@ export const CommentHandler: React.FC<CommentHandlerProps> = ({
         setComments(updatedComments);
         updateComments(updatedComments);
 
-        setNewComment(DefaultComment);
+        setNewComment(emptyComment);
         setMedias([]);
     };
 
@@ -106,7 +103,7 @@ export const CommentHandler: React.FC<CommentHandlerProps> = ({
     const cancelEditing = () => {
         setEditing(false);
         setEditIndex(null);
-        setNewComment(DefaultComment);
+        setNewComment(emptyComment);
         setMedias([]);
     };
 
@@ -193,14 +190,19 @@ export const CommentHandler: React.FC<CommentHandlerProps> = ({
         </>
     );
 
-    return isDialog ? (
-        <Dialog open={open} handler={onClose}>
+    const dialogHandler = () => {
+        dialog?.handler && dialog.handler();
+        setNewComment(emptyComment)
+    }
+
+    return dialog ? (
+        <Dialog open={dialog.open} handler={dialogHandler}>
             <DialogHeader>Comentario</DialogHeader>
             <DialogBody className="h-[70vh] overflow-y-auto space-y-4">
                 {renderFormContent()}
             </DialogBody>
             <DialogFooter className='space-x-4'>
-                <Button variant="text"  onClick={onClose} color={"red"}>
+                <Button variant="text"  onClick={dialogHandler} color={"red"}>
                     Cancel
                 </Button>
             </DialogFooter>
@@ -233,7 +235,7 @@ export const CommentHandler: React.FC<CommentHandlerProps> = ({
         <div className="form-container">
             {renderFormContent()}
             <div className="flex justify-end space-x-2">
-                <Button onClick={onClose} className="bg-gray-500 text-white p-2 rounded-md">
+                <Button onClick={dialogHandler} className="bg-gray-500 text-white p-2 rounded-md">
                     Cancel
                 </Button>
             </div>
