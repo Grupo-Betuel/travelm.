@@ -828,7 +828,7 @@ export const ClientsExcursionTable = (
                         <div className="flex items-center">
                             <SearchableSelect<IWsGroup>
                                 options={seedData.groups.filter(item => !item.subject?.toLowerCase()?.includes('sin filtro'))}
-                                displayProperty="subject"
+                                displayProperty="title"
                                 label="Selecciona un grupo"
                                 disabled={wsLoading}
                                 onSelect={handleWsGroupSelection}

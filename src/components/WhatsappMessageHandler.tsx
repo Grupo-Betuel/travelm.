@@ -257,10 +257,10 @@ const Messaging: React.FC<IMessaging> = (
     }
 
     const usersData: IWsUser[] = useMemo(() => {
-        return seedData.users.map((user: IWsUser) => ({
+        return seedData.users?.map((user: IWsUser) => ({
             ...user,
             fullName: `${user.firstName || user.phone || ''} ${user.lastName || ''}`,
-        }));
+        })) || [];
     }, [seedData.users]);
 
 
