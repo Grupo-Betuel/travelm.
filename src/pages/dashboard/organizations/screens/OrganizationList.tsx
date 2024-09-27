@@ -59,7 +59,7 @@ export const OrganizationList: React.FC = () => {
             key: 'contact',
             label: 'Filtrar por Email',
             type: 'select',
-            options: Array.from(new Set(organizations.map(org => org.contact.email))).map(email => ({
+            options: Array.from(new Set(organizations.map(org => org.contact?.email || ''))).map(email => ({
                 label: email,
                 value: email
             }))
