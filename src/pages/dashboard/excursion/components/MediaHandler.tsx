@@ -71,11 +71,12 @@ export interface IHandleMediaFormProps {
         flyer?: boolean;
         logo?: boolean;
     }
+    enableSingleSelection?: boolean;
 }
 
 export const mediasService = getCrudService('medias');
 
-const MediaHandler = ({onChange, medias, disableUpload, logoMedia, flyerMedia, handle}: IHandleMediaFormProps) => {
+const MediaHandler = ({onChange, medias, disableUpload, logoMedia, flyerMedia, handle, enableSingleSelection}: IHandleMediaFormProps) => {
     const [flyer, setFlyer] = useState<IMediaFile>();
     const [logo, setLogo] = useState<IMediaFile>();
     const [images, setImages] = useState<IMediaFile[]>([]);
@@ -131,6 +132,10 @@ const MediaHandler = ({onChange, medias, disableUpload, logoMedia, flyerMedia, h
             videosData.length && setVideos([...videosData, ...videos]);
             audiosData.length && setAudios([...audiosData, ...audios]);
 
+        } else {
+            images.length && setImages([]);
+            videos.length && setVideos([]);
+            audios.length && setAudios([]);
         }
     }, [medias]);
 
@@ -605,7 +610,11 @@ const MediaHandler = ({onChange, medias, disableUpload, logoMedia, flyerMedia, h
                             MediaTypeEnum.IMAGE
                             : selectedMediaSelectorType as MediaTypeEnum
                         }
-                        multiple={selectedMediaSelectorType !== ExtraMediaTypesEnum.FLYER && selectedMediaSelectorType !== ExtraMediaTypesEnum.LOGO}
+                        multiple={
+                            !enableSingleSelection &&
+                            (selectedMediaSelectorType !== ExtraMediaTypesEnum.FLYER &&
+                                selectedMediaSelectorType !== ExtraMediaTypesEnum.LOGO)
+                        }
                         onSelect={onSelectMedia}
                     />
                 </DialogBody>

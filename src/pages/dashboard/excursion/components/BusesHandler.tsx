@@ -131,7 +131,8 @@ const BusHandler: React.FC<BusHandlerProps> = ({buses, updateBuses}) => {
                        name={"description"}
                        onChange={handleInputChange}/>
 
-                <Button color="blue" onClick={addBus}>{editingIndex !== null ? `${BASIC_CONSTANTS.SAVE_TEXT}` : `${BASIC_CONSTANTS.ADD_TEXT}`}</Button>
+                <Button color="blue"
+                        onClick={addBus}>{editingIndex !== null ? `${BASIC_CONSTANTS.SAVE_TEXT}` : `${BASIC_CONSTANTS.ADD_TEXT}`}</Button>
 
                 {hasContent && (
                     <Button color="red" onClick={handleCancel}>

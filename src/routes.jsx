@@ -11,6 +11,7 @@ import {SignIn, SignUp} from "@/pages/auth";
 import Excursions from "@/pages/dashboard/excursion/excursions";
 import {CgOrganisation} from "react-icons/cg";
 import Organizations from "@/pages/dashboard/organizations/organizations";
+import Clients from "@/pages/dashboard/clients/clients";
 
 const icon = {
     className: "w-5 h-5 text-inherit",
@@ -35,26 +36,34 @@ export const routes = [
                 roles: ['admin'],
                 userTypes: ['agency'],
             },
-            // {
-            //     icon: <UserCircleIcon {...icon} />,
-            //     name: 'profile',
-            //     path: '/profile',
-            //     element: Profile,
-            // },
-            // {
-            //     icon: <TableCellsIcon {...icon} />,
-            //     name: 'tables',
-            //     path: '/tables',
-            //     element: Tables,
-            //     roles: ['admin', 'user'],
-            // },
-            // {
-            //     icon: <InformationCircleIcon {...icon} />,
-            //     name: 'notifications',
-            //     path: '/notifications',
-            //     element: Notifications,
-            //     roles: ['admin', 'user'],
-            // },
+            {
+                icon: <CgOrganisation {...icon} />,
+                name: 'Clientes',
+                path: '/clients/*',
+                element: Clients,
+                roles: ['admin'],
+                userTypes: ['agency'],
+            },
+            {
+                icon: <UserCircleIcon {...icon} />,
+                name: 'profile',
+                path: '/profile',
+                element: Profile,
+            },
+            {
+                icon: <TableCellsIcon {...icon} />,
+                name: 'tables',
+                path: '/tables',
+                element: Tables,
+                roles: ['admin', 'user'],
+            },
+            {
+                icon: <InformationCircleIcon {...icon} />,
+                name: 'notifications',
+                path: '/notifications',
+                element: Notifications,
+                roles: ['admin', 'user'],
+            },
         ],
     },
     {

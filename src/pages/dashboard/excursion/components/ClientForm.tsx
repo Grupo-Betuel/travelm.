@@ -1,4 +1,4 @@
-import React, {ReactNode, useEffect, useMemo, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {Input, Button, Dialog, DialogHeader, DialogBody, DialogFooter, Typography} from "@material-tailwind/react";
 import {IClient} from "@/models/clientModel";
 import InputMask from "react-input-mask";
@@ -43,8 +43,8 @@ const ClientForm: React.FC<ClientFormProps> = (
         skip: client.phone.length < 11 || initialClient?.phone === client.phone
     });
 
+
     const handleChange = ({target: {value, name, type}}: React.ChangeEvent<HTMLInputElement>) => {
-        // if(!value) return;
         if (type === 'tel') {
             value = value.replace(/[^0-9]/g, '');
             if (value == '1') return;
@@ -61,9 +61,9 @@ const ClientForm: React.FC<ClientFormProps> = (
         setClient({...client, services: [s]});
     }
     useEffect(() => {
-        if (initialClient) {
+        if (initialClient?._id) {
             setClient(initialClient);
-            setService(initialClient.currentService); // Use currentService to avoid mixing data
+            setService(initialClient.currentService);
         }
     }, [initialClient]);
 
@@ -74,11 +74,11 @@ const ClientForm: React.FC<ClientFormProps> = (
             const foundClient = existingClients[0];
             if (foundClient) {
                 const newServices = mergeClientServices(foundClient);
-                setClient({ ...foundClient, services: newServices });
+                setClient({...foundClient, services: newServices});
             }
 
         } else if (client.phone.length === 11) {
-            setClient({ ...emptyClient, phone: client.phone });
+            setClient({...emptyClient, phone: client.phone});
         }
     }, [existingClients, client.phone, initialClient?.phone]);
 
@@ -105,8 +105,11 @@ const ClientForm: React.FC<ClientFormProps> = (
     }, [service]);
 
     const handleSubmit = () => {
-        onSubmit(client);
-
+        onSubmit({
+            ...client,
+            currentService: service
+        }
+        );
         setClient(structuredClone(emptyClient));
         setService(undefined);
     };
@@ -120,7 +123,7 @@ const ClientForm: React.FC<ClientFormProps> = (
                 type="tel"
                 value={client.phone}
                 onChange={handleChange}
-                maskPlaceholder={null} // This avoids showing underscores or other characters in unfocused state
+                maskPlaceholder={null}
                 alwaysShowMask={false}
             >
                 {
@@ -150,12 +153,19 @@ const ClientForm: React.FC<ClientFormProps> = (
                     onChange={handleChange}
                 />
             </div>
-            {enableService && <ServiceHandler
+            <Input
+                crossOrigin={"true"}
+                label="Correo"
+                name="email"
+                value={client.email}
+                onChange={handleChange}
+            />
+            {enableService && (<ServiceHandler
                 service={service}
                 services={client.services}
                 onUpdateSingleService={onUpdateSingleService}
                 onUpdateServices={onUpdateServices}/>
-            }
+            )}
             {!dialog && <Button
                 color="blue"
                 onClick={handleSubmit}

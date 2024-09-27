@@ -24,7 +24,6 @@ const FinancesHandlerStep: React.FC<FinancesStepProps> = ({excursionData, update
         return excursionData.activities?.reduce((acc, activity) => acc + (activity?.finance?.price || 0), 0) || 0;
     }, [excursionData.activities]);
 
-
     const destinationsPrice = useMemo(() => {
         return excursionData.destinations?.reduce((acc, destination) => acc + (destination?.entryFee?.price || 0), 0) || 0;
     }, [excursionData.destinations]);
@@ -52,6 +51,7 @@ const FinancesHandlerStep: React.FC<FinancesStepProps> = ({excursionData, update
                 finance={excursionData.finance}
                 updateFinance={onUpdateFinances}
                 type="excursion"
+                options={[]}
             />
 
             <div className="flex flex-wrap justify-center items-center bg-gray-50 py-6 rounded-lg shadow-md">
@@ -110,7 +110,7 @@ const FinancesHandlerStep: React.FC<FinancesStepProps> = ({excursionData, update
                 {/*<Typography variant="h5" color="blue" className="p-4 text-center">Precio por Actividad:*/}
                 {/*    RD${activityPrice.toLocaleString()}</Typography>*/}
                 {/*<Typography variant="h5" color="blue"*/}
-                {/*            className="p-4 text-center">Beneficio: {(excursionData.finance?.price - total).toLocaleString()}</Typography>*/}
+                {/*    className="p-4 text-center">Beneficio: {(excursionData.finance?.price - total).toLocaleString()}</Typography>*/}
             </>
         </div>
     );
