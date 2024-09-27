@@ -68,6 +68,7 @@ export const OrganizationForm: React.FC<OrganizationHandlerProps> = (
     const [organization, setOrganization] = useState<IOrganization>(emptyOrganization);
     const {data: organizationUserData} = userService.useFetchAllTravelUsers({organization: organization?._id}, {skip: !organization?._id});
     const [isOrganizationUserDialogOpen, setIsOrganizationUserDialogOpen] = useState(false);
+    const [isOrganizationBedroomsDialogOpen, setIsOrganizationBedroomsDialogOpen] = useState(false);
     const [addUser] = userService.useAddTravelUsers();
     const [updateUser] = userService.useUpdateTravelUsers();
     const [organizationUser, setOrganizationUser] = useState<IUser>()
@@ -79,6 +80,7 @@ export const OrganizationForm: React.FC<OrganizationHandlerProps> = (
     }, [organizationUserData]);
 
     const toggleOrganizationUserDialog = () => setIsOrganizationUserDialogOpen(!isOrganizationUserDialogOpen);
+    const toggleOrganizationBedroomsDialog = () => setIsOrganizationBedroomsDialogOpen(!isOrganizationBedroomsDialogOpen);
 
     const handleInputChange = (event: React.ChangeEvent<any>): void => {
         const {name, value} = event.target;
@@ -115,7 +117,7 @@ export const OrganizationForm: React.FC<OrganizationHandlerProps> = (
         }));
     };
     const handleMediasChange = (data: IMediaHandled): void => {
-        const { audios = [], images = [], videos = [] } = data;
+        const {audios = [], images = [], videos = []} = data;
 
         setOrganization(prevState => ({
             ...prevState,
@@ -139,7 +141,7 @@ export const OrganizationForm: React.FC<OrganizationHandlerProps> = (
 
     const handleSubmit = async () => {
         const organizationInfo = structuredClone(organization);
-        if (!bedroomsIsShown ){
+        if (!bedroomsIsShown) {
             organizationInfo.bedrooms && delete organizationInfo.bedrooms;
         }
         if (organizationInfo._id) {
@@ -236,7 +238,8 @@ export const OrganizationForm: React.FC<OrganizationHandlerProps> = (
                 <div className='flex flex-col relative w-1/5 space-y-4'>
                     <MediaHandler logoMedia={organization.logo} medias={organization.medias} onChange={handleLogoChange}
                                   handle={{logo: true}}/>
-                    <FinanceHandler options={[]} finance={organization.entryFee || {} as IFinance} updateFinance={handleEntryFee}/>
+                    <FinanceHandler options={[]} finance={organization.entryFee || {} as IFinance}
+                                    updateFinance={handleEntryFee}/>
                 </div>
                 <div className='flex flex-col gap-4 w-2/3'>
                     <div className='grid grid-cols-2 gap-4 '>
@@ -260,11 +263,22 @@ export const OrganizationForm: React.FC<OrganizationHandlerProps> = (
                     {showSocialNetworkForm &&
                         <SocialNetworkForm socialNetworks={organization.socialNetworks}
                                            updateSocialNetworks={handleSocialNetworksChange}/>}
-                    {bedroomsIsShown &&
-                        <BedroomsHandler bedrooms={organization.bedrooms || []} updateBedrooms={handleBedrooms}/>}
+                    {bedroomsIsShown && <>
+                        <Button
+                            onClick={toggleOrganizationBedroomsDialog}>{'Agregar Habitacion'}
+                        </Button>
+                        <BedroomsHandler
+                            dialog={{
+                                open: isOrganizationBedroomsDialogOpen,
+                                handler: toggleOrganizationBedroomsDialog,
+                            }}
+                            bedrooms={organization.bedrooms || []}
+                            updateBedrooms={handleBedrooms}
+                        />
+                    </>}
                     {(imagesIsShown || showMediaHandler) && (
                         <MediaHandler
-                            handle={{ images: true }}
+                            handle={{images: true}}
                             onChange={handleMediasChange}
                             medias={organization.medias}
                         />
@@ -305,7 +319,6 @@ export const OrganizationForm: React.FC<OrganizationHandlerProps> = (
         </div>
 
     )
-
 
     return (
         <div>
