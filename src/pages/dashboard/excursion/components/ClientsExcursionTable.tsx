@@ -101,7 +101,7 @@ export const ClientsExcursionTable = (
         const service = client.currentService;
         if (service) {
             setSelectedClient(client);
-            setComments(service.comments || []); // Cargar comentarios
+            setComments(service.comments || []);
             setDialogOpen(true);
         }
     };
@@ -127,26 +127,6 @@ export const ClientsExcursionTable = (
     const toggleHandleClient = () => {
         setClientToEdit(emptyClient);
         setIsNewClientOpen(!isNewClientOpen);
-    };
-
-    const handleCommentChange = (client: IClient, updatedComments: IComment[]) => {
-        const service = getService(client);
-
-        if (!service) {
-            // TODO: toast service not found
-            return;
-        }
-
-        // Update the service with the new array of comments
-        const updatedService = {...service, comments: updatedComments};
-        const updatedClient: IClient = {
-            ...client,
-            services: client.services.map(s => s.excursionId === excursion._id ? updatedService : s) as IService[]
-        };
-
-        // Update the client and service with the new comments
-        onUpdateClient(updatedClient, {isOptimistic: true, avoidConfirm: true});
-        updatedService?._id && updateService({_id: updatedService._id, ...updatedService});
     };
 
     const toggleAssignGroupModal = () => {
@@ -232,7 +212,7 @@ export const ClientsExcursionTable = (
     }, [selectedClient]);
 
     const handleUpdateComment = (comment: IComment, isOptimistic?: boolean) => {
-        if (!selectedClient || !selectedService) {
+        if (!selectedService) {
             // TODO: mostrar mensaje de error con un toast
             return;
         }
@@ -240,9 +220,11 @@ export const ClientsExcursionTable = (
         let updatedComments: IComment[] = selectedService.comments || [];
 
         if (comment._id) {
+            console.log("entro 1 ")
             // Actualiza el comentario si ya existe
             updatedComments = updatedComments.map(c => c._id === comment._id ? { ...c, ...comment } : c);
         } else {
+            console.log("entro 2 ")
             // Agrega un nuevo comentario si no tiene _id
             updatedComments = [...updatedComments, comment];
         }
@@ -252,15 +234,11 @@ export const ClientsExcursionTable = (
             comments: updatedComments,
         };
 
-        const updatedClient: IClient = {
-            ...selectedClient,
-            services: selectedClient.services.map(s =>
-                s._id === selectedService._id ? updatedService : s
-            )
-        };
-
-        setSelectedClient(updatedClient);
-        onUpdateClient(updatedClient, { isOptimistic });
+        // Guarda el servicio actualizado usando onUpdateService
+        if (updatedService._id) {
+            console.log("entro 3 ", updatedService)
+            onUpdateService({_id: updatedService._id, ...updatedService});
+        }
     };
 
     const handleDeleteComment = (comment: IComment) => {
@@ -269,8 +247,7 @@ export const ClientsExcursionTable = (
             return;
         }
 
-        // Si el comentario tiene un _id, lo eliminamos
-        comment._id && await deleteComment(comment._id);
+        comment._id && deleteComment(comment._id);
 
         const updatedComments = selectedService.comments?.filter(c => c._id !== comment._id) || [];
 
@@ -842,7 +819,6 @@ export const ClientsExcursionTable = (
                     handler: closeCommentDialog
                 }}
                 initialComments={selectedService.comments}
-                // onChangeComments={handleChangeComment}
                 onUpdateComments={handleUpdateComment}
                 onDeleteComments={handleDeleteComment}
             />

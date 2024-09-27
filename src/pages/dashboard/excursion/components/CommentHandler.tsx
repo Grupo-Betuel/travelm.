@@ -21,9 +21,8 @@ import {Navigation, Pagination} from "swiper/modules";
 import {AppImage} from "@/components/AppImage";
 import {useAuth} from "@/context/authContext";
 import IUser from "@/models/interfaces/userModel";
-import {CommonConfirmActions, CommonConfirmActionsDataTypes, ICustomComponentDialog} from "@/models/common";
-import {useConfirmAction} from "@/hooks/useConfirmActionHook";
-import {IPayment} from "@/models/PaymentModel";
+import {ICustomComponentDialog} from "@/models/common";
+
 
 interface CommentHandlerProps {
     dialog?: ICustomComponentDialog;
@@ -57,46 +56,38 @@ export const CommentHandler: React.FC<CommentHandlerProps> = ({
     }, [initialComments]);
 
     const handleInputChange = (field: keyof IComment, value: any) => {
-        setNewComment({...newComment, [field]: value });
+        setNewComment(prevComment => ({
+            ...prevComment,
+            author: user as IUser ,
+            [field]: value
+        }));
     };
 
     const handleMedia = (media: IMediaHandled) => {
         const images = media.images || [];
 
-        if (newComment._id) {
-            const updatedComments = comments.map(co =>
-                co._id === newComment._id
-                    ? { ...co, medias: [...(co.medias || []), ...images] }
-                    : co
-            );
-            setComments(updatedComments);
-            const updatedComment = updatedComments.find(co => co._id === newComment._id);
-            if (updatedComment) {
-                onUpdateComments(updatedComment);
-            }
-        } else {
-            setNewComment({
-                ...newComment,
-                medias: [...(newComment.medias || []), ...images]
-            });
-        }
+        // Almacena temporalmente las imágenes en el estado 'newComment'
+        setNewComment({
+            ...newComment,
+            medias: [...(newComment.medias || []), ...images],
+        });
     };
 
     const handleSave = () => {
-        if (newComment._id) {
-            const updatedComments = comments.map((comment) =>
-                comment._id === newComment._id ? { ...comment, ...newComment } : comment
+        const commentWithAuthor = { ...newComment, author: user as IUser };
+
+        if (commentWithAuthor._id) {
+            const updatedComments = comments.map(comment =>
+                comment._id === commentWithAuthor._id ? { ...comment, ...commentWithAuthor } : comment
             );
             setComments(updatedComments);
-            const updatedComment = updatedComments.find(comment => comment._id === newComment._id);
-            if (updatedComment) {
-                onUpdateComments(updatedComment);
-            }
+            onUpdateComments(commentWithAuthor);
         } else {
-            const newComments = [...comments, newComment];
+            const newComments = [...comments, commentWithAuthor];
             setComments(newComments);
-            onUpdateComments(newComment);
+            onUpdateComments(commentWithAuthor);
         }
+
         setNewComment(emptyComment);
     };
 
@@ -122,7 +113,8 @@ export const CommentHandler: React.FC<CommentHandlerProps> = ({
                 onChange={(e) => handleInputChange('text', e.target.value)}
                 label="Comentario"
             />
-            <MediaHandler onChange={handleMedia} handle={{images: true}} medias={newComment?.medias ? newComment.medias : undefined}/>
+            <MediaHandler onChange={handleMedia} handle={{images: true}}
+                          medias={newComment?.medias ? newComment.medias : undefined}/>
             <Button onClick={handleSave} color={newComment._id ? "blue" : "green"}>
                 {newComment._id ? "Guardar Cambios" : "Agregar Comentario"}
             </Button>
@@ -159,7 +151,8 @@ export const CommentHandler: React.FC<CommentHandlerProps> = ({
                                         Ver más
                                     </Button>
                                 )}
-                                <Button variant="text" className="p-2" color="blue" onClick={() => startEditing(comment)}>
+                                <Button variant="text" className="p-2" color="blue"
+                                        onClick={() => startEditing(comment)}>
                                     <PencilIcon className="w-5 h-5"/>
                                 </Button>
                                 <Button variant="text" className="p-2" color="red"
@@ -180,7 +173,7 @@ export const CommentHandler: React.FC<CommentHandlerProps> = ({
     };
 
     return dialog ? (
-        <Dialog open={dialog.open} handler={dialogHandler} dismiss={{enabled : false}}>
+        <Dialog open={dialog.open} handler={dialogHandler} dismiss={{enabled: false}}>
             <DialogHeader>Comentario</DialogHeader>
             <DialogBody className="h-[70vh] overflow-y-auto space-y-4">
                 {renderFormContent()}
