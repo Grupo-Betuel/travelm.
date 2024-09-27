@@ -50,7 +50,7 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({src, title}) => {
 
     return (
         <Card>
-            <CardBody>
+            <CardBody className="p-3">
                 <Typography variant="h6">{title}</Typography>
                 <audio ref={audioRef} src={src} preload="metadata" hidden/>
                 <div className="flex items-center space-x-4">

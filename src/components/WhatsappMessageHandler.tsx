@@ -22,10 +22,11 @@ import {IoReload} from "react-icons/io5";
 import {CgClose} from "react-icons/cg";
 import MediaHandler, {IMediaHandled} from "../pages/dashboard/excursion/components/MediaHandler";
 import {IMedia, IMediaFile} from "@/models/mediaModel";
+import {useAuth} from "@/context/authContext";
 
 export interface IMessaging {
     dialog?: ICustomComponentDialog;
-    sessionId?: string;
+    // sessionId?: string;
 
 }
 
@@ -33,11 +34,11 @@ export type SessionActionsTypes = 'restart' | 'close' | 'cancel-messaging' | Wha
 
 const Messaging: React.FC<IMessaging> = (
     {
-        sessionId,
+        // sessionId,
         dialog
     }
 ) => {
-    const [selectedSession, setSelectedSession] = useState<string | undefined>(sessionId)
+    const [selectedSession, setSelectedSession] = useState<string | undefined>('')
     const [message, setMessage] = useState<string>('')
     const [onlySendImagesIds, setOnlySendImagesIds] = useState<string[]>([]);
     const [medias, setMedias] = useState<IMediaHandled>()
@@ -48,9 +49,21 @@ const Messaging: React.FC<IMessaging> = (
     const lastSession = React.useRef<string>();
     const [actionToConfirm, setActionToConfirm] = React.useState<SessionActionsTypes | undefined>(undefined);
     const [fetchingSeed, setFetchingSeed] = React.useState<WhatsappSeedTypes>();
+    const { user: authUser } = useAuth();
+
     React.useEffect(() => {
         lastSession.current = selectedSession
     }, [selectedSession]);
+
+    React.useEffect(() => {
+        setSelectedSession(authUser?.organization?.sessionId)
+    }, [authUser]);
+
+    //
+    // React.useEffect(() => {
+    //     setSelectedSession(sessionId)
+    // }, [sessionId]);
+
 
     const {
         logged,
@@ -120,7 +133,7 @@ const Messaging: React.FC<IMessaging> = (
         xhr.send();
     }
 
-    const handleSendMessage = (sessionId: string) => async () => {
+    const handleSendMessage = (wsSessionId: string = selectedSession || '') => async () => {
         const whatsappUsers = getWhatsappUsers();
         let firstMessage: IWhatsappMessage = {
             text: message,
@@ -150,7 +163,7 @@ const Messaging: React.FC<IMessaging> = (
 
         console.log('messages =>', messages);
 
-        await sendMessage(sessionId, whatsappUsers, [firstMessage, ...messages]);
+        await sendMessage(wsSessionId, whatsappUsers, [firstMessage, ...messages]);
     }
 
     const onChangeMessage = (e: any) => {
@@ -160,7 +173,7 @@ const Messaging: React.FC<IMessaging> = (
 
     const handleLabelSelection = (selectedList: IWsLabel[]) => {
         let labeled: IWsUser[] = [];
-        selectedList.forEach(label => labeled = [...labeled, ...label.users]);
+        selectedList.forEach(label => labeled = [...labeled, ...label.recipients]);
         setLabeledUsers(labeled);
     }
 
@@ -311,7 +324,7 @@ const Messaging: React.FC<IMessaging> = (
                         <div className="flex items-center">
                             <SearchableSelect<IWsGroup>
                                 multiple
-                                options={seedData.groups?.filter(item => !item.subject?.toLowerCase()?.includes('sin filtro'))}
+                                options={seedData?.groups?.filter(item => !item?.title?.toLowerCase()?.includes('sin filtro'))}
                                 displayProperty="title"
                                 label="Selecciona un grupo"
                                 disabled={fetchingSeed === 'groups'}
@@ -337,7 +350,7 @@ const Messaging: React.FC<IMessaging> = (
                         <div className="flex items-center">
                             <SearchableSelect<IWsLabel>
                                 multiple
-                                options={seedData.labels || []}
+                                options={seedData?.labels || []}
                                 displayProperty="name"
                                 label="Etiquetas"
                                 disabled={fetchingSeed === 'labels'}
@@ -431,17 +444,20 @@ const Messaging: React.FC<IMessaging> = (
         </div>
 
     )
-    return dialog ? (<Dialog open={dialog.open} handler={dialog.handler}>
-            <DialogHeader>
+    return dialog ? (<Dialog open={dialog.open} handler={dialog.handler} dismiss={{ enabled: false }}>
+            <DialogHeader className="flex justify-between items-center gap-2">
                 <Typography variant="h3" className="text-center w-full">Envia Mensajes</Typography>
+                <CgClose color="red" onClick={dialog.handler} />
             </DialogHeader>
             <DialogBody className="overflow-y-scroll max-h-[80dvh]">
                 {content}
-            </DialogBody>
-            <DialogFooter>
-                <Button variant="text" color="light-green" className="w-full" size="lg"
+                <Button color="light-green" className="w-full" size="lg"
                         onClick={handleSendMessage(selectedSession as string)}>Send
                     Message</Button>
+            </DialogBody>
+            <DialogFooter className="flex justify-end">
+                <Button variant="text" color="red" size="lg"
+                        onClick={dialog.handler}>Cerrar</Button>
             </DialogFooter>
         </Dialog>)
         : content

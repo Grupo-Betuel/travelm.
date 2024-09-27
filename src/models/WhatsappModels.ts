@@ -56,9 +56,11 @@ export interface IWsGroup {
 
 export interface IWsLabel {
     id: string;
-    name: string;
-    hexColor: string;
-    users: IWsUser[];
+    predefinedId: string;
+    title: string;
+    color: string;
+    deleted?: boolean;
+    recipients: IWsUser[];
 }
 
 export interface ISeed {

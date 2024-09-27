@@ -20,10 +20,9 @@ import {AppImage} from "@/components/AppImage";
 import {MediaList} from "@/components/MediaList";
 import {useAuth} from "@/context/authContext";
 import {AiOutlineCloudUpload} from "react-icons/ai";
-import {CgClose} from "react-icons/cg";
+import {CgTrash} from "react-icons/cg";
 import {IoSearch} from "react-icons/io5";
 import {IMG_CONSTANTS} from "@/constants/img.utils";
-import organizations from "@/pages/dashboard/organizations/organizations";
 
 
 const renderMediaPreview = (media: IMedia): JSX.Element => {
@@ -34,6 +33,7 @@ const renderMediaPreview = (media: IMedia): JSX.Element => {
             // return <img src={media.content} alt={media.name} className="max-w-full h-auto"/>;
             return <>
                 <AppImage
+                    className="!h-auto"
                     src={media.content}
                     alt={media.title}
                 />
@@ -76,7 +76,15 @@ export interface IHandleMediaFormProps {
 
 export const mediasService = getCrudService('medias');
 
-const MediaHandler = ({onChange, medias, disableUpload, logoMedia, flyerMedia, handle, enableSingleSelection}: IHandleMediaFormProps) => {
+const MediaHandler = ({
+                          onChange,
+                          medias,
+                          disableUpload,
+                          logoMedia,
+                          flyerMedia,
+                          handle,
+                          enableSingleSelection
+                      }: IHandleMediaFormProps) => {
     const [flyer, setFlyer] = useState<IMediaFile>();
     const [logo, setLogo] = useState<IMediaFile>();
     const [images, setImages] = useState<IMediaFile[]>([]);
@@ -313,77 +321,8 @@ const MediaHandler = ({onChange, medias, disableUpload, logoMedia, flyerMedia, h
 
 
     return (
-        <div className="space-y-2 p-2">
-            <div className=''>
-                <>
-                    {/*{(handle?.logo) && <>*/}
-                    {/*    <div className="flex items-center gap-5">*/}
-                    {/*        <div className="flex flex-col items-center gap-2">*/}
-                    {/*            <Avatar src={logo?.content || logoMedia?.content || IMG_CONSTANTS.LOGO_PLACEHOLDER}*/}
-                    {/*                    size="lg"/>*/}
-                    {/*            <Typography variant="h6">Logo</Typography>*/}
-
-                    {/*        </div>*/}
-                    {/*        <IoSearch onClick={toggleSearchMediaModal(ExtraMediaTypesEnum.LOGO)}*/}
-                    {/*                  className="text-blue-400 w-[23px] h-[23px] cursor-pointer"/>*/}
-                    {/*        {!disableUpload && <label>*/}
-                    {/*            <input type="file" className="hidden absolute -z-10" placeholder="flyer" accept="image/*"*/}
-                    {/*                   onChange={handleLogoChange}/>*/}
-                    {/*            <AiOutlineCloudUpload className="h-10 cursor-pointer text-blue-400 w-[26px]"/>*/}
-                    {/*        </label>}*/}
-                    {/*    </div>*/}
-                    {/*</>*/}
-                    {/*}*/}
-                    {/*{(!handle || handle.flyer) && <>*/}
-                    {/*    <div className="flex items-center gap-5">*/}
-                    {/*        <Typography variant="h6">Flyer ({flyer ? 1 : 0}):</Typography>*/}
-                    {/*        <IoSearch onClick={toggleSearchMediaModal(ExtraMediaTypesEnum.FLYER)}*/}
-                    {/*                  className="text-blue-400 w-[23px] h-[23px] cursor-pointer"/>*/}
-                    {/*        {!disableUpload && <label>*/}
-                    {/*            <input type="file" className="hidden absolute -z-10" placeholder="flyer" accept="image/*"*/}
-                    {/*                   onChange={handleFlyerChange}/>*/}
-                    {/*            <AiOutlineCloudUpload className="h-10 cursor-pointer text-blue-400 w-[26px]"/>*/}
-                    {/*        </label>}*/}
-                    {/*    </div>*/}
-                    {/*</>*/}
-                    {/*}*/}
-
-                    {/*{(!handle || handle.images) &&*/}
-                    {/*    <div className="flex items-center gap-5">*/}
-                    {/*        <Typography variant="h6" className="whitespace-nowrap">Imagenes ({images.length}):</Typography>*/}
-                    {/*        <IoSearch onClick={toggleSearchMediaModal(MediaTypeEnum.IMAGE)}*/}
-                    {/*                  className="text-blue-400 w-[23px] h-[23px] cursor-pointer"/>*/}
-                    {/*        {!disableUpload && <label>*/}
-                    {/*            <input type="file" className="hidden absolute -z-10" placeholder="flyer" accept="image/*"*/}
-                    {/*                   onChange={handleImagesChange}/>*/}
-                    {/*            <AiOutlineCloudUpload className="h-10 w-10 cursor-pointer text-blue-400 w-[26px]"/>*/}
-                    {/*        </label>}*/}
-                    {/*    </div>*/}
-                    {/*}*/}
-
-                    {/*{(!handle || handle.videos) &&*/}
-                    {/*    <div className="flex items-center gap-3">*/}
-                    {/*        <Typography variant="h6">Videos</Typography>*/}
-                    {/*        <Input type="file" placeholder="videos" accept="video/*" onChange={handleVideosChange} multiple/>*/}
-                    {/*    </div>*/}
-                    {/*}*/}
-
-                    {/*{(!handle || handle.audios) &&*/}
-                    {/*    <div className="flex items-center gap-5">*/}
-                    {/*        <Typography variant="h6">Audios ({audios.length}):</Typography>*/}
-                    {/*        <IoSearch onClick={toggleSearchMediaModal(MediaTypeEnum.AUDIO)}*/}
-                    {/*                  className="text-blue-400 w-[23px] h-[23px] cursor-pointer"/>*/}
-                    {/*        {!disableUpload && <label>*/}
-                    {/*            <input type="file" className="hidden absolute -z-10" placeholder="flyer" accept="audio/*"*/}
-                    {/*                   onChange={handleAudiosChange}/>*/}
-                    {/*            <AiOutlineCloudUpload className="h-10 cursor-pointer text-blue-400 w-[26px]"/>*/}
-                    {/*        </label>}*/}
-                    {/*    </div>*/}
-                    {/*}*/}
-
-                </>
-            </div>
-            <div className='lg:flex gap-4 '>
+        <div className="gap-5 grid grid-cols-2 py-8">
+            {(handle?.flyer || handle?.logo || handle?.images) && <div className='lg:flex gap-4 '>
                 {(handle?.logo) && (
                     <div className='w-full'>
                         <Card className=''>
@@ -438,7 +377,7 @@ const MediaHandler = ({onChange, medias, disableUpload, logoMedia, flyerMedia, h
                                                 <div key={`image-slide-${index}`}
                                                      className="relative col-span-1 row-span-1">
                                                     {renderMediaPreview(image)}
-                                                    <CgClose
+                                                    <CgTrash
                                                         onClick={() => handleSetActionToConfirm('delete', 'quitar esta imagen')(image)}
                                                         className="absolute top-2 right-2 cursor-pointer h-8 w-8 p-1 text-red-500 bg-white rounded-full z-50"
                                                     />
@@ -467,7 +406,7 @@ const MediaHandler = ({onChange, medias, disableUpload, logoMedia, flyerMedia, h
                 {/*)}*/}
 
 
-                <div className={`${(!handle || handle.flyer) ? 'w-2/3' : 'w-full mt-4'}`}>
+                <div className={`${(!handle || handle.flyer) ? 'w-2/3' : 'w-full'}`}>
                     {(!handle || handle.images) && (<>
                         <Card className=''>
                             <CardHeader
@@ -477,43 +416,43 @@ const MediaHandler = ({onChange, medias, disableUpload, logoMedia, flyerMedia, h
                                                 variant="h5">{images.length > 0 && (images.length)} Imagenes </Typography>
                                 </div>
                             </CardHeader>
-                            <CardBody className='p-2'>
+                            <CardBody className={`px-2 py-0 ${ imagesMedia.length ? 'my-4' : ''} max-h-[200px] overflow-y-auto`}>
                                 <div
-                                    className='grid lg:grid-cols-4 md:grid-cols-2 gap-6 mx-4 overflow-y-auto max-h-[460px]'>
+                                    className="columns-1 sm:columns-2 md:columns-3 lg:columns-3 gap-4 space-y-4 max-h-[200px] overflow-y-auto">
                                     {imagesMedia.length > 0 && (<>
                                         {imagesMedia.map((image, index) => (
                                             <div key={`image-slide-${index}`}
-                                                 className="relative col-span-1 row-span-1 gap-2 h-36 w-36">
+                                                 className="relative col-span-1 row-span-1 gap-2">
                                                 {renderMediaPreview(image)}
-                                                <CgClose
+                                                <CgTrash
                                                     onClick={() => handleSetActionToConfirm('delete', 'quitar esta imagen')(image)}
-                                                    className="absolute top-2 right-2 cursor-pointer h-8 w-8 p-1 text-red-500 bg-white rounded-full z-50"
+                                                    className="absolute top-2 right-2 cursor-pointer h-7 w-7 p-1 text-red-500 bg-white rounded-full z-50"
                                                 />
                                             </div>
                                         ))}
                                     </>)}
                                 </div>
                             </CardBody>
-                            <CardFooter className='align-baseline p-4'>
+                            <CardFooter className='align-baseline !p-4'>
                                 <div className="flex justify-center items-center gap-3">
                                     <IoSearch onClick={toggleSearchMediaModal(MediaTypeEnum.IMAGE)}
-                                              className="text-blue-400 w-[23px] h-[23px] cursor-pointer"/>
+                                              className="text-blue-400 w-7 h-7 cursor-pointer"/>
                                     {!disableUpload && <label>
                                         <input type="file" className="hidden absolute -z-10" placeholder="flyer"
                                                accept="image/*"
                                                onChange={handleImagesChange}/>
-                                        <AiOutlineCloudUpload className="h-10 cursor-pointer text-blue-400 w-[26px]"/>
+                                        <AiOutlineCloudUpload className="w-7 h-7 cursor-pointer text-blue-400"/>
                                     </label>}
                                 </div>
                             </CardFooter>
                         </Card>
                     </>)}
                 </div>
-            </div>
+            </div>}
 
             {(!handle || handle.audios) && (<>
                 <div className='w-full'>
-                    <Card className='my-10'>
+                    <Card>
                         <CardHeader
                             className='relative bg-gradient-to-tr from-blue-600 to-blue-400 shadow-blue-500/40 p-2'>
                             <div className="flex justify-center items-center ">
@@ -521,20 +460,20 @@ const MediaHandler = ({onChange, medias, disableUpload, logoMedia, flyerMedia, h
                                             variant="h5">{audios.length > 0 && (audios.length)} Audios</Typography>
                             </div>
                         </CardHeader>
-                        <CardBody className="p-2 ">
-                            <div className="grid grid-cols-3 gap-4 max-h-[300px] overflow-y-auto">
+                        <CardBody className={`${ audios.length ? 'my-4' : ''} p-0 max-h-[200px] overflow-y-auto`}>
+                            <div
+                                className="flex flex-col gap-2 px-3">
                                 {audios.map((audio, index) => (
                                     <div key={`audio-${index}`} className="relative">
                                         <div
                                             className="relative col-span-1 row-span-1 w-42 h-32"
-
                                         >
                                             <AudioPlayer
                                                 key={`audio-${index}`}
                                                 src={audio.content}
                                                 title={`Audio Track ${index + 1}`}
                                             />
-                                            <CgClose
+                                            <CgTrash
                                                 onClick={() => handleSetActionToConfirm('delete', 'quitar esta audio')(audio)}
                                                 className="absolute top-2 right-2 cursor-pointer h-8 w-8 p-1 text-red-500 bg-white rounded-full z-50"
                                             />
@@ -546,39 +485,18 @@ const MediaHandler = ({onChange, medias, disableUpload, logoMedia, flyerMedia, h
                         <CardFooter className='align-baseline p-4'>
                             <div className="flex justify-center items-center gap-3">
                                 <IoSearch onClick={toggleSearchMediaModal(MediaTypeEnum.AUDIO)}
-                                          className="text-blue-400 w-[23px] h-[23px] cursor-pointer"/>
+                                          className="text-blue-400 w-7 h-7 cursor-pointer"/>
                                 {!disableUpload && <label>
                                     <input type="file" className="hidden absolute -z-10" placeholder="flyer"
                                            accept="audio/*"
                                            onChange={handleAudiosChange}/>
-                                    <AiOutlineCloudUpload className="h-10 cursor-pointer text-blue-400 w-[26px]"/>
+                                    <AiOutlineCloudUpload className="h-7 cursor-pointer text-blue-400 w-7"/>
                                 </label>}
                             </div>
                         </CardFooter>
                     </Card>
                 </div>
             </>)}
-
-            {/*{allImagesMedia.length > 0 && (*/}
-            {/*    <Swiper*/}
-            {/*        cssMode*/}
-            {/*        modules={[Navigation, Pagination]}*/}
-            {/*        spaceBetween={10} slidesPerView={3} navigation*/}
-            {/*        pagination={{clickable: true}} className="relative h-[300px] w-full">*/}
-            {/*        {allImagesMedia.map((image, index) => (*/}
-            {/*            <SwiperSlide key={`image-slide-${index}`} className="flex justify-center">*/}
-            {/*                <div className="flex">*/}
-            {/*                    {renderMediaPreview(image)}*/}
-            {/*                    <CgClose onClick={() =>*/}
-            {/*                        handleSetActionToConfirm('delete', 'quitar esta imagen')(image)*/}
-            {/*                    }*/}
-            {/*                             className="absolute top-4 cursor-pointer right-4 h-8 w-8 p-1 text-red-500 z-50 bg-white rounded-full"/>*/}
-            {/*                </div>*/}
-            {/*            </SwiperSlide>*/}
-
-            {/*        ))}*/}
-            {/*    </Swiper>*/}
-            {/*)}*/}
 
 
             {videos.length > 0 && (

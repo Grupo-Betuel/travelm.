@@ -1,4 +1,5 @@
 import {BaseModel} from "./BaseModel";
+import {IOrganization} from "@/models/organizationModel";
 
 export enum UserRoleTypes {
     ADMIN = 'admin',
@@ -19,6 +20,6 @@ export default interface IUser extends BaseModel {
     phone: string;
     email?: string;
     role: UserRoleTypes;
-    organization: string,
+    organization: IOrganization,
     type: UserTypes,
 }
