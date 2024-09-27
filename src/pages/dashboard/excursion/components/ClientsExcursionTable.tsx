@@ -101,7 +101,7 @@ export const ClientsExcursionTable = (
         const service = client.currentService;
         if (service) {
             setSelectedClient(client);
-            setComments(service.comments || []); // Cargar comentarios
+            setComments(service.comments || []);
             setDialogOpen(true);
         }
     };
@@ -127,28 +127,6 @@ export const ClientsExcursionTable = (
     const toggleHandleClient = () => {
         setClientToEdit(emptyClient);
         setIsNewClientOpen(!isNewClientOpen);
-    };
-
-
-
-    const handleCommentChange = (client: IClient, updatedComments: IComment[]) => {
-        const service = getService(client);
-
-        if (!service) {
-            // TODO: toast service not found
-            return;
-        }
-
-        // Update the service with the new array of comments
-        const updatedService = {...service, comments: updatedComments};
-        const updatedClient: IClient = {
-            ...client,
-            services: client.services.map(s => s.excursionId === excursion._id ? updatedService : s) as IService[]
-        };
-
-        // Update the client and service with the new comments
-        onUpdateClient(updatedClient, {isOptimistic: true, avoidConfirm: true});
-        updatedService?._id && updateService({_id: updatedService._id, ...updatedService});
     };
 
     const toggleAssignGroupModal = () => {
@@ -233,21 +211,60 @@ export const ClientsExcursionTable = (
         return selectedClient?.services.find(s => s.excursionId === excursion._id) || excursionService;
     }, [selectedClient]);
 
-    const handleUpdateComment = (comments: IComment[]) => {
-        if (!selectedClient || !selectedService) {
-            // TODO: toast error message
+    const handleUpdateComment = (comment: IComment, isOptimistic?: boolean) => {
+        if (!selectedService) {
+            // TODO: mostrar mensaje de error con un toast
             return;
         }
 
-        const updatedClient = {
-            ...selectedClient,
-            services: selectedClient.services.map(s =>
-                s._id === selectedService._id ? {...s, comments}
-                    : s
-            ) as IService[]
+        let updatedComments: IComment[] = selectedService.comments || [];
+
+        if (comment._id) {
+            console.log("entro 1 ")
+            // Actualiza el comentario si ya existe
+            updatedComments = updatedComments.map(c => c._id === comment._id ? { ...c, ...comment } : c);
+        } else {
+            console.log("entro 2 ")
+            // Agrega un nuevo comentario si no tiene _id
+            updatedComments = [...updatedComments, comment];
+        }
+
+        const updatedService = {
+            ...selectedService,
+            comments: updatedComments,
         };
 
-        onUpdateClient(updatedClient);
+        // Guarda el servicio actualizado usando onUpdateService
+        if (updatedService._id) {
+            console.log("entro 3 ", updatedService)
+            onUpdateService({_id: updatedService._id, ...updatedService});
+        }
+    };
+
+    const handleDeleteComment = (comment: IComment) => {
+        if (!selectedClient || !selectedService) {
+            // TODO: mostrar mensaje de error con un toast
+            return;
+        }
+
+        comment._id && deleteComment(comment._id);
+
+        const updatedComments = selectedService.comments?.filter(c => c._id !== comment._id) || [];
+
+        const updatedService = {
+            ...selectedService,
+            comments: updatedComments,
+        };
+
+        const updatedClient: IClient = {
+            ...selectedClient,
+            services: selectedClient.services.map(s =>
+                s._id === selectedService._id ? updatedService : s
+            )
+        };
+
+        setSelectedClient(updatedClient);
+        onUpdateClient(updatedClient, { isOptimistic: true, avoidConfirm: true });
     };
 
     const handleUpdatePayment = async (payments: IPayment[]) => {
@@ -283,21 +300,6 @@ export const ClientsExcursionTable = (
         setSelectedClient(updatedClient);
     };
 
-    const handleChangeComment = async (payments: IComment[]) => {
-        if (!selectedClient) {
-            // TODO: toast error message
-            return;
-        }
-
-        const updatedService = {...selectedService, comments};
-
-        const updatedClient: IClient = {
-            ...selectedClient,
-            services: selectedClient?.services.map(s => s.excursionId === excursion._id ? updatedService : s) || []
-        };
-
-        setSelectedClient(updatedClient);
-    };
 
     const handleDeleteClient = (client: IClient) => () => {
         const updatedClients = clients.filter(c => c._id !== client._id);
@@ -332,27 +334,7 @@ export const ClientsExcursionTable = (
         }
     };
 
-    const handleDeleteComment = (comment: IComment) => {
-        if (selectedClient) {
-            comment._id && deleteComment(comment._id);
 
-            const updatedComments = selectedService?.comments?.filter(c => c._id !== comment._id);
-
-            const updatedService = {
-                ...selectedService,
-                comments: updatedComments,
-            };
-
-            const updatedClient: IClient = {
-                ...selectedClient,
-                services: selectedClient?.services.map(s => s.excursionId === excursion._id ? updatedService : s) || []
-            };
-
-            setSelectedClient(updatedClient);
-
-            onUpdateClient(updatedClient, {isOptimistic: true, avoidConfirm: true});
-        }
-    };
 
     const [clientToEdit, setClientToEdit] = useState<IClient>();
     const handleClientToEdit = (client: IClient) => () => {
@@ -832,12 +814,12 @@ export const ClientsExcursionTable = (
                 </Dialog>
             </Card>
             <CommentHandler
-                isDialog={true}
-                open={dialogOpen}
-                onClose={closeCommentDialog}
+                dialog={{
+                    open: dialogOpen,
+                    handler: closeCommentDialog
+                }}
                 initialComments={selectedService.comments}
-                onChangeComments={handleChangeComment}
-                updateComments={handleUpdateComment}
+                onUpdateComments={handleUpdateComment}
                 onDeleteComments={handleDeleteComment}
             />
         </>
