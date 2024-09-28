@@ -9,7 +9,7 @@ interface ContactFormProps {
     updateContact: (contact: IContact) => void;
 }
 
-const ContactForm: React.FC<ContactFormProps> = ({contact, updateContact}) => {
+const ContactForm: React.FC<ContactFormProps> = ({contact = {} as any, updateContact}) => {
     const handleOnChangeContact = ({target: {name, value, type}}: React.ChangeEvent<HTMLInputElement>) => {
         if (type === 'tel') {
             value = value.replace(/[^0-9]/g, '');
