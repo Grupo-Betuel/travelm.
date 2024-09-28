@@ -18,7 +18,7 @@ export interface IFilterOption<T> {
     options?: IFilterOptionItem[];
 }
 
-export type IDataTableColumn<T> = { key: keyof T | "actions", label: string };
+export type IDataTableColumn<T> = { key: keyof T, label: string };
 
 interface DataTableProps<T> {
     data: T[];

@@ -264,9 +264,6 @@ export const OrganizationForm: React.FC<OrganizationHandlerProps> = (
                         <SocialNetworkForm socialNetworks={organization.socialNetworks}
                                            updateSocialNetworks={handleSocialNetworksChange}/>}
                     {bedroomsIsShown && <>
-                        <Button
-                            onClick={toggleOrganizationBedroomsDialog}>{'Agregar Habitacion'}
-                        </Button>
                         <BedroomsHandler
                             dialog={{
                                 open: isOrganizationBedroomsDialogOpen,
@@ -275,6 +272,10 @@ export const OrganizationForm: React.FC<OrganizationHandlerProps> = (
                             bedrooms={organization.bedrooms || []}
                             updateBedrooms={handleBedrooms}
                         />
+                        <Button
+                            className={`w-full bg-blue-500 text-white`}
+                            onClick={toggleOrganizationBedroomsDialog}>{'Agregar Habitacion'}
+                        </Button>
                     </>}
                     {(imagesIsShown || showMediaHandler) && (
                         <MediaHandler
