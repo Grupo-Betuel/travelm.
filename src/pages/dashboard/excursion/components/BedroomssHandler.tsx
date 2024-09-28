@@ -1,13 +1,17 @@
-import React, {useState} from 'react';
-import {Button, Input, Typography} from '@material-tailwind/react';
+import React, {useMemo, useState} from 'react';
+import {Button, Dialog, DialogBody, DialogFooter, DialogHeader, Input, Typography} from '@material-tailwind/react';
 import {IBedroom} from "@/models/bedroomModel";
 import {getCrudService} from "@/api/services/CRUD.service";
-import {CommonConfirmActions, CommonConfirmActionsDataTypes} from "../../../../models/common";
-import {useConfirmAction} from "../../../../hooks/useConfirmActionHook";
+import {CommonConfirmActions, CommonConfirmActionsDataTypes, ICustomComponentDialog} from "@/models/common";
+import {useConfirmAction} from "@/hooks/useConfirmActionHook";
+import {DataTable} from "@/components/DataTable";
+import {generateFilterOptions, bedroomColumns} from "@/constants/bedroom.constant";
+
 
 interface BedroomsHandlerProps {
     bedrooms: IBedroom[];
     updateBedrooms: (bedrooms: IBedroom[]) => void;
+    dialog?: ICustomComponentDialog;
 }
 
 const emptyBedroom: IBedroom = {
@@ -19,10 +23,16 @@ const emptyBedroom: IBedroom = {
 
 export const bedroomService = getCrudService('bedrooms');
 
-const BedroomsHandler: React.FC<BedroomsHandlerProps> = ({bedrooms, updateBedrooms}) => {
+const BedroomsHandler: React.FC<BedroomsHandlerProps> = ({
+                                                             bedrooms,
+                                                             updateBedrooms,
+                                                             dialog
+                                                         }) => {
     const [bedroomForm, setBedroomForm] = useState<IBedroom>(emptyBedroom);
     const [editBedroomIndex, setEditBedroomIndex] = useState<number>();
     const [deleteBedroom] = bedroomService.useDeleteBedrooms();
+    const filterOptions = useMemo(() => generateFilterOptions(bedrooms), [bedrooms]);
+    const columns = bedroomColumns;
 
     const onConfirmAction = (type?: CommonConfirmActions, data?: CommonConfirmActionsDataTypes<IBedroom>) => {
         switch (type) {
@@ -61,6 +71,7 @@ const BedroomsHandler: React.FC<BedroomsHandlerProps> = ({bedrooms, updateBedroo
         }
 
         cleanBedroomHandler();
+        dialog?.handler && dialog.handler();
     };
 
     const handleDeleteBedroom = (bedroom: IBedroom) => {
@@ -86,59 +97,116 @@ const BedroomsHandler: React.FC<BedroomsHandlerProps> = ({bedrooms, updateBedroo
     const editBedroomMode = (index: number) => () => {
         setBedroomForm(bedrooms[index]);
         setEditBedroomIndex(index);
+        dialog?.handler && dialog.handler();
     }
 
 
-    return (
-        <div className="p-4">
-            <Typography variant="h5" className="mb-4">Manage Bedrooms</Typography>
-            <div className="flex flex-col gap-5 pb-5">
-                <Input
-                    type="number"
-                    label="Capacidad"
-                    name="capacity"
-                    value={bedroomForm?.capacity}
-                    onChange={handleOnChangeBedroom}
-                />
-                <Input
-                    label="Nombre"
-                    name="name"
-                    value={bedroomForm?.name}
-                    onChange={handleOnChangeBedroom}
-                />
-                <Input
-                    type="number"
-                    label="Planta"
-                    name="level"
-                    value={bedroomForm?.level}
-                    onChange={handleOnChangeBedroom}
-                />
-                <Input
-                    label="Zona"
-                    name="zone"
-                    value={bedroomForm?.zone}
-                    onChange={handleOnChangeBedroom}
-                />
-            </div>
-            <div className="flex justify-between">
-                <Button color="blue"
-                        onClick={handleAddOrUpdateBedroom}>{editBedroomIndex !== undefined ? 'Actualizar' : 'Crear'} Habitacion</Button>
-            </div>
-            <div className="grid gap-y-6 gap-x-6 md:grid-cols-2 xl:grid-cols-3">
-                {(bedrooms || []).map((bedroom, index) => (
-                    <div key={index} className="mt-2 bg-gray-100 rounded-xl p-4">
-                        <Typography variant="h6">Nombre: {bedroom.name}</Typography>
-                        <Typography variant="h6">Capacidad: {bedroom.capacity}</Typography>
-                        <Typography variant="h6">Planta: {bedroom.level}</Typography>
-                        <Typography variant="h6">Zona: {bedroom.zone}</Typography>
-                        <div className="flex space-x-4 mt-2">
-                            <Button color="red"
-                                    onClick={() => handleSetActionToConfirm('delete', 'Eliminar Habitacion')(bedroom)}>Delete</Button>
-                            <Button onClick={editBedroomMode(index)}>Edit</Button>
-                        </div>
+    const renderRow = (bedroom: IBedroom, key: number) => {
+        const {name, capacity, level, zone} = bedroom;
+        return (
+            <tr key={`${name}-${key}`}>
+                <td className="py-3 px-5">
+                    <Typography className="text-xs font-semibold">{name}</Typography>
+                </td>
+                <td className="py-3 px-5">
+                    <Typography className="text-xs font-semibold">{capacity}</Typography>
+                </td>
+                <td className="py-3 px-5">
+                    <Typography className="text-xs font-semibold">{level}</Typography>
+                </td>
+                <td className="py-3 px-5">
+                    <Typography className="text-xs font-semibold">{zone}</Typography>
+                </td>
+                <td className="py-3 px-5">
+                    <div className="flex items-center gap-2">
+                        <Button color="blue" size="sm" onClick={editBedroomMode(key)}>
+                            Editar
+                        </Button>
+                        <Button color="red" size="sm" onClick={() => handleSetActionToConfirm('delete')(bedroom)}>
+                            Eliminar
+                        </Button>
                     </div>
-                ))}
+                </td>
+            </tr>
+        );
+    };
+
+    const form = (
+        <div className="p-4 flex flex-col gap-5">
+            <Input
+                crossOrigin={false}
+                type="number"
+                label="Capacidad"
+                name="capacity"
+                value={bedroomForm?.capacity}
+                onChange={handleOnChangeBedroom}
+            />
+            <Input
+                crossOrigin={false}
+                label="Nombre"
+                name="name"
+                value={bedroomForm?.name}
+                onChange={handleOnChangeBedroom}
+            />
+            <Input
+                crossOrigin={false}
+                type="number"
+                label="Planta"
+                name="level"
+                value={bedroomForm?.level}
+                onChange={handleOnChangeBedroom}
+            />
+            <Input
+                crossOrigin={false}
+                label="Zona"
+                name="zone"
+                value={bedroomForm?.zone}
+                onChange={handleOnChangeBedroom}
+            />
+        </div>
+    );
+
+    const dialogHandler = () => {
+        dialog?.handler && dialog.handler();
+        cleanBedroomHandler();
+    };
+
+
+    return (
+        <div>
+            {dialog ? (
+                <Dialog open={dialog.open} handler={dialogHandler}>
+                    <DialogHeader>Manage Bedrooms</DialogHeader>
+                    <DialogBody>{form}</DialogBody>
+                    <DialogFooter>
+                        <Button color="red" variant="text" onClick={dialogHandler}>
+                            Cancelar
+                        </Button>
+                        <Button color="blue" onClick={handleAddOrUpdateBedroom}>
+                            {editBedroomIndex !== undefined ? 'Actualizar' : 'Crear'} Habitacion
+                        </Button>
+                    </DialogFooter>
+                </Dialog>
+            ) : (
+                <div className="p-4">
+                    <Typography variant="h5" className="mb-4">Manage Bedrooms</Typography>
+                    {form}
+                    <div className="flex justify-between">
+                        <Button color="blue" onClick={handleAddOrUpdateBedroom}>
+                            {editBedroomIndex !== undefined ? 'Actualizar' : 'Crear'} Habitacion
+                        </Button>
+                    </div>
+                </div>
+            )}
+            <div className="pt-7">
+                <DataTable
+                    data={bedrooms}
+                    columns={columns}
+                    filterOptions={filterOptions}
+                    renderRow={renderRow}
+                />
             </div>
+
             <ConfirmDialog/>
         </div>
     );

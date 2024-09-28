@@ -1,5 +1,5 @@
 import React, {ChangeEvent, useMemo, useState} from 'react';
-import {Button, Input, Typography} from "@material-tailwind/react";
+import {Button, Input, Select, Typography, Option} from "@material-tailwind/react";
 import {
     ArrowDownIcon,
     ArrowUpIcon, ChevronDoubleLeftIcon,
@@ -138,9 +138,10 @@ export function DataTable<T>(
         setCurrentPage(page);
     };
 
-    const handleItemsPerPageChange = (value: string) => {
-        setItemsPerPage(Math.abs(Number(value)) || 1);
-        setCurrentPage(1); // Reset to first page when changing items per page
+    const handleItemsPerPageChange = (value: string | undefined) => {
+        const newValue = Number(value);
+        setItemsPerPage(newValue);
+        setCurrentPage(1);
     };
 
     const renderPagination = () => {
@@ -321,21 +322,22 @@ export function DataTable<T>(
                     <Typography color="gray" className="text-sm whitespace-nowrap">
                         Total: {filteredData.length}
                     </Typography>
-                    <Typography color="gray" className="text-sm whitespace-nowrap">
-                        por pagina:
-                    </Typography>
-                    <Input
-                        crossOrigin={false}
-                        width={"50px"}
-                        type="number"
-                        value={itemsPerPage}
-                        onChange={(e) => handleItemsPerPageChange(e.target.value || '1')}
+                    <Select
+                        label="por pagina"
+                        value={itemsPerPage.toString()}
+                        onChange={(value) => handleItemsPerPageChange(value)}
                         color="light-blue"
                         containerProps={{
-                            className: "!min-w-[50px] max-w-[100px]"
+                            className: "!min-w-[80px] max-w-[200px]"
                         }}
-                        className="text-center "
-                    />
+                    >
+                        <Option value="5">5</Option>
+                        <Option value="10">10</Option>
+                        <Option value="15">15</Option>
+                        <Option value="25">25</Option>
+                        <Option value="50">50</Option>
+                        <Option value="100">100</Option>
+                    </Select>
                 </div>
             </div>
         </div>
