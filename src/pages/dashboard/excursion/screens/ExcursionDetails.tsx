@@ -432,7 +432,6 @@ export const ExcursionDetails: React.FC = () => {
             <ConfirmDialog/>
             {ownerOrganization?.sessionId && wsMessagingIsOpen &&
                 <Messaging
-                    sessionId={ownerOrganization?.sessionId}
                     dialog={{
                         open: wsMessagingIsOpen,
                         handler: toggleWsMessaging,

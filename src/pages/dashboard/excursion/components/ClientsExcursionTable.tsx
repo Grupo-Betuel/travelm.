@@ -42,6 +42,7 @@ import {IService, serviceStatusLabels, serviceStatusList, ServiceStatusTypes} fr
 import {getCrudService} from "@/api/services/CRUD.service";
 import {CommentHandler} from "@/pages/dashboard/excursion/components/CommentHandler";
 import {IComment} from "@/models/commentModel";
+import {useAuth} from "@/context/authContext";
 
 export interface IUpdateClientExtra extends IConfirmActionExtraParams {
     isOptimistic?: boolean;
@@ -84,7 +85,7 @@ export const ClientsExcursionTable = (
         excursion,
         onUpdateClient,
         onUpdateService,
-        updateExcursion
+        updateExcursion,
     }: IClientTableProps) => {
     const [selectedClient, setSelectedClient] = useState<IClient | null>(null);
     const [isModalOpen, setModalOpen] = useState(false);
@@ -95,7 +96,8 @@ export const ClientsExcursionTable = (
     const [assignWsGroupModal, setAssignWsGroupModal] = useState<boolean>(false);
     const [dialogOpen, setDialogOpen] = useState<boolean>(false);
     const [comments, setComments] = useState<IComment[]>([]); // Comentarios del servicio
-
+    const {user: authUser} = useAuth();
+    console.log('user', authUser);
     // Función para abrir el diálogo y cargar los comentarios del cliente seleccionado
     const openCommentDialog = (client: IClient) => {
         const service = client.currentService;
@@ -119,7 +121,7 @@ export const ClientsExcursionTable = (
         seedData,
         loading: wsLoading,
         fetchWsSeedData,
-    } = useWhatsapp(whatsappSessionKeys.betueltravel);
+    } = useWhatsapp(authUser?.organization?.sessionId);
 
     const [deletePayment] = paymentService.useDeletePayments();
     const [deleteComment] = commentService.useDeleteComments();
@@ -222,7 +224,7 @@ export const ClientsExcursionTable = (
         if (comment._id) {
             console.log("entro 1 ")
             // Actualiza el comentario si ya existe
-            updatedComments = updatedComments.map(c => c._id === comment._id ? { ...c, ...comment } : c);
+            updatedComments = updatedComments.map(c => c._id === comment._id ? {...c, ...comment} : c);
         } else {
             console.log("entro 2 ")
             // Agrega un nuevo comentario si no tiene _id
@@ -264,7 +266,7 @@ export const ClientsExcursionTable = (
         };
 
         setSelectedClient(updatedClient);
-        onUpdateClient(updatedClient, { isOptimistic: true, avoidConfirm: true });
+        onUpdateClient(updatedClient, {isOptimistic: true, avoidConfirm: true});
     };
 
     const handleUpdatePayment = async (payments: IPayment[]) => {
@@ -333,7 +335,6 @@ export const ClientsExcursionTable = (
             onUpdateClient(updatedClient, {isOptimistic: true, avoidConfirm: true});
         }
     };
-
 
 
     const [clientToEdit, setClientToEdit] = useState<IClient>();
@@ -434,7 +435,7 @@ export const ClientsExcursionTable = (
     };
 
     const [selectedWsGroup, setSelectedWsGroup] = useState<IWsGroup | null>(null);
-    const loadWsGroups = async () => fetchWsSeedData(whatsappSessionKeys.betueltravel, 'groups');
+    const loadWsGroups = async () => fetchWsSeedData(undefined, 'groups');
 
     const handleWsGroupSelection = async (selectedList: IWsGroup[], selectedItem: IWsGroup) => {
         setSelectedWsGroup(selectedItem);
@@ -547,6 +548,11 @@ export const ClientsExcursionTable = (
             }
         }
     }, [clients]);
+
+    const enableWhatsappOptions = useMemo(() => {
+        return excursion.owner._id === authUser?.organization?._id
+    }, [excursion.owner, authUser?.organization]);
+
 
     const renderRow = (client: IClient, index: number, selected: boolean, onSelect: (checked: boolean) => void) => {
         const noService = "No Service";
@@ -684,7 +690,11 @@ export const ClientsExcursionTable = (
                             </Button>
                         </div>
                     </div>
-                    <ProtectedElement roles={[UserRoleTypes.ADMIN]} userTypes={[UserTypes.AGENCY]}>
+                    <ProtectedElement
+                        roles={[UserRoleTypes.ADMIN]}
+                        userTypes={[UserTypes.AGENCY]}
+                        condition={enableWhatsappOptions}
+                    >
                         <div className="flex items-center px-4 justify-between bg-green-400 rounded-md shadow-lg">
                             <p>Opciones de Whatsapp: {excursion.whatsappGroupID?.slice(0, 5)}</p>
                             <div className="flex items-center">
@@ -788,7 +798,7 @@ export const ClientsExcursionTable = (
                         <div className="flex items-center">
                             <SearchableSelect<IWsGroup>
                                 options={seedData.groups.filter(item => !item.subject?.toLowerCase()?.includes('sin filtro'))}
-                                displayProperty="subject"
+                                displayProperty="title"
                                 label="Selecciona un grupo"
                                 disabled={wsLoading}
                                 onSelect={handleWsGroupSelection}

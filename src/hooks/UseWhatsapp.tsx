@@ -29,7 +29,7 @@ const useWhatsapp = (whatsappSessionId?: string, autologin = false) => {
         const localData = localStorageImpl.getItem(`${whatsappSeedStorePrefix}${whatsappSessionId}`)
         const storedSeedData = localData && JSON.parse(localData);
         storedSeedData && setSeedData(storedSeedData);
-    }, []);
+    }, [whatsappSessionId]);
 
 
     React.useEffect(() => {
@@ -164,7 +164,7 @@ const useWhatsapp = (whatsappSessionId?: string, autologin = false) => {
         }
 
         return () => socket ? socket.disconnect() : {} as any;
-    }, [socket]);
+    }, [socket, whatsappSessionId]);
 
     const handleWhatsappMessaging = (sent: (contact: IClient) => any, end: (contacts: IClient[]) => any) => {
         if (socket) {

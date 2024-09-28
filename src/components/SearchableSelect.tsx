@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { Input, List, ListItem } from '@material-tailwind/react';
-import {BackspaceIcon} from "@heroicons/react/20/solid";
+import {CgClose} from "react-icons/cg";
 
 export interface IOption<T = any> {
     label: string;
@@ -111,7 +111,7 @@ function SearchableSelect<T>({
                 }}
                 icon={
                     (searchTerm || displayValue)   ? (
-                        <BackspaceIcon className="h-5 w-5" onClick={handleClear}/>
+                        <CgClose className="h-5 w-5 cursor-pointer" onClick={handleClear}/>
                     ): null
                 }
                 placeholder={!isFocused && multiple ? displayValue : ''}

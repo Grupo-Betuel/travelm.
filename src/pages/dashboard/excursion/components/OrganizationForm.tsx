@@ -133,7 +133,7 @@ export const OrganizationForm: React.FC<OrganizationHandlerProps> = (
         setOrganization((prevFormData) => ({
             ...prevFormData,
             contact: {
-                ...prevFormData.contact.location,
+                ...(prevFormData?.contact?.location || {}),
                 ...contact,
             },
         }));

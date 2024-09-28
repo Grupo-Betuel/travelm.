@@ -2,12 +2,13 @@ import React, {ChangeEvent, useMemo, useState} from 'react';
 import {Button, Input, Select, Typography, Option} from "@material-tailwind/react";
 import {
     ArrowDownIcon,
-    ArrowUpIcon, BackspaceIcon, ChevronDoubleLeftIcon,
+    ArrowUpIcon, ChevronDoubleLeftIcon,
     ChevronDoubleRightIcon
 } from "@heroicons/react/20/solid";
 import SearchableSelect from './SearchableSelect';
 import _ from "lodash";
 import {ChevronLeftIcon, ChevronRightIcon} from "@heroicons/react/24/outline";
+import {CgClose} from "react-icons/cg";
 
 export type IFilterOptionItem = { label: string, value: string | number };
 
@@ -248,7 +249,7 @@ export function DataTable<T>(
                     onChange={handleSearchChange}
                     icon={
                     searchTerm ? (
-                        <BackspaceIcon className="h-5 w-5" onClick={() => handleClear('search')}/>
+                        <CgClose className="h-5 w-5 cursor-pointer" onClick={() => handleClear('search')}/>
                         ): null
                     }
                 />
@@ -265,7 +266,7 @@ export function DataTable<T>(
                                 onChange={(e) => handleFilterChange(option.key, [e.target.value])}
                                 icon={
                                     (filters[option.key]) ? (
-                                        <BackspaceIcon className="h-5 w-5" onClick={() => handleClear(option.key)}/>
+                                        <CgClose className="h-5 w-5 cursor-pointer" onClick={() => handleClear(option.key)}/>
                                     ): null
                                 }
                             />
