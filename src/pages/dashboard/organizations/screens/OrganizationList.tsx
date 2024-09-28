@@ -55,15 +55,15 @@ export const OrganizationList: React.FC = () => {
                 value: name
             }))
         },
-        {
-            key: 'contact',
-            label: 'Filtrar por Email',
-            type: 'select',
-            options: Array.from(new Set(organizations.map(org => org.contact.email))).map(email => ({
-                label: email,
-                value: email
-            }))
-        },
+        // {
+        //     key: 'contact',
+        //     label: 'Filtrar por Email',
+        //     type: 'select',
+        //     options: Array.from(new Set(organizations.map(org => org.contact.email))).map(email => ({
+        //         label: email,
+        //         value: email
+        //     }))
+        // },
     ], [organizations]);
 
     const columns: IDataTableColumn<IOrganization>[] = [
