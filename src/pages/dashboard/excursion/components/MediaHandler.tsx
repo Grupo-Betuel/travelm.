@@ -550,18 +550,3 @@ const MediaHandler = ({
 };
 
 export default MediaHandler;
-
-
-
-export interface IExcursionConfiguration {
-    customMessages: {
-        type: 'promotion' | 'request-payment' | 'motivation';
-        text: string;
-        media: IMedia[];
-    },
-    actions: {
-        type: 'promotion',
-        enabled: boolean;
-
-    }[]
-}
