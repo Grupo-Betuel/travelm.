@@ -1,13 +1,18 @@
 import React, {useMemo} from 'react';
-import {Input, Typography} from '@material-tailwind/react';
-import {useController, Control, useFormState} from 'react-hook-form';
+import {Input, Textarea, Typography} from '@material-tailwind/react';
+import {Controller, Control, useFormState} from 'react-hook-form';
+import InputMask from 'react-input-mask';
+import {PHONE_COSNTANTS} from "@/constants/phone.constants";
 
 interface FormControlProps {
     name: string;
     control: Control<any>;
     label: string;
     rules?: any;
-    type?: string;
+    type?: 'text' | 'password' | 'email' | 'number' | 'textarea' | 'tel';
+    inputProps?: any;
+    mask?: string;
+    maskProps?: any;
 }
 
 const FormControl: React.FC<FormControlProps> = (
@@ -17,34 +22,94 @@ const FormControl: React.FC<FormControlProps> = (
         label,
         rules,
         type = 'text',
-    }) => {
-    const {
-        field,
-        fieldState: {error, isTouched},
-    } = useController({
-        name,
-        control,
-        rules,
-    });
+        inputProps,
+        mask,
+        maskProps,
+    }
+) => {
+    const {isSubmitted} = useFormState({control});
 
-    const { isSubmitted } = useFormState({ control });
+    const telRules = useMemo(() => {
+        return type === 'tel' ? {
+            pattern: {
+                value: PHONE_COSNTANTS.PATTERN,
+                message: PHONE_COSNTANTS.MESSSAGE,
+            },
+        } : {};
 
-    const isError = useMemo(() => error && (isTouched || isSubmitted), [error, isTouched, isSubmitted]);
+    }, [type]);
+
+    const inputMask = useMemo(() => {
+        return mask || type === 'tel' ? PHONE_COSNTANTS.MASK : undefined
+    }, [type]);
+
 
     return (
         <div className="mb-4">
-            <Input
-                {...field}
-                label={label}
-                error={!!isError}
-                success={!isError}
-                type={type}
+            <Controller
+                name={name}
+                control={control}
+                rules={{
+                    ...telRules,
+                    ...rules
+                }}
+                render={({field, fieldState: {error, isTouched}}) => {
+                    const isError = useMemo(
+                        () => error && (isTouched || isSubmitted),
+                        [error, isTouched, isSubmitted]
+                    );
+
+                    const InputComponent = inputMask ? (
+                        <InputMask
+                            mask={inputMask}
+                            {...maskProps}
+                            {...field}
+                            onChange={(e) => {
+                                field.onChange(e);
+                            }}
+                        >
+                            {(inputMaskProps: any) => (
+                                <Input
+                                    {...inputProps}
+                                    {...inputMaskProps}
+                                    label={label}
+                                    error={!!isError}
+                                    success={!isError && !!field.value}
+                                    type={type}
+                                />
+                            )}
+                        </InputMask>
+                    ) : type === 'textarea' ? (
+                        <Textarea
+                            {...field}
+                            {...inputProps}
+                            label={label}
+                            error={!!isError}
+                            success={!isError && !!field.value}
+                        />
+                    ) : (
+                        <Input
+                            {...field}
+                            {...inputProps}
+                            label={label}
+                            error={!!isError}
+                            success={!isError && !!field.value}
+                            type={type}
+                        />
+                    );
+
+                    return (
+                        <>
+                            {InputComponent}
+                            {isError && (
+                                <Typography variant="small" color="red">
+                                    {error?.message}
+                                </Typography>
+                            )}
+                        </>
+                    );
+                }}
             />
-            {isError && (
-                <Typography variant="small" color="red">
-                    {error?.message}
-                </Typography>
-            )}
         </div>
     );
 };
