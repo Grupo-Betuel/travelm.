@@ -73,7 +73,7 @@
 // }
 
 
-import React from "react";
+import React, {useMemo} from "react";
 import {
     Input,
     Popover,
@@ -84,7 +84,7 @@ import {
 import { format } from "date-fns";
 import { DayPicker } from "react-day-picker";
 import { ChevronRightIcon, ChevronLeftIcon } from "@heroicons/react/24/outline";
-import { useController, Control, RegisterOptions } from "react-hook-form";
+import {useController, Control, RegisterOptions, useFormState} from "react-hook-form";
 
 interface DatePickerProps {
     name: string;
@@ -110,32 +110,28 @@ const DatePicker: React.FC<DatePickerProps> = ({
         rules,
     });
 
+    const { isSubmitted } = useFormState({ control });
+
     const [isPopoverOpen, setIsPopoverOpen] = React.useState(false);
-    const [hasInteracted, setHasInteracted] = React.useState(false);
 
     const handleDateSelect = (date?: Date) => {
         onChange(date);
-        onBlur(); // Manually mark the field as touched
+        onBlur();
         setIsPopoverOpen(false);
     };
 
     const handleInputClick = () => {
         setIsPopoverOpen(!isPopoverOpen);
-        setHasInteracted(true); // Mark that the user has interacted with the date picker
-        // Do not call onBlur here to prevent premature error display
     };
 
     const handlePopoverClose = () => {
         setIsPopoverOpen(false);
-        // If the user opened the popover and didn't select a date, mark the field as touched
-        if (hasInteracted && !isTouched) {
-            onBlur();
-        }
+        onBlur();
     };
 
     const formattedValue = value ? format(new Date(value), "dd / MM / yyyy") : "";
 
-    const showError = error && isTouched;
+    const showError = useMemo(() => (error && (isTouched || isSubmitted)), [error, isTouched, isSubmitted]);
 
     return (
         <div className="mb-4">
@@ -160,14 +156,14 @@ const DatePicker: React.FC<DatePickerProps> = ({
                         />
                     </div>
                 </PopoverHandler>
-                <PopoverContent className="z-[9999]">
+                <PopoverContent className="z-[9999]" onBlur={onBlur}>
                     <DayPicker
                         mode="single"
                         selected={value ? new Date(value) : undefined}
                         onSelect={handleDateSelect}
                         showOutsideDays
+                        onDayBlur={onBlur}
                         className="border-0"
-
                         classNames={{
                             caption: "flex justify-center py-2 mb-4 relative items-center",
                             caption_label: "text-sm font-medium text-gray-900",
@@ -203,7 +199,7 @@ const DatePicker: React.FC<DatePickerProps> = ({
             </Popover>
             {showError && (
                 <Typography variant="small" color="red">
-                    {error.message}
+                    {error?.message}
                 </Typography>
             )}
         </div>

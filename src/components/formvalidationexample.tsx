@@ -15,6 +15,7 @@ import getFormValidatorClassNames, {FormValidatorEntityType} from "@/utils/form-
 import FormControl from "@/components/FormControl";
 import SelectControl from "@/components/SelectControl";
 import RadioControl from "@/components/RadioControl";
+import DatePicker from "@/components/DatePicker";
 
 
 const roles = [
@@ -85,6 +86,12 @@ const LoginScreen = () => {
                             label="Género"
                             options={genders}
                             rules={{ required: 'El género es requerido' }}
+                        />
+                        <DatePicker
+                            control={control}
+                            name="endDate"
+                            rules={{required: 'Fecha de finalizacion es requerida'}}
+                            label="Dia de Finalizacion"
                         />
                     </CardBody>
                     <CardFooter className="pt-0">
