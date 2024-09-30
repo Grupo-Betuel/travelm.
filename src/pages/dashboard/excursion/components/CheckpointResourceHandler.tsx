@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect} from 'react';
 import {
     Button,
     Input,
@@ -13,15 +13,15 @@ import {
     Select,
     Option,
 } from '@material-tailwind/react';
-import { getCrudService } from "@/api/services/CRUD.service";
-import { useConfirmAction } from "@/hooks/useConfirmActionHook";
-import { ICheckpoint } from "@/models/checkpointModel";
-import { ILocation } from "@/models/ordersModels";
-import { IBus } from "@/models/busesModel";
+import {getCrudService} from "@/api/services/CRUD.service";
+import {useConfirmAction} from "@/hooks/useConfirmActionHook";
+import {ICheckpoint} from "@/models/checkpointModel";
+import {ILocation} from "@/models/ordersModels";
+import {IBus} from "@/models/busesModel";
 import BusHandler from "./BusesHandler";
 import MapPicker from "@/components/MapPicker";
-import SearchableSelect, { IOption } from "@/components/SearchableSelect";
-import { AlertWithContent } from "@/components/AlertWithContent";
+import SearchableSelect, {IOption} from "@/components/SearchableSelect";
+import {AlertWithContent} from "@/components/AlertWithContent";
 import {ITransportResource} from "@/models/transportResourcesModel";
 
 interface CheckpointHandlerProps {
@@ -51,7 +51,7 @@ const CheckpointHandler: React.FC<CheckpointHandlerProps> = ({
     const [inValid, setInValid] = useState(false);
     const [currentLocation, setCurrentLocation] = useState<ILocation | null>(null);
 
-    const { data: busesData } = busesService.useFetchAllBuses();
+    const {data: busesData} = busesService.useFetchAllBuses();
 
     useEffect(() => {
         if (busesData) {
@@ -59,7 +59,7 @@ const CheckpointHandler: React.FC<CheckpointHandlerProps> = ({
         }
     }, [busesData]);
 
-    const handleDescriptionChange = ({ target: { value } }: any) => {
+    const handleDescriptionChange = ({target: {value}}: any) => {
         setNewCheckpoint({
             ...newCheckpoint,
             description: value
@@ -94,7 +94,10 @@ const CheckpointHandler: React.FC<CheckpointHandlerProps> = ({
 
             const updatedSelectedBuses = alreadySelected
                 ? selectedBuses.filter(bus => bus.value !== busId)
-                : [...selectedBuses, { value: selectedBus._id, label: `${selectedBus.model} - ${selectedBus.capacity} pasajeros` }];
+                : [...selectedBuses, {
+                    value: selectedBus._id,
+                    label: `${selectedBus.model} - ${selectedBus.capacity} pasajeros`
+                }];
 
             setSelectedBuses(updatedSelectedBuses);
         }
@@ -132,10 +135,13 @@ const CheckpointHandler: React.FC<CheckpointHandlerProps> = ({
         setCurrentLocation(checkpointToEdit.location);
 
         // Populate selectedBuses with the buses of the checkpoint being edited
-        const selectedBusesForEdit = checkpointToEdit.buses.map(bus => ({
-            value: bus._id,
-            label: `${bus.model} - ${bus.capacity} pasajeros`
-        }));
+        const selectedBusesForEdit = checkpointToEdit.buses.map(bus => {
+            const resource = excursionBuses.find(resource => resource.bus._id === bus._id);
+            return {
+                value: bus._id,
+                label: `${bus.model} - ${bus.capacity} pasajeros - Conductor: ${resource?.driver.firstName || 'N/A'}`
+            };
+        });
         setSelectedBuses(selectedBusesForEdit);
     };
 
@@ -145,9 +151,10 @@ const CheckpointHandler: React.FC<CheckpointHandlerProps> = ({
     };
 
     return (
-        <div className="flex flex-col gap-4 px-4">
-            <AlertWithContent open={inValid} setOpen={setInValid} content={"Debe seleccionar una ubicación y autobuses"} type="warning" />
-            <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-4">
+            <AlertWithContent open={inValid} setOpen={setInValid} content={"Debe seleccionar una ubicación y autobuses"}
+                              type="warning"/>
+            <div className="flex flex-col gap-4 px-4">
                 <MapPicker
                     initialLocation={{
                         latitude: currentLocation?.latitude || 18.485424,
@@ -194,15 +201,23 @@ const CheckpointHandler: React.FC<CheckpointHandlerProps> = ({
                 {checkpoints.map((checkpoint, index) => (
                     <Card key={index} className="p-4">
                         <Typography variant="h6">Descripción: {checkpoint.description}</Typography>
-                        <Typography variant="h6">Ubicación: {checkpoint.location?.address || `Lat: ${checkpoint.location?.latitude}, Lng: ${checkpoint.location?.longitude}`}</Typography>
+                        <Typography
+                            variant="h6">Ubicación: {checkpoint.location?.address || `Lat: ${checkpoint.location?.latitude}, Lng: ${checkpoint.location?.longitude}`}</Typography>
                         <Typography variant="h6">Autobuses:</Typography>
-                        {checkpoint.buses.map(bus => (
-                            <Typography key={bus._id} variant="paragraph">{bus.model} - {bus.capacity} pasajeros</Typography>
-                        ))}
+                        {checkpoint.buses.map(bus => {
+                            const resource = excursionBuses.find(resource => resource.bus._id === bus._id);
+                            return (
+                                <Typography key={bus._id} variant="paragraph">
+                                    {bus.model} ({bus.capacity} pasajeros) -
+                                    Conductor: {resource?.driver.firstName}
+                                </Typography>
+                            );
+                        })}
 
-                        <CardFooter className="flex gap-2">
+                        <CardFooter className="flex gap-2 px-0 py-2">
                             <Button variant="outlined" onClick={() => startEditing(index)}>Editar</Button>
-                            <Button variant="outlined" color="red" onClick={() => handleDeleteCheckpoint(index)}>Eliminar</Button>
+                            <Button variant="outlined" color="red"
+                                    onClick={() => handleDeleteCheckpoint(index)}>Eliminar</Button>
                         </CardFooter>
                     </Card>
                 ))}
@@ -211,7 +226,7 @@ const CheckpointHandler: React.FC<CheckpointHandlerProps> = ({
             <Dialog size="md" open={isBusDialogOpen} handler={setIsBusDialogOpen}>
                 <DialogHeader>Gestionar Autobuses</DialogHeader>
                 <DialogBody>
-                    <BusHandler buses={buses} updateBuses={setBuses} />
+                    <BusHandler buses={buses} updateBuses={setBuses}/>
                 </DialogBody>
                 <DialogFooter>
                     <Button variant="text" color="red" onClick={() => setIsBusDialogOpen(false)}>Cancelar</Button>
