@@ -1,6 +1,6 @@
-import React from 'react';
+import React, {useMemo} from 'react';
 import {Input, Typography} from '@material-tailwind/react';
-import {useController, Control} from 'react-hook-form';
+import {useController, Control, useFormState} from 'react-hook-form';
 
 interface FormControlProps {
     name: string;
@@ -27,18 +27,22 @@ const FormControl: React.FC<FormControlProps> = (
         rules,
     });
 
+    const { isSubmitted } = useFormState({ control });
+
+    const isError = useMemo(() => error && (isTouched || isSubmitted), [error, isTouched, isSubmitted]);
+
     return (
         <div className="mb-4">
             <Input
                 {...field}
                 label={label}
-                error={!!error && isTouched}
-                success={!error && isTouched}
+                error={!!isError}
+                success={!isError}
                 type={type}
             />
-            {error && isTouched && (
+            {isError && (
                 <Typography variant="small" color="red">
-                    {error.message}
+                    {error?.message}
                 </Typography>
             )}
         </div>

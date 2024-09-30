@@ -13,7 +13,20 @@ import {
 import { useForm, SubmitHandler, ValidationRule } from 'react-hook-form';
 import getFormValidatorClassNames, {FormValidatorEntityType} from "@/utils/form-validator.utils";
 import FormControl from "@/components/FormControl";
+import SelectControl from "@/components/SelectControl";
+import RadioControl from "@/components/RadioControl";
 
+
+const roles = [
+    { label: 'Administrador', value: 'admin' },
+    { label: 'Usuario', value: 'user' },
+    { label: 'Invitado', value: 'guest' },
+];
+const genders = [
+    { label: 'Masculino', value: 'male' },
+    { label: 'Femenino', value: 'female' },
+    { label: 'Otro', value: 'other' },
+];
 
 const LoginScreen = () => {
 
@@ -26,6 +39,7 @@ const LoginScreen = () => {
         console.log(data);
         // login(data);
     };
+
 
     return (
         <div className="flex items-center justify-center h-screen bg-gray-50">
@@ -57,6 +71,20 @@ const LoginScreen = () => {
                             rules={{
                                 required: 'Password is required',
                             }}
+                        />
+                        <SelectControl
+                            name="role"
+                            control={control}
+                            label="Rol"
+                            options={roles}
+                            rules={{ required: 'El rol es requerido' }}
+                        />
+                        <RadioControl
+                            name="gender"
+                            control={control}
+                            label="Género"
+                            options={genders}
+                            rules={{ required: 'El género es requerido' }}
                         />
                     </CardBody>
                     <CardFooter className="pt-0">
