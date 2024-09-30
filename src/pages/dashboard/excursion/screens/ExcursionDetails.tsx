@@ -369,9 +369,9 @@ export const ExcursionDetails: React.FC = () => {
             {/*{!!excursion.activities.length && <ActivityDetails activities={excursion.activities}/>}*/}
             {/*<ProjectionsCharts projections={excursion.projections}/>*/}
             {!!excursion.checkpoints?.length && (
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+                <div className="flex space-x-4 overflow-x-auto py-4">
                     {excursion.checkpoints.map((checkpoint, index) => (
-                        <Card key={index} className="flex flex-col">
+                        <Card key={index} className="flex-shrink-0 flex flex-col min-w-[300px]">
                             <CardBody>
                                 <Typography variant="h6" color="blue-gray" className="mb-2">
                                     {checkpoint.description}
@@ -391,8 +391,7 @@ export const ExcursionDetails: React.FC = () => {
                                             {checkpoint.buses.map((bus, busIndex) => (
                                                 <li key={busIndex}>
                                                     <Typography variant="small" color="gray">
-                                                        Modelo: {bus.model}, Capacidad: {bus.capacity},
-                                                        Color: {bus.color}
+                                                        Modelo: {bus.model}, Capacidad: {bus.capacity}, Color: {bus.color}
                                                     </Typography>
                                                 </li>
                                             ))}
