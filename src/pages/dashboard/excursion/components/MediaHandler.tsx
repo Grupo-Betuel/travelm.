@@ -319,7 +319,7 @@ const MediaHandler = ({
         setSearchMediaModal(newValue);
     }
 
-    const handleQuantity = !handle ? 2 : Object.values(handle || {}).length;
+    const handleQuantity = useMemo(() => !handle ? 2 : Object.keys(handle || {}).length, [handle])
 
     return (
         <div className={`columns-${handleQuantity > 1 ? 2 : 1} space-y-10 py-8`}>
@@ -550,3 +550,18 @@ const MediaHandler = ({
 };
 
 export default MediaHandler;
+
+
+
+export interface IExcursionConfiguration {
+    customMessages: {
+        type: 'promotion' | 'request-payment' | 'motivation';
+        text: string;
+        media: IMedia[];
+    },
+    actions: {
+        type: 'promotion',
+        enabled: boolean;
+
+    }[]
+}

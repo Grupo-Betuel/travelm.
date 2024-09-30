@@ -19,3 +19,12 @@
 .animate-loading-bar {
     animation: loading-bar 1.3s linear infinite;
 }
+
+/*Errors handling*/
+input[data-error]:after, select[data-error]:after, textarea[data-error]:after, div[data-error]:after, .error-message {
+    content: attr(data-error);
+    color: red;
+    display: block;
+    font-size: 12px;
+    margin-top: 4px;
+}

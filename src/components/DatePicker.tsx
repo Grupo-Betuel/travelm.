@@ -1,73 +1,217 @@
+// import React from "react";
+// import {
+//     Input,
+//     Popover,
+//     PopoverHandler,
+//     PopoverContent,
+// } from "@material-tailwind/react";
+// import {format} from "date-fns";
+// import {DayPicker} from "react-day-picker";
+// import {ChevronRightIcon, ChevronLeftIcon} from "@heroicons/react/24/outline";
+//
+// export interface ICustomDatePickerProps {
+//     onChange: (date?: Date) => any;
+//     date?: Date;
+//     label?: string;
+//     disabled?: boolean;
+// }
+//
+// export default function DatePicker({onChange, date, label, disabled}: ICustomDatePickerProps) {
+//     return (
+//         <Popover placement="bottom">
+//             <PopoverHandler>
+//                 <Input
+//                     name="date"
+//                     label={label}
+//                     onChange={() => null}
+//                     value={date ? format(date, "dd / MM / yyyy") : ""}
+//                     disabled={disabled}
+//                 />
+//             </PopoverHandler>
+//             <PopoverContent className="z-[9999]">
+//                 <DayPicker
+//                     mode="single"
+//                     selected={date}
+//                     onSelect={onChange}
+//                     showOutsideDays
+//                     className="border-0"
+//                     classNames={{
+//                         caption: "flex justify-center py-2 mb-4 relative items-center",
+//                         caption_label: "text-sm font-medium text-gray-900",
+//                         nav: "flex items-center",
+//                         nav_button:
+//                             "h-6 w-6 bg-transparent hover:bg-blue-gray-50 p-1 rounded-md transition-colors duration-300",
+//                         nav_button_previous: "absolute left-1.5",
+//                         nav_button_next: "absolute right-1.5",
+//                         table: "w-full border-collapse",
+//                         head_row: "flex font-medium text-gray-900",
+//                         head_cell: "m-0.5 w-9 font-normal text-sm",
+//                         row: "flex w-full mt-2",
+//                         cell: "text-gray-600 rounded-md h-9 w-9 text-center text-sm p-0 m-0.5 relative [&:has([aria-selected].day-range-end)]:rounded-r-md [&:has([aria-selected].day-outside)]:bg-gray-900/20 [&:has([aria-selected].day-outside)]:text-white [&:has([aria-selected])]:bg-gray-900/50 first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20",
+//                         day: "h-9 w-9 p-0 font-normal",
+//                         day_range_end: "day-range-end",
+//                         day_selected:
+//                             "rounded-md bg-gray-900 text-white hover:bg-gray-900 hover:text-white focus:bg-gray-900 focus:text-white",
+//                         day_today: "rounded-md bg-gray-200 text-gray-900",
+//                         day_outside:
+//                             "day-outside text-gray-500 opacity-50 aria-selected:bg-gray-500 aria-selected:text-gray-900 aria-selected:bg-opacity-10",
+//                         day_disabled: "text-gray-500 opacity-50",
+//                         day_hidden: "invisible",
+//                     }}
+//                     components={{
+//                         IconLeft: ({...props}) => (
+//                             <ChevronLeftIcon {...props} className="h-4 w-4 stroke-2"/>
+//                         ),
+//                         IconRight: ({...props}) => (
+//                             <ChevronRightIcon {...props} className="h-4 w-4 stroke-2"/>
+//                         ),
+//                     }}
+//                 />
+//             </PopoverContent>
+//         </Popover>
+//     );
+// }
+
+
 import React from "react";
 import {
     Input,
     Popover,
     PopoverHandler,
     PopoverContent,
+    Typography,
 } from "@material-tailwind/react";
-import {format} from "date-fns";
-import {DayPicker} from "react-day-picker";
-import {ChevronRightIcon, ChevronLeftIcon} from "@heroicons/react/24/outline";
+import { format } from "date-fns";
+import { DayPicker } from "react-day-picker";
+import { ChevronRightIcon, ChevronLeftIcon } from "@heroicons/react/24/outline";
+import { useController, Control, RegisterOptions } from "react-hook-form";
 
-export interface ICustomDatePickerProps {
-    onChange: (date?: Date) => any;
-    date?: Date;
+interface DatePickerProps {
+    name: string;
+    control: Control<any>;
     label?: string;
+    rules?: RegisterOptions;
     disabled?: boolean;
 }
 
-export default function DatePicker({onChange, date, label, disabled}: ICustomDatePickerProps) {
+const DatePicker: React.FC<DatePickerProps> = ({
+                                                   name,
+                                                   control,
+                                                   label,
+                                                   rules,
+                                                   disabled,
+                                               }) => {
+    const {
+        field: { value, onChange, ref, onBlur },
+        fieldState: { error, isTouched },
+    } = useController({
+        name,
+        control,
+        rules,
+    });
+
+    const [isPopoverOpen, setIsPopoverOpen] = React.useState(false);
+    const [hasInteracted, setHasInteracted] = React.useState(false);
+
+    const handleDateSelect = (date?: Date) => {
+        onChange(date);
+        onBlur(); // Manually mark the field as touched
+        setIsPopoverOpen(false);
+    };
+
+    const handleInputClick = () => {
+        setIsPopoverOpen(!isPopoverOpen);
+        setHasInteracted(true); // Mark that the user has interacted with the date picker
+        // Do not call onBlur here to prevent premature error display
+    };
+
+    const handlePopoverClose = () => {
+        setIsPopoverOpen(false);
+        // If the user opened the popover and didn't select a date, mark the field as touched
+        if (hasInteracted && !isTouched) {
+            onBlur();
+        }
+    };
+
+    const formattedValue = value ? format(new Date(value), "dd / MM / yyyy") : "";
+
+    const showError = error && isTouched;
+
     return (
-        <Popover placement="bottom">
-            <PopoverHandler>
-                <Input
-                    name="date"
-                    label={label}
-                    onChange={() => null}
-                    value={date ? format(date, "dd / MM / yyyy") : ""}
-                    disabled={disabled}
-                />
-            </PopoverHandler>
-            <PopoverContent className="z-[9999]">
-                <DayPicker
-                    mode="single"
-                    selected={date}
-                    onSelect={onChange}
-                    showOutsideDays
-                    className="border-0"
-                    classNames={{
-                        caption: "flex justify-center py-2 mb-4 relative items-center",
-                        caption_label: "text-sm font-medium text-gray-900",
-                        nav: "flex items-center",
-                        nav_button:
-                            "h-6 w-6 bg-transparent hover:bg-blue-gray-50 p-1 rounded-md transition-colors duration-300",
-                        nav_button_previous: "absolute left-1.5",
-                        nav_button_next: "absolute right-1.5",
-                        table: "w-full border-collapse",
-                        head_row: "flex font-medium text-gray-900",
-                        head_cell: "m-0.5 w-9 font-normal text-sm",
-                        row: "flex w-full mt-2",
-                        cell: "text-gray-600 rounded-md h-9 w-9 text-center text-sm p-0 m-0.5 relative [&:has([aria-selected].day-range-end)]:rounded-r-md [&:has([aria-selected].day-outside)]:bg-gray-900/20 [&:has([aria-selected].day-outside)]:text-white [&:has([aria-selected])]:bg-gray-900/50 first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20",
-                        day: "h-9 w-9 p-0 font-normal",
-                        day_range_end: "day-range-end",
-                        day_selected:
-                            "rounded-md bg-gray-900 text-white hover:bg-gray-900 hover:text-white focus:bg-gray-900 focus:text-white",
-                        day_today: "rounded-md bg-gray-200 text-gray-900",
-                        day_outside:
-                            "day-outside text-gray-500 opacity-50 aria-selected:bg-gray-500 aria-selected:text-gray-900 aria-selected:bg-opacity-10",
-                        day_disabled: "text-gray-500 opacity-50",
-                        day_hidden: "invisible",
-                    }}
-                    components={{
-                        IconLeft: ({...props}) => (
-                            <ChevronLeftIcon {...props} className="h-4 w-4 stroke-2"/>
-                        ),
-                        IconRight: ({...props}) => (
-                            <ChevronRightIcon {...props} className="h-4 w-4 stroke-2"/>
-                        ),
-                    }}
-                />
-            </PopoverContent>
-        </Popover>
+        <div className="mb-4">
+            <Popover
+                placement="bottom"
+                open={isPopoverOpen}
+                handler={setIsPopoverOpen}
+                onClose={handlePopoverClose}
+            >
+                <PopoverHandler>
+                    <div>
+                        <Input
+                            ref={ref}
+                            name={name}
+                            label={label}
+                            value={formattedValue}
+                            readOnly
+                            disabled={disabled}
+                            onClick={handleInputClick}
+                            error={!!showError}
+                            success={!error && isTouched}
+                        />
+                    </div>
+                </PopoverHandler>
+                <PopoverContent className="z-[9999]">
+                    <DayPicker
+                        mode="single"
+                        selected={value ? new Date(value) : undefined}
+                        onSelect={handleDateSelect}
+                        showOutsideDays
+                        className="border-0"
+
+                        classNames={{
+                            caption: "flex justify-center py-2 mb-4 relative items-center",
+                            caption_label: "text-sm font-medium text-gray-900",
+                            nav: "flex items-center",
+                            nav_button:
+                                "h-6 w-6 bg-transparent hover:bg-blue-gray-50 p-1 rounded-md transition-colors duration-300",
+                            nav_button_previous: "absolute left-1.5",
+                            nav_button_next: "absolute right-1.5",
+                            table: "w-full border-collapse",
+                            head_row: "flex font-medium text-gray-900",
+                            head_cell: "m-0.5 w-9 font-normal text-sm",
+                            row: "flex w-full mt-2",
+                            cell: "text-gray-600 rounded-md h-9 w-9 text-center text-sm p-0 m-0.5 relative focus-within:relative focus-within:z-20",
+                            day: "h-9 w-9 p-0 font-normal",
+                            day_selected:
+                                "rounded-md bg-gray-900 text-white hover:bg-gray-900 hover:text-white focus:bg-gray-900 focus:text-white",
+                            day_today: "rounded-md bg-gray-200 text-gray-900",
+                            day_outside:
+                                "text-gray-500 opacity-50 aria-selected:bg-gray-500 aria-selected:text-gray-900 aria-selected:bg-opacity-10",
+                            day_disabled: "text-gray-500 opacity-50",
+                            day_hidden: "invisible",
+                        }}
+                        components={{
+                            IconLeft: ({ ...props }) => (
+                                <ChevronLeftIcon {...props} className="h-4 w-4 stroke-2" />
+                            ),
+                            IconRight: ({ ...props }) => (
+                                <ChevronRightIcon {...props} className="h-4 w-4 stroke-2" />
+                            ),
+                        }}
+                    />
+                </PopoverContent>
+            </Popover>
+            {showError && (
+                <Typography variant="small" color="red">
+                    {error.message}
+                </Typography>
+            )}
+        </div>
     );
-}
+};
+
+export default DatePicker;
+
+
+
+

@@ -16,6 +16,7 @@ import {DataTable, IDataTableColumn, IFilterOption} from "../../../../components
 import {BiDollar} from "react-icons/bi";
 import {MdPlace} from "react-icons/md";
 import {RiOrganizationChart} from "react-icons/ri";
+import LoginScreen from "@/components/formvalidationexample";
 
 const excursionService = getCrudService("excursions");
 
@@ -166,6 +167,7 @@ function ExcursionsList() {
 
     return (
         <div className="p-4 flex flex-col gap-6 min-h-[88dvh]">
+            <LoginScreen />
             <div className="grid gap-y-10 gap-x-6 md:grid-cols-2 xl:grid-cols-4">
                 <StatisticsCard
                     title="Clientes"

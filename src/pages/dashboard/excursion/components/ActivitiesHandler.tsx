@@ -146,11 +146,11 @@ const ActivitiesHandler: React.FC<ActivitiesHandlerProps> = ({activities, update
                         onChange={(e) => setActivityForm({...activityForm, title: e.target.value})}
                         className="mb-4"
                     />
-                    <DatePicker
-                        label="Select Date"
-                        onChange={onSelectDate}
-                        date={activityForm.date}
-                    />
+                    {/*<DatePicker*/}
+                    {/*    label="Select Date"*/}
+                    {/*    onChange={onSelectDate}*/}
+                    {/*    date={activityForm.date}*/}
+                    {/*/>*/}
                     <ReactQuill
                         theme="snow"
                         value={activityForm.description}
@@ -192,12 +192,12 @@ const ActivitiesHandler: React.FC<ActivitiesHandlerProps> = ({activities, update
                             <Typography variant="h6" className="font-bold line-clamp-2">
                                 {activity.title}
                             </Typography>
-                            <DatePicker
-                                label="Select Date"
-                                onChange={onSelectDate}
-                                date={activityForm.date}
-                                disabled={true}
-                            />
+                            {/*<DatePicker*/}
+                            {/*    label="Select Date"*/}
+                            {/*    onChange={onSelectDate}*/}
+                            {/*    date={activityForm.date}*/}
+                            {/*    disabled={true}*/}
+                            {/*/>*/}
                             {activity.description &&
                             <Button color="blue" onClick={() => handleViewDescription(activity.description)}>
                                 Ver Descripción Completa

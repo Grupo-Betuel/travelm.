@@ -90,10 +90,10 @@ const ProjectionsHandler: React.FC<ProjectionsHandlerProps> = ({projections, upd
                 className="mb-4"
             />
             <Typography variant="h6" className="mb-2">Select Date:</Typography>
-            <DatePicker
-                date={projectionForm.date}
-                onChange={(date?: Date) => setProjectionForm({...projectionForm, date})}
-            />
+            {/*<DatePicker*/}
+            {/*    date={projectionForm.date}*/}
+            {/*    onChange={(date?: Date) => setProjectionForm({...projectionForm, date})}*/}
+            {/*/>*/}
             <Checkbox
                 label="Done"
                 checked={projectionForm.done}

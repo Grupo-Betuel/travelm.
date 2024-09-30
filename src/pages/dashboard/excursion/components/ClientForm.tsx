@@ -143,7 +143,6 @@ const ClientForm: React.FC<ClientFormProps> = (
                     name="firstName"
                     value={client.firstName}
                     onChange={handleChange}
-
                 />
                 <Input
                     crossOrigin={"true"}

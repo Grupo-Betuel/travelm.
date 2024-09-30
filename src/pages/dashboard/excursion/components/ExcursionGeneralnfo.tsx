@@ -3,7 +3,7 @@ import {
     Input,
     Popover,
     PopoverHandler,
-    PopoverContent, Textarea,
+    PopoverContent, Textarea, Button,
 } from "@material-tailwind/react";
 // import { format } from "date-fns";
 // import { DayPicker } from "react-day-picker";
@@ -11,6 +11,7 @@ import {
 import {IExcursion} from "../../../../models/excursionModel";
 import DatePicker from "../../../../components/DatePicker";
 import MapPicker from "../../../../components/MapPicker";
+import {useForm} from "react-hook-form";
 
 interface GeneralInfoProps {
     excursionData: IExcursion;
@@ -19,6 +20,7 @@ interface GeneralInfoProps {
 
 const ExcursionGeneralInfo: React.FC<GeneralInfoProps> = ({excursionData, updateExcursion}) => {
     const handleInputChange = (event: any): void => {
+        console.log(event);
         if (event.target.name === 'startDate' && !excursionData.endDate) {
             updateExcursion({
                 [event.target.name]: event.target.value,
@@ -29,8 +31,15 @@ const ExcursionGeneralInfo: React.FC<GeneralInfoProps> = ({excursionData, update
         }
     };
 
+    const {
+        control,
+        handleSubmit,
+    } = useForm<any>({ mode: 'onBlur' });
+
+
     return (
-        <div className="flex flex-col gap-4 mb-6">
+
+        <form onSubmit={handleSubmit(handleInputChange)} className="flex flex-col gap-4 mb-6">
             <Input
                 label="Title"
                 name="title"
@@ -45,15 +54,27 @@ const ExcursionGeneralInfo: React.FC<GeneralInfoProps> = ({excursionData, update
             />
             <DatePicker
                 label="Dia de comienzo"
-                onChange={date => handleInputChange({target: {name: 'startDate', value: date}})}
-                date={excursionData.startDate}
+                control={control}
+                name="startDate"
+                rules={{required: 'Fecha de finalizacion es requerida'}}
+                // onChange={date => handleInputChange({target: {name: 'startDate', value: date}})}
+                // date={excursionData.startDate}
             />
             <DatePicker
+                control={control}
+                name="endDate"
+                rules={{required: 'Fecha de finalizacion es requerida'}}
                 label="Dia de Finalizacion"
-                onChange={date => handleInputChange({target: {name: 'endDate', value: date}})}
-                date={excursionData.endDate || excursionData.startDate}
+                // onChange={date => handleInputChange({target: {name: 'endDate', value: date}})}
+                // date={excursionData.endDate || excursionData.startDate}
             />
-        </div>
+            <Button
+                color="blue"
+                type="submit"
+            >
+                Guardar
+            </Button>
+        </form>
     );
 };
 

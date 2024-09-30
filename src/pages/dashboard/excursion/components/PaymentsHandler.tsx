@@ -142,11 +142,11 @@ const PaymentHandler: React.FC<PaymentHandlerProps> = (
                 onChange={(e) => handleInputChange('comment', e.target.value)}
             />
             <div className="flex items-center gap-3 justify-between">
-                <DatePicker
-                    label="Fecha"
-                    onChange={date => handleInputChange('date', date)}
-                    date={paymentFormData.date}
-                />
+                {/*<DatePicker*/}
+                {/*    label="Fecha"*/}
+                {/*    onChange={date => handleInputChange('date', date)}*/}
+                {/*    date={paymentFormData.date}*/}
+                {/*/>*/}
             </div>
             <MediaHandler onChange={handleMedia} medias={paymentFormData?.media ? [paymentFormData.media] : []} handle={{images: true}} enableSingleSelection={true} disableUpload/>
             <div className="flex items-center gap-5">
