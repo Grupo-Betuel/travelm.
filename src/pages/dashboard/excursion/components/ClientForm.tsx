@@ -6,6 +6,8 @@ import ServiceHandler from "./ServiceHandler";
 import {IService} from "@/models/serviceModel";
 import {getCrudService} from "@/api/services/CRUD.service";
 import {ICustomComponentDialog} from "@/models/common";
+import {useForm, SubmitHandler, Control} from "react-hook-form";
+import FormControl from "@/components/FormControl";
 
 interface ClientFormProps {
     initialClient?: IClient;
@@ -42,6 +44,13 @@ const ClientForm: React.FC<ClientFormProps> = (
     }, {
         skip: client.phone.length < 11 || initialClient?.phone === client.phone
     });
+
+    const {
+        control,
+        handleSubmit,
+        setValue,
+        formState: {errors},
+    } = useForm<any>({mode: 'all', values: client});
 
 
     const handleChange = ({target: {value, name, type}}: React.ChangeEvent<HTMLInputElement>) => {
@@ -104,11 +113,12 @@ const ClientForm: React.FC<ClientFormProps> = (
         });
     }, [service]);
 
-    const handleSubmit = () => {
+
+    const handleOnSubmit: SubmitHandler<any> = () => {
         onSubmit({
-            ...client,
-            currentService: service
-        }
+                ...client,
+                currentService: service
+            }
         );
         setClient(structuredClone(emptyClient));
         setService(undefined);
@@ -117,61 +127,60 @@ const ClientForm: React.FC<ClientFormProps> = (
     const form = (
         <div className="px-4 flex flex-col gap-3">
             <Typography variant="h6">Datos del Cliente</Typography>
-            <InputMask
-                mask="+1 (999) 999-9999"
+            {/*<form onSubmit={handleSubmit}>*/}
+            <FormControl
                 name="phone"
+                control={control as Control}
+                label="Teléfono"
                 type="tel"
-                value={client.phone}
-                onChange={handleChange}
-                maskPlaceholder={null}
-                alwaysShowMask={false}
-            >
-                {
-                    ((inputProps: any) => (
-                        <Input
-                            {...(inputProps as any)}
-                            type="tel"
-                            label="Teléfono"
-                            value={client.phone}
-                        />
-                    ) as any) as any}
-            </InputMask>
+                rules={{required: 'El teléfono es requerido'}}
+                mask="+1 (999) 999-9999"
+                maskProps={{
+                    maskPlaceholder: null,
+                    alwaysShowMask: false,
+                }}
+            />
             <div className="flex gap-3 items-center">
-                <Input
-                    crossOrigin={"true"}
-                    label="Nombre"
+                <FormControl
                     name="firstName"
-                    value={client.firstName}
-                    onChange={handleChange}
+                    control={control as Control}
+                    label="Nombre"
+                    rules={{required: 'El nombre es requerido'}}
                 />
-                <Input
-                    crossOrigin={"true"}
-                    label="Apellido"
+                <FormControl
                     name="lastName"
-                    value={client.lastName}
-                    onChange={handleChange}
+                    control={control as Control}
+                    label="Apellido"
+                    rules={{required: 'El apellido es requerido'}}
                 />
             </div>
-            <Input
-                crossOrigin={"true"}
-                label="Correo"
+            <FormControl
                 name="email"
-                value={client.email}
-                onChange={handleChange}
+                control={control as Control}
+                label="Correo"
+                type="email"
+                rules={{
+                    required: 'El correo es requerido',
+                    pattern: {
+                        value: /^\S+@\S+$/i,
+                        message: 'Formato de correo inválido',
+                    },
+                }}
             />
             {enableService && (<ServiceHandler
-                service={service}
-                services={client.services}
-                onUpdateSingleService={onUpdateSingleService}
-                onUpdateServices={onUpdateServices}/>
+                    service={service}
+                    services={client.services}
+                    onUpdateSingleService={onUpdateSingleService}
+                    onUpdateServices={onUpdateServices}/>
             )}
             {!dialog && <Button
                 color="blue"
-                onClick={handleSubmit}
+                type={'submit'}
                 className="mt-4"
             >
                 {!!existingClients?.length ? 'Actualizar' : 'Agregar'}
             </Button>}
+            {/*</form>*/}
         </div>
     )
 
@@ -198,7 +207,7 @@ const ClientForm: React.FC<ClientFormProps> = (
                         variant="text"
                         size="lg"
                         color="blue"
-                        onClick={handleSubmit}
+                        type={'submit'}
                     >
                         Enviar
                     </Button>
