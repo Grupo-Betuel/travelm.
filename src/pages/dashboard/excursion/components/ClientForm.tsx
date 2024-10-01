@@ -47,7 +47,6 @@ const ClientForm: React.FC<ClientFormProps> = (
     const {
         control,
         handleSubmit,
-        setValue,
         formState: {errors},
     } = useForm<IClient>({mode: 'all', values: client});
 
@@ -139,18 +138,20 @@ const ClientForm: React.FC<ClientFormProps> = (
                         alwaysShowMask: false,
                     }}
                 />
-                <div className="flex gap-3 items-center">
+                <div className="flex gap-4">
                     <FormControl
                         name="firstName"
                         control={control}
                         label="Nombre"
                         rules={{required: 'El nombre es requerido'}}
+                        className={'w-full'}
                     />
                     <FormControl
                         name="lastName"
                         control={control}
                         label="Apellido"
                         rules={{required: 'El apellido es requerido'}}
+                        className={'w-full'}
                     />
                 </div>
                 <FormControl

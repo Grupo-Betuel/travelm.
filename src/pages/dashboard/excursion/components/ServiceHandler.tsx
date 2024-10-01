@@ -2,9 +2,15 @@ import React, {useEffect, useMemo, useState} from 'react';
 import {Input, Option, Select} from '@material-tailwind/react';
 import {
     IService,
-    serviceStatusLabels
+    serviceStatusLabels, serviceTypeLabels
 } from "../../../../models/serviceModel";
 import {SERVICE_CONSTANTS} from "../../../../constants/service.constant";
+import SelectControl from "@/components/SelectControl";
+import {PAYMENT_CONSTANTS} from "@/constants/payment.constants";
+import {paymentTypeLabels} from "@/models/PaymentModel";
+import {useForm} from "react-hook-form";
+import {IClient} from "@/models/clientModel";
+import FormControl from "@/components/FormControl";
 
 interface ServiceFormProps {
     services: IService[];
@@ -40,53 +46,66 @@ const ServiceHandler: React.FC<ServiceFormProps> = ({services, onUpdateSingleSer
         }
     }, [newService]);
 
+    const {
+        control,
+        handleSubmit,
+        formState: {errors},
+    } = useForm<IService>({mode: 'all', values: newService});
 
     // temporal fix
-    const  ServiceTypeActions = false;
+    const ServiceTypeActions = false;
     return (
         <div className="flex flex-col gap-4">
             <div className="flex flex-col gap-4 rounded-md">
-                <div className="flex items-center justify-between gap-3">
-                    {ServiceTypeActions && (
-                        <Select
-                            label="Service Type"
-                            value={newService.type}
-                            placeholder="Selecciona"
-                            onChange={(e) => handleServiceChange('type', e)}
-                        >
-                            {SERVICE_CONSTANTS.TYPES.map(type => (
-                                <Option key={type} value={type}>{serviceStatusLabels ? [type] : ''}</Option>
-                            ))}
-                        </Select>
-                    )}
-                    <Select
-                        label="Estado del Servicio"
-                        value={service?.status || newService.status}
-                        onChange={(e) => handleServiceChange('status', e)}
-                    >
-                        {SERVICE_CONSTANTS.STATUS_TYPES.map(status => (
-                            <Option key={status} value={status}>
-                                {serviceStatusLabels[status]}
-                            </Option>
-                        ))}
-                    </Select>
-                    <Input
-                        crossOrigin={"true"}
-                        type="number"
-                        label="Cantidad De Asientos"
-                        value={newService.seats}
-                        // disabled={!!service?.seats}
-                        onChange={(e) => {
-                            console.log(e.target.value)
-                            const value = parseInt(e.target.value, 10);
-                            if (value >= 1) {
-                                handleServiceChange('seats', value);
-                            }
-                        }}
-                        step={1}
-                        min={1}
-                    />
-                </div>
+                <form>
+                    <div className="flex items-center justify-between gap-3">
+                        {ServiceTypeActions && (
+                            <SelectControl
+                                name="type"
+                                control={control}
+                                label="Service Type"
+                                options={SERVICE_CONSTANTS.TYPES.map(type => ({
+                                    label: serviceTypeLabels[type],
+                                    value: type
+                                }))}
+                                rules={{required: 'El Estado del Servicio es requerido'}}
+                                className={'w-full'}
+                            />
+                        )}
+                        <SelectControl
+                            name="status"
+                            control={control}
+                            label="Estado del Servicio"
+                            options={SERVICE_CONSTANTS.STATUS_TYPES.map(type => ({
+                                label: serviceStatusLabels[type],
+                                value: type
+                            }))}
+                            rules={{required: 'El Estado del Servicio es requerido'}}
+                            className={'w-full'}
+                        />
+                        <FormControl
+                            name="seats"
+                            control={control}
+                            label="Cantidad De Asientos"
+                            type="number"
+                            className={'w-full'}
+                            rules={{
+                                required: 'La cantidad de asientos es requerida',
+                                min: {value: 1, message: 'Debe ser al menos 1'}
+                            }}
+                            inputProps={{
+                                step: 1,
+                                min: 1,
+                                onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
+                                    const value = parseInt(e.target.value, 10);
+                                    if (value >= 1) {
+                                        handleServiceChange('seats', value);
+                                    }
+                                }
+                            }}
+                        />
+                    </div>
+                </form>
             </div>
         </div>
     );

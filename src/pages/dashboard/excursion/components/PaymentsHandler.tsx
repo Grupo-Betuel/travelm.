@@ -24,6 +24,10 @@ import {CardBody, CardHeader, Typography} from '@material-tailwind/react';
 import {Swiper, SwiperSlide} from "swiper/react";
 import {Navigation, Pagination} from "swiper/modules";
 import {IExpense} from "@/models/ExpensesModel";
+import {useForm} from "react-hook-form";
+import {IClient} from "@/models/clientModel";
+import SelectControl from "@/components/SelectControl";
+import FormControl from "@/components/FormControl";
 
 interface PaymentHandlerProps {
     enableAddPayment?: boolean;
@@ -68,7 +72,7 @@ const PaymentHandler: React.FC<PaymentHandlerProps> = (
 
 
     const handleInputChange = (field: keyof IPayment, value: any) => {
-        setPaymentFormData({ ...paymentFormData, [field]: value });
+        setPaymentFormData({...paymentFormData, [field]: value});
     };
 
     const addOrUpdatePayment = () => {
@@ -76,12 +80,18 @@ const PaymentHandler: React.FC<PaymentHandlerProps> = (
         if (paymentFormData._id) {
             paymentsData = paymentsData.map(item => item._id === paymentFormData._id ? paymentFormData : item);
         } else {
-            paymentsData = [...paymentsData, { ...paymentFormData }];
+            paymentsData = [...paymentsData, {...paymentFormData}];
         }
 
         onUpdatePayment(paymentsData);
         setPaymentFormData(emptyPayment);
     };
+
+    const {
+        control,
+        handleSubmit,
+        formState: {errors},
+    } = useForm<IPayment>({mode: 'all', values: paymentFormData});
 
     const startEditing = (index: number) => {
         setPaymentFormData(payments[index])
@@ -99,66 +109,72 @@ const PaymentHandler: React.FC<PaymentHandlerProps> = (
         const image = media.images && media.images[0];
         if (paymentFormData._id) {
             const updatedPayments = payments.map(payment =>
-                payment._id === paymentFormData._id ? { ...payment, media: image as IMedia } : payment
+                payment._id === paymentFormData._id ? {...payment, media: image as IMedia} : payment
             );
             onChangePayment(updatedPayments);
         } else {
-            setPaymentFormData({ ...paymentFormData, media: image as IMedia });
+            setPaymentFormData({...paymentFormData, media: image as IMedia});
         }
     };
 
     useEffect(() => {
         if (!paymentFormData.media) {
             // Re-render MediaHandler if media is undefined
-            setPaymentFormData({ ...paymentFormData });
+            setPaymentFormData({...paymentFormData});
         }
     }, [paymentFormData.media]);
 
     console.log('paymentsFormData', paymentFormData);
     return (
         <div className="flex flex-col gap-3">
-            <div className="flex items-center gap-3 justify-between">
-                <Select
-                    label="Tipo de Pago"
-                    value={paymentFormData.type}
-                    onChange={(e) => handleInputChange('type', e)}
-                >
-                    {PAYMENT_CONSTANTS.PAYMENT_TYPES.map(type => (
-                        <Option key={type} value={type}>{paymentTypeLabels[type]}</Option>
-                    ))}
-                </Select>
-                <Input
-                    crossOrigin={false}
-                    type="number"
-                    label="Cantidad"
-                    value={paymentFormData.amount.toString()}
-                    onChange={(e) => handleInputChange('amount', parseFloat(e.target.value))}
+            <form onSubmit={handleSubmit(addOrUpdatePayment)}>
+                <div className="flex gap-4">
+                    <SelectControl
+                        name="type"
+                        control={control}
+                        label="Tipo de Pago"
+                        options={PAYMENT_CONSTANTS.PAYMENT_TYPES.map(type => ({
+                            label: paymentTypeLabels[type],
+                            value: type
+                        }))}
+                        rules={{required: 'El tipo de pago es requerido'}}
+                        className={'w-full'}
+                    />
+                    <FormControl
+                        name="amount"
+                        control={control}
+                        type={'number'}
+                        label="Cantidad"
+                        rules={{required: 'La cantidad es obligatoria'}}
+                        className={'w-full'}
+                    />
+                </div>
+                <FormControl
+                    name="comment"
+                    control={control}
+                    label="Comentario (Opcional)"
+                    type="textarea"
+                    rules={{
+                        minLength: {
+                            value: 3,
+                            message: 'El comentario debe tener al menos 3 caracteres',
+                        },
+                    }}
                 />
-            </div>
-            <Textarea
-                rows={1}
-                label="Comentario (Opcional)"
-                value={paymentFormData.comment}
-                onChange={(e) => handleInputChange('comment', e.target.value)}
-            />
-            <div className="flex items-center gap-3 justify-between">
-                {/*<DatePicker*/}
-                {/*    label="Fecha"*/}
-                {/*    onChange={date => handleInputChange('date', date)}*/}
-                {/*    date={paymentFormData.date}*/}
-                {/*/>*/}
-            </div>
-            <MediaHandler onChange={handleMedia} medias={paymentFormData?.media ? [paymentFormData.media] : []} handle={{images: true}} enableSingleSelection={true} disableUpload/>
-            <div className="flex items-center gap-5">
-                {paymentFormData._id ? (
-                    <Button onClick={cancelEditing} color="red">
-                        Cancel
+
+                <MediaHandler onChange={handleMedia} medias={paymentFormData?.media ? [paymentFormData.media] : []}
+                              handle={{images: true}} enableSingleSelection={true} disableUpload/>
+                <div className="flex items-center gap-5">
+                    {paymentFormData._id ? (
+                        <Button onClick={cancelEditing} color="red">
+                            Cancel
+                        </Button>
+                    ) : null}
+                    <Button type={'submit'} color={paymentFormData._id ? "blue" : "green"}>
+                        {paymentFormData._id ? "Guardar Cambios" : "Agregar Pago"}
                     </Button>
-                ): null}
-                <Button onClick={addOrUpdatePayment} color={paymentFormData._id ? "blue" : "green"}>
-                    {paymentFormData._id ? "Guardar Cambios" : "Agregar Pago"}
-                </Button>
-            </div>
+                </div>
+            </form>
             <div className="grid grid-cols-3 gap-4 py-4">
                 {payments.map((payment, index) => (
                     <Card className="border border-blue-gray-100 shadow-sm h-full space-y-4" key={index}>

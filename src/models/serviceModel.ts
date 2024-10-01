@@ -41,3 +41,18 @@ export const serviceStatusList: IOption<ServiceStatusTypes>[] = [
     {value: 'free', label: serviceStatusLabels.free},
     {value: 'canceled', label: serviceStatusLabels.canceled},
 ]
+
+export const serviceTypeLabels: { [N in ServiceTypes]: string } = {
+    excursion: 'Excursión',
+    flight: 'Vuelos',
+    resort: 'Resort',
+    hotel: 'Hotel'
+}
+
+export const serviceTypeList: IOption<ServiceTypes>[] = [
+    {value: 'excursion', label: serviceTypeLabels.excursion},
+    {value: 'flight', label: serviceTypeLabels.flight},
+    {value: 'resort', label: serviceTypeLabels.resort},
+    {value: 'hotel', label: serviceTypeLabels.hotel},
+]
+

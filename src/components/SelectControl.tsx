@@ -1,6 +1,6 @@
 import React from 'react';
-import { Select, Option, Typography } from '@material-tailwind/react';
-import { Controller, Control, useFormState } from 'react-hook-form';
+import {Select, Option, Typography} from '@material-tailwind/react';
+import {Controller, Control, useFormState} from 'react-hook-form';
 
 interface OptionType {
     label: string;
@@ -13,6 +13,7 @@ interface SelectControlProps {
     label: string;
     options: OptionType[];
     rules?: any;
+    className?: string;
 }
 
 const SelectControl: React.FC<SelectControlProps> = ({
@@ -21,16 +22,17 @@ const SelectControl: React.FC<SelectControlProps> = ({
                                                          label,
                                                          options,
                                                          rules,
+                                                         className,
                                                      }) => {
-    const { isSubmitted } = useFormState({ control });
+    const {isSubmitted} = useFormState({control});
 
     return (
-        <div className="mb-4">
+        <div className={`mb-4 ${className}`}>
             <Controller
                 name={name}
                 control={control}
                 rules={rules}
-                render={({ field, fieldState: { error, isTouched } }) => {
+                render={({field, fieldState: {error, isTouched}}) => {
                     const showError = error && (isTouched || isSubmitted);
                     return (
                         <>

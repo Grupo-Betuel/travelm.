@@ -13,6 +13,7 @@ interface FormControlProps {
     inputProps?: any;
     mask?: string;
     maskProps?: any;
+    className?: string;
 }
 
 const FormControl: React.FC<FormControlProps> = (
@@ -25,6 +26,7 @@ const FormControl: React.FC<FormControlProps> = (
         inputProps,
         mask,
         maskProps,
+        className,
     }
 ) => {
     const {isSubmitted} = useFormState({control});
@@ -45,7 +47,7 @@ const FormControl: React.FC<FormControlProps> = (
 
 
     return (
-        <div className="mb-4">
+        <div className={`mb-4 ${className}`}>
             <Controller
                 name={name}
                 control={control}
