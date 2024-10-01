@@ -3,7 +3,7 @@ import {Card, CardBody, Typography, Avatar, CardHeader, CardFooter, Button} from
 import {Swiper, SwiperSlide} from 'swiper/react';
 import 'swiper/css';
 import {GoogleMap, LoadScript, Marker} from '@react-google-maps/api';
-import {IOrganization} from "../../../../models/organizationModel";
+import {IOrganization, OrganizationTypesEnum} from "../../../../models/organizationModel";
 import {Navigation, Pagination} from "swiper/modules";
 import {useRenderMedia} from "../../../../hooks/useRenderMedia"; // Adjust the path as necessary
 import {FaFacebookF, FaTwitter, FaWhatsapp, FaPhone, FaInstagram} from 'react-icons/fa';
@@ -121,8 +121,8 @@ export const OrganizationCard: React.FC<OrganizationCardProps> = ({onEdit, organ
                     </div>
                 }
                 <AlertWithContent content='Direccion Copiada en el portapapeles' open={alertVisible} setOpen={setAlertVisible} type="success"/>
-                {onEdit && <Button className="px-4" variant="outlined" color="blue"
-                                   onClick={handleOnEdit}>Editar</Button>}
+                {onEdit && organization.type !== OrganizationTypesEnum.AGENCY && <Button className="px-4" variant="outlined" color="blue"
+                                                                                         onClick={handleOnEdit}>Editar</Button>}
             </CardFooter>
         </Card>
     );
