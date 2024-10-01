@@ -36,6 +36,7 @@ import {SERVICE_CONSTANTS} from "@/constants/service.constant";
 import {IService} from "@/models/serviceModel";
 import {emptyClient} from "@/pages/dashboard/excursion/components/ClientForm";
 import {EXPENSES_CONSTANTS} from "@/constants/expenses.constant";
+import {CheckpointDetails} from "@/pages/dashboard/excursion/components/CheckpointDetails";
 
 const excursionService = getCrudService('excursions');
 const clientService = getCrudService('travelClients');
@@ -226,7 +227,7 @@ export const ExcursionDetails: React.FC = () => {
         setAppIsLoading(false);
     };
 
-    const onUpdateExcursion = (e: Partial<IExcursion>, extra?: {isOptimistic?: boolean, avoidConfirm?: boolean }) => {
+    const onUpdateExcursion = (e: Partial<IExcursion>, extra?: { isOptimistic?: boolean, avoidConfirm?: boolean }) => {
         setExcursion({...excursion, ...e});
         if (!extra?.isOptimistic) {
             updateExcursion({_id: excursion._id || '', ...e});
@@ -247,11 +248,11 @@ export const ExcursionDetails: React.FC = () => {
         let updatedExpenses: IExpense[] = excursion.expenses || [];
 
         if (expense._id) {
-            updatedExpenses = updatedExpenses.map(e => e._id === expense._id ? { ...e, ...expense } : e);
+            updatedExpenses = updatedExpenses.map(e => e._id === expense._id ? {...e, ...expense} : e);
         } else {
             updatedExpenses = [...updatedExpenses, expense];
         }
-        onUpdateExcursion({ expenses: updatedExpenses });
+        onUpdateExcursion({expenses: updatedExpenses});
 
         setAppIsLoading(false);
     };
@@ -259,7 +260,7 @@ export const ExcursionDetails: React.FC = () => {
     const onExpenseDelete = async (expense: IExpense) => {
         deleteExpense(expense._id as string);
         const updatedExpenses = excursion.expenses?.filter(e => e._id !== expense._id) || [];
-        onUpdateExcursion({ expenses: updatedExpenses });
+        onUpdateExcursion({expenses: updatedExpenses});
     };
 
     if (
@@ -368,54 +369,7 @@ export const ExcursionDetails: React.FC = () => {
             {!!excursionBedrooms?.length && <BedroomDetails excursion={excursion}/>}
             {/*{!!excursion.activities.length && <ActivityDetails activities={excursion.activities}/>}*/}
             {/*<ProjectionsCharts projections={excursion.projections}/>*/}
-            {!!excursion.checkpoints?.length && (
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-                    {excursion.checkpoints.map((checkpoint, index) => (
-                        <Card key={index} className="flex flex-col">
-                            <CardBody>
-                                <Typography variant="h6" color="blue-gray" className="mb-2">
-                                    {checkpoint.description}
-                                </Typography>
-                                <Typography variant="small" color="gray" className="mb-4">
-                                    {checkpoint.location.address}, {checkpoint.location.city},{" "}
-                                    {checkpoint.location.province}, {checkpoint.location.country}
-                                </Typography>
-
-                                {/* Mostrar lista de buses */}
-                                {!!checkpoint.buses?.length && (
-                                    <div className="mb-4">
-                                        <Typography variant="h6" color="blue-gray">
-                                            Buses Disponibles:
-                                        </Typography>
-                                        <ul className="list-disc ml-4">
-                                            {checkpoint.buses.map((bus, busIndex) => (
-                                                <li key={busIndex}>
-                                                    <Typography variant="small" color="gray">
-                                                        Modelo: {bus.model}, Capacidad: {bus.capacity},
-                                                        Color: {bus.color}
-                                                    </Typography>
-                                                </li>
-                                            ))}
-                                        </ul>
-                                    </div>
-                                )}
-
-                                <div className="mt-auto"> {/* Asegura que el botón esté en la parte inferior */}
-                                    <Button
-                                        size="sm"
-                                        color="blue"
-                                        variant="outlined"
-                                        onClick={() => window.open(checkpoint.location.link, "_blank")}
-                                        className="w-full"
-                                    >
-                                        Ver en Google Maps
-                                    </Button>
-                                </div>
-                            </CardBody>
-                        </Card>
-                    ))}
-                </div>
-            )}
+            {!!excursion.checkpoints?.length && <CheckpointDetails excursion={excursion} />}
 
             {/* Organization, Destination, and TransportStep Information Cards */}
             <div>
