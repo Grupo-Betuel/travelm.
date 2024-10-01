@@ -57,7 +57,7 @@ const ServiceHandler: React.FC<ServiceFormProps> = ({services, onUpdateSingleSer
     return (
         <div className="flex flex-col gap-4">
             <div className="flex flex-col gap-4 rounded-md">
-                <form>
+                {/*<form>*/}
                     <div className="flex items-center justify-between gap-3">
                         {ServiceTypeActions && (
                             <SelectControl
@@ -105,7 +105,7 @@ const ServiceHandler: React.FC<ServiceFormProps> = ({services, onUpdateSingleSer
                             }}
                         />
                     </div>
-                </form>
+                {/*</form>*/}
             </div>
         </div>
     );

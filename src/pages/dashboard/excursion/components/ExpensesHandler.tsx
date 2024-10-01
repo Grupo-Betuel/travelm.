@@ -19,6 +19,9 @@ import { FinanceTypes, IFinance } from "@/models/financeModel";
 import { BiDollar, BiTrash, BiEdit } from "react-icons/bi";
 import {ICustomComponentDialog} from "@/models/common";
 import {emptyClient} from "@/pages/dashboard/excursion/components/ClientForm";
+import {useForm} from "react-hook-form";
+import {IService} from "@/models/serviceModel";
+import FormControl from "@/components/FormControl";
 
 interface ExpenseFormProps {
     initialExpenses: IExpense[];
@@ -86,9 +89,15 @@ export const ExpenseForm: React.FC<ExpenseFormProps> = ({
         setExpenses(filteredExpenses);
         onDeleteExpense(expense);
     };
+    const {
+        control,
+        handleSubmit,
+        formState: {errors},
+    } = useForm<IExpense>({mode: 'all', values: newExpense});
 
     const renderFormContent = () => (
         <>
+            <form onSubmit={handleSubmit(handleSave)}>
             <FinanceHandler
                 enabledCost={false}
                 finance={newExpense.finance}
@@ -101,25 +110,31 @@ export const ExpenseForm: React.FC<ExpenseFormProps> = ({
                 type="excursion"
             />
             <div className="mb-4">
-                <Input
-                    crossOrigin={true}
+                <FormControl
+                    name="title"
+                    control={control}
                     label="Nombre del Gasto"
-                    type="text"
-                    value={newExpense.title}
-                    onChange={(e) => handleInputChange('title', e.target.value)}
-                    placeholder="Título del Gasto"
+                    rules={{ required: 'El título de gasto es requerido' }}
                     className="w-full"
                 />
             </div>
             <div className="mb-4">
-                <Textarea
+                <FormControl
+                    name="description"
+                    control={control}
                     label="Descripción"
-                    value={newExpense.description}
-                    onChange={(e) => handleInputChange('description', e.target.value)}
+                    type="textarea"
                     className="w-full"
+                    rules={{
+                        required: 'La descripción es requerida',
+                        minLength: {
+                            value: 3,
+                            message: 'La descripción debe tener al menos 3 caracteres',
+                        },
+                    }}
                 />
             </div>
-            <Button onClick={handleSave} color={newExpense._id ? "blue" : "green"}>
+            <Button type={'submit'} color={newExpense._id ? "blue" : "green"}>
                 {newExpense._id ? "Guardar Cambios" : "Agregar Gasto"}
             </Button>
             {newExpense._id && (
@@ -127,6 +142,7 @@ export const ExpenseForm: React.FC<ExpenseFormProps> = ({
                     Cancelar
                 </Button>
             )}
+            </form>
 
             <Typography variant="h6" className="mb-2 mt-4">
                 Gastos Agregados
