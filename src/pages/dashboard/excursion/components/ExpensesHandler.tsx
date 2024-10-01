@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, {useEffect, useState} from "react";
 import {
     Dialog,
     DialogHeader,
@@ -13,10 +13,10 @@ import {
     CardFooter,
     Card,
 } from "@material-tailwind/react";
-import { IExpense } from "@/models/ExpensesModel";
-import { FinanceHandler } from "@/pages/dashboard/excursion/components/FinanceHandler";
-import { FinanceTypes, IFinance } from "@/models/financeModel";
-import { BiDollar, BiTrash, BiEdit } from "react-icons/bi";
+import {IExpense} from "@/models/ExpensesModel";
+import {FinanceHandler} from "@/pages/dashboard/excursion/components/FinanceHandler";
+import {FinanceTypes, IFinance} from "@/models/financeModel";
+import {BiDollar, BiTrash, BiEdit} from "react-icons/bi";
 import {ICustomComponentDialog} from "@/models/common";
 import {emptyClient} from "@/pages/dashboard/excursion/components/ClientForm";
 import {useForm} from "react-hook-form";
@@ -27,7 +27,7 @@ interface ExpenseFormProps {
     initialExpenses: IExpense[];
     onUpdateExpense: (expenses: IExpense) => void;
     onDeleteExpense: (expenses: IExpense) => void;
-    dialog? : ICustomComponentDialog;
+    dialog?: ICustomComponentDialog;
 }
 
 const defaultExpense: IExpense = {
@@ -58,13 +58,13 @@ export const ExpenseForm: React.FC<ExpenseFormProps> = ({
     }, [initialExpenses]);
 
     const handleInputChange = (name: string, value: string) => {
-        setNewExpense((prev) => ({ ...prev, [name]: value }));
+        setNewExpense((prev) => ({...prev, [name]: value}));
     };
 
     const handleSave = () => {
         if (newExpense._id) {
             const updatedExpenses = expenses.map((exp) =>
-                exp._id === newExpense._id ? { ...exp, ...newExpense } : exp
+                exp._id === newExpense._id ? {...exp, ...newExpense} : exp
             );
             setExpenses(updatedExpenses);
             onUpdateExpense(newExpense);
@@ -98,50 +98,52 @@ export const ExpenseForm: React.FC<ExpenseFormProps> = ({
     const renderFormContent = () => (
         <>
             <form onSubmit={handleSubmit(handleSave)}>
-            <FinanceHandler
-                enabledCost={false}
-                finance={newExpense.finance}
-                updateFinance={(financeUpdate: Partial<IFinance>) =>
-                    setNewExpense((prev) => ({
-                        ...prev,
-                        finance: { ...prev.finance, ...financeUpdate },
-                    }))
-                }
-                type="excursion"
-            />
-            <div className="mb-4">
-                <FormControl
-                    name="title"
-                    control={control}
-                    label="Nombre del Gasto"
-                    rules={{ required: 'El título de gasto es requerido' }}
-                    className="w-full"
+                <FinanceHandler
+                    enabledCost={false}
+                    finance={newExpense.finance}
+                    updateFinance={(financeUpdate: Partial<IFinance>) =>
+                        setNewExpense((prev) => ({
+                            ...prev,
+                            finance: {...prev.finance, ...financeUpdate},
+                        }))
+                    }
+                    type="excursion"
                 />
-            </div>
-            <div className="mb-4">
-                <FormControl
-                    name="description"
-                    control={control}
-                    label="Descripción"
-                    type="textarea"
-                    className="w-full"
-                    rules={{
-                        required: 'La descripción es requerida',
-                        minLength: {
-                            value: 3,
-                            message: 'La descripción debe tener al menos 3 caracteres',
-                        },
-                    }}
-                />
-            </div>
-            <Button type={'submit'} color={newExpense._id ? "blue" : "green"}>
-                {newExpense._id ? "Guardar Cambios" : "Agregar Gasto"}
-            </Button>
-            {newExpense._id && (
-                <Button onClick={cancelEditing} color="red">
-                    Cancelar
+                <div className="mb-4">
+                    <FormControl
+                        name="title"
+                        control={control}
+                        label="Nombre del Gasto"
+                        rules={{required: 'El título de gasto es requerido'}}
+                        className="w-full"
+                        onChange={(e) => setNewExpense({...newExpense, title: e.target.value})}
+                    />
+                </div>
+                <div className="mb-4">
+                    <FormControl
+                        name="description"
+                        control={control}
+                        label="Descripción"
+                        type="textarea"
+                        className="w-full"
+                        rules={{
+                            required: 'La descripción es requerida',
+                            minLength: {
+                                value: 3,
+                                message: 'La descripción debe tener al menos 3 caracteres',
+                            },
+                        }}
+                        onChange={(e) => setNewExpense({...newExpense, description: e.target.value})}
+                    />
+                </div>
+                <Button type={'submit'} color={newExpense._id ? "blue" : "green"}>
+                    {newExpense._id ? "Guardar Cambios" : "Agregar Gasto"}
                 </Button>
-            )}
+                {newExpense._id && (
+                    <Button onClick={cancelEditing} color="red">
+                        Cancelar
+                    </Button>
+                )}
             </form>
 
             <Typography variant="h6" className="mb-2 mt-4">
@@ -157,7 +159,7 @@ export const ExpenseForm: React.FC<ExpenseFormProps> = ({
                             shadow={false}
                             className="absolute grid h-7 w-7 place-items-center"
                         >
-                            <BiDollar className="w-4 h-4 text-white" />
+                            <BiDollar className="w-4 h-4 text-white"/>
                         </CardHeader>
                         <CardBody className="p-2 text-right">
                             <Typography variant="small" className="font-normal text-blue-gray-600">
@@ -177,12 +179,14 @@ export const ExpenseForm: React.FC<ExpenseFormProps> = ({
                         <CardFooter className="border-t border-blue-gray-50 p-2 mt-auto items-end">
                             <div className="flex space-x-1 justify-end">
                                 {expense.description.length > 50 && (
-                                    <Button variant="text" className="p-2" color="blue" onClick={() => setSelectedExpense(expense)}>
+                                    <Button variant="text" className="p-2" color="blue"
+                                            onClick={() => setSelectedExpense(expense)}>
                                         Ver más
                                     </Button>
                                 )}
-                                <Button variant="text" className="p-2" color="blue" onClick={() => startEditing(expense)}>
-                                    <BiEdit className="w-5 h-5" />
+                                <Button variant="text" className="p-2" color="blue"
+                                        onClick={() => startEditing(expense)}>
+                                    <BiEdit className="w-5 h-5"/>
                                 </Button>
                                 <Button
                                     variant="text"
@@ -190,7 +194,7 @@ export const ExpenseForm: React.FC<ExpenseFormProps> = ({
                                     color="red"
                                     onClick={() => handleDelete(expense)}
                                 >
-                                    <BiTrash className="w-5 h-5" />
+                                    <BiTrash className="w-5 h-5"/>
                                 </Button>
                             </div>
                         </CardFooter>

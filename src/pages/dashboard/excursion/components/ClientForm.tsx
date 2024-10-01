@@ -51,15 +51,6 @@ const ClientForm: React.FC<ClientFormProps> = (
     } = useForm<IClient>({mode: 'all', values: client});
 
 
-    const handleChange = ({target: {value, name, type}}: React.ChangeEvent<HTMLInputElement>) => {
-        if (type === 'tel') {
-            value = value.replace(/[^0-9]/g, '');
-            if (value == '1') return;
-        }
-
-        setClient({...client, [name]: value});
-    };
-
     const onUpdateServices = (services: IService[]) => {
         setClient({...client, services});
     }
@@ -112,12 +103,14 @@ const ClientForm: React.FC<ClientFormProps> = (
     }, [service]);
 
 
-    const handleFormSubmit: SubmitHandler<IClient> = () => {
-        onSubmit({
-                ...client,
-                currentService: service
-            }
-        );
+    const handleFormSubmit: SubmitHandler<IClient> = (newClient) => {
+        const updatedClient = {
+            ...newClient,
+            services: mergeClientServices(newClient),
+            currentService: service,
+        };
+        console.log('updatedClient', updatedClient);
+        // onSubmit(updatedClient);
         setClient(structuredClone(emptyClient));
         setService(undefined);
     };
@@ -125,62 +118,61 @@ const ClientForm: React.FC<ClientFormProps> = (
     const form = (
         <div className="px-4 flex flex-col gap-3">
             <Typography variant="h6">Datos del Cliente</Typography>
-            <form onSubmit={handleSubmit(handleFormSubmit)}>
+            <FormControl
+                name="phone"
+                control={control}
+                label="Teléfono"
+                type="tel"
+                rules={{required: 'El teléfono es requerido'}}
+                mask="+1 (999) 999-9999"
+                maskProps={{
+                    maskPlaceholder: null,
+                    alwaysShowMask: false,
+                }}
+            />
+            <div className="flex gap-4">
                 <FormControl
-                    name="phone"
+                    name="firstName"
                     control={control}
-                    label="Teléfono"
-                    type="tel"
-                    rules={{required: 'El teléfono es requerido'}}
-                    mask="+1 (999) 999-9999"
-                    maskProps={{
-                        maskPlaceholder: null,
-                        alwaysShowMask: false,
-                    }}
+                    label="Nombre"
+                    rules={{required: 'El nombre es requerido'}}
+                    className={'w-full'}
                 />
-                <div className="flex gap-4">
-                    <FormControl
-                        name="firstName"
-                        control={control}
-                        label="Nombre"
-                        rules={{required: 'El nombre es requerido'}}
-                        className={'w-full'}
-                    />
-                    <FormControl
-                        name="lastName"
-                        control={control}
-                        label="Apellido"
-                        rules={{required: 'El apellido es requerido'}}
-                        className={'w-full'}
-                    />
-                </div>
                 <FormControl
-                    name="email"
+                    name="lastName"
                     control={control}
-                    label="Correo"
-                    type="email"
-                    rules={{
-                        required: 'El correo es requerido',
-                        pattern: {
-                            value: /^\S+@\S+$/i,
-                            message: 'Formato de correo inválido',
-                        },
-                    }}
+                    label="Apellido"
+                    rules={{required: 'El apellido es requerido'}}
+                    className={'w-full'}
                 />
-                {enableService && (<ServiceHandler
-                        service={service}
-                        services={client.services}
-                        onUpdateSingleService={onUpdateSingleService}
-                        onUpdateServices={onUpdateServices}/>
-                )}
-                {!dialog && <Button
-                    color="blue"
-                    type={'submit'}
-                    className="mt-4"
-                >
-                    {!!existingClients?.length ? 'Actualizar' : 'Agregar'}
-                </Button>}
-            </form>
+            </div>
+            <FormControl
+                name="email"
+                control={control}
+                label="Correo"
+                type="email"
+                rules={{
+                    required: 'El correo es requerido',
+                    pattern: {
+                        value: /^\S+@\S+$/i,
+                        message: 'Formato de correo inválido',
+                    },
+                }}
+            />
+            {enableService && (<ServiceHandler
+                    service={service}
+                    services={client.services}
+                    onUpdateSingleService={onUpdateSingleService}
+                    onUpdateServices={onUpdateServices}/>
+            )}
+            {!dialog && <Button
+                color="blue"
+                type={'submit'}
+                className="mt-4"
+            >
+                {!!existingClients?.length ? 'Actualizar' : 'Agregar'}
+            </Button>}
+
         </div>
     )
 
@@ -192,28 +184,33 @@ const ClientForm: React.FC<ClientFormProps> = (
     return (
         dialog ?
             <Dialog open={dialog.open} handler={dialogHandler}>
-                <DialogHeader className="justify-between">
-                    {client._id ? 'Editar Cliente' : 'Agregar Cliente'}
-                </DialogHeader>
-                <DialogBody className="overflow-y-scroll max-h-[80dvh]">
-                    {form}
-                </DialogBody>
-                <DialogFooter className="flex items-center justify-between">
-                    <Button
-                        variant="text"
-                        size="lg"
-                        color="red" onClick={dialogHandler}>Cancelar</Button>
-                    <Button
-                        variant="text"
-                        size="lg"
-                        color="blue"
-                        type={'submit'}
-                    >
-                        Enviar
-                    </Button>
-                </DialogFooter>
+                <form onSubmit={handleSubmit(handleFormSubmit)}>
+                    <DialogHeader className="justify-between">
+                        {client._id ? 'Editar Cliente' : 'Agregar Cliente'}
+                    </DialogHeader>
+                    <DialogBody className="overflow-y-scroll max-h-[80dvh]">
+                        {form}
+                    </DialogBody>
+                    <DialogFooter className="flex items-center justify-between">
+                        <Button
+                            variant="text"
+                            size="lg"
+                            color="red" onClick={dialogHandler}>Cancelar</Button>
+                        <Button
+                            variant="text"
+                            size="lg"
+                            color="blue"
+                            type={'submit'}
+                        >
+                            Enviar
+                        </Button>
+                    </DialogFooter>
+                </form>
             </Dialog>
-            : form
+            :
+            <form onSubmit={handleSubmit(handleFormSubmit)}>
+                {form}
+            </form>
     );
 };
 
