@@ -22,6 +22,10 @@ import {AppImage} from "@/components/AppImage";
 import {useAuth} from "@/context/authContext";
 import IUser from "@/models/interfaces/userModel";
 import {ICustomComponentDialog} from "@/models/common";
+import FormControl from "@/components/FormControl";
+import {SubmitHandler, useForm} from "react-hook-form";
+import {IExpense} from "@/models/ExpensesModel";
+import {IClient} from "@/models/clientModel";
 
 
 interface CommentHandlerProps {
@@ -58,45 +62,69 @@ export const CommentHandler: React.FC<CommentHandlerProps> = ({
     const handleInputChange = (field: keyof IComment, value: any) => {
         setNewComment(prevComment => ({
             ...prevComment,
-            author: user as IUser ,
+            author: user as IUser,
             [field]: value
         }));
     };
 
-    const handleMedia = (media: IMediaHandled) => {
-        const images = media.images || [];
+    // const handleMedia = (media: IMediaHandled) => {
+    //     const images = media.images || [];
+    //
+    //     setNewComment({
+    //         ...newComment,
+    //         medias: [...(newComment.medias || []), ...images],
+    //     });
+    // };
 
-        // Almacena temporalmente las imágenes en el estado 'newComment'
-        setNewComment({
-            ...newComment,
-            medias: [...(newComment.medias || []), ...images],
-        });
+
+    const {
+        control,
+        handleSubmit,
+        formState: {errors},
+        setValue,
+        reset,
+    } = useForm<IComment>({mode: 'all', defaultValues: newComment});
+
+    const handleMedia = (media: IMediaHandled) => {
+        if (media.images && media.images.length > 0) {
+            const images = media.images || [];
+
+            setValue('medias', images);
+        } else {
+            setValue('medias', undefined);
+        }
     };
 
-    const handleSave = () => {
-        const commentWithAuthor = { ...newComment, author: user as IUser };
+    const handleSave: SubmitHandler<IComment> = (comment) => {
+        const commentWithAuthor = {...comment, author: user as IUser};
 
         if (commentWithAuthor._id) {
-            const updatedComments = comments.map(comment =>
-                comment._id === commentWithAuthor._id ? { ...comment, ...commentWithAuthor } : comment
+            const updatedComments = comments.map((c) =>
+                c._id === commentWithAuthor._id ? {...c, ...commentWithAuthor} : c
             );
             setComments(updatedComments);
+            console.log("updatedComments", updatedComments);
             onUpdateComments(commentWithAuthor);
         } else {
             const newComments = [...comments, commentWithAuthor];
             setComments(newComments);
+            console.log("updatedComments", newComments);
             onUpdateComments(commentWithAuthor);
         }
-
-        setNewComment(emptyComment);
+        reset(emptyComment);
     };
 
     const startEditing = (comment: IComment) => {
         setNewComment(comment);
+        setValue('_id', comment._id);
+        setValue('text', comment.text);
+        setValue('medias', comment.medias);
     };
 
     const cancelEditing = () => {
-        setNewComment(emptyComment);
+        reset(emptyComment);
+        setValue('_id', undefined);
+        setValue('medias', undefined);
     };
 
     const handleDelete = (comment: IComment) => {
@@ -108,17 +136,28 @@ export const CommentHandler: React.FC<CommentHandlerProps> = ({
 
     const renderFormContent = () => (
         <>
-            <Textarea
-                value={newComment.text}
-                onChange={(e) => handleInputChange('text', e.target.value)}
-                label="Comentario"
-            />
-            <MediaHandler onChange={handleMedia} handle={{images: true}}
-                          medias={newComment?.medias ? newComment.medias : undefined}/>
-            <Button onClick={handleSave} color={newComment._id ? "blue" : "green"}>
-                {newComment._id ? "Guardar Cambios" : "Agregar Comentario"}
-            </Button>
-            {newComment._id && <Button onClick={cancelEditing} color="red">Cancelar</Button>}
+            <form onSubmit={handleSubmit(handleSave)}>
+                <FormControl
+                    name="text"
+                    control={control}
+                    label="Comentario"
+                    type="textarea"
+                    className="w-full"
+                    rules={{
+                        required: 'La descripción es requerida',
+                        minLength: {
+                            value: 3,
+                            message: 'La descripción debe tener al menos 3 caracteres',
+                        },
+                    }}
+                />
+                <MediaHandler onChange={handleMedia} handle={{images: true}}
+                              medias={newComment?.medias ? newComment.medias : undefined}/>
+                <Button type={'submit'} color={newComment._id ? "blue" : "green"}>
+                    {newComment._id ? "Guardar Cambios" : "Agregar Comentario"}
+                </Button>
+                {newComment._id && <Button onClick={cancelEditing} color="red">Cancelar</Button>}
+            </form>
 
             <div className="grid grid-cols-3 gap-4 py-4">
                 {comments.map((comment, index) => (

@@ -3,7 +3,6 @@
 import React from 'react';
 import {
     Button,
-    Input,
     Typography,
     Card,
     CardBody,
@@ -11,14 +10,10 @@ import {
     CardHeader,
 } from '@material-tailwind/react';
 import {useForm, SubmitHandler, ValidationRule} from 'react-hook-form';
-import getFormValidatorClassNames, {FormValidatorEntityType} from "@/utils/form-validator.utils";
 import FormControl from "@/components/FormControl";
 import SelectControl from "@/components/SelectControl";
 import RadioControl from "@/components/RadioControl";
 import DatePicker from "@/components/DatePicker";
-import InputMask from "react-input-mask";
-import {IMaskInput} from "@/models/interfaces/InputMask.interfaces";
-
 
 const roles = [
     {label: 'Administrador', value: 'admin'},

@@ -24,10 +24,11 @@ import {CardBody, CardHeader, Typography} from '@material-tailwind/react';
 import {Swiper, SwiperSlide} from "swiper/react";
 import {Navigation, Pagination} from "swiper/modules";
 import {IExpense} from "@/models/ExpensesModel";
-import {useForm} from "react-hook-form";
+import {SubmitHandler, useForm} from "react-hook-form";
 import {IClient} from "@/models/clientModel";
 import SelectControl from "@/components/SelectControl";
 import FormControl from "@/components/FormControl";
+import {IComment} from "@/models/commentModel";
 
 interface PaymentHandlerProps {
     enableAddPayment?: boolean;
@@ -71,51 +72,52 @@ const PaymentHandler: React.FC<PaymentHandlerProps> = (
     } = useConfirmAction<CommonConfirmActions, CommonConfirmActionsDataTypes<IPayment>>(onConfirmAction, onDeniedAction);
 
 
-    const handleInputChange = (field: keyof IPayment, value: any) => {
-        setPaymentFormData({...paymentFormData, [field]: value});
-    };
-
-    const addOrUpdatePayment = () => {
-        let paymentsData = structuredClone(payments);
-        if (paymentFormData._id) {
-            paymentsData = paymentsData.map(item => item._id === paymentFormData._id ? paymentFormData : item);
-        } else {
-            paymentsData = [...paymentsData, {...paymentFormData}];
-        }
-
-        onUpdatePayment(paymentsData);
-        setPaymentFormData(emptyPayment);
-    };
-
     const {
         control,
         handleSubmit,
         formState: {errors},
-    } = useForm<IPayment>({mode: 'all', values: paymentFormData});
+        setValue,
+        getValues,
+        reset,
+    } = useForm<IPayment>({mode: 'all', defaultValues: paymentFormData});
+
+    const handleMedia = (media: IMediaHandled) => {
+        const image = media.images && media.images[0];
+        setValue('media', image as IMedia);
+    };
+
+    const addOrUpdatePayment: SubmitHandler<IPayment> = (payment) => {
+        const paymentFormData = getValues();
+        let paymentsData = structuredClone(payments);
+        if (paymentFormData._id) {
+            paymentsData = paymentsData.map(item => item._id === paymentFormData._id ? paymentFormData : item);
+        } else {
+            paymentsData = [...paymentsData, paymentFormData];
+        }
+
+        console.log('paymentsData', paymentsData);
+        onUpdatePayment(paymentsData);
+        setPaymentFormData(emptyPayment);
+    };
 
     const startEditing = (index: number) => {
-        setPaymentFormData(payments[index])
+        const payment = payments[index];
+        setValue('type', payment.type);
+        setValue('date', payment.date);
+        setValue('amount', payment.amount);
+        setValue('comment', payment.comment);
+        setValue('media', payment.media);
+        setValue('_id', payment._id);
     };
 
     const cancelEditing = () => {
-        setPaymentFormData(emptyPayment);
+        reset(emptyPayment);
     };
 
     const handleOnDelete = (p: IPayment) => {
         onDeletePayment(p);
     }
 
-    const handleMedia = (media: IMediaHandled) => {
-        const image = media.images && media.images[0];
-        if (paymentFormData._id) {
-            const updatedPayments = payments.map(payment =>
-                payment._id === paymentFormData._id ? {...payment, media: image as IMedia} : payment
-            );
-            onChangePayment(updatedPayments);
-        } else {
-            setPaymentFormData({...paymentFormData, media: image as IMedia});
-        }
-    };
 
     useEffect(() => {
         if (!paymentFormData.media) {
@@ -128,6 +130,7 @@ const PaymentHandler: React.FC<PaymentHandlerProps> = (
     return (
         <div className="flex flex-col gap-3">
             <form onSubmit={handleSubmit(addOrUpdatePayment)}>
+                    <input name="_id" disabled />
                 <div className="flex gap-4">
                     <SelectControl
                         name="type"
@@ -165,13 +168,13 @@ const PaymentHandler: React.FC<PaymentHandlerProps> = (
                 <MediaHandler onChange={handleMedia} medias={paymentFormData?.media ? [paymentFormData.media] : []}
                               handle={{images: true}} enableSingleSelection={true} disableUpload/>
                 <div className="flex items-center gap-5">
-                    {paymentFormData._id ? (
+                    {getValues('_id') ? (
                         <Button onClick={cancelEditing} color="red">
                             Cancel
                         </Button>
                     ) : null}
                     <Button type={'submit'} color={paymentFormData._id ? "blue" : "green"}>
-                        {paymentFormData._id ? "Guardar Cambios" : "Agregar Pago"}
+                        {getValues('_id') ? "Guardar Cambios" : "Agregar Pago"}
                     </Button>
                 </div>
             </form>

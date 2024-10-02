@@ -6,8 +6,6 @@ import {
     DialogFooter,
     Button,
     Typography,
-    Input,
-    Textarea,
     CardHeader,
     CardBody,
     CardFooter,
@@ -18,9 +16,7 @@ import {FinanceHandler} from "@/pages/dashboard/excursion/components/FinanceHand
 import {FinanceTypes, IFinance} from "@/models/financeModel";
 import {BiDollar, BiTrash, BiEdit} from "react-icons/bi";
 import {ICustomComponentDialog} from "@/models/common";
-import {emptyClient} from "@/pages/dashboard/excursion/components/ClientForm";
-import {useForm} from "react-hook-form";
-import {IService} from "@/models/serviceModel";
+import {SubmitHandler, useForm} from "react-hook-form";
 import FormControl from "@/components/FormControl";
 
 interface ExpenseFormProps {
@@ -57,24 +53,42 @@ export const ExpenseForm: React.FC<ExpenseFormProps> = ({
         }
     }, [initialExpenses]);
 
-    const handleInputChange = (name: string, value: string) => {
-        setNewExpense((prev) => ({...prev, [name]: value}));
+
+    const {
+        control,
+        handleSubmit,
+        formState: {errors},
+    } = useForm<IExpense>({mode: 'all', defaultValues: newExpense});
+
+    const onUpdateFinance = (updatedFields: Partial<IFinance>) => {
+        console.log('updatedFields', updatedFields);
+        setNewExpense(prev => ({
+            ...prev,
+            finance: {
+                ...prev.finance,
+                ...updatedFields,
+            },
+        }));
+        console.log('newExpense', newExpense);
     };
 
-    const handleSave = () => {
-        if (newExpense._id) {
+    const handleSave: SubmitHandler<IExpense> = (formData: IExpense) => {
+        if (formData._id) {
             const updatedExpenses = expenses.map((exp) =>
-                exp._id === newExpense._id ? {...exp, ...newExpense} : exp
+                exp._id === formData._id ? {...exp, ...formData} : exp
             );
             setExpenses(updatedExpenses);
-            onUpdateExpense(newExpense);
+            console.log('updatedExpenses', updatedExpenses);
+            onUpdateExpense({...formData, finance: newExpense.finance});
         } else {
-            const newExpenses = [...expenses, newExpense];
+            const newExpenses = [...expenses, {...formData, finance: newExpense.finance}];
             setExpenses(newExpenses);
-            onUpdateExpense(newExpense);
+            console.log('updatedExpenses2', newExpenses);
+            onUpdateExpense({...formData, finance: newExpense.finance});
         }
         setNewExpense(defaultExpense);
     };
+
 
     const startEditing = (expense: IExpense) => {
         setNewExpense(expense);
@@ -89,11 +103,7 @@ export const ExpenseForm: React.FC<ExpenseFormProps> = ({
         setExpenses(filteredExpenses);
         onDeleteExpense(expense);
     };
-    const {
-        control,
-        handleSubmit,
-        formState: {errors},
-    } = useForm<IExpense>({mode: 'all', values: newExpense});
+
 
     const renderFormContent = () => (
         <>
@@ -101,12 +111,7 @@ export const ExpenseForm: React.FC<ExpenseFormProps> = ({
                 <FinanceHandler
                     enabledCost={false}
                     finance={newExpense.finance}
-                    updateFinance={(financeUpdate: Partial<IFinance>) =>
-                        setNewExpense((prev) => ({
-                            ...prev,
-                            finance: {...prev.finance, ...financeUpdate},
-                        }))
-                    }
+                    updateFinance={onUpdateFinance}
                     type="excursion"
                 />
                 <div className="mb-4">
@@ -116,7 +121,6 @@ export const ExpenseForm: React.FC<ExpenseFormProps> = ({
                         label="Nombre del Gasto"
                         rules={{required: 'El título de gasto es requerido'}}
                         className="w-full"
-                        onChange={(e) => setNewExpense({...newExpense, title: e.target.value})}
                     />
                 </div>
                 <div className="mb-4">
@@ -133,7 +137,6 @@ export const ExpenseForm: React.FC<ExpenseFormProps> = ({
                                 message: 'La descripción debe tener al menos 3 caracteres',
                             },
                         }}
-                        onChange={(e) => setNewExpense({...newExpense, description: e.target.value})}
                     />
                 </div>
                 <Button type={'submit'} color={newExpense._id ? "blue" : "green"}>

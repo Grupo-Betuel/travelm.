@@ -1,11 +1,12 @@
 import {Button, Input, Menu, MenuHandler, MenuList, MenuItem, Select, Option} from "@material-tailwind/react";
-import React, {useEffect} from "react";
+import React, {useCallback, useEffect, useRef, useState} from "react";
 import {FinanceOptionEnum, financeTypes, FinanceTypes, IFinance} from "@/models/financeModel";
 import {PlusCircleIcon, TrashIcon} from "@heroicons/react/20/solid";
 import {useForm} from "react-hook-form";
 import {IExpense} from "@/models/ExpensesModel";
 import FormControl from "@/components/FormControl";
 import SelectControl from "@/components/SelectControl";
+import {IService} from "@/models/serviceModel";
 
 export interface IFinanceProps {
     finance: IFinance;
@@ -13,6 +14,11 @@ export interface IFinanceProps {
     type?: FinanceTypes;
     enabledCost?: boolean;
     options?: FinanceOptionEnum[];
+}
+
+const emptyFinance: IFinance = {
+    price: 0,
+    type: 'excursion',
 }
 
 export const FinanceHandler = ({
@@ -30,16 +36,7 @@ export const FinanceHandler = ({
     const toggleRates = () => setEnableRates(!enableRates);
     const toggleChildren = () => setEnableChildren(!enableChildren);
 
-    const handleOnChangeFinance = ({target: {name, value, type}}: any) => {
-        if (type === "number") {
-            value = Number(value);
-        }
-        updateFinance({
-            ...finance,
-            type: financeType || finance.type,
-            [name]: value,
-        });
-    };
+    const [newFinance, setNewFinance] = useState<IFinance>(emptyFinance);
 
     useEffect(() => {
         console.log("options", options)
@@ -60,7 +57,16 @@ export const FinanceHandler = ({
         control,
         handleSubmit,
         formState: {errors},
+        watch
     } = useForm<IFinance>({mode: 'all', values: finance});
+
+    const watchedPrice = watch("price");
+
+    useEffect(() => {
+        setNewFinance({...finance, price: watchedPrice});
+        updateFinance({...newFinance, price: watchedPrice});
+    }, [watchedPrice]);
+
 
     return (
         <div className="w-full space-y-4">

@@ -1,6 +1,6 @@
 import React from 'react';
 import {Select, Option, Typography} from '@material-tailwind/react';
-import {Controller, Control, useFormState} from 'react-hook-form';
+import {Controller, Control, useFormState, useForm} from 'react-hook-form';
 
 interface OptionType {
     label: string;
@@ -14,6 +14,7 @@ interface SelectControlProps {
     options: OptionType[];
     rules?: any;
     className?: string;
+    onChange?: (value: any) => void;
 }
 
 const SelectControl: React.FC<SelectControlProps> = ({
@@ -23,8 +24,20 @@ const SelectControl: React.FC<SelectControlProps> = ({
                                                          options,
                                                          rules,
                                                          className,
+                                                         onChange,
                                                      }) => {
     const {isSubmitted} = useFormState({control});
+
+    const {watch} = useForm();
+
+    const value = watch(name);
+
+    React.useEffect(() => {
+        if (onChange && value) {
+            onChange(value);
+        }
+    }, [value, onChange]);
+
 
     return (
         <div className={`mb-4 ${className}`}>

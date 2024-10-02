@@ -29,13 +29,15 @@ const emptyService: IService = {
 
 const ServiceHandler: React.FC<ServiceFormProps> = ({services, onUpdateSingleService, service, onUpdateServices}) => {
     const [newService, setNewService] = useState<IService>(emptyService);
-
+    // console.log('service2', service);
 
     useEffect(() => {
         if (service) {
             setNewService({...newService, ...service});
         }
+        console.log('service3', newService);
     }, [service])
+
     const handleServiceChange = (field: keyof IService, value: any) => {
         setNewService({...newService, [field]: value});
     };
@@ -50,14 +52,22 @@ const ServiceHandler: React.FC<ServiceFormProps> = ({services, onUpdateSingleSer
         control,
         handleSubmit,
         formState: {errors},
+        watch,
     } = useForm<IService>({mode: 'all', values: newService});
+
+    const watchedStatus = watch('status');
+    const watchedSeats = watch('seats');
+
+    useEffect(() => {
+        setNewService({...newService, status: watchedStatus, seats: watchedSeats});
+        onUpdateServices(services.map(s => s._id === newService._id ? newService : s));
+    }, [watchedStatus, watchedSeats]);
 
     // temporal fix
     const ServiceTypeActions = false;
     return (
         <div className="flex flex-col gap-4">
             <div className="flex flex-col gap-4 rounded-md">
-                {/*<form>*/}
                     <div className="flex items-center justify-between gap-3">
                         {ServiceTypeActions && (
                             <SelectControl
@@ -105,7 +115,6 @@ const ServiceHandler: React.FC<ServiceFormProps> = ({services, onUpdateSingleSer
                             }}
                         />
                     </div>
-                {/*</form>*/}
             </div>
         </div>
     );
