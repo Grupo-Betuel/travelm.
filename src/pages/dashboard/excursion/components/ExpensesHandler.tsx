@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, {useState} from "react";
 import {
     Dialog,
     DialogHeader,
@@ -16,7 +16,7 @@ import {FinanceHandler} from "@/pages/dashboard/excursion/components/FinanceHand
 import {FinanceTypes, IFinance} from "@/models/financeModel";
 import {BiDollar, BiTrash, BiEdit} from "react-icons/bi";
 import {ICustomComponentDialog} from "@/models/common";
-import {SubmitHandler, useForm} from "react-hook-form";
+import {SubmitHandler, useForm, useWatch} from "react-hook-form";
 import FormControl from "@/components/FormControl";
 
 interface ExpenseFormProps {
@@ -43,67 +43,50 @@ export const ExpenseForm: React.FC<ExpenseFormProps> = ({
                                                             onUpdateExpense,
                                                             onDeleteExpense,
                                                         }) => {
-    const [expenses, setExpenses] = useState<IExpense[]>(initialExpenses);
-    const [newExpense, setNewExpense] = useState<IExpense>(defaultExpense);
     const [selectedExpense, setSelectedExpense] = useState<IExpense | null>(null);
-
-    useEffect(() => {
-        if (initialExpenses && initialExpenses.length > 0) {
-            setExpenses(initialExpenses);
-        }
-    }, [initialExpenses]);
-
 
     const {
         control,
         handleSubmit,
-        formState: {errors},
-    } = useForm<IExpense>({mode: 'all', defaultValues: newExpense});
+        reset,
+        formState: { errors },
+        setValue,
+    } = useForm<IExpense>({
+        defaultValues: defaultExpense,
+        mode: "all",
+    });
+
+    const newExpense: IExpense = useWatch({control}) as IExpense;
 
     const onUpdateFinance = (updatedFields: Partial<IFinance>) => {
-        console.log('updatedFields', updatedFields);
-        setNewExpense(prev => ({
-            ...prev,
-            finance: {
-                ...prev.finance,
-                ...updatedFields,
-            },
-        }));
-        console.log('newExpense', newExpense);
+        const currentFinance = newExpense.finance;
+        const updatedFinance: IFinance = {
+            ...currentFinance,
+            ...updatedFields,
+        };
+        setValue("finance", updatedFinance);
     };
 
-    const handleSave: SubmitHandler<IExpense> = (formData: IExpense) => {
+    const handleSave: SubmitHandler<IExpense> = (formData) => {
         if (formData._id) {
-            const updatedExpenses = expenses.map((exp) =>
-                exp._id === formData._id ? {...exp, ...formData} : exp
-            );
-            setExpenses(updatedExpenses);
-            console.log('updatedExpenses', updatedExpenses);
-            onUpdateExpense({...formData, finance: newExpense.finance});
+            onUpdateExpense(formData);
         } else {
-            const newExpenses = [...expenses, {...formData, finance: newExpense.finance}];
-            setExpenses(newExpenses);
-            console.log('updatedExpenses2', newExpenses);
-            onUpdateExpense({...formData, finance: newExpense.finance});
+            onUpdateExpense(formData);
         }
-        setNewExpense(defaultExpense);
+        reset(defaultExpense);
     };
-
 
     const startEditing = (expense: IExpense) => {
-        setNewExpense(expense);
+        reset(expense);
     };
 
     const cancelEditing = () => {
-        setNewExpense(defaultExpense);
+        reset(defaultExpense);
     };
 
     const handleDelete = (expense: IExpense) => {
-        const filteredExpenses = expenses.filter((e) => e._id !== expense._id);
-        setExpenses(filteredExpenses);
         onDeleteExpense(expense);
     };
-
 
     const renderFormContent = () => (
         <>
@@ -153,7 +136,7 @@ export const ExpenseForm: React.FC<ExpenseFormProps> = ({
                 Gastos Agregados
             </Typography>
             <div className="grid grid-cols-3 gap-4">
-                {expenses.map((expense) => (
+                {initialExpenses.map((expense) => (
                     <Card className="border border-blue-gray-100 shadow-sm h-full" key={expense._id}>
                         <CardHeader
                             variant="gradient"
@@ -209,7 +192,7 @@ export const ExpenseForm: React.FC<ExpenseFormProps> = ({
 
     const dialogHandler = () => {
         dialog?.handler && dialog.handler();
-        setNewExpense(defaultExpense);
+        reset(defaultExpense);
     }
 
     return dialog ? (

@@ -2,7 +2,7 @@ import {Button, Input, Menu, MenuHandler, MenuList, MenuItem, Select, Option} fr
 import React, {useCallback, useEffect, useRef, useState} from "react";
 import {FinanceOptionEnum, financeTypes, FinanceTypes, IFinance} from "@/models/financeModel";
 import {PlusCircleIcon, TrashIcon} from "@heroicons/react/20/solid";
-import {useForm} from "react-hook-form";
+import {useForm, useWatch} from "react-hook-form";
 import {IExpense} from "@/models/ExpensesModel";
 import FormControl from "@/components/FormControl";
 import SelectControl from "@/components/SelectControl";
@@ -36,8 +36,6 @@ export const FinanceHandler = ({
     const toggleRates = () => setEnableRates(!enableRates);
     const toggleChildren = () => setEnableChildren(!enableChildren);
 
-    const [newFinance, setNewFinance] = useState<IFinance>(emptyFinance);
-
     useEffect(() => {
         console.log("options", options)
         if (!options) return
@@ -47,26 +45,16 @@ export const FinanceHandler = ({
         setEnableChildren(!!options?.includes(FinanceOptionEnum.CHILDREN));
     }, [options]);
 
-    useEffect(() => {
-        if (financeType) {
-            updateFinance({...finance, type: financeType});
-        }
-    }, [financeType]);
-
     const {
         control,
-        handleSubmit,
         formState: {errors},
-        watch
     } = useForm<IFinance>({mode: 'all', values: finance});
 
-    const watchedPrice = watch("price");
+    const newFinance : IFinance = useWatch({control}) as IFinance;
 
     useEffect(() => {
-        setNewFinance({...finance, price: watchedPrice});
-        updateFinance({...newFinance, price: watchedPrice});
-    }, [watchedPrice]);
-
+        updateFinance({...finance, ...newFinance, });
+    }, [newFinance]);
 
     return (
         <div className="w-full space-y-4">

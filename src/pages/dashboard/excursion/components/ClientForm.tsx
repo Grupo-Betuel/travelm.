@@ -1,13 +1,13 @@
-import React, {useEffect, useState} from 'react';
-import {Input, Button, Dialog, DialogHeader, DialogBody, DialogFooter, Typography} from "@material-tailwind/react";
+import React, {useEffect, useMemo} from 'react';
+import { Button, Dialog, DialogHeader, DialogBody, DialogFooter, Typography} from "@material-tailwind/react";
 import {IClient} from "@/models/clientModel";
-import InputMask from "react-input-mask";
 import ServiceHandler from "./ServiceHandler";
 import {IService} from "@/models/serviceModel";
 import {getCrudService} from "@/api/services/CRUD.service";
 import {ICustomComponentDialog} from "@/models/common";
-import {useForm, SubmitHandler} from "react-hook-form";
+import {useForm, SubmitHandler, useWatch} from "react-hook-form";
 import FormControl from "@/components/FormControl";
+import {extractNumbersFromText} from "@/utils/text.utils";
 
 interface ClientFormProps {
     initialClient?: IClient;
@@ -35,30 +35,34 @@ const ClientForm: React.FC<ClientFormProps> = (
         onSubmit,
         dialog
     }) => {
-    const [service, setService] = useState<IService | undefined>(structuredClone(serviceData));
-    console.log('service', service);
-    const [client, setClient] = useState<IClient>(initialClient || emptyClient);
-
-    const {data: existingClients} = clientService.useFetchAllTravelClients({
-        phone: client.phone
-    }, {
-        skip: client.phone.length < 11 || initialClient?.phone === client.phone
-    });
-
-    useEffect(() => {
-        if (serviceData) {
-            setService(structuredClone(serviceData));
-        }
-    }, [serviceData]);
 
     const {
         control,
         handleSubmit,
         formState: {errors},
-        watch,
-    } = useForm<IClient>({mode: 'all', values: client});
+        setValue,
+        reset
+    } = useForm<IClient>({
+        mode: 'all',
+        defaultValues: initialClient || emptyClient,
+    });
 
-    const watchedValues = watch();
+    const newClient: IClient = useWatch({ control }) as IClient;
+    console.log("newClient", newClient);
+    const newPhone = useMemo(() => extractNumbersFromText(newClient.phone), [newClient.phone]);
+    // const newPhone = extractNumbersFromText(newClient.phone);
+    const {data: existingClients} = clientService.useFetchAllTravelClients({
+        phone: newPhone
+    }, {
+        skip: newPhone < 11 || initialClient?.phone === newPhone.toString()
+    });
+
+    useEffect(() => {
+        if (initialClient) {
+            reset(initialClient);
+        }
+    }, [initialClient, reset]);
+
 
     const isValidPhoneNumber = (phone: string): boolean => {
         const phoneRegex = /^\+1 \(\d{3}\) \d{3}-\d{4}$/;
@@ -66,81 +70,34 @@ const ClientForm: React.FC<ClientFormProps> = (
     };
 
     useEffect(() => {
-        if (!watchedValues._id && isValidPhoneNumber(watchedValues.phone)) {
-            if (existingClients?.length) {
-                const foundClient = existingClients[0];
-                if (foundClient) {
-                    const newServices = mergeClientServices(foundClient);
-                    setClient({...foundClient, services: newServices});
-                    setService(foundClient.currentService);
+        if (isValidPhoneNumber(newClient.phone) && existingClients?.length) {
+            const foundClient = existingClients[0];
+            if (foundClient) {
+                reset(foundClient);
+                if (foundClient.currentService) {
+                    setValue('services', [foundClient.currentService]);
                 }
-            } else {
-                setClient({...emptyClient, phone: watchedValues.phone});
             }
         }
-    }, [watchedValues.phone, existingClients]);
+    }, [newClient.phone, existingClients, setValue]);
 
-    const onUpdateServices = (services: IService[]) => {
-        setClient({...client, services});
-    }
-
-    const onUpdateSingleService = (updatedFields: Partial<IService>) => {
-        if (service) {
-            // Merge the updated fields without overwriting the entire service
-            const updatedService = { ...service, ...updatedFields };
-
-            setClient({
-                ...client,
-                services: [updatedService],
-            });
-
-            console.log('onUpdateSingleService', updatedService);
-        }
-    };
-
-    useEffect(() => {
-        if (initialClient?._id) {
-            setClient(initialClient);
-            setService(initialClient.currentService);
-        }
-    }, [initialClient]);
-
-
-    const mergeClientServices = (clientData: IClient = client): IService[] => {
-        if (!service) return clientData.services || [];
-        const exist = clientData.services?.find(s => s.excursionId === service?.excursionId);
-        return clientData.services && exist ? clientData.services : [...(clientData.services || []), service];
-    };
-
-    useEffect(() => {
-        if (!service) return;
-
-        const newServices = mergeClientServices(client);
-        setClient({
-            ...client,
-            services: newServices,
-        });
-    }, [service]);
-
-
-    const handleFormSubmit: SubmitHandler<IClient> = (newClient) => {
-        // debugger;
-        console.log('newClient', newClient);
-
-        const { _id, ...clientDataWithoutId } = newClient._id ? newClient : { ...newClient };
-
+    const handleFormSubmit: SubmitHandler<IClient> = (client) => {
+        // Procesa el cliente antes de enviarlo
+        const { _id, ...clientDataWithoutId } = client._id ? client : { ...client };
         const updatedClient = {
             ...clientDataWithoutId,
-            services: newClient.services,
-            currentService: newClient.services?.length ? newClient.services[0] : service,
+            services: client.services,
+            currentService: client.services?.length ? client.services[0] : serviceData,
         };
 
-        console.log('updatedClient', updatedClient);
         onSubmit(updatedClient);
-
-        setClient(structuredClone(emptyClient));
-        setService(undefined);
+        reset(emptyClient);
     };
+
+    const onUpdateServices = (services: IService[]) => {
+        setValue('services', services);
+    };
+
     const form = (
         <div className="px-4 flex flex-col gap-3">
             <Typography variant="h6">Datos del Cliente</Typography>
@@ -186,10 +143,10 @@ const ClientForm: React.FC<ClientFormProps> = (
                 }}
             />
             {enableService && (<ServiceHandler
-                    service={service}
-                    services={client.services}
-                    onUpdateSingleService={onUpdateSingleService}
-                    onUpdateServices={onUpdateServices}/>
+                    service={initialClient?.services?.[0] || serviceData}
+                    services={newClient.services}
+                    onUpdateServices={onUpdateServices}
+                />
             )}
             {!dialog && <Button
                 color="blue"
@@ -204,7 +161,7 @@ const ClientForm: React.FC<ClientFormProps> = (
 
     const dialogHandler = () => {
         dialog?.handler && dialog.handler();
-        setClient(emptyClient);
+        reset(emptyClient);
     }
 
     return (
@@ -212,7 +169,7 @@ const ClientForm: React.FC<ClientFormProps> = (
             <Dialog open={dialog.open} handler={dialogHandler}>
                 <form onSubmit={handleSubmit(handleFormSubmit)}>
                     <DialogHeader className="justify-between">
-                        {client._id ? 'Editar Cliente' : 'Agregar Cliente'}
+                        {newClient._id ? 'Editar Cliente' : 'Agregar Cliente'}
                     </DialogHeader>
                     <DialogBody className="overflow-y-scroll max-h-[80dvh]">
                         {form}

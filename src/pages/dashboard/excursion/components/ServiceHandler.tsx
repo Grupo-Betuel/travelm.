@@ -2,8 +2,8 @@ import React, {useEffect} from 'react';
 import {
     IService,
     serviceStatusLabels, serviceTypeLabels
-} from "../../../../models/serviceModel";
-import {SERVICE_CONSTANTS} from "../../../../constants/service.constant";
+} from "@/models/serviceModel";
+import {SERVICE_CONSTANTS} from "@/constants/service.constant";
 import SelectControl from "@/components/SelectControl";
 import {useForm, useWatch} from "react-hook-form";
 import FormControl from "@/components/FormControl";
@@ -23,32 +23,11 @@ const emptyService: IService = {
     seats: 1,
 }
 
-const ServiceHandler: React.FC<ServiceFormProps> = ({services, onUpdateSingleService, service, onUpdateServices}) => {
-    // const [newService, setNewService] = useState<IService>(emptyService);
-    // console.log('service2', service);
-
-    // useEffect(() => {
-    //     if (service) {
-    //         setNewService({...newService, ...service});
-    //     }
-    //     console.log('service3', newService);
-    // }, [service])
-
-    // const handleServiceChange = (field: keyof IService, value: any) => {
-    //     setNewService({...newService, [field]: value});
-    // };
-
-    // useEffect(() => {
-    //     if (service && onUpdateSingleService) {
-    //         onUpdateSingleService(newService);
-    //     }
-    // }, [newService]);
+const ServiceHandler: React.FC<ServiceFormProps> = ({services, service, onUpdateServices}) => {
 
     const {
         control,
-        handleSubmit,
         formState: {errors},
-        watch,
     } = useForm<IService>({mode: 'all', values: (service || {}) as IService});
 
     const newService: IService = useWatch({ control }) as IService;
@@ -57,8 +36,6 @@ const ServiceHandler: React.FC<ServiceFormProps> = ({services, onUpdateSingleSer
         onUpdateServices(services.map(s => s._id === newService._id ? newService : s));
     }, [newService]);
 
-    console.log('service', newService);
-    // temporal fix
     const ServiceTypeActions = false;
     return (
         <div className="flex flex-col gap-4">
