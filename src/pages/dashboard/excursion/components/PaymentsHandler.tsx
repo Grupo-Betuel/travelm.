@@ -87,6 +87,8 @@ const PaymentHandler: React.FC<PaymentHandlerProps> = (
     };
 
     const addOrUpdatePayment: SubmitHandler<IPayment> = (payment) => {
+        console.log(payment);
+
         const paymentFormData = getValues();
         let paymentsData = structuredClone(payments);
         if (paymentFormData._id) {
@@ -102,12 +104,13 @@ const PaymentHandler: React.FC<PaymentHandlerProps> = (
 
     const startEditing = (index: number) => {
         const payment = payments[index];
-        setValue('type', payment.type);
-        setValue('date', payment.date);
-        setValue('amount', payment.amount);
-        setValue('comment', payment.comment);
-        setValue('media', payment.media);
-        setValue('_id', payment._id);
+        reset(payment)
+        // setValue('type', payment.type);
+        // setValue('date', payment.date);
+        // setValue('amount', payment.amount);
+        // setValue('comment', payment.comment);
+        // setValue('media', payment.media);
+        // setValue('_id', payment._id);
     };
 
     const cancelEditing = () => {

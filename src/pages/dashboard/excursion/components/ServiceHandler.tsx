@@ -1,15 +1,11 @@
-import React, {useEffect, useMemo, useState} from 'react';
-import {Input, Option, Select} from '@material-tailwind/react';
+import React, {useEffect} from 'react';
 import {
     IService,
     serviceStatusLabels, serviceTypeLabels
 } from "../../../../models/serviceModel";
 import {SERVICE_CONSTANTS} from "../../../../constants/service.constant";
 import SelectControl from "@/components/SelectControl";
-import {PAYMENT_CONSTANTS} from "@/constants/payment.constants";
-import {paymentTypeLabels} from "@/models/PaymentModel";
-import {useForm} from "react-hook-form";
-import {IClient} from "@/models/clientModel";
+import {useForm, useWatch} from "react-hook-form";
 import FormControl from "@/components/FormControl";
 
 interface ServiceFormProps {
@@ -28,41 +24,40 @@ const emptyService: IService = {
 }
 
 const ServiceHandler: React.FC<ServiceFormProps> = ({services, onUpdateSingleService, service, onUpdateServices}) => {
-    const [newService, setNewService] = useState<IService>(emptyService);
+    // const [newService, setNewService] = useState<IService>(emptyService);
     // console.log('service2', service);
 
-    useEffect(() => {
-        if (service) {
-            setNewService({...newService, ...service});
-        }
-        console.log('service3', newService);
-    }, [service])
+    // useEffect(() => {
+    //     if (service) {
+    //         setNewService({...newService, ...service});
+    //     }
+    //     console.log('service3', newService);
+    // }, [service])
 
-    const handleServiceChange = (field: keyof IService, value: any) => {
-        setNewService({...newService, [field]: value});
-    };
+    // const handleServiceChange = (field: keyof IService, value: any) => {
+    //     setNewService({...newService, [field]: value});
+    // };
 
-    useEffect(() => {
-        if (service && onUpdateSingleService) {
-            onUpdateSingleService(newService);
-        }
-    }, [newService]);
+    // useEffect(() => {
+    //     if (service && onUpdateSingleService) {
+    //         onUpdateSingleService(newService);
+    //     }
+    // }, [newService]);
 
     const {
         control,
         handleSubmit,
         formState: {errors},
         watch,
-    } = useForm<IService>({mode: 'all', values: newService});
+    } = useForm<IService>({mode: 'all', values: (service || {}) as IService});
 
-    const watchedStatus = watch('status');
-    const watchedSeats = watch('seats');
+    const newService: IService = useWatch({ control }) as IService;
 
     useEffect(() => {
-        setNewService({...newService, status: watchedStatus, seats: watchedSeats});
         onUpdateServices(services.map(s => s._id === newService._id ? newService : s));
-    }, [watchedStatus, watchedSeats]);
+    }, [newService]);
 
+    console.log('service', newService);
     // temporal fix
     const ServiceTypeActions = false;
     return (
@@ -106,12 +101,12 @@ const ServiceHandler: React.FC<ServiceFormProps> = ({services, onUpdateSingleSer
                             inputProps={{
                                 step: 1,
                                 min: 1,
-                                onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
-                                    const value = parseInt(e.target.value, 10);
-                                    if (value >= 1) {
-                                        handleServiceChange('seats', value);
-                                    }
-                                }
+                                // onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
+                                //     const value = parseInt(e.target.value, 10);
+                                //     if (value >= 1) {
+                                //         handleServiceChange('seats', value);
+                                //     }
+                                // }
                             }}
                         />
                     </div>
