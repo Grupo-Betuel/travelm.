@@ -753,7 +753,7 @@ export const ClientsExcursionTable = (
                         handler: toggleHandleClient,
                     }}
                     enableService
-                    serviceData={excursionService}
+                    serviceData={clientToEdit?.currentService || excursionService}
                     onSubmit={handleAddClient}
                 />
                 <Dialog open={isClientSearchOpen} handler={toggleClientSearch}>

@@ -48,7 +48,7 @@ const ClientForm: React.FC<ClientFormProps> = (
     });
 
     const newClient: IClient = useWatch({ control }) as IClient;
-    console.log("newClient", newClient);
+
     const newPhone = useMemo(() => extractNumbersFromText(newClient.phone), [newClient.phone]);
     // const newPhone = extractNumbersFromText(newClient.phone);
     const {data: existingClients} = clientService.useFetchAllTravelClients({
@@ -64,11 +64,6 @@ const ClientForm: React.FC<ClientFormProps> = (
     }, [initialClient, reset]);
 
 
-    const isValidPhoneNumber = (phone: string): boolean => {
-        const phoneRegex = /^\+1 \(\d{3}\) \d{3}-\d{4}$/;
-        return phoneRegex.test(phone);
-    };
-
     useEffect(() => {
         if (existingClients?.length) {
             const foundClient = existingClients[0];
@@ -83,9 +78,12 @@ const ClientForm: React.FC<ClientFormProps> = (
 
     const handleFormSubmit: SubmitHandler<IClient> = (client) => {
         // Procesa el cliente antes de enviarlo
+        debugger;
+        console.log("client", client);
         const { _id, ...clientDataWithoutId } = client._id ? client : { ...client };
         const updatedClient = {
             ...clientDataWithoutId,
+            phone: newPhone.toString(),
             services: client.services,
             currentService: client.services?.length ? client.services[0] : serviceData,
         };
@@ -95,6 +93,7 @@ const ClientForm: React.FC<ClientFormProps> = (
     };
 
     const onUpdateServices = (services: IService[]) => {
+        console.log("services", services);
         setValue('services', services);
     };
 
@@ -106,7 +105,7 @@ const ClientForm: React.FC<ClientFormProps> = (
                 control={control}
                 label="Teléfono"
                 type="tel"
-                rules={{required: 'El teléfono es requerido'}}
+                // rules={{required: 'El teléfono es requerido'}}
                 mask="+1 (999) 999-9999"
                 maskProps={{
                     maskPlaceholder: null,
@@ -135,7 +134,7 @@ const ClientForm: React.FC<ClientFormProps> = (
                 label="Correo"
                 type="email"
                 rules={{
-                    required: 'El correo es requerido',
+                    // required: 'El correo es requerido',
                     pattern: {
                         value: /^\S+@\S+$/i,
                         message: 'Formato de correo inválido',
@@ -143,7 +142,7 @@ const ClientForm: React.FC<ClientFormProps> = (
                 }}
             />
             {enableService && (<ServiceHandler
-                    service={initialClient?.services?.[0] || serviceData}
+                    service={serviceData}
                     services={newClient.services}
                     onUpdateServices={onUpdateServices}
                 />

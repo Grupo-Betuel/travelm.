@@ -33,7 +33,17 @@ const ServiceHandler: React.FC<ServiceFormProps> = ({services, service, onUpdate
     const newService: IService = useWatch({ control }) as IService;
 
     useEffect(() => {
-        onUpdateServices(services.map(s => s._id === newService._id ? newService : s));
+        console.log("newService", newService);
+        if (services.length === 0) {
+            onUpdateServices([newService]);
+            return;
+        }
+        const serviceExists = services.some(s => s._id === newService._id);
+        if (serviceExists) {
+            onUpdateServices(services.map(s => s._id === newService._id ? newService : s));
+        } else {
+            onUpdateServices([...services, newService]);
+        }
     }, [newService]);
 
     const ServiceTypeActions = false;
