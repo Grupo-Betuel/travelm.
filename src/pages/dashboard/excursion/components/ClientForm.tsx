@@ -70,7 +70,7 @@ const ClientForm: React.FC<ClientFormProps> = (
     };
 
     useEffect(() => {
-        if (isValidPhoneNumber(newClient.phone) && existingClients?.length) {
+        if (existingClients?.length) {
             const foundClient = existingClients[0];
             if (foundClient) {
                 reset(foundClient);
@@ -79,7 +79,7 @@ const ClientForm: React.FC<ClientFormProps> = (
                 }
             }
         }
-    }, [newClient.phone, existingClients, setValue]);
+    }, [existingClients]);
 
     const handleFormSubmit: SubmitHandler<IClient> = (client) => {
         // Procesa el cliente antes de enviarlo
