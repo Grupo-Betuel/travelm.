@@ -31,7 +31,7 @@ const OrganizationHandler: React.FC<IOrganizationSelectorProps> = (
         setHandleOrganizationOpen,
         onEditOrganization,
     } = useOrganizationHandler({
-        onSelect, selected, type: organizationType,
+        onSelect, selected, query: organizationType ? {type: organizationType} : {},
     });
 
     const handleOnSelectOrganization = (selectedValues: IOrganization[]) => {
