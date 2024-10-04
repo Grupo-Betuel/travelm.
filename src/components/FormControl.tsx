@@ -13,6 +13,7 @@ interface FormControlProps {
     inputProps?: any;
     mask?: string;
     maskProps?: any;
+    className?: string;
 }
 
 const FormControl: React.FC<FormControlProps> = (
@@ -25,6 +26,7 @@ const FormControl: React.FC<FormControlProps> = (
         inputProps,
         mask,
         maskProps,
+        className,
     }
 ) => {
     const {isSubmitted} = useFormState({control});
@@ -43,16 +45,20 @@ const FormControl: React.FC<FormControlProps> = (
         return mask || type === 'tel' ? PHONE_COSNTANTS.MASK : undefined
     }, [type]);
 
+    const inputRules = useMemo(() => {
+        return {
+            ...telRules,
+            ...rules
+        }
+    }, [rules, telRules]);
+
 
     return (
-        <div className="mb-4">
+        <div className={`mb-4 ${className}`}>
             <Controller
                 name={name}
                 control={control}
-                rules={{
-                    ...telRules,
-                    ...rules
-                }}
+                rules={inputRules}
                 render={({field, fieldState: {error, isTouched}}) => {
                     const isError = useMemo(
                         () => error && (isTouched || isSubmitted),
@@ -64,8 +70,11 @@ const FormControl: React.FC<FormControlProps> = (
                             mask={inputMask}
                             {...maskProps}
                             {...field}
-                            onChange={(e) => {
-                                field.onChange(e);
+                            beforeMaskedValueChange={(states: any) => {
+                                if (field.value !== states.value) {
+                                    field.onChange(states.value);
+                                }
+                                return states
                             }}
                         >
                             {(inputMaskProps: any) => (

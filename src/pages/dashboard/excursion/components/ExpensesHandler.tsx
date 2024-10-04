@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, {useState} from "react";
 import {
     Dialog,
     DialogHeader,
@@ -6,25 +6,24 @@ import {
     DialogFooter,
     Button,
     Typography,
-    Input,
-    Textarea,
     CardHeader,
     CardBody,
     CardFooter,
     Card,
 } from "@material-tailwind/react";
-import { IExpense } from "@/models/ExpensesModel";
-import { FinanceHandler } from "@/pages/dashboard/excursion/components/FinanceHandler";
-import { FinanceTypes, IFinance } from "@/models/financeModel";
-import { BiDollar, BiTrash, BiEdit } from "react-icons/bi";
+import {IExpense} from "@/models/ExpensesModel";
+import {FinanceHandler} from "@/pages/dashboard/excursion/components/FinanceHandler";
+import {FinanceTypes, IFinance} from "@/models/financeModel";
+import {BiDollar, BiTrash, BiEdit} from "react-icons/bi";
 import {ICustomComponentDialog} from "@/models/common";
-import {emptyClient} from "@/pages/dashboard/excursion/components/ClientForm";
+import {SubmitHandler, useForm, useWatch} from "react-hook-form";
+import FormControl from "@/components/FormControl";
 
 interface ExpenseFormProps {
     initialExpenses: IExpense[];
     onUpdateExpense: (expenses: IExpense) => void;
     onDeleteExpense: (expenses: IExpense) => void;
-    dialog? : ICustomComponentDialog;
+    dialog?: ICustomComponentDialog;
 }
 
 const defaultExpense: IExpense = {
@@ -44,95 +43,100 @@ export const ExpenseForm: React.FC<ExpenseFormProps> = ({
                                                             onUpdateExpense,
                                                             onDeleteExpense,
                                                         }) => {
-    const [expenses, setExpenses] = useState<IExpense[]>(initialExpenses);
-    const [newExpense, setNewExpense] = useState<IExpense>(defaultExpense);
     const [selectedExpense, setSelectedExpense] = useState<IExpense | null>(null);
 
-    useEffect(() => {
-        if (initialExpenses && initialExpenses.length > 0) {
-            setExpenses(initialExpenses);
-        }
-    }, [initialExpenses]);
+    const {
+        control,
+        handleSubmit,
+        reset,
+        formState: { errors },
+        setValue,
+    } = useForm<IExpense>({
+        defaultValues: defaultExpense,
+        mode: "all",
+    });
 
-    const handleInputChange = (name: string, value: string) => {
-        setNewExpense((prev) => ({ ...prev, [name]: value }));
+    const newExpense: IExpense = useWatch({control}) as IExpense;
+
+    const onUpdateFinance = (updatedFields: Partial<IFinance>) => {
+        const currentFinance = newExpense.finance;
+        const updatedFinance: IFinance = {
+            ...currentFinance,
+            ...updatedFields,
+        };
+        setValue("finance", updatedFinance);
     };
 
-    const handleSave = () => {
-        if (newExpense._id) {
-            const updatedExpenses = expenses.map((exp) =>
-                exp._id === newExpense._id ? { ...exp, ...newExpense } : exp
-            );
-            setExpenses(updatedExpenses);
-            onUpdateExpense(newExpense);
+    const handleSave: SubmitHandler<IExpense> = (formData) => {
+        if (formData._id) {
+            onUpdateExpense(formData);
         } else {
-            const newExpenses = [...expenses, newExpense];
-            setExpenses(newExpenses);
-            onUpdateExpense(newExpense);
+            onUpdateExpense(formData);
         }
-        setNewExpense(defaultExpense);
+        reset(defaultExpense);
     };
 
     const startEditing = (expense: IExpense) => {
-        setNewExpense(expense);
+        reset(expense);
     };
 
     const cancelEditing = () => {
-        setNewExpense(defaultExpense);
+        reset(defaultExpense);
     };
 
     const handleDelete = (expense: IExpense) => {
-        const filteredExpenses = expenses.filter((e) => e._id !== expense._id);
-        setExpenses(filteredExpenses);
         onDeleteExpense(expense);
     };
 
     const renderFormContent = () => (
         <>
-            <FinanceHandler
-                enabledCost={false}
-                finance={newExpense.finance}
-                updateFinance={(financeUpdate: Partial<IFinance>) =>
-                    setNewExpense((prev) => ({
-                        ...prev,
-                        finance: { ...prev.finance, ...financeUpdate },
-                    }))
-                }
-                type="excursion"
-            />
-            <div className="mb-4">
-                <Input
-                    crossOrigin={true}
-                    label="Nombre del Gasto"
-                    type="text"
-                    value={newExpense.title}
-                    onChange={(e) => handleInputChange('title', e.target.value)}
-                    placeholder="Título del Gasto"
-                    className="w-full"
+            <form onSubmit={handleSubmit(handleSave)}>
+                <FinanceHandler
+                    enabledCost={false}
+                    finance={newExpense.finance}
+                    updateFinance={onUpdateFinance}
+                    type="excursion"
                 />
-            </div>
-            <div className="mb-4">
-                <Textarea
-                    label="Descripción"
-                    value={newExpense.description}
-                    onChange={(e) => handleInputChange('description', e.target.value)}
-                    className="w-full"
-                />
-            </div>
-            <Button onClick={handleSave} color={newExpense._id ? "blue" : "green"}>
-                {newExpense._id ? "Guardar Cambios" : "Agregar Gasto"}
-            </Button>
-            {newExpense._id && (
-                <Button onClick={cancelEditing} color="red">
-                    Cancelar
+                <div className="mb-4">
+                    <FormControl
+                        name="title"
+                        control={control}
+                        label="Nombre del Gasto"
+                        rules={{required: 'El título de gasto es requerido'}}
+                        className="w-full"
+                    />
+                </div>
+                <div className="mb-4">
+                    <FormControl
+                        name="description"
+                        control={control}
+                        label="Descripción"
+                        type="textarea"
+                        className="w-full"
+                        rules={{
+                            required: 'La descripción es requerida',
+                            minLength: {
+                                value: 3,
+                                message: 'La descripción debe tener al menos 3 caracteres',
+                            },
+                        }}
+                    />
+                </div>
+                <Button type={'submit'} color={newExpense._id ? "blue" : "green"}>
+                    {newExpense._id ? "Guardar Cambios" : "Agregar Gasto"}
                 </Button>
-            )}
+                {newExpense._id && (
+                    <Button onClick={cancelEditing} color="red">
+                        Cancelar
+                    </Button>
+                )}
+            </form>
 
             <Typography variant="h6" className="mb-2 mt-4">
                 Gastos Agregados
             </Typography>
             <div className="grid grid-cols-3 gap-4">
-                {expenses.map((expense) => (
+                {initialExpenses.map((expense) => (
                     <Card className="border border-blue-gray-100 shadow-sm h-full" key={expense._id}>
                         <CardHeader
                             variant="gradient"
@@ -141,7 +145,7 @@ export const ExpenseForm: React.FC<ExpenseFormProps> = ({
                             shadow={false}
                             className="absolute grid h-7 w-7 place-items-center"
                         >
-                            <BiDollar className="w-4 h-4 text-white" />
+                            <BiDollar className="w-4 h-4 text-white"/>
                         </CardHeader>
                         <CardBody className="p-2 text-right">
                             <Typography variant="small" className="font-normal text-blue-gray-600">
@@ -161,12 +165,14 @@ export const ExpenseForm: React.FC<ExpenseFormProps> = ({
                         <CardFooter className="border-t border-blue-gray-50 p-2 mt-auto items-end">
                             <div className="flex space-x-1 justify-end">
                                 {expense.description.length > 50 && (
-                                    <Button variant="text" className="p-2" color="blue" onClick={() => setSelectedExpense(expense)}>
+                                    <Button variant="text" className="p-2" color="blue"
+                                            onClick={() => setSelectedExpense(expense)}>
                                         Ver más
                                     </Button>
                                 )}
-                                <Button variant="text" className="p-2" color="blue" onClick={() => startEditing(expense)}>
-                                    <BiEdit className="w-5 h-5" />
+                                <Button variant="text" className="p-2" color="blue"
+                                        onClick={() => startEditing(expense)}>
+                                    <BiEdit className="w-5 h-5"/>
                                 </Button>
                                 <Button
                                     variant="text"
@@ -174,7 +180,7 @@ export const ExpenseForm: React.FC<ExpenseFormProps> = ({
                                     color="red"
                                     onClick={() => handleDelete(expense)}
                                 >
-                                    <BiTrash className="w-5 h-5" />
+                                    <BiTrash className="w-5 h-5"/>
                                 </Button>
                             </div>
                         </CardFooter>
@@ -186,7 +192,7 @@ export const ExpenseForm: React.FC<ExpenseFormProps> = ({
 
     const dialogHandler = () => {
         dialog?.handler && dialog.handler();
-        setNewExpense(defaultExpense);
+        reset(defaultExpense);
     }
 
     return dialog ? (
