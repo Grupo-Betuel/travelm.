@@ -67,15 +67,6 @@ export const CommentHandler: React.FC<CommentHandlerProps> = ({
         }));
     };
 
-    // const handleMedia = (media: IMediaHandled) => {
-    //     const images = media.images || [];
-    //
-    //     setNewComment({
-    //         ...newComment,
-    //         medias: [...(newComment.medias || []), ...images],
-    //     });
-    // };
-
 
     const {
         control,
