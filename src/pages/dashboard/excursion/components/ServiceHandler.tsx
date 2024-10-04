@@ -90,12 +90,6 @@ const ServiceHandler: React.FC<ServiceFormProps> = ({services, service, onUpdate
                             inputProps={{
                                 step: 1,
                                 min: 1,
-                                // onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
-                                //     const value = parseInt(e.target.value, 10);
-                                //     if (value >= 1) {
-                                //         handleServiceChange('seats', value);
-                                //     }
-                                // }
                             }}
                         />
                     </div>
