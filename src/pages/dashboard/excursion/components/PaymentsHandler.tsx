@@ -49,9 +49,7 @@ const PaymentHandler: React.FC<PaymentHandlerProps> = (
         onChangePayment,
         onUpdatePayment
     }) => {
-    // const [payment, setPayment] = useState<IPayment[]>(payments)
     const [selectedPayment, setSelectedPayment] = useState<IPayment | null>(null);
-    // const [paymentFormData, setPaymentFormData] = useState<IPayment>(emptyPayment);
 
     const onConfirmAction = (type?: CommonConfirmActions, data?: CommonConfirmActionsDataTypes<IPayment>) => {
         console.log('confirm action', type, data);
@@ -96,7 +94,6 @@ const PaymentHandler: React.FC<PaymentHandlerProps> = (
             paymentsData = [...paymentsData, payment];
         }
 
-        // onUpdatePayment(paymentsData);
         onChangePayment(paymentsData);
         reset(emptyPayment);
     };
