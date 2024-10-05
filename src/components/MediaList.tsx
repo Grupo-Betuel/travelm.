@@ -30,14 +30,15 @@ export interface MediaListProps {
     multiple?: boolean;
     onSelect: (media: IMedia[], selectedItem: IMedia) => void;
     mediaType?: MediaTypeEnum;
+    selected?: IMedia[];
 }
 
 const mediaService = getCrudService("medias");
 
-export const MediaList: React.FC<MediaListProps> = ({onSelect, multiple, mediaType}) => {
+export const MediaList: React.FC<MediaListProps> = ({onSelect, multiple, mediaType, selected}) => {
     const [selectedType, setSelectedType] = useState<MediaTypeEnum>(mediaType || MediaTypeEnum.IMAGE);
     const [medias, setMedias] = useState<IMedia[]>([]);
-    const [selectedMedias, setSelectedMedias] = useState<IMedia[]>([]);
+    const [selectedMedias, setSelectedMedias] = useState<IMedia[]>(selected || []);
     const [deleteMedia] = mediaService.useDeleteMedias();
     const [updateMedia] = mediaService.useUpdateMedias();
     const [addMedia] = mediaService.useAddMedias();
@@ -45,12 +46,11 @@ export const MediaList: React.FC<MediaListProps> = ({onSelect, multiple, mediaTy
     const {user} = useAuth();
     const {uploadMultipleMedias} = useGCloudMediaHandler();
 
-    //TODO: Test this code
     const [renameModalOpen, setRenameModalOpen] = useState(false);
     const [mediaToRename, setMediaToRename] = useState<IMedia | null>(null);
     const [newTitle, setNewTitle] = useState("");
     const [searchTerm, setSearchTerm] = useState("");
-    //END TODO
+
 
     const {
         data: mediaByTypeData,
@@ -60,6 +60,13 @@ export const MediaList: React.FC<MediaListProps> = ({onSelect, multiple, mediaTy
     useEffect(() => {
         mediaType && setSelectedType(mediaType || selectedType);
     }, [mediaType]);
+
+    useEffect(() => {
+        if (selected) {
+            setSelectedMedias(selected);
+        }
+    }, [selected]);
+
     const onConfirmAction = (type?: CommonConfirmActions, data?: IMedia) => {
         if (type === 'delete') {
             handleDeleteMedia(data as IMedia);
@@ -98,11 +105,11 @@ export const MediaList: React.FC<MediaListProps> = ({onSelect, multiple, mediaTy
         let updatedSelectedMedias: IMedia[];
 
         if (multiple) {
-            updatedSelectedMedias = selectedMedias.includes(media)
+            updatedSelectedMedias = selectedMedias.find(m => m._id === media._id)
                 ? selectedMedias.filter((m) => m._id !== media._id)
                 : [...selectedMedias, media];
         } else {
-            updatedSelectedMedias = selectedMedias.includes(media) ? [] : [media];
+            updatedSelectedMedias = selectedMedias.find(m => m._id === media._id) ? [] : [media];
         }
 
         setSelectedMedias(updatedSelectedMedias);
@@ -176,6 +183,7 @@ export const MediaList: React.FC<MediaListProps> = ({onSelect, multiple, mediaTy
     }, [medias, searchTerm]);
 
 
+
     return (
         <div className="p-4 h-[70vh] w-full ">
             <div className="relative w-full flex justify-between items-center pb-2 overflow-hidden">
@@ -238,7 +246,7 @@ export const MediaList: React.FC<MediaListProps> = ({onSelect, multiple, mediaTy
                                 {filteredMedias.map((media) => (
                                     <div
                                         key={media._id}
-                                        className={`p-2 border rounded-xl cursor-pointer bg-gray-50 ${selectedMedias.includes(media) ? "!bg-blue-200" : ""}`}
+                                        className={`p-2 border rounded-xl cursor-pointer bg-gray-50 ${selectedMedias.find(m => m._id === media._id) ? "!bg-blue-200" : ""}`}
                                         onClick={() => handleSelect(media)}>
 
                                         <div className="z-[9999]">

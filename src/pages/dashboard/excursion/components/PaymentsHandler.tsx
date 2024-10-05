@@ -9,10 +9,9 @@ import {
     CardFooter,
     Card,
     Dialog,
-    DialogHeader, DialogBody, DialogFooter, ThemeProvider
+    DialogHeader, DialogBody, DialogFooter
 } from '@material-tailwind/react';
 import {IPayment, paymentTypeLabels} from "@/models/PaymentModel";
-import DatePicker from "../../../../components/DatePicker";
 import {PencilIcon, TrashIcon} from "@heroicons/react/20/solid";
 import {PAYMENT_CONSTANTS} from "@/constants/payment.constants";
 import {CommonConfirmActions, CommonConfirmActionsDataTypes} from "@/models/common";
@@ -23,19 +22,17 @@ import {AppImage} from "@/components/AppImage";
 import {CardBody, CardHeader, Typography} from '@material-tailwind/react';
 import {Swiper, SwiperSlide} from "swiper/react";
 import {Navigation, Pagination} from "swiper/modules";
-import {IExpense} from "@/models/ExpensesModel";
-import {SubmitHandler, useForm} from "react-hook-form";
-import {IClient} from "@/models/clientModel";
+import {SubmitHandler, useForm, useWatch} from "react-hook-form";
 import SelectControl from "@/components/SelectControl";
 import FormControl from "@/components/FormControl";
-import {IComment} from "@/models/commentModel";
-import value = ThemeProvider.propTypes.value;
+import {InfoCardItem} from "@/components/InfoCardItem";
+import {BiDollar, BiEdit, BiSave, BiTrash} from "react-icons/bi";
+import {FaRegSave} from "react-icons/fa";
 
 interface PaymentHandlerProps {
     enableAddPayment?: boolean;
     payments: IPayment[];
     onChangePayment: (payments: IPayment[]) => any;
-    onUpdatePayment: (payments: IPayment[]) => any;
     onDeletePayment: (payment: IPayment) => any;
 }
 
@@ -47,12 +44,10 @@ const PaymentHandler: React.FC<PaymentHandlerProps> = (
         payments,
         onDeletePayment,
         onChangePayment,
-        onUpdatePayment
     }) => {
     const [selectedPayment, setSelectedPayment] = useState<IPayment | null>(null);
 
     const onConfirmAction = (type?: CommonConfirmActions, data?: CommonConfirmActionsDataTypes<IPayment>) => {
-        console.log('confirm action', type, data);
         switch (type) {
             case 'delete':
                 handleOnDelete(data as IPayment);
@@ -74,11 +69,13 @@ const PaymentHandler: React.FC<PaymentHandlerProps> = (
     const {
         control,
         handleSubmit,
-        formState: {errors},
+        formState: {errors, isValid},
         setValue,
         getValues,
         reset,
     } = useForm<IPayment>({mode: 'all', values: emptyPayment});
+
+    const currentPayment = useWatch({control});
 
     const handleMedia = (media: IMediaHandled) => {
         const image = media.images && media.images[0];
@@ -103,6 +100,7 @@ const PaymentHandler: React.FC<PaymentHandlerProps> = (
         reset(payment)
     };
 
+
     const cancelEditing = () => {
         reset(emptyPayment);
     };
@@ -120,11 +118,14 @@ const PaymentHandler: React.FC<PaymentHandlerProps> = (
                         name="type"
                         control={control}
                         label="Tipo de Pago"
-                        options={PAYMENT_CONSTANTS.PAYMENT_TYPES.map(type => ({
-                            label: paymentTypeLabels[type],
-                            value: type
-                        }))}
-                        rules={{required: 'El tipo de pago es requerido'}}
+                        options={
+                            PAYMENT_CONSTANTS.PAYMENT_TYPES.map(type => ({
+                                label: paymentTypeLabels[type],
+                                value: type
+                            }))}
+                        rules={{
+                            required: 'El tipo de pago es requerido'
+                        }}
                         className={'w-full'}
                     />
                     <FormControl
@@ -132,7 +133,12 @@ const PaymentHandler: React.FC<PaymentHandlerProps> = (
                         control={control}
                         type={'number'}
                         label="Cantidad"
-                        rules={{required: 'La cantidad es obligatoria'}}
+                        rules={{
+                            required: 'La cantidad es obligatoria',
+                            min: {
+                                value: 1, message: 'Seleccione un tipo de pago'
+                            }
+                        }}
                         className={'w-full'}
                     />
                 </div>
@@ -148,104 +154,51 @@ const PaymentHandler: React.FC<PaymentHandlerProps> = (
                         },
                     }}
                 />
-
                 <MediaHandler
                     onChange={handleMedia}
-                    medias={getValues('media') ? [getValues('media') as IMedia] : []}
+                    medias={currentPayment.media ? [currentPayment.media as IMedia] : []}
                     handle={{images: true}}
                     enableSingleSelection={true}
                     disableUpload
                 />
-                <div className="flex items-center gap-5">
+                <div className="flex justify-end gap-5">
                     {getValues('_id') ? (
                         <Button onClick={cancelEditing} color="red">
                             Cancel
                         </Button>
                     ) : null}
-                    <Button type={'submit'} color={getValues('_id') ? "blue" : "green"}>
-                        {getValues('_id') ? "Guardar Cambios" : "Agregar Pago"}
+                    <Button
+                        disabled={!isValid}
+                        variant="text" className="text-sm flex items-center gap-3" type={'submit'}
+                        color={getValues('_id') ? "blue" : "green"}>
+                        <FaRegSave className="text-md"/>
+                        {getValues('_id') ? "Guardar Cambios" : "Agregar"}
                     </Button>
                 </div>
             </form>
-            <div className="grid grid-cols-3 gap-4 py-4">
+            <div className="flex items-end overflow-x-auto gap-4 pt-10 pb-2">
                 {payments.map((payment, index) => (
-                    <Card className="border border-blue-gray-100 shadow-sm h-full space-y-4" key={index}>
-                        {payment.media && (
-                            <CardHeader className="h-32 w-full mx-0 p-0">
-                                <Swiper
-                                    modules={[Navigation, Pagination]}
-                                    navigation
-                                    pagination={{clickable: true}}
-                                    className="relative h-full rounded-md"
-                                >
-                                    <SwiperSlide>
-                                        <AppImage src={payment.media.content} alt={payment.media.title}/>
-                                    </SwiperSlide>
-                                </Swiper>
-                            </CardHeader>
-                        )}
-                        <CardBody className="p-2 text-right">
-                            <Typography variant="small" className="font-normal text-blue-gray-600">
-                                {`Type: ${paymentTypeLabels[payment.type] || payment.type}`}
-                            </Typography>
-                            <Typography variant="h5" color="blue-gray">
-                                {`RD$${payment.amount.toLocaleString()}`}
-                            </Typography>
-                            <Typography variant="small" className="font-normal text-blue-gray-600">
-                                {payment?.comment
-                                    ? payment.comment.length > 50
-                                        ? `${payment.comment.slice(0, 50)}...`
-                                        : payment.comment
-                                    : "No comment"}
-                            </Typography>
-                            <Typography variant="small" color="blue-gray">
-                                {new Date(payment.date).toLocaleDateString()}
-                            </Typography>
-                        </CardBody>
-                        <CardFooter className="border-t border-blue-gray-50 p-2 mt-auto items-end">
-                            <div className="flex space-x-1 justify-end">
-                                {payment?.comment && payment.comment.length > 50 && (
-                                    <Button
-                                        variant="text"
-                                        className="p-2"
-                                        color="blue"
-                                        onClick={() => setSelectedPayment(payment)}
-                                    >
-                                        Ver más
-                                    </Button>
-                                )}
-                                <Button
-                                    variant="text"
-                                    className="p-2"
-                                    color="blue"
-                                    onClick={() => startEditing(index)}
-                                >
-                                    <PencilIcon className="w-5 h-5"/>
-                                </Button>
-                                <Button
-                                    className="p-2"
-                                    variant="text"
-                                    color="red"
-                                    onClick={() => handleSetActionToConfirm('delete')(payment)}
-                                >
-                                    <TrashIcon className="w-5 h-5"/>
-                                </Button>
-                            </div>
-                        </CardFooter>
-                        {selectedPayment && (
-                            <Dialog open={true} handler={() => setSelectedPayment(null)}>
-                                <DialogHeader>{selectedPayment.type}</DialogHeader>
-                                <DialogBody divider>
-                                    <Typography>{selectedPayment.comment}</Typography>
-                                </DialogBody>
-                                <DialogFooter>
-                                    <Button variant="text" color="blue" onClick={() => setSelectedPayment(null)}>
-                                        Cerrar
-                                    </Button>
-                                </DialogFooter>
-                            </Dialog>
-                        )}
-                    </Card>
+                    <InfoCardItem
+                        icon={<BiDollar className="w-4 h-4 text-white"/>}
+                        key={index}
+                        medias={payment.media ? [payment.media] : undefined}
+                        subtitle={paymentTypeLabels[payment.type] || payment.type}
+                        title={`RD$${payment.amount.toLocaleString()}`}
+                        description={payment.comment}
+                        actions={[
+                            {
+                                icon: <BiEdit className="w-5 h-5"/>,
+                                text: 'Editar',
+                                color: 'blue',
+                                onClick: () => startEditing(index)
+                            },
+                            {
+                                icon: <BiTrash className="w-5 h-5"/>,
+                                text: 'Eliminar',
+                                color: 'red',
+                                onClick: () => handleSetActionToConfirm('delete')(payment)
+                            }
+                        ]}/>
                 ))}
             </div>
 

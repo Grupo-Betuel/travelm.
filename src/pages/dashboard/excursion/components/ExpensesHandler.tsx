@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, {useMemo, useState} from "react";
 import {
     Dialog,
     DialogHeader,
@@ -6,18 +6,16 @@ import {
     DialogFooter,
     Button,
     Typography,
-    CardHeader,
-    CardBody,
-    CardFooter,
-    Card,
 } from "@material-tailwind/react";
 import {IExpense} from "@/models/ExpensesModel";
 import {FinanceHandler} from "@/pages/dashboard/excursion/components/FinanceHandler";
 import {FinanceTypes, IFinance} from "@/models/financeModel";
-import {BiDollar, BiTrash, BiEdit} from "react-icons/bi";
+import {BiDollar, BiTrash, BiEdit, BiSave, BiSolidSave} from "react-icons/bi";
 import {ICustomComponentDialog} from "@/models/common";
 import {SubmitHandler, useForm, useWatch} from "react-hook-form";
 import FormControl from "@/components/FormControl";
+import {InfoCardItem} from "@/components/InfoCardItem";
+import {FaRegSave} from "react-icons/fa";
 
 interface ExpenseFormProps {
     initialExpenses: IExpense[];
@@ -37,19 +35,21 @@ const defaultExpense: IExpense = {
     updateDate: new Date(),
 };
 
-export const ExpenseForm: React.FC<ExpenseFormProps> = ({
-                                                            dialog,
-                                                            initialExpenses,
-                                                            onUpdateExpense,
-                                                            onDeleteExpense,
-                                                        }) => {
+export const ExpensesHandler: React.FC<ExpenseFormProps> = (
+    {
+        dialog,
+        initialExpenses,
+        onUpdateExpense,
+        onDeleteExpense,
+    }
+) => {
     const [selectedExpense, setSelectedExpense] = useState<IExpense | null>(null);
 
     const {
         control,
         handleSubmit,
         reset,
-        formState: { errors },
+        formState: {errors, isValid},
         setValue,
     } = useForm<IExpense>({
         defaultValues: defaultExpense,
@@ -88,16 +88,20 @@ export const ExpenseForm: React.FC<ExpenseFormProps> = ({
         onDeleteExpense(expense);
     };
 
+    const isExpenseValid = useMemo(() => {
+        return isValid && newExpense.finance.price > 0;
+    }, [isValid, newExpense.finance]);
+
     const renderFormContent = () => (
         <>
-            <form onSubmit={handleSubmit(handleSave)}>
-                <FinanceHandler
-                    enabledCost={false}
-                    finance={newExpense.finance}
-                    updateFinance={onUpdateFinance}
-                    type="excursion"
-                />
-                <div className="mb-4">
+            <form onSubmit={handleSubmit(handleSave)} className="flex flex-col">
+                <div className="flex gap-2">
+                    <FinanceHandler
+                        enabledCost={false}
+                        finance={newExpense.finance}
+                        updateFinance={onUpdateFinance}
+                        type="excursion"
+                    />
                     <FormControl
                         name="title"
                         control={control}
@@ -106,85 +110,60 @@ export const ExpenseForm: React.FC<ExpenseFormProps> = ({
                         className="w-full"
                     />
                 </div>
-                <div className="mb-4">
-                    <FormControl
-                        name="description"
-                        control={control}
-                        label="Descripción"
-                        type="textarea"
-                        className="w-full"
-                        rules={{
-                            required: 'La descripción es requerida',
-                            minLength: {
-                                value: 3,
-                                message: 'La descripción debe tener al menos 3 caracteres',
-                            },
-                        }}
-                    />
-                </div>
-                <Button type={'submit'} color={newExpense._id ? "blue" : "green"}>
-                    {newExpense._id ? "Guardar Cambios" : "Agregar Gasto"}
-                </Button>
-                {newExpense._id && (
-                    <Button onClick={cancelEditing} color="red">
-                        Cancelar
+                <FormControl
+                    name="description"
+                    control={control}
+                    label="Descripción"
+                    type="textarea"
+                    className="w-full"
+                    rules={{
+                        minLength: {
+                            value: 3,
+                            message: 'La descripción debe tener al menos 3 caracteres',
+                        },
+                    }}
+                />
+                <div className="self-end flex gap-3">
+                    {newExpense._id && (
+                        <Button variant="text" className="text-sm" onClick={cancelEditing} color="red">
+                            Cancelar
+                        </Button>
+                    )}
+                    <Button variant="text"
+                            disabled={!isExpenseValid}
+                            type={'submit'} color={newExpense._id ? "blue" : "green"}
+                            className="flex gap-3 items-center text-sm">
+                        <FaRegSave className="text-lg"/>
+                        {newExpense._id ? "Guardar" : "Agregar"}
                     </Button>
-                )}
+                </div>
             </form>
-
-            <Typography variant="h6" className="mb-2 mt-4">
+            <Typography variant="h5" className="mb-2 my-4">
                 Gastos Agregados
             </Typography>
-            <div className="grid grid-cols-3 gap-4">
+            <div className="flex overflow-x-auto gap-4 pb-5">
                 {initialExpenses.map((expense) => (
-                    <Card className="border border-blue-gray-100 shadow-sm h-full" key={expense._id}>
-                        <CardHeader
-                            variant="gradient"
-                            color="blue"
-                            floated={false}
-                            shadow={false}
-                            className="absolute grid h-7 w-7 place-items-center"
-                        >
-                            <BiDollar className="w-4 h-4 text-white"/>
-                        </CardHeader>
-                        <CardBody className="p-2 text-right">
-                            <Typography variant="small" className="font-normal text-blue-gray-600">
-                                {expense.title}
-                            </Typography>
-                            <Typography variant="h5" color="blue-gray">
-                                {`RD$${expense.finance.price.toLocaleString()}`}
-                            </Typography>
-                            <Card className="px-2 text-justify border-0 shadow-none">
-                                <Typography variant="small" className="font-normal text-blue-gray-600">
-                                    {expense.description.length > 50
-                                        ? `${expense.description.slice(0, 50)}...`
-                                        : expense.description}
-                                </Typography>
-                            </Card>
-                        </CardBody>
-                        <CardFooter className="border-t border-blue-gray-50 p-2 mt-auto items-end">
-                            <div className="flex space-x-1 justify-end">
-                                {expense.description.length > 50 && (
-                                    <Button variant="text" className="p-2" color="blue"
-                                            onClick={() => setSelectedExpense(expense)}>
-                                        Ver más
-                                    </Button>
-                                )}
-                                <Button variant="text" className="p-2" color="blue"
-                                        onClick={() => startEditing(expense)}>
-                                    <BiEdit className="w-5 h-5"/>
-                                </Button>
-                                <Button
-                                    variant="text"
-                                    className="p-2"
-                                    color="red"
-                                    onClick={() => handleDelete(expense)}
-                                >
-                                    <BiTrash className="w-5 h-5"/>
-                                </Button>
-                            </div>
-                        </CardFooter>
-                    </Card>
+                    <InfoCardItem
+                        key={expense._id}
+                        icon={<BiDollar className="w-4 h-4 text-white"/>}
+                        subtitle={expense.title}
+                        title={`RD$${expense.finance.price.toLocaleString()}`}
+                        description={expense.description}
+                        actions={[
+                            {
+                                icon: <BiEdit className="w-5 h-5"/>,
+                                text: "Editar",
+                                onClick: () => startEditing(expense),
+                                color: 'blue',
+                            },
+                            {
+                                icon: <BiTrash className="w-5 h-5"/>,
+                                text: "Eliminar",
+                                onClick: () => handleDelete(expense),
+                                color: 'red',
+                            },
+                        ]}
+                    />
                 ))}
             </div>
         </>
@@ -197,13 +176,15 @@ export const ExpenseForm: React.FC<ExpenseFormProps> = ({
 
     return dialog ? (
         <Dialog open={dialog.open} handler={dialogHandler} dismiss={{enabled: false}}>
-            <DialogHeader>Gastos</DialogHeader>
-            <DialogBody className="h-[70vh] overflow-y-auto" divider>
+            <DialogHeader className="flex justify-center">
+                Gestor de Gastos
+            </DialogHeader>
+            <DialogBody className="overflow-y-auto">
                 {renderFormContent()}
             </DialogBody>
             <DialogFooter>
-                <Button variant="text" color="red" onClick={dialogHandler}>
-                    Cancelar
+                <Button size="lg" variant="text" color="red" onClick={dialogHandler}>
+                    Cerrar
                 </Button>
             </DialogFooter>
 

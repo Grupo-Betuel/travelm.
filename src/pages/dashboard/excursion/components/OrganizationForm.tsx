@@ -236,8 +236,10 @@ export const OrganizationForm: React.FC<OrganizationHandlerProps> = (
         <div className="space-y-4 w-4/5 mx-auto">
             <div className='flex gap-4'>
                 <div className='flex flex-col relative w-1/5 space-y-4'>
-                    <MediaHandler logoMedia={organization.logo} medias={organization.medias} onChange={handleLogoChange}
-                                  handle={{logo: true}}/>
+                    <MediaHandler
+                        logoMedia={organization.logo} medias={organization.medias}
+                        onChange={handleLogoChange}
+                        handle={{logo: true}} />
                     <FinanceHandler options={[]} finance={organization.entryFee || {} as IFinance}
                                     updateFinance={handleEntryFee}/>
                 </div>

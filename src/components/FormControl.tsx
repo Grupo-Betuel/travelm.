@@ -83,7 +83,6 @@ const FormControl: React.FC<FormControlProps> = (
                                     {...inputMaskProps}
                                     label={label}
                                     error={!!isError}
-                                    success={!isError && !!field.value}
                                     type={type}
                                 />
                             )}
@@ -94,7 +93,6 @@ const FormControl: React.FC<FormControlProps> = (
                             {...inputProps}
                             label={label}
                             error={!!isError}
-                            success={!isError && !!field.value}
                         />
                     ) : (
                         <Input
@@ -102,7 +100,6 @@ const FormControl: React.FC<FormControlProps> = (
                             {...inputProps}
                             label={label}
                             error={!!isError}
-                            success={!isError && !!field.value}
                             type={type}
                         />
                     );

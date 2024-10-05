@@ -6,7 +6,7 @@ import {Swiper, SwiperSlide} from 'swiper/react';
 import {mockExcursion} from "@/data/excursions-mock-data";
 import {ExcursionDetailActions, ExcursionDetailActionsDataTypes, IExcursion} from "@/models/excursionModel";
 import {EffectCoverflow, Navigation, Pagination} from "swiper/modules";
-import {ClientsExcursionTable} from "../components/ClientsExcursionTable";
+import {ClientsExcursionTable, IUpdateClientExtra} from "../components/ClientsExcursionTable";
 import {FinanceDetails} from "../components/FinanceDetail";
 import {ActivityDetails} from "../components/ActivityList";
 import {ProjectionsCharts} from "../components/ProjectionCharts";
@@ -31,7 +31,7 @@ import {FaWhatsapp} from "react-icons/fa";
 import {useAppLoading} from "@/context/appLoadingContext";
 import ExcursionDetailsSkeleton from "../../../../components/ExcursionDetailsSkeleton";
 import {IExpense} from "@/models/ExpensesModel";
-import {ExpenseForm} from "@/pages/dashboard/excursion/components/ExpensesHandler";
+import {ExpensesHandler} from "@/pages/dashboard/excursion/components/ExpensesHandler";
 import {SERVICE_CONSTANTS} from "@/constants/service.constant";
 import {IService} from "@/models/serviceModel";
 import {emptyClient} from "@/pages/dashboard/excursion/components/ClientForm";
@@ -160,39 +160,38 @@ export const ExcursionDetails: React.FC = () => {
 
     const onUpdateClient = async (client: Partial<IClient>, isOptimistic?: boolean) => {
         setAppIsLoading(true);
-        if (Array.isArray(client)) {
-            setExcursion({
-                ...excursion,
-                clients: excursion.clients.map(c => {
-                    const updatedClient = (client as Partial<IClient>[]).find(cl => cl._id === c._id);
-                    return updatedClient ? {...c, ...updatedClient} : c;
-                })
-            });
-            !isOptimistic && updateClient(client as any);
-        } else {
-            if (!client._id) {
-                // TODO: error toast
-                return;
-            }
-
-            if (!isOptimistic) {
-
-                const {data} = await updateClient({_id: client._id, ...client})
-                client = {
-                    ...client,
-                    ...data,
-                };
-            }
-
-            setExcursion({
-                ...excursion,
-                clients: excursion.clients.map(c => c._id === client._id ? {...c, ...client} : c)
-            });
+        // if (Array.isArray(client)) {
+        //     setExcursion({
+        //         ...excursion,
+        //         clients: excursion.clients.map(c => {
+        //             const updatedClient = (client as Partial<IClient>[]).find(cl => cl._id === c._id);
+        //             return updatedClient ? {...c, ...updatedClient} : c;
+        //         })
+        //     });
+        //     !isOptimistic && updateClient(client as any);
+        // } else {
+        if (!client._id) {
+            // TODO: error toast
+            return;
         }
+
+        if (!isOptimistic) {
+            const {data} = await updateClient({_id: client._id, ...client})
+            client = {
+                ...client,
+                ...data,
+            };
+        }
+
+        setExcursion({
+            ...excursion,
+            clients: excursion.clients.map(c => c._id === client._id ? {...c, ...client} : c)
+        });
+
         setAppIsLoading(false);
     }
 
-    const onUpdateService = async (service: Partial<IService>, isOptimistic?: boolean) => {
+    const onUpdateService = async (service: Partial<IService>, extra?: IUpdateClientExtra) => {
         setAppIsLoading(true);
 
         if (!service?._id) {
@@ -201,7 +200,7 @@ export const ExcursionDetails: React.FC = () => {
             return;
         }
 
-        if (!isOptimistic) {
+        if (!extra?.isOptimistic) {
             const {data} = await updateService({_id: service._id, ...service});
             service = {
                 ...service,
@@ -252,15 +251,16 @@ export const ExcursionDetails: React.FC = () => {
         } else {
             updatedExpenses = [...updatedExpenses, expense];
         }
-        onUpdateExcursion({expenses: updatedExpenses});
+
+        await onUpdateExcursion({expenses: updatedExpenses});
 
         setAppIsLoading(false);
     };
 
     const onExpenseDelete = async (expense: IExpense) => {
-        deleteExpense(expense._id as string);
+        await deleteExpense(expense._id as string);
         const updatedExpenses = excursion.expenses?.filter(e => e._id !== expense._id) || [];
-        onUpdateExcursion({expenses: updatedExpenses});
+        onUpdateExcursion({expenses: updatedExpenses}, { avoidConfirm: true, isOptimistic: true });
     };
 
     if (
@@ -357,7 +357,7 @@ export const ExcursionDetails: React.FC = () => {
                 projections={excursion.projections} excursionId={excursion._id as string}
                 dialog={toggleExpenseDialog}
             />
-            <ExpenseForm
+            <ExpensesHandler
                 dialog={{
                     open: isExpenseDialogOpen,
                     handler: toggleExpenseDialog,
@@ -369,7 +369,7 @@ export const ExcursionDetails: React.FC = () => {
             {!!excursionBedrooms?.length && <BedroomDetails excursion={excursion}/>}
             {/*{!!excursion.activities.length && <ActivityDetails activities={excursion.activities}/>}*/}
             {/*<ProjectionsCharts projections={excursion.projections}/>*/}
-            {!!excursion.checkpoints?.length && <CheckpointDetails excursion={excursion} />}
+            {!!excursion.checkpoints?.length && <CheckpointDetails excursion={excursion}/>}
 
             {/* Organization, Destination, and TransportStep Information Cards */}
             <div>

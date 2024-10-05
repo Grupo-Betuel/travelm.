@@ -152,7 +152,6 @@ const DatePicker: React.FC<DatePickerProps> = ({
                             disabled={disabled}
                             onClick={handleInputClick}
                             error={!!showError}
-                            success={!error && isTouched}
                         />
                     </div>
                 </PopoverHandler>

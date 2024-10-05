@@ -52,7 +52,6 @@ const SelectControl: React.FC<SelectControlProps> = ({
                             <Select
                                 label={label}
                                 error={!!showError}
-                                success={!showError && !!field.value}
                                 selected={(element) => element}
                                 value={field.value || ''}
                                 onBlur={field.onBlur}
