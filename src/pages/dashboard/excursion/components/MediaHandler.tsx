@@ -25,7 +25,7 @@ import {IoSearch} from "react-icons/io5";
 import {IMG_CONSTANTS} from "@/constants/img.utils";
 
 
-const renderMediaPreview = useCallback((media: IMedia): JSX.Element => {
+const renderMediaPreview = (media: IMedia): JSX.Element => {
     const mediaType = media.type;
     switch (mediaType) {
         case 'image':
@@ -48,7 +48,7 @@ const renderMediaPreview = useCallback((media: IMedia): JSX.Element => {
         default:
             return <></>;
     }
-}, []);
+}
 
 export interface IMediaHandled {
     flyer?: IMediaFile;
