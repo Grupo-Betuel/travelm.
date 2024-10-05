@@ -8,8 +8,10 @@ import {UserRoleTypes, UserTypes} from "@/models/interfaces/userModel";
 import { useConfirmAction } from "@/hooks/useConfirmActionHook";
 import { CommonConfirmActions, CommonConfirmActionsDataTypes } from "@/models/common";
 import {DataTable, IDataTableColumn, IFilterOption} from "@/components/DataTable";
+import {useAuth} from "@/context/authContext";
 
 export const OrganizationList: React.FC = () => {
+    const { user } = useAuth()
     const {
         organizationForm,
         toggleHandleOrganization,
@@ -17,7 +19,7 @@ export const OrganizationList: React.FC = () => {
         refetchOrganizations,
         onEditOrganization,
         onDeleteOrganization
-    } = useOrganizationHandler({});
+    } = useOrganizationHandler({ query: {owner: user?.organization?._id} })
 
     const onConfirmAction = (type?: CommonConfirmActions, data?: CommonConfirmActionsDataTypes<IOrganization>) => {
         switch (type) {

@@ -1,4 +1,4 @@
-import React, {useEffect, useMemo, useState} from 'react';
+import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import {
     Avatar,
     Button,
@@ -25,7 +25,7 @@ import {IoSearch} from "react-icons/io5";
 import {IMG_CONSTANTS} from "@/constants/img.utils";
 
 
-const renderMediaPreview = (media: IMedia): JSX.Element => {
+const renderMediaPreview = useCallback((media: IMedia): JSX.Element => {
     const mediaType = media.type;
     switch (mediaType) {
         case 'image':
@@ -48,7 +48,7 @@ const renderMediaPreview = (media: IMedia): JSX.Element => {
         default:
             return <></>;
     }
-};
+}, []);
 
 export interface IMediaHandled {
     flyer?: IMediaFile;
@@ -76,15 +76,16 @@ export interface IHandleMediaFormProps {
 
 export const mediasService = getCrudService('medias');
 
-const MediaHandler = ({
-                          onChange,
-                          medias,
-                          disableUpload,
-                          logoMedia,
-                          flyerMedia,
-                          handle,
-                          enableSingleSelection
-                      }: IHandleMediaFormProps) => {
+const MediaHandler = (
+    {
+        onChange,
+        medias,
+        disableUpload,
+        logoMedia,
+        flyerMedia,
+        handle,
+        enableSingleSelection
+    }: IHandleMediaFormProps) => {
     const [flyer, setFlyer] = useState<IMediaFile>();
     const [logo, setLogo] = useState<IMediaFile>();
     const [images, setImages] = useState<IMediaFile[]>([]);
@@ -145,6 +146,7 @@ const MediaHandler = ({
             videos.length && setVideos([]);
             audios.length && setAudios([]);
         }
+
     }, [medias]);
 
     const handleImagesChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -183,7 +185,7 @@ const MediaHandler = ({
             const logoMediaFile: IMediaFile = {
                 content: URL.createObjectURL(file),
                 title: file?.name || 'No title',
-                owner: user?.organization,
+                owner: user?.organization?._id,
                 type: MediaTypeEnum.IMAGE,
                 file,
             };
@@ -267,13 +269,13 @@ const MediaHandler = ({
     const handleSetSelectedMedia = () => {
         switch (selectedMediaSelectorType) {
             case 'image':
-                setImages([...images, ...selectedMedia] as IMediaFile[])
+                setImages(selectedMedia as IMediaFile[])
                 break;
             case 'video':
-                setVideos([...videos, ...selectedMedia] as IMediaFile[]);
+                setVideos(selectedMedia as IMediaFile[]);
                 break;
             case 'audio':
-                setAudios([...audios, ...selectedMedia] as IMediaFile[]);
+                setAudios(selectedMedia as IMediaFile[]);
                 break;
             case 'flyer':
                 setFlyer(selectedMedia[0] as IMediaFile);
@@ -319,15 +321,15 @@ const MediaHandler = ({
         setSearchMediaModal(newValue);
     }
 
-    const handleQuantity = !handle ? 2 : Object.values(handle || {}).length;
+    const handleQuantity = useMemo(() => !handle ? 2 : Object.keys(handle || {}).length, [handle])
 
     return (
-        <div className={`columns-${handleQuantity > 1 ? 2 : 1} space-y-10 py-8`}>
+        <div className={`columns-${handleQuantity > 1 ? 2 : 1} space-y-10 pt-6`}>
             {(handle?.logo) && (
                 <div className="break-inside-avoid mb-10">
                     <Card className='w-full'>
                         <CardHeader className='rounded-full overflow-hidden flex items-center justify-center'>
-                            <div className="flex justify-center items-center gap-3 ">
+                            <div className="flex justify-center items-center gap-3">
                                 {(logoMedia?.content || logo?.content) ? (
                                     <div
                                         className="rounded-full overflow-hidden w-44 h-44 flex items-center justify-center">
@@ -417,7 +419,7 @@ const MediaHandler = ({
                         <CardBody
                             className={`px-2 py-0 ${imagesMedia.length ? 'my-4' : ''} max-h-[200px] overflow-y-auto`}>
                             <div
-                                className="columns-1 sm:columns-2 md:columns-3 lg:columns-3 gap-4 space-y-4 max-h-[200px] overflow-y-auto">
+                                className="columns-1 sm:columns-2 md:columns-3 lg:columns-4 gap-4 space-y-4 overflow-y-auto">
                                 {imagesMedia.length > 0 && (<>
                                     {imagesMedia.map((image, index) => (
                                         <div key={`image-slide-${index}`}
@@ -508,11 +510,6 @@ const MediaHandler = ({
                     ))}
                 </Swiper>
             )}
-
-            {/*{audios.map((audio, index) => (*/}
-            {/*    <AudioPlayer key={`audio-${index}`} src={audio.content}*/}
-            {/*                 title={`Audio Track ${index + 1}`}/>*/}
-            {/*))}*/}
             <ConfirmDialog/>
 
             <Dialog open={searchMediaModal} handler={toggleSearchMediaModal()}>
@@ -523,6 +520,7 @@ const MediaHandler = ({
                 </DialogHeader>
                 <DialogBody className="max-h-[80dvh]">
                     <MediaList
+                        selected={medias}
                         mediaType={selectedMediaSelectorType === ExtraMediaTypesEnum.FLYER || selectedMediaSelectorType === ExtraMediaTypesEnum.LOGO ?
                             MediaTypeEnum.IMAGE
                             : selectedMediaSelectorType as MediaTypeEnum
@@ -550,3 +548,4 @@ const MediaHandler = ({
 };
 
 export default MediaHandler;
+

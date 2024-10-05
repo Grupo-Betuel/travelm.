@@ -1,7 +1,12 @@
 import {Button, Input, Menu, MenuHandler, MenuList, MenuItem, Select, Option} from "@material-tailwind/react";
-import React, {useEffect} from "react";
+import React, {useCallback, useEffect, useRef, useState} from "react";
 import {FinanceOptionEnum, financeTypes, FinanceTypes, IFinance} from "@/models/financeModel";
 import {PlusCircleIcon, TrashIcon} from "@heroicons/react/20/solid";
+import {useForm, useWatch} from "react-hook-form";
+import {IExpense} from "@/models/ExpensesModel";
+import FormControl from "@/components/FormControl";
+import SelectControl from "@/components/SelectControl";
+import {IService} from "@/models/serviceModel";
 
 export interface IFinanceProps {
     finance: IFinance;
@@ -9,6 +14,11 @@ export interface IFinanceProps {
     type?: FinanceTypes;
     enabledCost?: boolean;
     options?: FinanceOptionEnum[];
+}
+
+const emptyFinance: IFinance = {
+    price: 0,
+    type: 'excursion',
 }
 
 export const FinanceHandler = ({
@@ -26,17 +36,6 @@ export const FinanceHandler = ({
     const toggleRates = () => setEnableRates(!enableRates);
     const toggleChildren = () => setEnableChildren(!enableChildren);
 
-    const handleOnChangeFinance = ({target: {name, value, type}}: any) => {
-        if (type === "number") {
-            value = Number(value);
-        }
-        updateFinance({
-            ...finance,
-            type: financeType || finance.type,
-            [name]: value,
-        });
-    };
-
     useEffect(() => {
         console.log("options", options)
         if (!options) return
@@ -46,23 +45,33 @@ export const FinanceHandler = ({
         setEnableChildren(!!options?.includes(FinanceOptionEnum.CHILDREN));
     }, [options]);
 
+    const {
+        control,
+        formState: {errors},
+    } = useForm<IFinance>({mode: 'all', values: finance});
+
+    const newFinance : IFinance = useWatch({control}) as IFinance;
+
     useEffect(() => {
-        if (financeType) {
-            updateFinance({...finance, type: financeType});
-        }
-    }, [financeType]);
+        updateFinance({...finance, ...newFinance, });
+    }, [newFinance]);
 
     return (
         <div className="w-full space-y-4">
             <div className="flex items-center space-x-2">
-                <Input
-                    crossOrigin={false}
-                    type="number"
-                    label="Price"
+                <FormControl
                     name="price"
-                    value={finance?.price || ""}
-                    onChange={handleOnChangeFinance}
-                    containerProps={{className: "max-w-1/2 min-w-[50%]"}}
+                    control={control}
+                    label="Price"
+                    type="number"
+                    className="w-full"
+                    rules={{
+                        required: "Price is required",
+                        min: {
+                            value: 1,
+                            message: "Precio debe ser mayor a 0",
+                        },
+                    }}
                 />
                 {options && (
                     <Menu>
@@ -94,16 +103,13 @@ export const FinanceHandler = ({
 
             {enableCost && (
                 <div className="flex items-center gap-2">
-                    <Input
-                        crossOrigin={false}
-                        type="number"
-                        label="Cost"
+                    <FormControl
                         name="cost"
-                        value={finance?.cost || ""}
-                        onChange={handleOnChangeFinance}
-                        containerProps={{
-                            className: "min-w-[50%] max-w-1/2",
-                        }}
+                        control={control}
+                        label="Cost"
+                        type="number"
+                        className="min-w-[50%] max-w-1/2"
+                        rules={{ required: "Cost is required" }}
                     />
                     <Button
                         onClick={toggleCost}
@@ -118,16 +124,13 @@ export const FinanceHandler = ({
             <div className="flex flex-col gap-3">
                 {enableRates && (
                     <div className="flex items-center gap-2">
-                        <Input
-                            crossOrigin={false}
-                            type="number"
-                            label="Couples"
+                        <FormControl
                             name="couples"
-                            value={finance?.couple || ""}
-                            onChange={handleOnChangeFinance}
-                            containerProps={{
-                                className: "max-w-1/2 min-w-[50%]",
-                            }}
+                            control={control}
+                            label="Couples"
+                            type="number"
+                            className="max-w-1/2 min-w-[50%]"
+                            rules={{ required: "Couples is required" }}
                         />
                         <Button
                             onClick={toggleRates}
@@ -141,16 +144,13 @@ export const FinanceHandler = ({
 
                 {enableChildren && (
                     <div className="flex items-center gap-2">
-                        <Input
-                            crossOrigin={false}
-                            type="number"
-                            label="Children"
+                        <FormControl
                             name="children"
-                            value={finance?.children || ""}
-                            onChange={handleOnChangeFinance}
-                            containerProps={{
-                                className: "max-w-1/2 min-w-[50%]",
-                            }}
+                            control={control}
+                            label="Children"
+                            type="number"
+                            className="max-w-1/2 min-w-[50%]"
+                            rules={{ required: "Children is required" }}
                         />
                         <Button
                             onClick={toggleChildren}
@@ -164,22 +164,14 @@ export const FinanceHandler = ({
             </div>
 
             {!financeType && (
-                <Select
-                    label="Type"
+                <SelectControl
                     name="type"
-                    disabled={!!financeType}
-                    value={financeType || finance?.type}
-                    onChange={(value) =>
-                        updateFinance({...finance, type: value as FinanceTypes})
-                    }
+                    control={control}
+                    label="Type"
+                    options={financeTypes.map((type) => ({ label: type, value: type }))}
+                    rules={{ required: "Type is required" }}
                     className="mb-4"
-                >
-                    {financeTypes.map((type) => (
-                        <Option key={type} value={type}>
-                            {type}
-                        </Option>
-                    ))}
-                </Select>
+                />
             )}
         </div>
     );

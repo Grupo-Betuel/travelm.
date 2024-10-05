@@ -1,16 +1,17 @@
-import React, {useEffect, useState} from 'react';
-import {Input, Button, Dialog, DialogHeader, DialogBody, DialogFooter, Typography} from "@material-tailwind/react";
+import React, {useEffect, useMemo} from 'react';
+import { Button, Dialog, DialogHeader, DialogBody, DialogFooter, Typography} from "@material-tailwind/react";
 import {IClient} from "@/models/clientModel";
-import InputMask from "react-input-mask";
 import ServiceHandler from "./ServiceHandler";
 import {IService} from "@/models/serviceModel";
 import {getCrudService} from "@/api/services/CRUD.service";
 import {ICustomComponentDialog} from "@/models/common";
+import {useForm, SubmitHandler, useWatch} from "react-hook-form";
+import FormControl from "@/components/FormControl";
+import {extractNumbersFromText} from "@/utils/text.utils";
 
 interface ClientFormProps {
     initialClient?: IClient;
     onSubmit: (client: IClient) => void;
-    onDeletePayment?: (payment: any) => void;
     enableService?: boolean;
     serviceData?: IService;
     dialog?: ICustomComponentDialog;
@@ -34,178 +35,158 @@ const ClientForm: React.FC<ClientFormProps> = (
         onSubmit,
         dialog
     }) => {
-    const [service, setService] = useState<IService | undefined>(structuredClone(serviceData));
-    const [client, setClient] = useState<IClient>(initialClient || emptyClient);
 
-    const {data: existingClients} = clientService.useFetchAllTravelClients({
-        phone: client.phone
-    }, {
-        skip: client.phone.length < 11 || initialClient?.phone === client.phone
+    const {
+        control,
+        handleSubmit,
+        formState: {errors},
+        setValue,
+        reset
+    } = useForm<IClient>({
+        mode: 'all',
+        defaultValues: initialClient || emptyClient,
     });
 
+    const newClient: IClient = useWatch({ control }) as IClient;
 
-    const handleChange = ({target: {value, name, type}}: React.ChangeEvent<HTMLInputElement>) => {
-        if (type === 'tel') {
-            value = value.replace(/[^0-9]/g, '');
-            if (value == '1') return;
+    const newPhone = useMemo(() => extractNumbersFromText(newClient.phone), [newClient.phone]);
+    const {data: existingClients} = clientService.useFetchAllTravelClients({
+        phone: newPhone
+    }, {
+        skip: newPhone < 11 || initialClient?.phone === newPhone.toString()
+    });
+
+    useEffect(() => {
+        if (initialClient) {
+            reset(initialClient);
         }
+    }, [initialClient, reset]);
 
-        setClient({...client, [name]: value});
+
+    useEffect(() => {
+        if (existingClients?.length) {
+            const foundClient = existingClients[0];
+            if (foundClient) {
+                reset(foundClient);
+                if (foundClient.currentService) {
+                    setValue('services', [foundClient.currentService]);
+                }
+            }
+        }
+    }, [existingClients]);
+
+    const handleFormSubmit: SubmitHandler<IClient> = (client) => {
+        const { _id, ...clientDataWithoutId } = client._id ? client : { ...client };
+        const updatedClient = {
+            ...clientDataWithoutId,
+            phone: newPhone.toString(),
+            services: client.services,
+            currentService: client.services?.length ? client.services[0] : serviceData,
+        };
+
+        onSubmit(updatedClient);
+        reset(emptyClient);
     };
 
     const onUpdateServices = (services: IService[]) => {
-        setClient({...client, services});
-    }
-
-    const onUpdateSingleService = (s: IService) => {
-        setClient({...client, services: [s]});
-    }
-    useEffect(() => {
-        if (initialClient?._id) {
-            setClient(initialClient);
-            setService(initialClient.currentService);
-        }
-    }, [initialClient]);
-
-    useEffect(() => {
-        if (initialClient && initialClient.phone === client.phone) return;
-
-        if (existingClients?.length && client.phone.length === 11) {
-            const foundClient = existingClients[0];
-            if (foundClient) {
-                const newServices = mergeClientServices(foundClient);
-                setClient({...foundClient, services: newServices});
-            }
-
-        } else if (client.phone.length === 11) {
-            setClient({...emptyClient, phone: client.phone});
-        }
-    }, [existingClients, client.phone, initialClient?.phone]);
-
-    useEffect(() => {
-        if (serviceData) {
-            setService(structuredClone(serviceData));
-        }
-    }, [serviceData]);
-
-    const mergeClientServices = (clientData: IClient = client): IService[] => {
-        if (!service) return clientData.services || [];
-        const exist = clientData.services?.find(s => s.excursionId === service?.excursionId);
-        return clientData.services && exist ? clientData.services : [...(clientData.services || []), service];
-    };
-
-    useEffect(() => {
-        if (!service) return;
-
-        const newServices = mergeClientServices();
-        setClient({
-            ...client,
-            services: newServices,
-        });
-    }, [service]);
-
-    const handleSubmit = () => {
-        onSubmit({
-            ...client,
-            currentService: service
-        }
-        );
-        setClient(structuredClone(emptyClient));
-        setService(undefined);
+        console.log("services", services);
+        setValue('services', services);
     };
 
     const form = (
         <div className="px-4 flex flex-col gap-3">
             <Typography variant="h6">Datos del Cliente</Typography>
-            <InputMask
-                mask="+1 (999) 999-9999"
+            <FormControl
                 name="phone"
+                control={control}
+                label="Teléfono"
                 type="tel"
-                value={client.phone}
-                onChange={handleChange}
-                maskPlaceholder={null}
-                alwaysShowMask={false}
-            >
-                {
-                    ((inputProps: any) => (
-                        <Input
-                            {...(inputProps as any)}
-                            type="tel"
-                            label="Teléfono"
-                            value={client.phone}
-                        />
-                    ) as any) as any}
-            </InputMask>
-            <div className="flex gap-3 items-center">
-                <Input
-                    crossOrigin={"true"}
-                    label="Nombre"
+                mask="+1 (999) 999-9999"
+                maskProps={{
+                    maskPlaceholder: null,
+                    alwaysShowMask: false,
+                }}
+            />
+            <div className="flex gap-4">
+                <FormControl
                     name="firstName"
-                    value={client.firstName}
-                    onChange={handleChange}
-
+                    control={control}
+                    label="Nombre"
+                    rules={{required: 'El nombre es requerido'}}
+                    className={'w-full'}
                 />
-                <Input
-                    crossOrigin={"true"}
-                    label="Apellido"
+                <FormControl
                     name="lastName"
-                    value={client.lastName}
-                    onChange={handleChange}
+                    control={control}
+                    label="Apellido"
+                    rules={{required: 'El apellido es requerido'}}
+                    className={'w-full'}
                 />
             </div>
-            <Input
-                crossOrigin={"true"}
-                label="Correo"
+            <FormControl
                 name="email"
-                value={client.email}
-                onChange={handleChange}
+                control={control}
+                label="Correo"
+                type="email"
+                rules={{
+                    pattern: {
+                        value: /^\S+@\S+$/i,
+                        message: 'Formato de correo inválido',
+                    },
+                }}
             />
             {enableService && (<ServiceHandler
-                service={service}
-                services={client.services}
-                onUpdateSingleService={onUpdateSingleService}
-                onUpdateServices={onUpdateServices}/>
+                    service={serviceData}
+                    services={newClient.services}
+                    onUpdateServices={onUpdateServices}
+                />
             )}
             {!dialog && <Button
                 color="blue"
-                onClick={handleSubmit}
+                type={'submit'}
                 className="mt-4"
             >
                 {!!existingClients?.length ? 'Actualizar' : 'Agregar'}
             </Button>}
+
         </div>
     )
 
     const dialogHandler = () => {
         dialog?.handler && dialog.handler();
-        setClient(emptyClient);
+        reset(emptyClient);
     }
 
     return (
         dialog ?
             <Dialog open={dialog.open} handler={dialogHandler}>
-                <DialogHeader className="justify-between">
-                    {client._id ? 'Editar Cliente' : 'Agregar Cliente'}
-                </DialogHeader>
-                <DialogBody className="overflow-y-scroll max-h-[80dvh]">
-                    {form}
-                </DialogBody>
-                <DialogFooter className="flex items-center justify-between">
-                    <Button
-                        variant="text"
-                        size="lg"
-                        color="red" onClick={dialogHandler}>Cancelar</Button>
-                    <Button
-                        variant="text"
-                        size="lg"
-                        color="blue"
-                        onClick={handleSubmit}
-                    >
-                        Enviar
-                    </Button>
-                </DialogFooter>
+                <form onSubmit={handleSubmit(handleFormSubmit)}>
+                    <DialogHeader className="justify-between">
+                        {newClient._id ? 'Editar Cliente' : 'Agregar Cliente'}
+                    </DialogHeader>
+                    <DialogBody className="overflow-y-scroll max-h-[80dvh]">
+                        {form}
+                    </DialogBody>
+                    <DialogFooter className="flex items-center justify-between">
+                        <Button
+                            variant="text"
+                            size="lg"
+                            color="red" onClick={dialogHandler}>Cancelar</Button>
+                        <Button
+                            variant="text"
+                            size="lg"
+                            color="blue"
+                            type={'submit'}
+                        >
+                            Enviar
+                        </Button>
+                    </DialogFooter>
+                </form>
             </Dialog>
-            : form
+            :
+            <form onSubmit={handleSubmit(handleFormSubmit)}>
+                {form}
+            </form>
     );
 };
 

@@ -6,7 +6,7 @@ import {Swiper, SwiperSlide} from 'swiper/react';
 import {mockExcursion} from "@/data/excursions-mock-data";
 import {ExcursionDetailActions, ExcursionDetailActionsDataTypes, IExcursion} from "@/models/excursionModel";
 import {EffectCoverflow, Navigation, Pagination} from "swiper/modules";
-import {ClientsExcursionTable} from "../components/ClientsExcursionTable";
+import {ClientsExcursionTable, IUpdateClientExtra} from "../components/ClientsExcursionTable";
 import {FinanceDetails} from "../components/FinanceDetail";
 import {ActivityDetails} from "../components/ActivityList";
 import {ProjectionsCharts} from "../components/ProjectionCharts";
@@ -31,11 +31,12 @@ import {FaWhatsapp} from "react-icons/fa";
 import {useAppLoading} from "@/context/appLoadingContext";
 import ExcursionDetailsSkeleton from "../../../../components/ExcursionDetailsSkeleton";
 import {IExpense} from "@/models/ExpensesModel";
-import {ExpenseForm} from "@/pages/dashboard/excursion/components/ExpensesHandler";
+import {ExpensesHandler} from "@/pages/dashboard/excursion/components/ExpensesHandler";
 import {SERVICE_CONSTANTS} from "@/constants/service.constant";
 import {IService} from "@/models/serviceModel";
 import {emptyClient} from "@/pages/dashboard/excursion/components/ClientForm";
 import {EXPENSES_CONSTANTS} from "@/constants/expenses.constant";
+import {CheckpointDetails} from "@/pages/dashboard/excursion/components/CheckpointDetails";
 
 const excursionService = getCrudService('excursions');
 const clientService = getCrudService('travelClients');
@@ -159,39 +160,38 @@ export const ExcursionDetails: React.FC = () => {
 
     const onUpdateClient = async (client: Partial<IClient>, isOptimistic?: boolean) => {
         setAppIsLoading(true);
-        if (Array.isArray(client)) {
-            setExcursion({
-                ...excursion,
-                clients: excursion.clients.map(c => {
-                    const updatedClient = (client as Partial<IClient>[]).find(cl => cl._id === c._id);
-                    return updatedClient ? {...c, ...updatedClient} : c;
-                })
-            });
-            !isOptimistic && updateClient(client as any);
-        } else {
-            if (!client._id) {
-                // TODO: error toast
-                return;
-            }
-
-            if (!isOptimistic) {
-
-                const {data} = await updateClient({_id: client._id, ...client})
-                client = {
-                    ...client,
-                    ...data,
-                };
-            }
-
-            setExcursion({
-                ...excursion,
-                clients: excursion.clients.map(c => c._id === client._id ? {...c, ...client} : c)
-            });
+        // if (Array.isArray(client)) {
+        //     setExcursion({
+        //         ...excursion,
+        //         clients: excursion.clients.map(c => {
+        //             const updatedClient = (client as Partial<IClient>[]).find(cl => cl._id === c._id);
+        //             return updatedClient ? {...c, ...updatedClient} : c;
+        //         })
+        //     });
+        //     !isOptimistic && updateClient(client as any);
+        // } else {
+        if (!client._id) {
+            // TODO: error toast
+            return;
         }
+
+        if (!isOptimistic) {
+            const {data} = await updateClient({_id: client._id, ...client})
+            client = {
+                ...client,
+                ...data,
+            };
+        }
+
+        setExcursion({
+            ...excursion,
+            clients: excursion.clients.map(c => c._id === client._id ? {...c, ...client} : c)
+        });
+
         setAppIsLoading(false);
     }
 
-    const onUpdateService = async (service: Partial<IService>, isOptimistic?: boolean) => {
+    const onUpdateService = async (service: Partial<IService>, extra?: IUpdateClientExtra) => {
         setAppIsLoading(true);
 
         if (!service?._id) {
@@ -200,7 +200,7 @@ export const ExcursionDetails: React.FC = () => {
             return;
         }
 
-        if (!isOptimistic) {
+        if (!extra?.isOptimistic) {
             const {data} = await updateService({_id: service._id, ...service});
             service = {
                 ...service,
@@ -226,7 +226,7 @@ export const ExcursionDetails: React.FC = () => {
         setAppIsLoading(false);
     };
 
-    const onUpdateExcursion = (e: Partial<IExcursion>, extra?: {isOptimistic?: boolean, avoidConfirm?: boolean }) => {
+    const onUpdateExcursion = (e: Partial<IExcursion>, extra?: { isOptimistic?: boolean, avoidConfirm?: boolean }) => {
         setExcursion({...excursion, ...e});
         if (!extra?.isOptimistic) {
             updateExcursion({_id: excursion._id || '', ...e});
@@ -247,19 +247,20 @@ export const ExcursionDetails: React.FC = () => {
         let updatedExpenses: IExpense[] = excursion.expenses || [];
 
         if (expense._id) {
-            updatedExpenses = updatedExpenses.map(e => e._id === expense._id ? { ...e, ...expense } : e);
+            updatedExpenses = updatedExpenses.map(e => e._id === expense._id ? {...e, ...expense} : e);
         } else {
             updatedExpenses = [...updatedExpenses, expense];
         }
-        onUpdateExcursion({ expenses: updatedExpenses });
+
+        await onUpdateExcursion({expenses: updatedExpenses});
 
         setAppIsLoading(false);
     };
 
     const onExpenseDelete = async (expense: IExpense) => {
-        deleteExpense(expense._id as string);
+        await deleteExpense(expense._id as string);
         const updatedExpenses = excursion.expenses?.filter(e => e._id !== expense._id) || [];
-        onUpdateExcursion({ expenses: updatedExpenses });
+        onUpdateExcursion({expenses: updatedExpenses}, { avoidConfirm: true, isOptimistic: true });
     };
 
     if (
@@ -356,7 +357,7 @@ export const ExcursionDetails: React.FC = () => {
                 projections={excursion.projections} excursionId={excursion._id as string}
                 dialog={toggleExpenseDialog}
             />
-            <ExpenseForm
+            <ExpensesHandler
                 dialog={{
                     open: isExpenseDialogOpen,
                     handler: toggleExpenseDialog,
@@ -368,54 +369,7 @@ export const ExcursionDetails: React.FC = () => {
             {!!excursionBedrooms?.length && <BedroomDetails excursion={excursion}/>}
             {/*{!!excursion.activities.length && <ActivityDetails activities={excursion.activities}/>}*/}
             {/*<ProjectionsCharts projections={excursion.projections}/>*/}
-            {!!excursion.checkpoints?.length && (
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-                    {excursion.checkpoints.map((checkpoint, index) => (
-                        <Card key={index} className="flex flex-col">
-                            <CardBody>
-                                <Typography variant="h6" color="blue-gray" className="mb-2">
-                                    {checkpoint.description}
-                                </Typography>
-                                <Typography variant="small" color="gray" className="mb-4">
-                                    {checkpoint.location.address}, {checkpoint.location.city},{" "}
-                                    {checkpoint.location.province}, {checkpoint.location.country}
-                                </Typography>
-
-                                {/* Mostrar lista de buses */}
-                                {!!checkpoint.buses?.length && (
-                                    <div className="mb-4">
-                                        <Typography variant="h6" color="blue-gray">
-                                            Buses Disponibles:
-                                        </Typography>
-                                        <ul className="list-disc ml-4">
-                                            {checkpoint.buses.map((bus, busIndex) => (
-                                                <li key={busIndex}>
-                                                    <Typography variant="small" color="gray">
-                                                        Modelo: {bus.model}, Capacidad: {bus.capacity},
-                                                        Color: {bus.color}
-                                                    </Typography>
-                                                </li>
-                                            ))}
-                                        </ul>
-                                    </div>
-                                )}
-
-                                <div className="mt-auto"> {/* Asegura que el botón esté en la parte inferior */}
-                                    <Button
-                                        size="sm"
-                                        color="blue"
-                                        variant="outlined"
-                                        onClick={() => window.open(checkpoint.location.link, "_blank")}
-                                        className="w-full"
-                                    >
-                                        Ver en Google Maps
-                                    </Button>
-                                </div>
-                            </CardBody>
-                        </Card>
-                    ))}
-                </div>
-            )}
+            {!!excursion.checkpoints?.length && <CheckpointDetails excursion={excursion}/>}
 
             {/* Organization, Destination, and TransportStep Information Cards */}
             <div>

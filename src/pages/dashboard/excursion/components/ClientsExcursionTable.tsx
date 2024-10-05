@@ -43,6 +43,8 @@ import {getCrudService} from "@/api/services/CRUD.service";
 import {CommentHandler} from "@/pages/dashboard/excursion/components/CommentHandler";
 import {IComment} from "@/models/commentModel";
 import {useAuth} from "@/context/authContext";
+import {useAppLoading} from "@/context/appLoadingContext";
+import {formatPhoneNumber} from "@/utils/text.utils";
 
 export interface IUpdateClientExtra extends IConfirmActionExtraParams {
     isOptimistic?: boolean;
@@ -97,6 +99,7 @@ export const ClientsExcursionTable = (
     const [dialogOpen, setDialogOpen] = useState<boolean>(false);
     const [comments, setComments] = useState<IComment[]>([]); // Comentarios del servicio
     const {user: authUser} = useAuth();
+    const {setAppIsLoading} = useAppLoading()
     console.log('user', authUser);
     // Función para abrir el diálogo y cargar los comentarios del cliente seleccionado
     const openCommentDialog = (client: IClient) => {
@@ -213,21 +216,16 @@ export const ClientsExcursionTable = (
         return selectedClient?.services.find(s => s.excursionId === excursion._id) || excursionService;
     }, [selectedClient]);
 
-    const handleUpdateComment = (comment: IComment, isOptimistic?: boolean) => {
+    const handleUpdateComment = async (comment: IComment, isOptimistic?: boolean) => {
         if (!selectedService) {
-            // TODO: mostrar mensaje de error con un toast
             return;
         }
 
         let updatedComments: IComment[] = selectedService.comments || [];
 
         if (comment._id) {
-            console.log("entro 1 ")
-            // Actualiza el comentario si ya existe
             updatedComments = updatedComments.map(c => c._id === comment._id ? {...c, ...comment} : c);
         } else {
-            console.log("entro 2 ")
-            // Agrega un nuevo comentario si no tiene _id
             updatedComments = [...updatedComments, comment];
         }
 
@@ -236,70 +234,51 @@ export const ClientsExcursionTable = (
             comments: updatedComments,
         };
 
-        // Guarda el servicio actualizado usando onUpdateService
         if (updatedService._id) {
-            console.log("entro 3 ", updatedService)
-            onUpdateService({_id: updatedService._id, ...updatedService});
+            await onUpdateService({_id: updatedService._id, ...updatedService});
         }
+
     };
 
-    const handleDeleteComment = (comment: IComment) => {
+    const handleDeleteComment = async (comment: IComment) => {
         if (!selectedClient || !selectedService) {
             // TODO: mostrar mensaje de error con un toast
             return;
         }
 
-        comment._id && deleteComment(comment._id);
-
         const updatedComments = selectedService.comments?.filter(c => c._id !== comment._id) || [];
 
-        const updatedService = {
-            ...selectedService,
+        await onUpdateService({
+            _id: selectedService._id as string,
             comments: updatedComments,
-        };
-
-        const updatedClient: IClient = {
-            ...selectedClient,
-            services: selectedClient.services.map(s =>
-                s._id === selectedService._id ? updatedService : s
-            )
-        };
-
-        setSelectedClient(updatedClient);
-        onUpdateClient(updatedClient, {isOptimistic: true, avoidConfirm: true});
-    };
-
-    const handleUpdatePayment = async (payments: IPayment[]) => {
-        if (!selectedClient || !selectedService) {
-            // TODO: toast error message
-            return;
-        }
-
-        const updatedClient = {
-            ...selectedClient,
-            services: selectedClient.services.map(s =>
-                s._id === selectedService._id ? {...s, payments}
-                    : s
-            ) as IService[]
-        };
-
-        onUpdateClient(updatedClient);
+        });
     };
 
     const handleChangePayment = async (payments: IPayment[]) => {
+        setAppIsLoading(true);
+
         if (!selectedClient) {
             // TODO: toast error message
             return;
         }
 
-        const updatedService = {...selectedService, payments};
+        const {data: updatedService} = await updateService({
+            _id: selectedService._id as string, ...selectedService,
+            payments
+        });
 
         const updatedClient: IClient = {
             ...selectedClient,
-            services: selectedClient?.services.map(s => s.excursionId === excursion._id ? updatedService : s) || []
+            currentService: updatedService,
+            services: selectedClient?.services.map(s => s._id === updatedService?._id ? updatedService as IService : s) || []
         };
 
         setSelectedClient(updatedClient);
+        onUpdateClient(updatedClient, {isOptimistic: true, avoidConfirm: true});
+
+        setAppIsLoading(false);
+
+
     };
 
 
@@ -321,13 +300,14 @@ export const ClientsExcursionTable = (
             payment._id && deletePayment(payment._id);
             const updatedPayments = selectedService.payments.filter(p => p._id !== payment._id);
 
-            const updatedService = {
+            const updatedService: IService = {
                 ...selectedService,
                 payments: updatedPayments,
             };
 
             const updatedClient: IClient = {
                 ...selectedClient,
+                currentService: updatedService,
                 services: selectedClient?.services.map(s => s.excursionId === excursion._id ? updatedService : s) || []
             };
 
@@ -581,7 +561,7 @@ export const ClientsExcursionTable = (
                 </td>
                 <td>
                     <a href={`https://wa.me/${client.phone}`} target="_blank">
-                        <Button variant="text">{client.phone}</Button>
+                        <Button variant="text">{formatPhoneNumber(client.phone)}</Button>
                     </a>
                 </td>
                 <td>
@@ -753,7 +733,7 @@ export const ClientsExcursionTable = (
                         handler: toggleHandleClient,
                     }}
                     enableService
-                    serviceData={excursionService}
+                    serviceData={clientToEdit?.currentService || excursionService}
                     onSubmit={handleAddClient}
                 />
                 <Dialog open={isClientSearchOpen} handler={toggleClientSearch}>
@@ -779,7 +759,6 @@ export const ClientsExcursionTable = (
                                     enableAddPayment={selectedService.status !== 'paid'}
                                     payments={selectedService.payments}
                                     onDeletePayment={handleDeletePayment}
-                                    onUpdatePayment={handleUpdatePayment}
                                     onChangePayment={handleChangePayment}
                                 />
                             ) : (

@@ -22,6 +22,11 @@ import {AppImage} from "@/components/AppImage";
 import {useAuth} from "@/context/authContext";
 import IUser from "@/models/interfaces/userModel";
 import {ICustomComponentDialog} from "@/models/common";
+import FormControl from "@/components/FormControl";
+import {SubmitHandler, useForm, useWatch} from "react-hook-form";
+import {InfoCardItem} from "@/components/InfoCardItem";
+import {BiEdit, BiSave, BiTrash} from "react-icons/bi";
+import {FaRegSave} from "react-icons/fa";
 
 
 interface CommentHandlerProps {
@@ -45,9 +50,17 @@ export const CommentHandler: React.FC<CommentHandlerProps> = ({
                                                                   onDeleteComments,
                                                               }) => {
     const [comments, setComments] = useState<IComment[]>(initialComments);
-    const [newComment, setNewComment] = useState<IComment>(emptyComment);
     const [selectedComment, setSelectedComment] = useState<IComment | null>(null);
     const {user} = useAuth();
+    const {
+        control,
+        handleSubmit,
+        formState: {errors, isValid},
+        setValue,
+        reset,
+    } = useForm<IComment>({mode: 'all', defaultValues: emptyComment});
+
+    const newComment: IComment = useWatch({control}) as IComment;
 
     useEffect(() => {
         if (initialComments && initialComments.length > 0) {
@@ -55,113 +68,98 @@ export const CommentHandler: React.FC<CommentHandlerProps> = ({
         }
     }, [initialComments]);
 
-    const handleInputChange = (field: keyof IComment, value: any) => {
-        setNewComment(prevComment => ({
-            ...prevComment,
-            author: user as IUser ,
-            [field]: value
-        }));
-    };
 
     const handleMedia = (media: IMediaHandled) => {
-        const images = media.images || [];
-
-        // Almacena temporalmente las imágenes en el estado 'newComment'
-        setNewComment({
-            ...newComment,
-            medias: [...(newComment.medias || []), ...images],
-        });
+        if (media.images && media.images.length > 0) {
+            const images = media.images || [];
+            setValue('medias', images);
+        } else {
+            setValue('medias', undefined);
+        }
     };
 
-    const handleSave = () => {
-        const commentWithAuthor = { ...newComment, author: user as IUser };
+    const handleSave: SubmitHandler<IComment> = (comment) => {
+        const commentWithAuthor = {...comment, author: user as IUser};
 
         if (commentWithAuthor._id) {
-            const updatedComments = comments.map(comment =>
-                comment._id === commentWithAuthor._id ? { ...comment, ...commentWithAuthor } : comment
-            );
-            setComments(updatedComments);
             onUpdateComments(commentWithAuthor);
         } else {
-            const newComments = [...comments, commentWithAuthor];
-            setComments(newComments);
             onUpdateComments(commentWithAuthor);
         }
 
-        setNewComment(emptyComment);
+        reset(emptyComment);
     };
 
     const startEditing = (comment: IComment) => {
-        setNewComment(comment);
+        reset(comment);
     };
 
     const cancelEditing = () => {
-        setNewComment(emptyComment);
+        reset(emptyComment);
     };
 
     const handleDelete = (comment: IComment) => {
-        const filteredComments = comments.filter((c) => c._id !== comment._id);
-        setComments(filteredComments);
         onDeleteComments(comment);
     };
 
 
     const renderFormContent = () => (
         <>
-            <Textarea
-                value={newComment.text}
-                onChange={(e) => handleInputChange('text', e.target.value)}
-                label="Comentario"
-            />
-            <MediaHandler onChange={handleMedia} handle={{images: true}}
-                          medias={newComment?.medias ? newComment.medias : undefined}/>
-            <Button onClick={handleSave} color={newComment._id ? "blue" : "green"}>
-                {newComment._id ? "Guardar Cambios" : "Agregar Comentario"}
-            </Button>
-            {newComment._id && <Button onClick={cancelEditing} color="red">Cancelar</Button>}
-
-            <div className="grid grid-cols-3 gap-4 py-4">
+            <form onSubmit={handleSubmit(handleSave)} className="flex flex-col">
+                <FormControl
+                    name="text"
+                    control={control}
+                    label="Comentario"
+                    type="textarea"
+                    className="w-full"
+                    rules={{
+                        required: 'La descripción es requerida',
+                        minLength: {
+                            value: 3,
+                            message: 'La descripción debe tener al menos 3 caracteres',
+                        },
+                    }}
+                />
+                <MediaHandler onChange={handleMedia} handle={{images: true}}
+                              medias={newComment?.medias ? newComment.medias : undefined}/>
+                <div className="self-end flex gap-3">
+                    {newComment._id && <Button
+                        className="text-sm flex items-center gap-3"
+                        variant="text"
+                        onClick={cancelEditing} color="red">Cancelar</Button>}
+                    <Button
+                        className="text-sm flex items-center gap-3"
+                        variant="text"
+                        disabled={!isValid}
+                        type={'submit'} color={newComment._id ? "blue" : "green"}>
+                        <FaRegSave className="text-md" />
+                        {newComment._id ? "Guardar Cambios" : "Agregar"}
+                    </Button>
+                </div>
+            </form>
+            <Typography variant="h4" className="">Comentarios</Typography>
+            <div className="flex items-end gap-4 pt-10 pb-2 overflow-x-auto">
                 {comments.map((comment, index) => (
-                    <Card className="border border-blue-gray-100 shadow-sm h-full space-y-4" key={index}>
-                        {comment.medias && comment.medias.length > 0 && (
-                            <CardHeader className="h-32 w-full mx-0 p-0">
-                                <Swiper modules={[Navigation, Pagination]} navigation pagination={{clickable: true}}
-                                        className="relative h-full rounded-md">
-                                    {comment.medias.map((media, i) => (
-                                        <SwiperSlide key={i}>
-                                            <AppImage src={media.content} alt={media.title}/>
-                                        </SwiperSlide>
-                                    ))}
-                                </Swiper>
-                            </CardHeader>
-                        )}
-                        <CardBody className="p-2 text-right">
-                            <Typography variant="small" className="font-normal text-blue-gray-600">
-                                {comment.text.length > 50 ? `${comment.text.slice(0, 50)}...` : comment.text}
-                            </Typography>
-                            <Typography variant="small" color="blue-gray">
-                                {new Date(comment.createDate).toLocaleDateString()}
-                            </Typography>
-                        </CardBody>
-                        <CardFooter className="border-t border-blue-gray-50 p-2 mt-auto items-end">
-                            <div className="flex space-x-1 justify-end">
-                                {comment.text.length > 50 && (
-                                    <Button variant="text" className="p-2" color="blue"
-                                            onClick={() => setSelectedComment(comment)}>
-                                        Ver más
-                                    </Button>
-                                )}
-                                <Button variant="text" className="p-2" color="blue"
-                                        onClick={() => startEditing(comment)}>
-                                    <PencilIcon className="w-5 h-5"/>
-                                </Button>
-                                <Button variant="text" className="p-2" color="red"
-                                        onClick={() => handleDelete(comment)}>
-                                    <TrashIcon className="w-5 h-5"/>
-                                </Button>
-                            </div>
-                        </CardFooter>
-                    </Card>
+                    <InfoCardItem
+                        key={index}
+                        title={`Author/a: ${comment.author?.firstName}`}
+                        subtitle={`Author/a: ${comment.author?.firstName}`}
+                        medias={comment.medias}
+                        description={comment.text}
+                        actions={[
+                            {
+                                icon: <BiEdit className="w-5 h-5"/>,
+                                text: "Editar",
+                                color: "blue",
+                                onClick: () => startEditing(comment),
+                            },
+                            {
+                                icon: <BiTrash className="w-5 h-5"/>,
+                                text: "Eliminar",
+                                color: "red",
+                                onClick: () => handleDelete(comment),
+                            },
+                        ]}/>
                 ))}
             </div>
         </>
@@ -169,18 +167,18 @@ export const CommentHandler: React.FC<CommentHandlerProps> = ({
 
     const dialogHandler = () => {
         dialog?.handler && dialog.handler();
-        setNewComment(emptyComment);
+        reset(emptyComment);
     };
 
     return dialog ? (
         <Dialog open={dialog.open} handler={dialogHandler} dismiss={{enabled: false}}>
-            <DialogHeader>Comentario</DialogHeader>
-            <DialogBody className="h-[70vh] overflow-y-auto space-y-4">
+            <DialogHeader className="flex justify-center">Gestor de Comentarios</DialogHeader>
+            <DialogBody className="max-h-[70vh] overflow-y-auto space-y-4">
                 {renderFormContent()}
             </DialogBody>
             <DialogFooter className='space-x-4'>
-                <Button variant="text" onClick={dialogHandler} color={"red"}>
-                    Cancel
+                <Button variant="text" size="lg" onClick={dialogHandler} color={"red"}>
+                    Cerrar
                 </Button>
             </DialogFooter>
             {selectedComment && (

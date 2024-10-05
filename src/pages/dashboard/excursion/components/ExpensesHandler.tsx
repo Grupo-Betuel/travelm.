@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, {useMemo, useState} from "react";
 import {
     Dialog,
     DialogHeader,
@@ -6,25 +6,22 @@ import {
     DialogFooter,
     Button,
     Typography,
-    Input,
-    Textarea,
-    CardHeader,
-    CardBody,
-    CardFooter,
-    Card,
 } from "@material-tailwind/react";
-import { IExpense } from "@/models/ExpensesModel";
-import { FinanceHandler } from "@/pages/dashboard/excursion/components/FinanceHandler";
-import { FinanceTypes, IFinance } from "@/models/financeModel";
-import { BiDollar, BiTrash, BiEdit } from "react-icons/bi";
+import {IExpense} from "@/models/ExpensesModel";
+import {FinanceHandler} from "@/pages/dashboard/excursion/components/FinanceHandler";
+import {FinanceTypes, IFinance} from "@/models/financeModel";
+import {BiDollar, BiTrash, BiEdit, BiSave, BiSolidSave} from "react-icons/bi";
 import {ICustomComponentDialog} from "@/models/common";
-import {emptyClient} from "@/pages/dashboard/excursion/components/ClientForm";
+import {SubmitHandler, useForm, useWatch} from "react-hook-form";
+import FormControl from "@/components/FormControl";
+import {InfoCardItem} from "@/components/InfoCardItem";
+import {FaRegSave} from "react-icons/fa";
 
 interface ExpenseFormProps {
     initialExpenses: IExpense[];
     onUpdateExpense: (expenses: IExpense) => void;
     onDeleteExpense: (expenses: IExpense) => void;
-    dialog? : ICustomComponentDialog;
+    dialog?: ICustomComponentDialog;
 }
 
 const defaultExpense: IExpense = {
@@ -38,147 +35,135 @@ const defaultExpense: IExpense = {
     updateDate: new Date(),
 };
 
-export const ExpenseForm: React.FC<ExpenseFormProps> = ({
-                                                            dialog,
-                                                            initialExpenses,
-                                                            onUpdateExpense,
-                                                            onDeleteExpense,
-                                                        }) => {
-    const [expenses, setExpenses] = useState<IExpense[]>(initialExpenses);
-    const [newExpense, setNewExpense] = useState<IExpense>(defaultExpense);
+export const ExpensesHandler: React.FC<ExpenseFormProps> = (
+    {
+        dialog,
+        initialExpenses,
+        onUpdateExpense,
+        onDeleteExpense,
+    }
+) => {
     const [selectedExpense, setSelectedExpense] = useState<IExpense | null>(null);
 
-    useEffect(() => {
-        if (initialExpenses && initialExpenses.length > 0) {
-            setExpenses(initialExpenses);
-        }
-    }, [initialExpenses]);
+    const {
+        control,
+        handleSubmit,
+        reset,
+        formState: {errors, isValid},
+        setValue,
+    } = useForm<IExpense>({
+        defaultValues: defaultExpense,
+        mode: "all",
+    });
 
-    const handleInputChange = (name: string, value: string) => {
-        setNewExpense((prev) => ({ ...prev, [name]: value }));
+    const newExpense: IExpense = useWatch({control}) as IExpense;
+
+    const onUpdateFinance = (updatedFields: Partial<IFinance>) => {
+        const currentFinance = newExpense.finance;
+        const updatedFinance: IFinance = {
+            ...currentFinance,
+            ...updatedFields,
+        };
+        setValue("finance", updatedFinance);
     };
 
-    const handleSave = () => {
-        if (newExpense._id) {
-            const updatedExpenses = expenses.map((exp) =>
-                exp._id === newExpense._id ? { ...exp, ...newExpense } : exp
-            );
-            setExpenses(updatedExpenses);
-            onUpdateExpense(newExpense);
+    const handleSave: SubmitHandler<IExpense> = (formData) => {
+        if (formData._id) {
+            onUpdateExpense(formData);
         } else {
-            const newExpenses = [...expenses, newExpense];
-            setExpenses(newExpenses);
-            onUpdateExpense(newExpense);
+            onUpdateExpense(formData);
         }
-        setNewExpense(defaultExpense);
+        reset(defaultExpense);
     };
 
     const startEditing = (expense: IExpense) => {
-        setNewExpense(expense);
+        reset(expense);
     };
 
     const cancelEditing = () => {
-        setNewExpense(defaultExpense);
+        reset(defaultExpense);
     };
 
     const handleDelete = (expense: IExpense) => {
-        const filteredExpenses = expenses.filter((e) => e._id !== expense._id);
-        setExpenses(filteredExpenses);
         onDeleteExpense(expense);
     };
 
+    const isExpenseValid = useMemo(() => {
+        return isValid && newExpense.finance.price > 0;
+    }, [isValid, newExpense.finance]);
+
     const renderFormContent = () => (
         <>
-            <FinanceHandler
-                enabledCost={false}
-                finance={newExpense.finance}
-                updateFinance={(financeUpdate: Partial<IFinance>) =>
-                    setNewExpense((prev) => ({
-                        ...prev,
-                        finance: { ...prev.finance, ...financeUpdate },
-                    }))
-                }
-                type="excursion"
-            />
-            <div className="mb-4">
-                <Input
-                    crossOrigin={true}
-                    label="Nombre del Gasto"
-                    type="text"
-                    value={newExpense.title}
-                    onChange={(e) => handleInputChange('title', e.target.value)}
-                    placeholder="Título del Gasto"
-                    className="w-full"
-                />
-            </div>
-            <div className="mb-4">
-                <Textarea
+            <form onSubmit={handleSubmit(handleSave)} className="flex flex-col">
+                <div className="flex gap-2">
+                    <FinanceHandler
+                        enabledCost={false}
+                        finance={newExpense.finance}
+                        updateFinance={onUpdateFinance}
+                        type="excursion"
+                    />
+                    <FormControl
+                        name="title"
+                        control={control}
+                        label="Nombre del Gasto"
+                        rules={{required: 'El título de gasto es requerido'}}
+                        className="w-full"
+                    />
+                </div>
+                <FormControl
+                    name="description"
+                    control={control}
                     label="Descripción"
-                    value={newExpense.description}
-                    onChange={(e) => handleInputChange('description', e.target.value)}
+                    type="textarea"
                     className="w-full"
+                    rules={{
+                        minLength: {
+                            value: 3,
+                            message: 'La descripción debe tener al menos 3 caracteres',
+                        },
+                    }}
                 />
-            </div>
-            <Button onClick={handleSave} color={newExpense._id ? "blue" : "green"}>
-                {newExpense._id ? "Guardar Cambios" : "Agregar Gasto"}
-            </Button>
-            {newExpense._id && (
-                <Button onClick={cancelEditing} color="red">
-                    Cancelar
-                </Button>
-            )}
-
-            <Typography variant="h6" className="mb-2 mt-4">
+                <div className="self-end flex gap-3">
+                    {newExpense._id && (
+                        <Button variant="text" className="text-sm" onClick={cancelEditing} color="red">
+                            Cancelar
+                        </Button>
+                    )}
+                    <Button variant="text"
+                            disabled={!isExpenseValid}
+                            type={'submit'} color={newExpense._id ? "blue" : "green"}
+                            className="flex gap-3 items-center text-sm">
+                        <FaRegSave className="text-lg"/>
+                        {newExpense._id ? "Guardar" : "Agregar"}
+                    </Button>
+                </div>
+            </form>
+            <Typography variant="h5" className="mb-2 my-4">
                 Gastos Agregados
             </Typography>
-            <div className="grid grid-cols-3 gap-4">
-                {expenses.map((expense) => (
-                    <Card className="border border-blue-gray-100 shadow-sm h-full" key={expense._id}>
-                        <CardHeader
-                            variant="gradient"
-                            color="blue"
-                            floated={false}
-                            shadow={false}
-                            className="absolute grid h-7 w-7 place-items-center"
-                        >
-                            <BiDollar className="w-4 h-4 text-white" />
-                        </CardHeader>
-                        <CardBody className="p-2 text-right">
-                            <Typography variant="small" className="font-normal text-blue-gray-600">
-                                {expense.title}
-                            </Typography>
-                            <Typography variant="h5" color="blue-gray">
-                                {`RD$${expense.finance.price.toLocaleString()}`}
-                            </Typography>
-                            <Card className="px-2 text-justify border-0 shadow-none">
-                                <Typography variant="small" className="font-normal text-blue-gray-600">
-                                    {expense.description.length > 50
-                                        ? `${expense.description.slice(0, 50)}...`
-                                        : expense.description}
-                                </Typography>
-                            </Card>
-                        </CardBody>
-                        <CardFooter className="border-t border-blue-gray-50 p-2 mt-auto items-end">
-                            <div className="flex space-x-1 justify-end">
-                                {expense.description.length > 50 && (
-                                    <Button variant="text" className="p-2" color="blue" onClick={() => setSelectedExpense(expense)}>
-                                        Ver más
-                                    </Button>
-                                )}
-                                <Button variant="text" className="p-2" color="blue" onClick={() => startEditing(expense)}>
-                                    <BiEdit className="w-5 h-5" />
-                                </Button>
-                                <Button
-                                    variant="text"
-                                    className="p-2"
-                                    color="red"
-                                    onClick={() => handleDelete(expense)}
-                                >
-                                    <BiTrash className="w-5 h-5" />
-                                </Button>
-                            </div>
-                        </CardFooter>
-                    </Card>
+            <div className="flex overflow-x-auto gap-4 pb-5">
+                {initialExpenses.map((expense) => (
+                    <InfoCardItem
+                        key={expense._id}
+                        icon={<BiDollar className="w-4 h-4 text-white"/>}
+                        subtitle={expense.title}
+                        title={`RD$${expense.finance.price.toLocaleString()}`}
+                        description={expense.description}
+                        actions={[
+                            {
+                                icon: <BiEdit className="w-5 h-5"/>,
+                                text: "Editar",
+                                onClick: () => startEditing(expense),
+                                color: 'blue',
+                            },
+                            {
+                                icon: <BiTrash className="w-5 h-5"/>,
+                                text: "Eliminar",
+                                onClick: () => handleDelete(expense),
+                                color: 'red',
+                            },
+                        ]}
+                    />
                 ))}
             </div>
         </>
@@ -186,18 +171,20 @@ export const ExpenseForm: React.FC<ExpenseFormProps> = ({
 
     const dialogHandler = () => {
         dialog?.handler && dialog.handler();
-        setNewExpense(defaultExpense);
+        reset(defaultExpense);
     }
 
     return dialog ? (
         <Dialog open={dialog.open} handler={dialogHandler} dismiss={{enabled: false}}>
-            <DialogHeader>Gastos</DialogHeader>
-            <DialogBody className="h-[70vh] overflow-y-auto" divider>
+            <DialogHeader className="flex justify-center">
+                Gestor de Gastos
+            </DialogHeader>
+            <DialogBody className="overflow-y-auto">
                 {renderFormContent()}
             </DialogBody>
             <DialogFooter>
-                <Button variant="text" color="red" onClick={dialogHandler}>
-                    Cancelar
+                <Button size="lg" variant="text" color="red" onClick={dialogHandler}>
+                    Cerrar
                 </Button>
             </DialogFooter>
 

@@ -73,7 +73,6 @@ const ExcursionStepper: React.FC = () => {
         validateFormData();
     }, [excursion]);
 
-
     useEffect(() => {
         if (createdExcursion && createdExcursion._id) {
             console.log('createdExcursion', createdExcursion);
