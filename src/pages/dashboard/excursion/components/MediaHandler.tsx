@@ -51,11 +51,11 @@ const renderMediaPreview = (media: IMedia): JSX.Element => {
 }
 
 export interface IMediaHandled {
-    flyer?: IMediaFile;
-    logo?: IMediaFile;
-    images: IMediaFile[];
-    videos: IMediaFile[];
-    audios: IMediaFile[];
+    flyer?: IMediaFile | IMedia;
+    logo?: IMediaFile | IMedia;
+    images: (IMediaFile | IMedia)[];
+    videos: (IMediaFile | IMedia)[];
+    audios: (IMediaFile | IMedia)[];
 }
 
 export interface IHandleMediaFormProps {
@@ -86,11 +86,19 @@ const MediaHandler = (
         handle,
         enableSingleSelection
     }: IHandleMediaFormProps) => {
-    const [flyer, setFlyer] = useState<IMediaFile>();
-    const [logo, setLogo] = useState<IMediaFile>();
-    const [images, setImages] = useState<IMediaFile[]>([]);
-    const [videos, setVideos] = useState<IMediaFile[]>([]);
-    const [audios, setAudios] = useState<IMediaFile[]>([]);
+    const [flyer, setFlyer] = useState<IMediaFile | IMedia | undefined>(flyerMedia || undefined);
+    const [logo, setLogo] = useState<IMediaFile | IMedia | undefined>(
+        logoMedia || undefined
+    );
+    const [images, setImages] = useState<IMediaFile[]>(
+        medias?.filter((media) => media.type === 'image') as IMediaFile[] || []
+    );
+    const [videos, setVideos] = useState<IMediaFile[]>(
+        medias?.filter((media) => media.type === 'video') as IMediaFile[] || []
+    );
+    const [audios, setAudios] = useState<IMediaFile[]>(
+        medias?.filter((media) => media.type === 'audio') as IMediaFile[] || []
+    );
     const {user} = useAuth()
 
     useEffect(() => {
@@ -136,7 +144,6 @@ const MediaHandler = (
                     audiosData.push(media);
                 }
             });
-
             imagesData.length && setImages([...imagesData, ...images]);
             videosData.length && setVideos([...videosData, ...videos]);
             audiosData.length && setAudios([...audiosData, ...audios]);
@@ -157,7 +164,7 @@ const MediaHandler = (
                 title: file?.name || 'No title',
                 owner: user?.organization,
                 file,
-            }));
+            })) as IMediaFile[];
 
             const allData = [...images, ...imagesMedias]
             setImages(allData);
@@ -202,7 +209,7 @@ const MediaHandler = (
                 owner: user?.organization,
                 title: file?.name || 'No title',
                 file,
-            }));
+            })) as IMediaFile[];
             setVideos(videosMedias);
         }
     };
@@ -215,19 +222,13 @@ const MediaHandler = (
                 owner: user?.organization,
                 title: file?.name || 'No title',
                 file,
-            }));
+            })) as IMediaFile[];
             setAudios(audiosMedias);
         }
     };
 
-    const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-        event.preventDefault();
-        // Here you would handle the submission of the media, e.g., uploading to a server
-        console.log('Submit:', {flyer, images, videos, audios});
-    };
-
     useEffect(() => {
-        onChange({flyer, images, videos, audios, logo});
+        onChange(structuredClone({flyer, images, videos, audios, logo}));
     }, [flyer, images, videos, audios, logo]);
 
     const onDeleteMedia = async (media: IMedia) => {
