@@ -118,7 +118,7 @@ export const OrganizationForm: React.FC<OrganizationHandlerProps> = (
     };
     const handleMediasChange = (data: IMediaHandled): void => {
         const {audios = [], images = [], videos = []} = data;
-
+        console.log('data images', data);
         setOrganization(prevState => ({
             ...prevState,
             medias: [
@@ -237,7 +237,8 @@ export const OrganizationForm: React.FC<OrganizationHandlerProps> = (
             <div className='flex gap-4'>
                 <div className='flex flex-col relative w-1/5 space-y-4'>
                     <MediaHandler
-                        logoMedia={organization.logo} medias={organization.medias}
+                        logoMedia={organization.logo}
+                        medias={organization.medias}
                         onChange={handleLogoChange}
                         handle={{logo: true}} />
                     <FinanceHandler options={[]} finance={organization.entryFee || {} as IFinance}
