@@ -134,6 +134,7 @@ const ExcursionStepper: React.FC = () => {
 
     const updateExcursionData = async (data: Partial<IExcursion>): void => {
         const newData: IExcursion = {...excursion, ...data};
+        console.log("newData",newData)
         const stepData = excursionSteps[currentStep || 0];
 
         console.log('updated', newData, stepData)

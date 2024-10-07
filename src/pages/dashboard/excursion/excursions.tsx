@@ -4,7 +4,7 @@ import ExcursionsList from "./screens/ExcursionList";
 import {ExcursionDetails} from "./screens/ExcursionDetails";
 import ExcursionStepper from "./screens/ExcursionStepper";
 import ProtectedRoute from "../../../components/ProtectedRoute";
-import {UserRoleTypes, UserTypes} from "../../../models/interfaces/userModel";
+import {UserRoleTypes, UserTypes} from "@/models/interfaces/userModel";
 
 function Excursions() {
 
