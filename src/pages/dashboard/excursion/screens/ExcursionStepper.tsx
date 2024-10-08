@@ -276,24 +276,24 @@ const ExcursionStepper: React.FC = () => {
             icon: <UserIcon className="max-w-[20px]"/>,
             component: <ActivitiesHandlerStep excursionData={excursion} updateExcursion={updateExcursionData}/>,
         },
-         {
-             properties: ['foods'],
-             label: 'Comidas',
-             icon: <UserIcon className="max-w-[20px]"/>,
-             component: <FoodsHandlerStep excursionData={excursion} updateExcursion={updateExcursionData}/>,
-         },
+         // {
+         //     properties: ['foods'],
+         //     label: 'Comidas',
+         //     icon: <UserIcon className="max-w-[20px]"/>,
+         //     component: <FoodsHandlerStep excursionData={excursion} updateExcursion={updateExcursionData}/>,
+         // },
         {
             properties: ['transport'],
             label: 'Transporte',
             icon: <UserIcon className="max-w-[20px]"/>,
             component: <TransportHandlerStep excursionData={excursion} updateExcursion={updateExcursionData}/>,
         },
-        {
-            properties: ['checkpoints'],
-            label: 'checkpoints',
-            icon: <UserIcon className="max-w-[20px]"/>,
-            component: <CheckpointHandlerStep excursionData={excursion} updateExcursion={updateExcursionData}/>,
-        },
+        // {
+        //     properties: ['checkpoints'],
+        //     label: 'checkpoints',
+        //     icon: <UserIcon className="max-w-[20px]"/>,
+        //     component: <CheckpointHandlerStep excursionData={excursion} updateExcursion={updateExcursionData}/>,
+        // },
         {
             properties: ['finance'],
             label: 'Finanzas',
