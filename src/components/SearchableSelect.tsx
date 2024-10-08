@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
-import { Input, List, ListItem } from '@material-tailwind/react';
-import {CgClose} from "react-icons/cg";
+import { Input, List, ListItem, Typography } from '@material-tailwind/react';
+import { CgClose } from 'react-icons/cg';
+import { Control, useController, useFormState } from 'react-hook-form';
 
 export interface IOption<T = any> {
     label: string;
@@ -8,96 +9,161 @@ export interface IOption<T = any> {
 }
 
 interface SearchableSelectProps<T> {
+    name?: string;
+    control?: Control<any>;
     options: (IOption | T)[];
     displayProperty?: keyof T;
     label: string;
     disabled?: boolean;
     multiple?: boolean;
-    onSelect?: ((selectedValues: string[], selectedItem: string) => void) | ((selectedValues: T[], selectedItem: T) => void);
-    selectedValues?: string[] | T[];
+    rules?: any;
     className?: string;
+    onSelect?: (selectedValues: T[] | string[], selectedItem: T | string | null) => void;
 }
 
 function SearchableSelect<T>({
-                                 disabled,
+                                 name,
+                                 control,
                                  options,
                                  label,
                                  multiple = false,
-                                 onSelect,
-                                 selectedValues,
                                  displayProperty,
                                  className,
+                                 rules,
+                                 disabled,
+                                 onSelect,
                              }: SearchableSelectProps<T>) {
     const [searchTerm, setSearchTerm] = useState<string>('');
     const [filteredOptions, setFilteredOptions] = useState<(IOption | T)[]>(options);
-    const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
     const [isFocused, setIsFocused] = useState<boolean>(false);
-    const ref = useRef<HTMLDivElement>(null);
+    const refDiv = useRef<HTMLDivElement>(null);
+
+    // For internal state management when control is not provided
+    const [internalValue, setInternalValue] = useState<any>(multiple ? [] : null);
+
+    // Determine if react-hook-form is being used
+    const isControlled = control && name;
+
+    // Declare variables
+    let value: any;
+    let onChange: (value: any) => void;
+    let ref: any;
+    let onBlur: () => void;
+    let error: any;
+    let isTouched: boolean;
+    let isSubmitted: boolean;
+
+    if (isControlled) {
+        // Setup for react-hook-form
+        const {
+            field,
+            fieldState,
+        } = useController({
+            name: name!,
+            control: control!,
+            rules,
+        });
+        value = field.value;
+        onChange = field.onChange;
+        ref = field.ref;
+        onBlur = field.onBlur;
+        error = fieldState.error;
+        isTouched = fieldState.isTouched;
+        isSubmitted = useFormState({ control }).isSubmitted;
+    } else {
+        // Uncontrolled mode
+        value = internalValue;
+        onChange = (newValue: any) => {
+            setInternalValue(newValue);
+            if (onSelect) {
+                const selectedItem = multiple ? null : newValue;
+                onSelect(newValue, selectedItem);
+            }
+        };
+        ref = undefined;
+        onBlur = () => {};
+        error = null;
+        isTouched = false;
+        isSubmitted = false;
+    }
 
     useEffect(() => {
-        const filtered = options.filter(option => {
-            const value: string = ((option as T)[displayProperty as keyof T] || (option as IOption).label || '') as string;
-            return value.toLowerCase().includes(searchTerm.toLowerCase());
+        const filtered = options.filter((option) => {
+            const optionLabel: string =
+                ((option as T)[displayProperty as keyof T] || (option as IOption).label || '') as string;
+            return optionLabel.toLowerCase().includes(searchTerm.toLowerCase());
         });
         setFilteredOptions(filtered);
     }, [searchTerm, options]);
 
-    useEffect(() => {
-        const selected = selectedValues?.map(value => JSON.stringify(value)) || [];
-        setSelectedOptions(selected);
-    }, [selectedValues]);
+    const handleOptionClick = (option: T | IOption) => {
+        let newValue;
 
-    const toggleOption = (value: string | any) => {
-        value = JSON.stringify(value);
-        const included = selectedOptions.includes(value);
-        const newSelectedOptions = multiple
-            ? included
-                ? selectedOptions.filter(item => item !== value)
-                : [...selectedOptions, value]
-            : included ? [] : [value];
-
-        setSelectedOptions(newSelectedOptions);
-
-        if (onSelect) {
-            const list = newSelectedOptions.map(option => JSON.parse(option));
-            const item = included ? null : JSON.parse(value);
-            onSelect(list, item);
+        if (multiple) {
+            const optionValue = JSON.stringify(option);
+            const currentValues = Array.isArray(value)
+                ? value.map((v: any) => JSON.stringify(v))
+                : [];
+            const isSelected = currentValues.includes(optionValue);
+            if (isSelected) {
+                newValue = value.filter((v: any) => JSON.stringify(v) !== optionValue);
+            } else {
+                newValue = [...(value || []), option];
+            }
+        } else {
+            newValue = option;
+            setIsFocused(false);
         }
 
-        if (!multiple) {
-            setIsFocused(false); // Automatically close the dropdown for single select
+        onChange(newValue);
+
+        if (isControlled) {
+            // Call onBlur to trigger validation
+            onBlur();
         }
     };
 
     const handleBlur = (event: React.FocusEvent<HTMLDivElement>) => {
-        if (!ref.current?.contains(event.relatedTarget as Node)) {
+        if (!refDiv.current?.contains(event.relatedTarget as Node)) {
             setIsFocused(false);
+            if (isControlled) {
+                onBlur();
+            }
         }
     };
 
     const handleClear = () => {
         setSearchTerm('');
-        setSelectedOptions([]);
-        if (onSelect) {
-            onSelect([], '' as any);
-        }
+        onChange(multiple ? [] : null);
         setIsFocused(false);
+        if (isControlled) {
+            onBlur();
+        }
     };
 
     const displayValue: string = useMemo(() => {
-        if (multiple) {
-            return selectedOptions.map(value => {
-                const option = options.find(option => JSON.stringify(option) === value);
-                return (option as T)?.[displayProperty as keyof T] || (option as IOption)?.label || '';
-            }).join(', ') as string;
-        } else {
-            const option = selectedOptions[0] ? JSON.parse(selectedOptions[0]) : null;
-            return ((option as T)?.[displayProperty as keyof T] || (option as IOption)?.label || '') as string;
+        if (multiple && Array.isArray(value)) {
+            return value
+                .map((val: any) => {
+                    const option = val;
+                    return (
+                        (option as T)?.[displayProperty as keyof T] || (option as IOption)?.label || ''
+                    );
+                })
+                .join(', ') as string;
+        } else if (!multiple && value) {
+            const option = value;
+            return (
+                ((option as T)?.[displayProperty as keyof T] || (option as IOption)?.label || '') as string
+            );
         }
-    }, [selectedOptions, options, multiple, displayProperty]);
+        return '';
+    }, [value, multiple, displayProperty]);
+
+    const showError = isControlled && error && (isTouched || isSubmitted);
 
     return (
-        <div ref={ref} onBlur={handleBlur} className={`${className || ''} relative w-full`}>
+        <div ref={refDiv} onBlur={handleBlur} className={`${className || ''} relative w-full`}>
             <Input
                 disabled={disabled}
                 crossOrigin={false}
@@ -110,28 +176,41 @@ function SearchableSelect<T>({
                     setSearchTerm(''); // Clear search term on focus to show all options
                 }}
                 icon={
-                    (searchTerm || displayValue)   ? (
-                        <CgClose className="h-5 w-5 cursor-pointer" onClick={handleClear}/>
-                    ): null
+                    searchTerm || displayValue ? (
+                        <CgClose className="h-5 w-5 cursor-pointer" onClick={handleClear} />
+                    ) : null
                 }
                 placeholder={!isFocused && multiple ? displayValue : ''}
+                error={!!showError}
+                inputRef={ref}
             />
             {isFocused && (
                 <List className="max-h-60 overflow-auto mt-1 border absolute w-full rounded bg-white z-50">
-                    {filteredOptions.map((option, index) => (
-                        <a
-                            key={`selectable-options-${index}`}
-                            onClick={() => toggleOption(option)}
-                        >
-                            <ListItem
-                                disabled={disabled}
-                                className={`cursor-pointer ${selectedOptions.includes(JSON.stringify(option)) ? 'bg-gray-300' : ''}`}
-                            >
-                                {displayProperty ? (option as any)[displayProperty] : (option as IOption).label}
-                            </ListItem>
-                        </a>
-                    ))}
+                    {filteredOptions.map((option, index) => {
+                        const optionValue = JSON.stringify(option);
+                        const isSelected = multiple
+                            ? Array.isArray(value) &&
+                            value.some((v: any) => JSON.stringify(v) === optionValue)
+                            : JSON.stringify(value) === optionValue;
+                        return (
+                            <a key={`selectable-options-${index}`} onClick={() => handleOptionClick(option)}>
+                                <ListItem
+                                    disabled={disabled}
+                                    className={`cursor-pointer ${isSelected ? 'bg-gray-300' : ''}`}
+                                >
+                                    {displayProperty
+                                        ? (option as any)[displayProperty]
+                                        : (option as IOption).label}
+                                </ListItem>
+                            </a>
+                        );
+                    })}
                 </List>
+            )}
+            {showError && (
+                <Typography variant="small" color="red" className="mt-1">
+                    {error?.message}
+                </Typography>
             )}
         </div>
     );
