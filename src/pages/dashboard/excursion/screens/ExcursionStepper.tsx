@@ -28,6 +28,7 @@ import {IStep} from "@/models/common";
 import {AppStepper} from "@/components/AppStepper";
 import {useAppLoading} from "@/context/appLoadingContext";
 import {CheckpointHandlerStep} from "@/pages/dashboard/excursion/components/Steps/CheckpointHandlerStep";
+import {useAlertAction} from "@/hooks/useAlertAction";
 
 
 const excursionService = getCrudService("excursions");
@@ -38,6 +39,7 @@ const ExcursionStepper: React.FC = () => {
     const [isFormValid, setIsFormValid] = useState<boolean>(false);
     const [validationErrors, setValidationErrors] = useState<string[]>([]);
     const {setAppIsLoading} = useAppLoading();
+    const { showAlert, AlertDialog } = useAlertAction();
 
     const [updateExcursion, {
         isLoading: isUpdatingExcursion,
@@ -115,8 +117,9 @@ const ExcursionStepper: React.FC = () => {
         try {
             setAppIsLoading(true);
             if (currentStep < excursionSteps.length
-                // && isFormValid
+                //&& isFormValid
             ) {
+                // showAlert('Formulario Incompleto. No se puede avanzar al siguiente paso.');
                 setCurrentStep(currentStep + 1);
                 await handleExcursionSave();
             }
@@ -232,7 +235,6 @@ const ExcursionStepper: React.FC = () => {
         }
 
     }
-
 
     const excursionSteps: IStep<IExcursion>[] = [
         {
@@ -365,6 +367,7 @@ const ExcursionStepper: React.FC = () => {
                 </Typography>
             </CardHeader>
             <CardBody>
+                {AlertDialog()}
                 <AppStepper<IExcursion>
                     steps={excursionSteps}
                     activeStep={currentStep || 0}

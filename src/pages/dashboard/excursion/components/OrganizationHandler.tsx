@@ -46,7 +46,7 @@ const OrganizationHandler: React.FC<IOrganizationSelectorProps> = (
                 <SearchableSelect<IOrganization>
                     onSelect={handleOnSelectOrganization}
                     options={organizations || []}
-                    label="Select Organiazation"
+                    label="Select Organization"
                     multiple={isMultiple}
                     displayProperty={"name"}
                     selectedValues={selected}

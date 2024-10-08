@@ -31,35 +31,20 @@ const defaultValues = {
 const ExcursionGeneralInfo: React.FC<GeneralInfoProps> = ({excursionData, updateExcursion}) => {
     const {
         control,
-        handleSubmit,
-        watch,
+        formState: {errors},
         reset,
-    } = useForm<any>({ mode: 'all', defaultValues: excursionData });
+    } = useForm<any>({mode: 'all', values: excursionData});
 
-    const startDate = useWatch({
-        control,
-        name: "startDate",
-    });
-    const endDate = useWatch({
-        control,
-        name: "endDate",
-    });
-    const previousData = React.useRef(excursionData);
+    const newExcusion: IExcursion = useWatch({control});
+    useEffect(() => {
+        updateExcursion({...excursionData, ...newExcusion});
+    }, [newExcusion]);
 
     useEffect(() => {
-        if (startDate !== previousData.current.startDate || endDate !== previousData.current.endDate) {
-            updateExcursion({
-                startDate,
-                endDate,
-            });
-
-            previousData.current = {
-                ...previousData.current,
-                startDate,
-                endDate,
-            };
+        if (excursionData._id) {
+            reset(excursionData)
         }
-    }, [startDate, endDate]);
+    }, [excursionData._id]);
 
     return (
 
