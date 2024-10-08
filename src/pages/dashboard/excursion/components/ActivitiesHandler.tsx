@@ -1,4 +1,4 @@
-import React, {MouseEvent, useEffect, useState} from 'react';
+import React, {useMemo, useState} from 'react';
 import {
     Button,
     Card,
@@ -7,7 +7,6 @@ import {
     CardHeader,
     Dialog, DialogBody, DialogFooter,
     DialogHeader,
-    Input,
     Typography
 } from '@material-tailwind/react';
 import ReactQuill from 'react-quill';
@@ -22,9 +21,6 @@ import {Swiper, SwiperSlide} from "swiper/react";
 import {Navigation, Pagination} from "swiper/modules";
 import {AppImage} from "@/components/AppImage";
 import {SubmitHandler, useForm, useWatch} from "react-hook-form";
-import {IPayment} from "@/models/PaymentModel";
-import {emptyPayment} from "@/pages/dashboard/excursion/components/PaymentsHandler";
-import {IExpense} from "@/models/ExpensesModel";
 import FormControl from "@/components/FormControl"; // Include the Quill stylesheet
 
 
@@ -95,11 +91,10 @@ const ActivitiesHandler: React.FC<ActivitiesHandlerProps> = ({activities, update
         reset,
     } = useForm<IActivity>({mode: 'all', values: emptyActivity});
 
-    // const newActivity: IActivity = useWatch({control})
+    const newActivity = useWatch({control})
 
     const handleSave: SubmitHandler<IActivity> = (formData) => {
         if (formData._id || editActivityIndex !== undefined) {
-            // Actualizar actividad existente
             const updatedActivities = activities.map((act, idx) => {
                 if (formData._id && act._id === formData._id) {
                     return formData;
@@ -119,27 +114,6 @@ const ActivitiesHandler: React.FC<ActivitiesHandlerProps> = ({activities, update
     };
 
 
-    // const handleAddOrUpdateActivity = (index?: number) => {
-    //     if (!!activityForm._id || editActivityIndex !== undefined) {
-    //         const updatedActivities = activities.map((act, idx) => {
-    //             if (activityForm._id && act._id === activityForm._id) {
-    //                 return activityForm;
-    //
-    //             } else if (idx === editActivityIndex) {
-    //                 return activityForm;
-    //             }
-    //
-    //             return act
-    //         });
-    //
-    //         updateActivities(updatedActivities);
-    //     } else {
-    //         updateActivities([...activities, activityForm]);
-    //     }
-    //
-    //     cleanActivityHandler()
-    // };
-
     const onMediaSubmit = (data: IMediaHandled) => {
         const updatedMedia = {
             ...activityForm,
@@ -150,19 +124,18 @@ const ActivitiesHandler: React.FC<ActivitiesHandlerProps> = ({activities, update
     }
 
     const cleanActivityHandler = () => {
-        // setActivityForm(emptyActivity);
-        // setActivityForm({...emptyActivity, images: []});
         reset(emptyActivity)
         setEditActivityIndex(undefined);
     }
 
     const editActivityMode = (index: number) => () => {
         reset(activities[index])
-        // setActivityForm(activities[index]);
         setEditActivityIndex(index);
     }
 
-    console.log("actividades",activities)
+    const isActivityValid = useMemo(() => {
+        return isValid && newActivity.title && newActivity.title.length > 0;
+    }, [isValid, newActivity.finance]);
 
     return (
         <div className="flex flex-col gap-5 pb-10">
@@ -188,7 +161,7 @@ const ActivitiesHandler: React.FC<ActivitiesHandlerProps> = ({activities, update
                     </div>
                     <MediaHandler key={editActivityIndex !== undefined ? `edit-${editActivityIndex}` : undefined}
                                   handle={{images: true}} onChange={onMediaSubmit} medias={activityForm.images}/>
-                    <Button color="blue" type={"submit"}>
+                    <Button color="blue" type={"submit"} disabled={!isActivityValid}>
                         {editActivityIndex !== undefined ? 'Actualizar' : 'Crear'} Actividad
                     </Button>
                     {(editActivityIndex !== undefined) && (

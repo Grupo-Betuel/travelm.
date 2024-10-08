@@ -131,7 +131,7 @@ function ExcursionsList() {
                 {excursion.clients.length}
             </td>
             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                RD${excursion.finance?.price.toLocaleString()}
+                RD${excursion.finance?.price?.toLocaleString()}
             </td>
             <td>
                 <ProtectedElement roles={[UserRoleTypes.ADMIN]} userTypes={[UserTypes.AGENCY]}>
