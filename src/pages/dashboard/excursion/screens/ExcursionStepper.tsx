@@ -4,15 +4,6 @@ import {UserIcon} from '@heroicons/react/20/solid';
 import ExcursionGeneralInfo from '../components/ExcursionGeneralnfo';
 import {MediaHandlerStep} from '../components/Steps/MediaHandlerStep';
 import {ExcursionStatusEnum, IExcursion} from '@/models/excursionModel';
-import {
-    validateStep1,
-    validateStep2,
-    validateStep3,
-    validateStep4,
-    validateStep5,
-    validateStep6,
-    validateStep7
-} from "@/utils/excursionStepperValidations";
 import {OrganizationsDestinationsStep} from "../components/Steps/OrganizationsDestinationsStep";
 import ActivitiesHandlerStep from "../components/Steps/ActivitiesHandlerStep";
 import FoodsHandlerStep from "../components/Steps/FoodsHandlerStep";
@@ -91,29 +82,13 @@ const ExcursionStepper: React.FC = () => {
     const validateFormData = (): void => {
         const errors: string[] = [];
         // Define validation functions for each step
-        const validationFunctions = [
-            validateStep0, // Informacion
-            validateStep1, // Checkpoints
-            validateStep2, // Media
-            validateStep3, // Clients
-            validateStep4, // Activities
-            validateStep5, // Foods
-            validateStep6, // Projections
-            validateStep7  // TransportStep
-        ];
-
-        // Execute validation function for current step
-        if (validationFunctions[currentStep]) {
-            const stepErrors = validationFunctions[currentStep](excursion);
-            errors.push(...stepErrors);
-        }
-
         // Update form validity and validation errors
         setIsFormValid(errors.length === 0);
         setValidationErrors(errors);
     };
 
     const handleNext = async () => {
+        if(!isValid) return;
         try {
             setAppIsLoading(true);
             if (currentStep < excursionSteps.length
@@ -236,6 +211,8 @@ const ExcursionStepper: React.FC = () => {
 
     }
 
+    const [isValid, setIsValid] = useState(false);
+
     const excursionSteps: IStep<IExcursion>[] = [
         {
             properties: ['title', 'description', 'startDate', 'endDate'],
@@ -243,6 +220,7 @@ const ExcursionStepper: React.FC = () => {
             icon: <UserIcon className="max-w-[20px]"/>,
             type: 'title',
             component: <ExcursionGeneralInfo
+                setIsValid={setIsValid}
                 excursionData={excursion}
                 updateExcursion={updateExcursionData}
             />,
@@ -251,7 +229,7 @@ const ExcursionStepper: React.FC = () => {
             properties: ['organizations'],
             label: 'Organizaciones',
             icon: <UserIcon className="max-w-[20px]"/>,
-            component: <OrganizationsDestinationsStep excursionData={excursion} updateExcursion={updateExcursionData}/>,
+            component: <OrganizationsDestinationsStep setIsValid={setIsValid} excursionData={excursion} updateExcursion={updateExcursionData}/>,
         },
         {
             properties: ['destinations'],
@@ -380,6 +358,7 @@ const ExcursionStepper: React.FC = () => {
                     <Button
                         size="lg"
                         color="blue"
+                        disabled={!isValid}
                         onClick={handleNext}
                         // disabled={currentStep === 7 || !isFormValid}
                     >

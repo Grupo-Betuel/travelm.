@@ -9,13 +9,15 @@ export interface IOrganizationsDestinationsStepProps {
     excursionData: IExcursion;
     updateExcursion: (excursion: Partial<IExcursion>) => void;
     type?: 'destinations' | 'organizations';
+    setIsValid: (isValid: boolean) => void;
 }
 
 export const OrganizationsDestinationsStep = (
     {
         excursionData,
         updateExcursion,
-        type
+        type,
+        setIsValid,
     }: IOrganizationsDestinationsStepProps = {type: 'organizations'} as IOrganizationsDestinationsStepProps) => {
     const [selectedOrganizations, setSelectedOrganizations] = React.useState<IOrganization[]>([]);
 

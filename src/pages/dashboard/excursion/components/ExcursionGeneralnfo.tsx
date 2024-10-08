@@ -19,6 +19,8 @@ import reset = Simulate.reset;
 interface GeneralInfoProps {
     excursionData: IExcursion;
     updateExcursion: (excursion: Partial<IExcursion>) => void;
+    setIsValid: (isValid: boolean) => void;
+
 }
 
 const defaultValues = {
@@ -28,10 +30,10 @@ const defaultValues = {
     endDate: null,
 }
 
-const ExcursionGeneralInfo: React.FC<GeneralInfoProps> = ({excursionData, updateExcursion}) => {
+const ExcursionGeneralInfo: React.FC<GeneralInfoProps> = ({excursionData, setIsValid, updateExcursion}) => {
     const {
         control,
-        formState: {errors},
+        formState: {errors, isValid },
         reset,
     } = useForm<any>({mode: 'all', values: excursionData});
 
@@ -45,6 +47,10 @@ const ExcursionGeneralInfo: React.FC<GeneralInfoProps> = ({excursionData, update
             reset(excursionData)
         }
     }, [excursionData._id]);
+
+    useEffect(() => {
+        setIsValid(isValid);
+    }, [isValid]);
 
     return (
 
