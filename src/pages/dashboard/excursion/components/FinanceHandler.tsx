@@ -48,12 +48,13 @@ export const FinanceHandler = ({
     const {
         control,
         formState: {errors},
-    } = useForm<IFinance>({mode: 'all', values: finance});
+    } = useForm<IFinance>({mode: 'all', defaultValues: finance});
 
     const newFinance : IFinance = useWatch({control}) as IFinance;
 
     useEffect(() => {
-        updateFinance({...finance, ...newFinance, });
+        console.log('pres',newFinance, finance)
+        updateFinance({...newFinance });
     }, [newFinance]);
 
     return (

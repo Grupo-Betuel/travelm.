@@ -89,7 +89,7 @@ const ActivitiesHandler: React.FC<ActivitiesHandlerProps> = ({activities, update
         setValue,
         getValues,
         reset,
-    } = useForm<IActivity>({mode: 'all', values: emptyActivity});
+    } = useForm<IActivity>({mode: 'all', defaultValues: emptyActivity});
 
     const newActivity = useWatch({control})
 

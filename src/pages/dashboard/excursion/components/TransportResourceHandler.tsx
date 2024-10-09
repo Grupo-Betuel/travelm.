@@ -132,7 +132,6 @@ const TransportResourceHandler: React.FC<TransportResourceHandlerProps> = ({
         if (cleanedPhone && cleanedPhone > 10) {
             console.log('Valid phone number:', phone);
 
-            // Log extracted numbers
             console.log('Extracted numbers:', cleanedPhone);
 
             if (existingDrivers && existingDrivers.length > 0) {

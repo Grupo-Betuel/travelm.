@@ -1,26 +1,14 @@
 import React, {useEffect} from "react";
-import {
-    Input,
-    Popover,
-    PopoverHandler,
-    PopoverContent, Textarea, Button,
-} from "@material-tailwind/react";
-// import { format } from "date-fns";
-// import { DayPicker } from "react-day-picker";
-// import { ChevronRightIcon, ChevronLeftIcon } from "@heroicons/react/24/outline";
-import {IExcursion} from "../../../../models/excursionModel";
+import {IExcursion} from "@/models/excursionModel";
 import DatePicker from "../../../../components/DatePicker";
-import MapPicker from "../../../../components/MapPicker";
 import {SubmitHandler, useForm, useWatch} from "react-hook-form";
 import FormControl from "@/components/FormControl";
 import {Simulate} from "react-dom/test-utils";
-import reset = Simulate.reset;
 
 interface GeneralInfoProps {
     excursionData: IExcursion;
     updateExcursion: (excursion: Partial<IExcursion>) => void;
     setIsValid: (isValid: boolean) => void;
-
 }
 
 const defaultValues = {
@@ -35,7 +23,7 @@ const ExcursionGeneralInfo: React.FC<GeneralInfoProps> = ({excursionData, setIsV
         control,
         formState: {errors, isValid },
         reset,
-    } = useForm<any>({mode: 'all', values: excursionData});
+    } = useForm<any>({mode: 'all', defaultValues: excursionData});
 
     const newExcusion: IExcursion = useWatch({control});
     useEffect(() => {

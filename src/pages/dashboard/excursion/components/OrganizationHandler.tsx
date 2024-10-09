@@ -1,4 +1,4 @@
-import React, {useMemo, useState} from "react";
+import React, {useEffect, useMemo, useState} from "react";
 import {
     Button,
 } from "@material-tailwind/react";
@@ -13,6 +13,7 @@ export interface IOrganizationSelectorProps {
     selected?: IOrganization[];
     isMultiple?: boolean;
     organizationType?: OrganizationTypesEnum;
+    setIsValid?: (isValid: boolean) => void;
 }
 
 const OrganizationHandler: React.FC<IOrganizationSelectorProps> = (
@@ -21,6 +22,7 @@ const OrganizationHandler: React.FC<IOrganizationSelectorProps> = (
         isMultiple,
         selected,
         organizationType,
+        setIsValid,
     }) => {
 
     const {
@@ -39,6 +41,12 @@ const OrganizationHandler: React.FC<IOrganizationSelectorProps> = (
         // const selectedOrganization = (organizations || []).filter((organization) => selectedValues.includes(organization._id || ''));
         onSelect(selectedValues);
     }
+
+    useEffect(() => {
+        if (setIsValid) {
+            setIsValid(!!selected?.length);
+        }
+    }, [selected]);
 
     return (
         <div className="space-y-4">

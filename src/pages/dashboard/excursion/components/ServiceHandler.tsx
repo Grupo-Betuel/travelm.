@@ -28,7 +28,7 @@ const ServiceHandler: React.FC<ServiceFormProps> = ({services, service, onUpdate
     const {
         control,
         formState: {errors},
-    } = useForm<IService>({mode: 'all', values: (service || {}) as IService});
+    } = useForm<IService>({mode: 'all', defaultValues: (service || {}) as IService});
 
     const newService: IService = useWatch({ control }) as IService;
 
