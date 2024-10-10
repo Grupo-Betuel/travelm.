@@ -282,20 +282,22 @@ const ExcursionStepper: React.FC = () => {
             label: 'Finanzas',
             icon: <UserIcon className="max-w-[20px]"/>,
             component: <FinancesHandlerStep
-                setIsValid={(valid) => updateStepValidity(5, valid)}
+                setIsValid={(valid) => updateStepValidity(6, valid)}
                 excursionData={excursion} updateExcursion={updateExcursionData}/>,
         },
         {
             properties: ['projections'],
             label: 'Proyecciones',
             icon: <UserIcon className="max-w-[20px]"/>,
-            component: <ProjectHandlerStep excursionData={excursion} updateExcursion={updateExcursionData}/>,
+            component: <ProjectHandlerStep excursionData={excursion} updateExcursion={updateExcursionData}
+                                           setIsValid={(valid) => updateStepValidity(7, valid)} />,
         },
         {
             properties: [],
             label: 'Compartir',
             icon: <UserIcon className="max-w-[20px]"/>,
-            component: <div></div>,
+            component: <div>
+            </div>
         },
     ];
 
@@ -313,38 +315,38 @@ const ExcursionStepper: React.FC = () => {
         setCurrentStep(index);
     }
 
-    useEffect(() => {
-        console.log('excursion =>', excursion);
-        const isTitleValid = !!excursion.title;
-        const isDescriptionValid = !!excursion.description;
-        const isStartDateValid = !!excursion.startDate;
-        const isEndDateValid = !!excursion.endDate;
-        const areDestinationsValid = excursion.destinations && excursion.destinations.length > 0;
-        const isFlyerValid = !!excursion.flyer;
-        const isTransportValid = !!excursion.transport;
-        const isFinanceValid = !!excursion.finance;
-        console.log('Flyer Valid:', isFlyerValid);
-        if (
-            isTitleValid &&
-            isDescriptionValid &&
-            isStartDateValid &&
-            isEndDateValid &&
-            areDestinationsValid &&
-            isFlyerValid &&
-            isTransportValid &&
-            isFinanceValid
-        ) {
-            console.log('completed');
-            if (excursion.status !== 'completed') {
-                setExcursion({...excursion, status: ExcursionStatusEnum.COMPLETED});
-            }
-        } else {
-            console.log('draft');
-            if (excursion.status !== 'draft') {
-                setExcursion({...excursion, status: ExcursionStatusEnum.DRAFT});
-            }
-        }
-    }, [excursion]);
+    // useEffect(() => {
+    //     console.log('excursion =>', excursion);
+    //     const isTitleValid = !!excursion.title;
+    //     const isDescriptionValid = !!excursion.description;
+    //     const isStartDateValid = !!excursion.startDate;
+    //     const isEndDateValid = !!excursion.endDate;
+    //     const areDestinationsValid = excursion.destinations && excursion.destinations.length > 0;
+    //     const isFlyerValid = !!excursion.flyer;
+    //     const isTransportValid = !!excursion.transport;
+    //     const isFinanceValid = !!excursion.finance;
+    //     console.log('Flyer Valid:', isFlyerValid);
+    //     if (
+    //         isTitleValid &&
+    //         isDescriptionValid &&
+    //         isStartDateValid &&
+    //         isEndDateValid &&
+    //         areDestinationsValid &&
+    //         isFlyerValid &&
+    //         isTransportValid &&
+    //         isFinanceValid
+    //     ) {
+    //         console.log('completed');
+    //         if (excursion.status !== 'completed') {
+    //             setExcursion({...excursion, status: ExcursionStatusEnum.COMPLETED});
+    //         }
+    //     } else {
+    //         console.log('draft');
+    //         if (excursion.status !== 'draft') {
+    //             setExcursion({...excursion, status: ExcursionStatusEnum.DRAFT});
+    //         }
+    //     }
+    // }, [excursion]);
 
 
     useEffect(() => {

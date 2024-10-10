@@ -44,6 +44,15 @@ const FinancesHandlerStep: React.FC<FinancesStepProps> = ({excursionData, update
         updateExcursion({finance: {...excursionData.finance, cost: total}});
     }, [total, excursionData.finance?.cost])
 
+    useEffect(() => {
+        if (excursionData.finance?.price && excursionData.finance.price > 0) {
+            console.log("es valido")
+            setIsValid(true);
+        } else {
+            setIsValid(false);
+        }
+    }, [excursionData.finance?.price]);
+
     console.log('total', total, excursionData.finance);
     return (
         <div>

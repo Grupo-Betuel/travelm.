@@ -161,7 +161,7 @@ const ActivitiesHandler: React.FC<ActivitiesHandlerProps> = ({activities, update
                     </div>
                     <MediaHandler key={editActivityIndex !== undefined ? `edit-${editActivityIndex}` : undefined}
                                   handle={{images: true}} onChange={onMediaSubmit} medias={activityForm.images}/>
-                    <Button color="blue" type={"submit"} disabled={!isActivityValid}>
+                    <Button color="blue" type={"submit"} disabled={!isActivityValid} data-avoid-disabled-on-app-loading>
                         {editActivityIndex !== undefined ? 'Actualizar' : 'Crear'} Actividad
                     </Button>
                     {(editActivityIndex !== undefined) && (

@@ -18,7 +18,7 @@ const ActivitiesHandlerStep: React.FC<ActivitiesStepProps> = ({excursionData, up
     }
 
     useEffect(() => {
-        setIsValid(!!excursionData.activities?.length); // Set valid if there are activities
+        setIsValid(true)
     }, [excursionData.activities]);
 
     return (
