@@ -3,7 +3,7 @@ import {Button, Card, CardBody, CardHeader, Typography} from '@material-tailwind
 import {UserIcon} from '@heroicons/react/20/solid';
 import ExcursionGeneralInfo from '../components/ExcursionGeneralnfo';
 import {MediaHandlerStep} from '../components/Steps/MediaHandlerStep';
-import {IExcursion} from '@/models/excursionModel';
+import {ExcursionStatusEnum, IExcursion} from '@/models/excursionModel';
 import {OrganizationsDestinationsStep} from "../components/Steps/OrganizationsDestinationsStep";
 import ActivitiesHandlerStep from "../components/Steps/ActivitiesHandlerStep";
 import FoodsHandlerStep from "../components/Steps/FoodsHandlerStep";
@@ -282,7 +282,7 @@ const ExcursionStepper: React.FC = () => {
             label: 'Finanzas',
             icon: <UserIcon className="max-w-[20px]"/>,
             component: <FinancesHandlerStep
-
+                setIsValid={(valid) => updateStepValidity(5, valid)}
                 excursionData={excursion} updateExcursion={updateExcursionData}/>,
         },
         {
@@ -313,40 +313,38 @@ const ExcursionStepper: React.FC = () => {
         setCurrentStep(index);
     }
 
-    // useEffect(() => {
-    //     console.log('excursion =>', excursion);
-    //     const isTitleValid = !!excursion.title;
-    //     const isDescriptionValid = !!excursion.description;
-    //     const isStartDateValid = !!excursion.startDate;
-    //     const isEndDateValid = !!excursion.endDate;
-    //     const areDestinationsValid = excursion.destinations && excursion.destinations.length > 0;
-    //     const isFlyerValid = !!excursion.flyer;
-    //     const isTransportValid = !!excursion.transport;
-    //     const isFinanceValid = !!excursion.finance;
-    //     console.log('Flyer Valid:', isFlyerValid);
-    //
-    //     if (
-    //         isTitleValid &&
-    //         isDescriptionValid &&
-    //         isStartDateValid &&
-    //         isEndDateValid &&
-    //         areDestinationsValid &&
-    //         isFlyerValid &&
-    //         isTransportValid &&
-    //         isFinanceValid
-    //     ) {
-    //         console.log('completed');
-    //         if (excursion.status !== 'completed') {
-    //             setExcursion({...excursion, status: ExcursionStatusEnum.COMPLETED});
-    //         }
-    //     } else {
-    //         console.log('draft');
-    //         if (excursion.status !== 'draft') {
-    //             setExcursion({...excursion, status: ExcursionStatusEnum.DRAFT});
-    //         }
-    //     }
-    //
-    // }, [excursion]);
+    useEffect(() => {
+        console.log('excursion =>', excursion);
+        const isTitleValid = !!excursion.title;
+        const isDescriptionValid = !!excursion.description;
+        const isStartDateValid = !!excursion.startDate;
+        const isEndDateValid = !!excursion.endDate;
+        const areDestinationsValid = excursion.destinations && excursion.destinations.length > 0;
+        const isFlyerValid = !!excursion.flyer;
+        const isTransportValid = !!excursion.transport;
+        const isFinanceValid = !!excursion.finance;
+        console.log('Flyer Valid:', isFlyerValid);
+        if (
+            isTitleValid &&
+            isDescriptionValid &&
+            isStartDateValid &&
+            isEndDateValid &&
+            areDestinationsValid &&
+            isFlyerValid &&
+            isTransportValid &&
+            isFinanceValid
+        ) {
+            console.log('completed');
+            if (excursion.status !== 'completed') {
+                setExcursion({...excursion, status: ExcursionStatusEnum.COMPLETED});
+            }
+        } else {
+            console.log('draft');
+            if (excursion.status !== 'draft') {
+                setExcursion({...excursion, status: ExcursionStatusEnum.DRAFT});
+            }
+        }
+    }, [excursion]);
 
 
     useEffect(() => {

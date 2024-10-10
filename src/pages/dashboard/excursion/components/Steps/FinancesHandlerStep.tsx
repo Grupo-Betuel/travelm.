@@ -9,9 +9,10 @@ import {Typography} from "@material-tailwind/react";
 interface FinancesStepProps {
     excursionData: IExcursion;
     updateExcursion: (excursion: Partial<IExcursion>) => void;
+    setIsValid: (isValid: boolean) => void;
 }
 
-const FinancesHandlerStep: React.FC<FinancesStepProps> = ({excursionData, updateExcursion}) => {
+const FinancesHandlerStep: React.FC<FinancesStepProps> = ({excursionData, updateExcursion, setIsValid}) => {
     const onUpdateFinances = (finance: IFinance) => {
         updateExcursion({finance});
     }

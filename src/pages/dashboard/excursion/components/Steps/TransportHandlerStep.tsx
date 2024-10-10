@@ -51,7 +51,6 @@ export const TransportHandlerStep = (
         console.log("Datos", TransportData);
     }, [TransportData]);
 
-
     return (
         <div>
             <h1>Transport Organization</h1>

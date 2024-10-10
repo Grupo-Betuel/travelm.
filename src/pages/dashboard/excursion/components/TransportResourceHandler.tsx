@@ -208,11 +208,17 @@ const TransportResourceHandler: React.FC<TransportResourceHandlerProps> = ({
 
     const isTransportValid = useMemo(() => {
         const driver = newTransportResource.driver || {};
+        const bus = newTransportResource.bus || {};
+
         const hasValidPhone = driver.phone && driver.phone.length > 0;
         const hasValidFirstName = driver.firstName && driver.firstName.length > 0;
+        const hasValidPrice = newTransportResource.finance?.price && newTransportResource.finance?.price > 0;
+        const hasValidBus = bus._id && bus._id.length > 0;
 
-        return isValid && hasValidPhone && hasValidFirstName;
-    }, [isValid, newTransportResource.driver]);
+        return isValid && hasValidPhone && hasValidFirstName && hasValidPrice && hasValidBus;
+    }, [isValid, newTransportResource]);
+
+    console.log(isTransportValid);
 
     return (
         <div className="flex flex-col gap-3">
@@ -258,7 +264,9 @@ const TransportResourceHandler: React.FC<TransportResourceHandlerProps> = ({
                 <FinanceHandler enabledCost={true} finance={transportResourceForm.finance} type="transport"
                                 updateFinance={handleFinanceChange}/>
                 <Button color="blue" disabled={!isTransportValid}
-                        type={"submit"}>{editingIndex !== null ? `${BASIC_CONSTANTS.SAVE_TEXT}` : 'Add Transport Resource'}</Button>
+                        data-avoid-disabled-on-app-loading
+                        type={"submit"}>{editingIndex !== null ? `${BASIC_CONSTANTS.SAVE_TEXT}` : 'Add Transport Resource'}
+                </Button>
             </form>
             <div className="grid grid-cols-3 gap-4">
                 {transportResources.map((bus, index) => (
