@@ -1,4 +1,4 @@
-import React, {MouseEvent, useState} from 'react';
+import React, {useMemo, useState} from 'react';
 import {
     Button,
     Card,
@@ -7,7 +7,6 @@ import {
     CardHeader,
     Dialog, DialogBody, DialogFooter,
     DialogHeader,
-    Input,
     Typography
 } from '@material-tailwind/react';
 import ReactQuill from 'react-quill';
@@ -20,7 +19,9 @@ import {CommonConfirmActions, CommonConfirmActionsDataTypes} from "@/models/comm
 import {useConfirmAction} from "@/hooks/useConfirmActionHook";
 import {Swiper, SwiperSlide} from "swiper/react";
 import {Navigation, Pagination} from "swiper/modules";
-import {AppImage} from "@/components/AppImage"; // Include the Quill stylesheet
+import {AppImage} from "@/components/AppImage";
+import {SubmitHandler, useForm, useWatch} from "react-hook-form";
+import FormControl from "@/components/FormControl"; // Include the Quill stylesheet
 
 
 interface ActivitiesHandlerProps {
@@ -28,7 +29,7 @@ interface ActivitiesHandlerProps {
     updateActivities: (activities: IActivity[]) => void;
 }
 
-export const emptyActivity: IActivity = {
+const emptyActivity: IActivity = {
     title: '',
     images: [],
     videos: [],
@@ -45,13 +46,10 @@ const ActivitiesHandler: React.FC<ActivitiesHandlerProps> = ({activities, update
     const [selectedDescription, setSelectedDescription] = useState<string>('');
 
     const [deleteActivity] = activitiesService.useDeleteActivities();
-
     const onConfirmAction = (type?: CommonConfirmActions, data?: CommonConfirmActionsDataTypes<IActivity>) => {
         switch (type) {
             case 'delete':
                 handleDeleteActivity(data as IActivity);
-                // setEditActivityIndex(undefined);
-                // setActivityForm(emptyActivity);
                 break;
         }
     }
@@ -66,26 +64,10 @@ const ActivitiesHandler: React.FC<ActivitiesHandlerProps> = ({activities, update
         ConfirmDialog
     } = useConfirmAction<CommonConfirmActions, CommonConfirmActionsDataTypes<IActivity>>(onConfirmAction, onDeniedAction);
 
-    const handleAddOrUpdateActivity = (index?: number) => {
-        if (!!activityForm._id || editActivityIndex !== undefined) {
-            const updatedActivities = activities.map((act, idx) => {
-                if (activityForm._id && act._id === activityForm._id) {
-                    return activityForm;
-
-                } else if (idx === editActivityIndex) {
-                    return activityForm;
-                }
-
-                return act
-            });
-
-            updateActivities(updatedActivities);
-        } else {
-            updateActivities([...activities, activityForm]);
-        }
-
-        cleanActivityHandler()
-    };
+    const handleViewDescription = (description: string) => {
+        setSelectedDescription(description);
+        setIsDialogOpen(true);
+    }
 
     const handleDeleteActivity = (activity: IActivity) => {
         const filteredActivities = activities.filter((a) => {
@@ -100,37 +82,61 @@ const ActivitiesHandler: React.FC<ActivitiesHandlerProps> = ({activities, update
         activity._id && deleteActivity(activity._id as string);
     };
 
+    const {
+        control,
+        handleSubmit,
+        formState: {errors, isValid},
+        setValue,
+        getValues,
+        reset,
+    } = useForm<IActivity>({mode: 'all', defaultValues: emptyActivity});
+
+    const newActivity = useWatch({control})
+
+    const handleSave: SubmitHandler<IActivity> = (formData) => {
+        if (formData._id || editActivityIndex !== undefined) {
+            const updatedActivities = activities.map((act, idx) => {
+                if (formData._id && act._id === formData._id) {
+                    return formData;
+                } else if (idx === editActivityIndex) {
+                    return formData;
+                }
+                return act;
+            });
+
+            updateActivities(updatedActivities);
+        } else {
+            updateActivities([...activities, formData]);
+        }
+
+        reset(emptyActivity);
+        setEditActivityIndex(undefined);
+    };
+
+
     const onMediaSubmit = (data: IMediaHandled) => {
         const updatedMedia = {
             ...activityForm,
             ...data
         };
 
-        setActivityForm(updatedMedia);
-    }
-
-    const onSelectDate = (
-        date?: Date | undefined) => {
-        setActivityForm({...activityForm, date});
+        setValue('images', updatedMedia.images)
     }
 
     const cleanActivityHandler = () => {
-        // setActivityForm(emptyActivity);
-        setActivityForm({...emptyActivity, images: []});
+        reset(emptyActivity)
         setEditActivityIndex(undefined);
     }
 
     const editActivityMode = (index: number) => () => {
-        setActivityForm(activities[index]);
+        reset(activities[index])
         setEditActivityIndex(index);
     }
 
-    const handleViewDescription = (description: string) => {
-        setSelectedDescription(description);
-        setIsDialogOpen(true);
-    }
+    const isActivityValid = useMemo(() => {
+        return isValid && newActivity.title && newActivity.title.length > 0;
+    }, [isValid, newActivity.finance]);
 
-    // (date: Date) => setActivityForm({ ...activityForm, date })
     return (
         <div className="flex flex-col gap-5 pb-10">
             <div className="border-2 rounded-lg p-4">
@@ -138,33 +144,30 @@ const ActivitiesHandler: React.FC<ActivitiesHandlerProps> = ({activities, update
                     <Typography
                         variant="h5">{editActivityIndex !== undefined ? 'Editar' : 'Agregar Nueva'} Actividad</Typography>
                 </div>
-                <div className="flex flex-col gap-5">
-                    <Input
-                        type="text"
-                        label="Title"
-                        value={activityForm.title}
-                        onChange={(e) => setActivityForm({...activityForm, title: e.target.value})}
-                        className="mb-4"
-                    />
-                    {/*<DatePicker*/}
-                    {/*    label="Select Date"*/}
-                    {/*    onChange={onSelectDate}*/}
-                    {/*    date={activityForm.date}*/}
-                    {/*/>*/}
-                    <ReactQuill
-                        theme="snow"
-                        value={activityForm.description}
-                        onChange={(content) => setActivityForm({...activityForm, description: content})}
-                    />
-                </div>
-                <MediaHandler key={editActivityIndex !== undefined ? `edit-${editActivityIndex}` : undefined}
-                              handle={{images: true}} onChange={onMediaSubmit} medias={activityForm.images}/>
-                <Button color="blue" onClick={() => handleAddOrUpdateActivity()}>
-                    {editActivityIndex !== undefined ? 'Actualizar' : 'Crear'} Actividad
-                </Button>
-                {(editActivityIndex !== undefined ) && (
-                <Button className='mx-2' color="gray" onClick={cleanActivityHandler}>Cancelar</Button>
-                )}
+                <form onSubmit={handleSubmit(handleSave)}>
+                    <div className="flex flex-col gap-5">
+                        <FormControl
+                            name="title"
+                            control={control}
+                            label="Nombre de la Actividad"
+                            rules={{required: 'El título de la Actividad es requerido'}}
+                            className="w-full"
+                        />
+                        <ReactQuill
+                            theme="snow"
+                            value={getValues("description")} // Obtener valor del formulario
+                            onChange={(content) => setValue("description", content)} // Actualizar el valor en react-hook-form
+                        />
+                    </div>
+                    <MediaHandler key={editActivityIndex !== undefined ? `edit-${editActivityIndex}` : undefined}
+                                  handle={{images: true}} onChange={onMediaSubmit} medias={activityForm.images}/>
+                    <Button color="blue" type={"submit"} disabled={!isActivityValid} data-avoid-disabled-on-app-loading>
+                        {editActivityIndex !== undefined ? 'Actualizar' : 'Crear'} Actividad
+                    </Button>
+                    {(editActivityIndex !== undefined) && (
+                        <Button className='mx-2' color="gray" onClick={cleanActivityHandler}>Cancelar</Button>
+                    )}
+                </form>
             </div>
             <div className="grid gap-y-6 gap-x-6 md:grid-cols-2 xl:grid-cols-4">
                 {(activities || []).map((activity, index) => (
@@ -181,7 +184,8 @@ const ActivitiesHandler: React.FC<ActivitiesHandlerProps> = ({activities, update
                                 >
                                     {activity.images.map((image, index) => (
                                         <SwiperSlide key={index}>
-                                            <AppImage src={image.content} alt={image.title} className="w-full h-full m-0 object-contain rounded-md"/>
+                                            <AppImage src={image.content} alt={image.title}
+                                                      className="w-full h-full m-0 object-contain rounded-md"/>
                                         </SwiperSlide>
                                     ))}
                                 </Swiper>
@@ -192,16 +196,10 @@ const ActivitiesHandler: React.FC<ActivitiesHandlerProps> = ({activities, update
                             <Typography variant="h6" className="font-bold line-clamp-2">
                                 {activity.title}
                             </Typography>
-                            {/*<DatePicker*/}
-                            {/*    label="Select Date"*/}
-                            {/*    onChange={onSelectDate}*/}
-                            {/*    date={activityForm.date}*/}
-                            {/*    disabled={true}*/}
-                            {/*/>*/}
                             {activity.description &&
-                            <Button color="blue" onClick={() => handleViewDescription(activity.description)}>
-                                Ver Descripción Completa
-                            </Button>
+                                <Button color="blue" onClick={() => handleViewDescription(activity.description)}>
+                                    Ver Descripción Completa
+                                </Button>
                             }
                         </CardBody>
 
@@ -229,7 +227,7 @@ const ActivitiesHandler: React.FC<ActivitiesHandlerProps> = ({activities, update
             <Dialog open={isDialogOpen} handler={setIsDialogOpen} className=' '>
                 <DialogHeader>Descripción Completa</DialogHeader>
                 <DialogBody divider className='h-[70vh] overflow-y-auto'>
-                    <div dangerouslySetInnerHTML={{ __html: selectedDescription }} />
+                    <div dangerouslySetInnerHTML={{__html: selectedDescription}}/>
                 </DialogBody>
                 <DialogFooter>
                     <Button

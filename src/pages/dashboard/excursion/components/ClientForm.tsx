@@ -121,6 +121,7 @@ const ClientForm: React.FC<ClientFormProps> = (
                     label="Apellido"
                     rules={{required: 'El apellido es requerido'}}
                     className={'w-full'}
+                    data-disabled-loading
                 />
             </div>
             <FormControl

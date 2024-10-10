@@ -73,7 +73,7 @@ const PaymentHandler: React.FC<PaymentHandlerProps> = (
         setValue,
         getValues,
         reset,
-    } = useForm<IPayment>({mode: 'all', values: emptyPayment});
+    } = useForm<IPayment>({mode: 'all', defaultValues: emptyPayment});
 
     const currentPayment = useWatch({control});
 

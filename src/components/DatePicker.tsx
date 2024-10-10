@@ -69,6 +69,7 @@ const DatePicker: React.FC<DatePickerProps> = ({
                 <PopoverHandler>
                     <div>
                         <Input
+                            crossOrigin={false}
                             ref={ref}
                             name={name}
                             label={label}
