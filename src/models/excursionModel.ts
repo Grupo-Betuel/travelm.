@@ -12,6 +12,7 @@ import {BaseModel} from "./interfaces/BaseModel";
 import {IBedroom} from "./bedroomModel";
 import {IExpense} from "@/models/ExpensesModel";
 import {IService} from "@/models/serviceModel";
+import {IExcursionConfiguration} from "@/models/IConfiguration";
 
 export type ExcursionDetailActions = 'remove-client' | 'add-client' | 'update-client' | 'update' | 'update-service' | 'update-expense' | 'delete-expense';
 export type ExcursionDetailActionsDataTypes = IClient | Partial<IExcursion> | Partial<IClient>[] | Partial<IService>;
@@ -28,6 +29,7 @@ export interface IExcursion extends BaseModel {
     organizations: IOrganization[];
     owner: IOrganization;
     clients: IClient[];
+    configuration: IExcursionConfiguration;
     finance: IFinance;
     checkpoints: ICheckpoint[];
     flyer: IMedia;
