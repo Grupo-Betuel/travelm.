@@ -19,6 +19,7 @@ import {
     MenuItem,
 } from "@material-tailwind/react";
 import { PlusIcon, XMarkIcon, PencilIcon } from "@heroicons/react/24/solid";
+import { IExcursionConfiguration } from "@/models/IConfiguration";
 
 enum ExcursionConfigTypeEnum {
     PROMOTION = 'promotion',
@@ -34,10 +35,6 @@ interface TabData {
     label: string;
     value: string;
     type: ExcursionConfigTypeEnum;
-    subTabs: {
-        label: string;
-        content: string;
-    }[];
 }
 
 interface ICustomComponentDialog {
@@ -47,44 +44,24 @@ interface ICustomComponentDialog {
 
 interface IConfigTabs {
     dialog?: ICustomComponentDialog;
+    config?: IExcursionConfiguration;
 }
 
 export default function Component({ dialog }: IConfigTabs) {
     const [tabs, setTabs] = useState<TabData[]>([
-        { label: "Recibos", value: "recibos", type: ExcursionConfigTypeEnum.RECEIPT, subTabs: [
-                { label: "Nombre", content: "Contenido para Nombre en Recibos" },
-                { label: "Apellido", content: "Contenido para Apellido en Recibos" },
-                { label: "Encuesta", content: "Contenido para Encuesta en Recibos" },
-                { label: "multimedia", content: "Contenido para multimedia en Recibos" },
-            ]},
-        { label: "Promoción", value: "promocion", type: ExcursionConfigTypeEnum.PROMOTION, subTabs: [
-                { label: "Nombre", content: "Contenido para Nombre en Promoción" },
-                { label: "Apellido", content: "Contenido para Apellido en Promoción" },
-                { label: "Encuesta", content: "Contenido para Encuesta en Promoción" },
-                { label: "multimedia", content: "Contenido para multimedia en Promoción" },
-            ]},
-        { label: "Motivar", value: "motivar", type: ExcursionConfigTypeEnum.MOTIVATION, subTabs: [
-                { label: "Nombre", content: "Contenido para Nombre en Motivar" },
-                { label: "Apellido", content: "Contenido para Apellido en Motivar" },
-                { label: "Encuesta", content: "Contenido para Encuesta en Motivar" },
-                { label: "multimedia", content: "Contenido para multimedia en Motivar" },
-            ]},
+        { label: "Recibos", value: "recibos", type: ExcursionConfigTypeEnum.RECEIPT },
+        { label: "Promoción", value: "promocion", type: ExcursionConfigTypeEnum.PROMOTION },
+        { label: "Motivar", value: "motivar", type: ExcursionConfigTypeEnum.MOTIVATION },
     ]);
     const [activeTab, setActiveTab] = useState("recibos");
-    const [activeSubTab, setActiveSubTab] = useState("Nombre");
     const [editingTabIndex, setEditingTabIndex] = useState<number | null>(null);
+    const [textareaContent, setTextareaContent] = useState("");
 
     const addNewTab = (type: ExcursionConfigTypeEnum) => {
         const newTab: TabData = {
             label: type,
             value: type.toLowerCase(),
             type: type,
-            subTabs: [
-                { label: "Nombre", content: "" },
-                { label: "Apellido", content: "" },
-                { label: "Encuesta", content: "" },
-                { label: "multimedia", content: "" },
-            ],
         };
         setTabs([...tabs, newTab]);
     };
@@ -97,25 +74,15 @@ export default function Component({ dialog }: IConfigTabs) {
         }
     };
 
-    const updateSubTabContent = (tabValue: string, subTabLabel: string, newContent: string) => {
-        setTabs(prevTabs => prevTabs.map(tab => {
-            if (tab.value === tabValue) {
-                return {
-                    ...tab,
-                    subTabs: tab.subTabs.map(subTab =>
-                        subTab.label === subTabLabel ? { ...subTab, content: newContent } : subTab
-                    )
-                };
-            }
-            return tab;
-        }));
-    };
-
     const updateTabLabel = (index: number, newLabel: string) => {
         setTabs(prevTabs => prevTabs.map((tab, i) =>
             i === index ? { ...tab, label: newLabel } : tab
         ));
         setEditingTabIndex(null);
+    };
+
+    const insertText = (text: string) => {
+        setTextareaContent(prevContent => prevContent + text);
     };
 
     const content = (
@@ -126,6 +93,7 @@ export default function Component({ dialog }: IConfigTabs) {
                         <div key={value} className="flex items-center">
                             {editingTabIndex === index ? (
                                 <Input
+                                    crossOrigin
                                     type="text"
                                     defaultValue={label}
                                     onBlur={(e) => updateTabLabel(index, e.target.value)}
@@ -180,38 +148,22 @@ export default function Component({ dialog }: IConfigTabs) {
                     </Menu>
                 </TabsHeader>
                 <TabsBody>
-                    {tabs.map(({ value, subTabs }) => (
+                    {tabs.map(({ value }) => (
                         <TabPanel key={value} value={value}>
-                            <Tabs value={activeSubTab}>
-                                <TabsHeader>
-                                    {subTabs.map(({ label }) => (
-                                        <Tab
-                                            key={label}
-                                            value={label}
-                                            onClick={() => setActiveSubTab(label)}
-                                        >
-                                            {label}
-                                        </Tab>
-                                    ))}
-                                </TabsHeader>
-                                <TabsBody>
-                                    {subTabs.map(({ label, content }) => (
-                                        <TabPanel key={label} value={label}>
-                                            <div className="border-2 border-gray-300 rounded-lg p-4 h-64">
-                                                <h2 className="text-2xl font-bold mb-4">
-                                                    {tabs.find(tab => tab.value === activeTab)?.label} - {label}
-                                                </h2>
-                                                <Textarea
-                                                    value={content}
-                                                    onChange={(e) => updateSubTabContent(value, label, e.target.value)}
-                                                    placeholder={`Edita el contenido para ${label} en ${tabs.find(tab => tab.value === activeTab)?.label}`}
-                                                    className="w-full h-40"
-                                                />
-                                            </div>
-                                        </TabPanel>
-                                    ))}
-                                </TabsBody>
-                            </Tabs>
+                            <div className="flex flex-col space-y-4">
+                                <div className="flex space-x-2">
+                                    <Button onClick={() => insertText("@firstname")}>Nombre</Button>
+                                    <Button onClick={() => insertText("@lastname")}>Apellido</Button>
+                                    <Button onClick={() => insertText("")}>Encuesta</Button>
+                                    <Button onClick={() => insertText("")}>multimedia</Button>
+                                </div>
+                                <Textarea
+                                    value={textareaContent}
+                                    onChange={(e) => setTextareaContent(e.target.value)}
+                                    placeholder="El contenido se insertará aquí"
+                                    className="w-full h-64"
+                                />
+                            </div>
                         </TabPanel>
                     ))}
                 </TabsBody>
