@@ -26,7 +26,7 @@ import {BedroomDetails} from "../components/BedroomsDetails";
 import Messaging from "../../../../components/WhatsappMessageHandler";
 import {UserRoleTypes, UserTypes} from "@/models/interfaces/userModel";
 import ProtectedElement from "../../../../components/ProtectedElement";
-import {IoReload} from "react-icons/io5";
+import {IoReload, IoSettings} from "react-icons/io5";
 import {FaWhatsapp} from "react-icons/fa";
 import {useAppLoading} from "@/context/appLoadingContext";
 import ExcursionDetailsSkeleton from "../../../../components/ExcursionDetailsSkeleton";
@@ -37,6 +37,7 @@ import {IService} from "@/models/serviceModel";
 import {emptyClient} from "@/pages/dashboard/excursion/components/ClientForm";
 import {EXPENSES_CONSTANTS} from "@/constants/expenses.constant";
 import {CheckpointDetails} from "@/pages/dashboard/excursion/components/CheckpointDetails";
+import ConfigTabs from "@/components/ConfigTabs";
 
 const excursionService = getCrudService('excursions');
 const clientService = getCrudService('travelClients');
@@ -52,8 +53,10 @@ export const ExcursionDetails: React.FC = () => {
     const params = useParams();
     const [updateExcursion, {isLoading: isUpdating, data: updatedExcursion}] = excursionService.useUpdateExcursions();
     const [wsMessagingIsOpen, setWsMessagingIsOpen] = useState(false);
+    const [settingsIsOpen, setSettingsIsOpen] = useState(false);
     const ownerOrganization = useMemo(() => excursion.owner, [excursion.owner]);
     const toggleWsMessaging = () => setWsMessagingIsOpen(!wsMessagingIsOpen);
+    const toggleSettings = () => setSettingsIsOpen(!settingsIsOpen);
     const {setAppIsLoading} = useAppLoading();
 
     const [isExpenseDialogOpen, setIsExpenseDialogOpen] = useState(false);
@@ -337,6 +340,9 @@ export const ExcursionDetails: React.FC = () => {
                 <Button color="blue" className="flex items-center gap-2" onClick={refetchExcursion}>
                     Recargar <IoReload className="w-[18px] h-[18px] cursor-pointer"/>
                 </Button>
+                <Button color="blue" className="flex items-center gap-2" onClick={toggleSettings}>
+                    settings <IoSettings className="w-[18px] h-[18px] cursor-pointer"/>
+                </Button>
             </div>
 
             <ClientsExcursionTable
@@ -390,6 +396,15 @@ export const ExcursionDetails: React.FC = () => {
                         open: wsMessagingIsOpen,
                         handler: toggleWsMessaging,
                     }}/>
+            }
+            {ownerOrganization?.sessionId && settingsIsOpen &&
+                <ConfigTabs
+                    dialog={{
+                        open: settingsIsOpen,
+                        handler: toggleSettings,
+                    }}
+                    config={excursion.configuration}
+                />
             }
         </div>
     );
