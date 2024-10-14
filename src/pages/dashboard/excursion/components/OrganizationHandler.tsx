@@ -7,6 +7,7 @@ import {IOrganization, OrganizationTypesEnum} from "../../../../models/organizat
 import SearchableSelect from "../../../../components/SearchableSelect";
 import {OrganizationCard} from "./OrganizationCard";
 import {useOrganizationHandler} from "../../../../hooks/useOrganizationHandler";
+import {useForm} from "react-hook-form";
 
 export interface IOrganizationSelectorProps {
     onSelect: (selected: IOrganization[]) => void;
@@ -47,11 +48,15 @@ const OrganizationHandler: React.FC<IOrganizationSelectorProps> = (
             setIsValid(!!selected?.length);
         }
     }, [selected]);
+    const { control } = useForm({ mode: 'all' })
 
     return (
         <div className="space-y-4">
             <div className="flex items-center gap-3 w-100">
                 <SearchableSelect<IOrganization>
+                    control={control}
+                    name="organization"
+                    rules={{ required: 'Organization is required' }}
                     onSelect={handleOnSelectOrganization}
                     options={organizations || []}
                     label="Select Organization"

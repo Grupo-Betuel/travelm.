@@ -4,6 +4,7 @@ import {IExcursion} from "../../../../../models/excursionModel";
 import {OrganizationCard} from "../OrganizationCard";
 import {IOrganization} from "../../../../../models/organizationModel";
 import {Typography} from "@material-tailwind/react";
+import {useForm} from "react-hook-form";
 
 export interface IOrganizationsDestinationsStepProps {
     excursionData: IExcursion;
