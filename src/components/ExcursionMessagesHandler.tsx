@@ -15,12 +15,17 @@ import {
 } from "@material-tailwind/react";
 import {PlusIcon} from "@heroicons/react/24/solid";
 import {
-    ExcursionConfigTypeEnum,
+    ExcursionConfigTypeEnum, excursionConfigTypeLabels,
     IExcursionMessage
 } from "@/models/ExcursionConfigurationModels";
 import {ContentEditableDiv} from "@/components/ContentEditable";
 import {WhatsAppMarkdownPreview} from "@/components/WhatsappMarkdownPreview";
-import {TrashIcon} from "@heroicons/react/20/solid";
+import {ListBulletIcon, TrashIcon} from "@heroicons/react/20/solid";
+import {BiBold, BiItalic, BiStrikethrough} from "react-icons/bi";
+import {GrBlockQuote, GrMonospace} from "react-icons/gr";
+import {BsQuote} from "react-icons/bs";
+import {CgQuote} from "react-icons/cg";
+import {ImListNumbered} from "react-icons/im";
 
 interface IExcursionSettingHandlerProps {
     initialMessages?: IExcursionMessage[];
@@ -189,7 +194,7 @@ export default function ExcursionMessagesHandler(
 
     React.useEffect(() => {
         const messageData = structuredClone(messages);
-        if(enableCustomMessage && (customMessage.text || customMessage.medias?.length)) {
+        if (enableCustomMessage && (customMessage.text || customMessage.medias?.length)) {
             messageData.unshift(customMessage);
         }
         onChange(messageData);
@@ -209,16 +214,24 @@ export default function ExcursionMessagesHandler(
                 <div className="relative">
                     <div className="flex space-x-2 mb-2">
                         <Tooltip content="Bold">
-                            <Button onClick={() => applyMarkdown('*')}>B</Button>
+                            <Button onClick={() => applyMarkdown('*')} className='p-2 border-2' color={'white'}>
+                                <BiBold className="w-4 h-4 text-black"/>
+                            </Button>
                         </Tooltip>
                         <Tooltip content="Italic">
-                            <Button onClick={() => applyMarkdown('_')}>I</Button>
+                            <Button onClick={() => applyMarkdown('_')} className='p-2 border-2' color={'white'}>
+                                <BiItalic className="w-4 h-4 text-black"/>
+                            </Button>
                         </Tooltip>
                         <Tooltip content="Strikethrough">
-                            <Button onClick={() => applyMarkdown('~')}>S</Button>
+                            <Button onClick={() => applyMarkdown('~')} className='p-2 border-2' color={"white"}>
+                                <BiStrikethrough className="w-4 h-4 text-black"/>
+                            </Button>
                         </Tooltip>
                         <Tooltip content="Monospace">
-                            <Button onClick={() => applyMarkdown('```')}>M</Button>
+                            <Button onClick={() => applyMarkdown('```')} className="p-2 border" color={"white"}>
+                                <GrMonospace className="w-4 h-4 text-black"/>
+                            </Button>
                         </Tooltip>
                         <Tooltip content="Blockquote">
                             <Button onClick={() => {
@@ -229,13 +242,19 @@ export default function ExcursionMessagesHandler(
                                     const quoteText = selectedText ? `> ${selectedText}` : '> ';
                                     insertText(quoteText);
                                 }
-                            }}>Quote</Button>
+                            }} className="p-2 border-2" color={"white"}>
+                                <GrBlockQuote className="w-4 h-4 text-black"/>
+                            </Button>
                         </Tooltip>
                         <Tooltip content="Ordered List">
-                            <Button onClick={() => insertText('\n1. ')}>OL</Button>
+                            <Button onClick={() => insertText('\n1. ')} className="p-2 border-2" color={'white'}>
+                                <ImListNumbered className="w-4 h-4 text-black"/>
+                            </Button>
                         </Tooltip>
                         <Tooltip content="Unordered List">
-                            <Button onClick={() => insertText('\n- ')}>UL</Button>
+                            <Button onClick={() => insertText('\n- ')} className="p-2 border-2" color={'white'}>
+                                <ListBulletIcon className="w-5 h-5 text-black"/>
+                            </Button>
                         </Tooltip>
                     </div>
                 </div>
@@ -250,14 +269,16 @@ export default function ExcursionMessagesHandler(
                     {messages.map((tab, index) => renderTabHeader(tab, index))}
                     <Menu>
                         <MenuHandler>
-                            <Button className="flex items-center gap-3">
-                                <PlusIcon className="h-5 w-5"/>
+                            <Button
+                                className="flex items-center flex-shrink-0 justify-center w-8 h-8 my-auto rounded-2xl shadow-lg focus:outline-none focus:ring-2 focus:ring-opacity-50"
+                            >
+                                <PlusIcon className="w-6 h-6 text-white flex-shrink-0"/>
                             </Button>
                         </MenuHandler>
                         <MenuList className="z-[99999]">
                             {Object.values(ExcursionConfigTypeEnum).map((type) => (
                                 <MenuItem key={type} onClick={() => addNewTab(type)}>
-                                    {type}
+                                    {excursionConfigTypeLabels[type]}
                                 </MenuItem>
                             ))}
                         </MenuList>
