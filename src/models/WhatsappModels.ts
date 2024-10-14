@@ -39,10 +39,11 @@ export const whatsappSessionNames: { [K in WhatsappSessionTypes & any]: string }
 
 
 export interface IWsUser {
-    firstName: string;
-    lastName: string;
+    id?: string;
+    firstName?: string;
+    lastName?: string;
     fullName?: string;
-    phone: string;
+    phone?: string;
 }
 
 export interface IWsGroup {
@@ -71,6 +72,7 @@ export interface ISeed {
 
 export type WhatsappSeedTypes = 'users' | 'groups' | 'labels' | 'all';
 
+export type WhatsappRecipientTypes = 'user' | 'group';
 
 export type WhatsappGroupActionTypes = 'create-ws-group'
     | 'sync-ws-group'

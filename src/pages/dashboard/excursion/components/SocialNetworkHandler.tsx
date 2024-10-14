@@ -1,22 +1,22 @@
 // SocialNetworkHandler.tsx
 import React, { useState } from 'react';
 import { Input, Button, Select, Option } from '@material-tailwind/react';
-import {ISocialNetwork} from "../../../../models/ISocialNetwork";
+import {SocialNetworkModels} from "../../../../models/SocialNetworkModels";
 
 interface SocialNetworkHandlerProps {
-    socialNetworks: ISocialNetwork[];
-    onUpdateSocialNetworks: (socialNetworks: ISocialNetwork[]) => void;
+    socialNetworks: SocialNetworkModels[];
+    onUpdateSocialNetworks: (socialNetworks: SocialNetworkModels[]) => void;
 }
 
 const SocialNetworkHandler: React.FC<SocialNetworkHandlerProps> = ({ socialNetworks, onUpdateSocialNetworks }) => {
-    const [newSocialNetwork, setNewSocialNetwork] = useState<ISocialNetwork>({
+    const [newSocialNetwork, setNewSocialNetwork] = useState<SocialNetworkModels>({
         type: 'instagram',
         username: '',
         url: '',
         company: '',
     });
 
-    const handleChange = (field: keyof ISocialNetwork, value: string) => {
+    const handleChange = (field: keyof SocialNetworkModels, value: string) => {
         setNewSocialNetwork({ ...newSocialNetwork, [field]: value });
     };
 

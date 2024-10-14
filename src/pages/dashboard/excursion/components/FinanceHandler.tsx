@@ -1,12 +1,10 @@
-import {Button, Input, Menu, MenuHandler, MenuList, MenuItem, Select, Option} from "@material-tailwind/react";
-import React, {useCallback, useEffect, useRef, useState} from "react";
+import {Button, Menu, MenuHandler, MenuList, MenuItem} from "@material-tailwind/react";
+import React, {useEffect} from "react";
 import {FinanceOptionEnum, financeTypes, FinanceTypes, IFinance} from "@/models/financeModel";
 import {PlusCircleIcon, TrashIcon} from "@heroicons/react/20/solid";
 import {useForm, useWatch} from "react-hook-form";
-import {IExpense} from "@/models/ExpensesModel";
 import FormControl from "@/components/FormControl";
 import SelectControl from "@/components/SelectControl";
-import {IService} from "@/models/serviceModel";
 
 export interface IFinanceProps {
     finance: IFinance;
@@ -14,11 +12,6 @@ export interface IFinanceProps {
     type?: FinanceTypes;
     enabledCost?: boolean;
     options?: FinanceOptionEnum[];
-}
-
-const emptyFinance: IFinance = {
-    price: 0,
-    type: 'excursion',
 }
 
 export const FinanceHandler = ({
@@ -37,7 +30,6 @@ export const FinanceHandler = ({
     const toggleChildren = () => setEnableChildren(!enableChildren);
 
     useEffect(() => {
-        console.log("options", options)
         if (!options) return
 
         setEnableCost(!!options?.includes(FinanceOptionEnum.COST));
@@ -48,12 +40,12 @@ export const FinanceHandler = ({
     const {
         control,
         formState: {errors},
-    } = useForm<IFinance>({mode: 'all', values: finance});
+    } = useForm<IFinance>({mode: 'all', defaultValues: finance});
 
     const newFinance : IFinance = useWatch({control}) as IFinance;
 
     useEffect(() => {
-        updateFinance({...finance, ...newFinance, });
+        updateFinance({...newFinance });
     }, [newFinance]);
 
     return (

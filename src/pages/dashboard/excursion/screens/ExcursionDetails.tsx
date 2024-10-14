@@ -1,21 +1,16 @@
 import React, {useEffect, useMemo, useState} from 'react';
-import {Button, Card, CardBody, CardHeader, Typography} from "@material-tailwind/react";
+import {Button, Menu, MenuHandler, MenuItem, MenuList, Tooltip, Typography} from "@material-tailwind/react";
 import {Link, useParams} from 'react-router-dom';
 import {StarIcon} from "@heroicons/react/24/solid";
 import {Swiper, SwiperSlide} from 'swiper/react';
 import {mockExcursion} from "@/data/excursions-mock-data";
 import {ExcursionDetailActions, ExcursionDetailActionsDataTypes, IExcursion} from "@/models/excursionModel";
-import {EffectCoverflow, Navigation, Pagination} from "swiper/modules";
+import {EffectCoverflow, Pagination} from "swiper/modules";
 import {ClientsExcursionTable, IUpdateClientExtra} from "../components/ClientsExcursionTable";
 import {FinanceDetails} from "../components/FinanceDetail";
-import {ActivityDetails} from "../components/ActivityList";
-import {ProjectionsCharts} from "../components/ProjectionCharts";
 import {OrganizationCard} from "../components/OrganizationCard";
 import {useRenderMedia} from "@/hooks/useRenderMedia";
 import AudioPlayer from "../components/AudioCard";
-import {CheckpointForm} from "../components/CheckpointForm";
-import {ICheckpoint} from "@/models/checkpointModel";
-import {TravelMap} from "@/components/TravelMap";
 import {getCrudService} from "@/api/services/CRUD.service";
 import {IClient} from "@/models/clientModel";
 import {useConfirmAction} from "@/hooks/useConfirmActionHook";
@@ -26,17 +21,22 @@ import {BedroomDetails} from "../components/BedroomsDetails";
 import Messaging from "../../../../components/WhatsappMessageHandler";
 import {UserRoleTypes, UserTypes} from "@/models/interfaces/userModel";
 import ProtectedElement from "../../../../components/ProtectedElement";
-import {IoReload} from "react-icons/io5";
-import {FaWhatsapp} from "react-icons/fa";
+import {IoReload, IoSettings} from "react-icons/io5";
+import {FaUser, FaUsers, FaWhatsapp} from "react-icons/fa";
 import {useAppLoading} from "@/context/appLoadingContext";
 import ExcursionDetailsSkeleton from "../../../../components/ExcursionDetailsSkeleton";
 import {IExpense} from "@/models/ExpensesModel";
 import {ExpensesHandler} from "@/pages/dashboard/excursion/components/ExpensesHandler";
 import {SERVICE_CONSTANTS} from "@/constants/service.constant";
 import {IService} from "@/models/serviceModel";
-import {emptyClient} from "@/pages/dashboard/excursion/components/ClientForm";
 import {EXPENSES_CONSTANTS} from "@/constants/expenses.constant";
 import {CheckpointDetails} from "@/pages/dashboard/excursion/components/CheckpointDetails";
+import {ExcursionConfigurationHandler} from "@/components/ExcursionConfigurationHandler";
+import WhatsappExcursionMessageHandler from "@/components/WhatsappExcursionMessageHandler";
+import {WhatsappRecipientTypes} from "@/models/WhatsappModels";
+import {TbDotsVertical} from "react-icons/tb";
+
+export type UpdateExcursionHandlerType = (excursion: Partial<IExcursion>, extra?: IUpdateClientExtra) => any;
 
 const excursionService = getCrudService('excursions');
 const clientService = getCrudService('travelClients');
@@ -44,6 +44,7 @@ const serviceService = getCrudService('services');
 const expenseService = getCrudService('travelExpenses');
 export const ExcursionDetails: React.FC = () => {
     const [excursion, setExcursion] = useState<IExcursion>(mockExcursion);
+    const [selectedClients, setSelectedClients] = useState<IClient[]>([]);
     const {renderMedia} = useRenderMedia();
     const [updateService, {isLoading: isUpdatingService}] = serviceService.useUpdateServices();
     const [updateClient, {isLoading: isUpdatingClient}] = clientService.useUpdateTravelClients();
@@ -52,12 +53,15 @@ export const ExcursionDetails: React.FC = () => {
     const params = useParams();
     const [updateExcursion, {isLoading: isUpdating, data: updatedExcursion}] = excursionService.useUpdateExcursions();
     const [wsMessagingIsOpen, setWsMessagingIsOpen] = useState(false);
+    const [settingsIsOpen, setSettingsIsOpen] = useState(false);
     const ownerOrganization = useMemo(() => excursion.owner, [excursion.owner]);
     const toggleWsMessaging = () => setWsMessagingIsOpen(!wsMessagingIsOpen);
+    const toggleSettings = () => setSettingsIsOpen(!settingsIsOpen);
     const {setAppIsLoading} = useAppLoading();
 
     const [isExpenseDialogOpen, setIsExpenseDialogOpen] = useState(false);
     const toggleExpenseDialog = () => setIsExpenseDialogOpen(!isExpenseDialogOpen);
+    const [wsRecipientType, setWsRecipientType] = useState<WhatsappRecipientTypes>('user');
 
     const {
         data: excursionData,
@@ -260,7 +264,7 @@ export const ExcursionDetails: React.FC = () => {
     const onExpenseDelete = async (expense: IExpense) => {
         await deleteExpense(expense._id as string);
         const updatedExpenses = excursion.expenses?.filter(e => e._id !== expense._id) || [];
-        onUpdateExcursion({expenses: updatedExpenses}, { avoidConfirm: true, isOptimistic: true });
+        onUpdateExcursion({expenses: updatedExpenses}, {avoidConfirm: true, isOptimistic: true});
     };
 
     if (
@@ -270,6 +274,11 @@ export const ExcursionDetails: React.FC = () => {
             <ExcursionDetailsSkeleton/>
         </div>
     );
+
+    const handleOpenWhatsapp = (recipientType: WhatsappRecipientTypes) => () => {
+        setWsRecipientType(recipientType);
+        toggleWsMessaging();
+    }
 
     return (
         <div className="container mx-auto relative flex flex-col gap-5">
@@ -330,12 +339,43 @@ export const ExcursionDetails: React.FC = () => {
 
             <div className="flex gap-3 items-center justify-end">
                 <ProtectedElement roles={[UserRoleTypes.ADMIN]} userTypes={[UserTypes.AGENCY]}>
-                    <Button color="green" className="flex items-center gap-2" onClick={toggleWsMessaging}>
-                        Whatsapp <FaWhatsapp className="w-[18px] h-[18px] cursor-pointer"/>
-                    </Button>
+                    <Menu
+                        animate={{mount: {scale: 1}, unmount: {scale: 0.9}}}
+                    >
+                        <MenuHandler>
+                            <Button color="green" className="flex items-center gap-2"
+                                    variant="outlined">
+                                Whatsapp <FaWhatsapp className="w-[18px] h-[18px] cursor-pointer"/>
+                            </Button>
+                        </MenuHandler>
+                        <MenuList
+                            className="absolute z-[9999] bg-white shadow-lg rounded-lg p-2">
+                            <MenuItem
+                                className="flex items-center text-nowrap gap-2"
+                                onClick={handleOpenWhatsapp('group')}>
+                                Enviar al grupo
+                                <FaUsers />
+                            </MenuItem>
+                            <MenuItem
+                                className="flex items-center text-nowrap gap-2"
+                                disabled={!selectedClients?.length}
+                                onClick={handleOpenWhatsapp('user')}>
+                                <Tooltip content={!selectedClients?.length ? 'Selecciona almenos 1 cliente' : ''}>
+                                    Enviar a Clientes
+                                </Tooltip>
+                                <FaUser />
+                            </MenuItem>
+
+                        </MenuList>
+                    </Menu>
+
                 </ProtectedElement>
-                <Button color="blue" className="flex items-center gap-2" onClick={refetchExcursion}>
+                <Button color="blue" className="flex items-center gap-2" onClick={refetchExcursion} variant="outlined">
                     Recargar <IoReload className="w-[18px] h-[18px] cursor-pointer"/>
+                </Button>
+                <Button color="blue" className="flex items-center gap-2" onClick={toggleSettings} variant="outlined">
+                    Ajustes
+                    <IoSettings className="w-[18px] h-[18px] cursor-pointer"/>
                 </Button>
             </div>
 
@@ -347,6 +387,9 @@ export const ExcursionDetails: React.FC = () => {
                 onUpdateClient={handleSetActionToConfirm('update-client', CLIENTS_CONSTANTS.UPDATE_CLIENT_TEXT)}
                 onUpdateService={handleSetActionToConfirm('update-service', SERVICE_CONSTANTS.UPDATE_SERVICE_TEXT)}
                 onAddClient={handleSetActionToConfirm('add-client', CLIENTS_CONSTANTS.ADD_CLIENT_TEXT)}
+                onClientSelected={clients => {
+                    setSelectedClients(clients);
+                }}
             />
             <FinanceDetails
                 transport={excursion.transport}
@@ -371,7 +414,6 @@ export const ExcursionDetails: React.FC = () => {
             {/*<ProjectionsCharts projections={excursion.projections}/>*/}
             {!!excursion.checkpoints?.length && <CheckpointDetails excursion={excursion}/>}
 
-            {/* Organization, Destination, and TransportStep Information Cards */}
             <div>
                 <Typography variant="h2" className="mt-10">Organizaciones y Destinos</Typography>
                 <div className="flex justify-around gap-3 !overflow-x-scroll p-4 py-10 h-[400px]">
@@ -385,12 +427,24 @@ export const ExcursionDetails: React.FC = () => {
             </div>
             <ConfirmDialog/>
             {ownerOrganization?.sessionId && wsMessagingIsOpen &&
-                <Messaging
+                <WhatsappExcursionMessageHandler
+                    recipientType={wsRecipientType}
+                    recipients={selectedClients}
+                    excursion={excursion}
                     dialog={{
                         open: wsMessagingIsOpen,
                         handler: toggleWsMessaging,
                     }}/>
             }
+            <ExcursionConfigurationHandler
+                dialog={{
+                    open: settingsIsOpen,
+                    handler: toggleSettings,
+                }}
+                excursion={excursion}
+                updateExcursion={handleSetActionToConfirm('update', EXCURSION_CONSTANTS.UPDATE_EXCURSION_TEXT)}
+                initialConfig={excursion.configuration}
+            />
         </div>
     );
 };

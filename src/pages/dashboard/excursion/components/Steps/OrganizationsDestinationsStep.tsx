@@ -4,21 +4,23 @@ import {IExcursion} from "../../../../../models/excursionModel";
 import {OrganizationCard} from "../OrganizationCard";
 import {IOrganization} from "../../../../../models/organizationModel";
 import {Typography} from "@material-tailwind/react";
+import {useForm} from "react-hook-form";
 
 export interface IOrganizationsDestinationsStepProps {
     excursionData: IExcursion;
     updateExcursion: (excursion: Partial<IExcursion>) => void;
     type?: 'destinations' | 'organizations';
+    setIsValid: (isValid: boolean) => void;
 }
 
 export const OrganizationsDestinationsStep = (
     {
         excursionData,
         updateExcursion,
-        type
+        type,
+        setIsValid,
     }: IOrganizationsDestinationsStepProps = {type: 'organizations'} as IOrganizationsDestinationsStepProps) => {
     const [selectedOrganizations, setSelectedOrganizations] = React.useState<IOrganization[]>([]);
-
     const onSelectOrganization = (organizations: IOrganization[]) => {
         setSelectedOrganizations(organizations);
         updateExcursion({[type || 'organizations']: organizations});
@@ -38,6 +40,7 @@ export const OrganizationsDestinationsStep = (
                 {type === 'destinations' ? 'Destinations' : 'Organizations'}
             </Typography>
             <OrganizationHandler
+                setIsValid={setIsValid}
                 isMultiple={true}
                 onSelect={onSelectOrganization}
                 selected={selectedOrganizations}

@@ -4,15 +4,6 @@ import {UserIcon} from '@heroicons/react/20/solid';
 import ExcursionGeneralInfo from '../components/ExcursionGeneralnfo';
 import {MediaHandlerStep} from '../components/Steps/MediaHandlerStep';
 import {ExcursionStatusEnum, IExcursion} from '@/models/excursionModel';
-import {
-    validateStep1,
-    validateStep2,
-    validateStep3,
-    validateStep4,
-    validateStep5,
-    validateStep6,
-    validateStep7
-} from "@/utils/excursionStepperValidations";
 import {OrganizationsDestinationsStep} from "../components/Steps/OrganizationsDestinationsStep";
 import ActivitiesHandlerStep from "../components/Steps/ActivitiesHandlerStep";
 import FoodsHandlerStep from "../components/Steps/FoodsHandlerStep";
@@ -28,16 +19,18 @@ import {IStep} from "@/models/common";
 import {AppStepper} from "@/components/AppStepper";
 import {useAppLoading} from "@/context/appLoadingContext";
 import {CheckpointHandlerStep} from "@/pages/dashboard/excursion/components/Steps/CheckpointHandlerStep";
+import {useAlertAction} from "@/hooks/useAlertAction";
 
 
 const excursionService = getCrudService("excursions");
 
 const ExcursionStepper: React.FC = () => {
-    const [currentStep, setCurrentStep] = useState<number | null>(null);
+    const [currentStep, setCurrentStep] = useState<number>(0);
     const [excursion, setExcursion] = useState<IExcursion>({} as IExcursion);
-    const [isFormValid, setIsFormValid] = useState<boolean>(false);
-    const [validationErrors, setValidationErrors] = useState<string[]>([]);
+    // const [isFormValid, setIsFormValid] = useState<boolean>(false);
+    // const [validationErrors, setValidationErrors] = useState<string[]>([]);
     const {setAppIsLoading} = useAppLoading();
+    const {showAlert, AlertDialog} = useAlertAction();
 
     const [updateExcursion, {
         isLoading: isUpdatingExcursion,
@@ -89,42 +82,24 @@ const ExcursionStepper: React.FC = () => {
     const validateFormData = (): void => {
         const errors: string[] = [];
         // Define validation functions for each step
-        const validationFunctions = [
-            validateStep0, // Informacion
-            validateStep1, // Checkpoints
-            validateStep2, // Media
-            validateStep3, // Clients
-            validateStep4, // Activities
-            validateStep5, // Foods
-            validateStep6, // Projections
-            validateStep7  // TransportStep
-        ];
-
-        // Execute validation function for current step
-        if (validationFunctions[currentStep]) {
-            const stepErrors = validationFunctions[currentStep](excursion);
-            errors.push(...stepErrors);
-        }
-
         // Update form validity and validation errors
-        setIsFormValid(errors.length === 0);
-        setValidationErrors(errors);
+        // setIsFormValid(errors.length === 0);
+        // setValidationErrors(errors);
     };
 
     const handleNext = async () => {
+        if (!isValidSteps[currentStep]) return;
         try {
             setAppIsLoading(true);
-            if (currentStep < excursionSteps.length
-                // && isFormValid
-            ) {
+            if (currentStep < excursionSteps.length) {
                 setCurrentStep(currentStep + 1);
                 await handleExcursionSave();
             }
             setAppIsLoading(false);
         } catch (error) {
-            // TODO: TOAS handle error
+            // TODO: TOAST handle error
             setAppIsLoading(false);
-            console.log('error', error)
+            console.log('error', error);
         }
     };
 
@@ -132,11 +107,11 @@ const ExcursionStepper: React.FC = () => {
         if (currentStep > 0) setCurrentStep(currentStep - 1);
     };
 
-    const updateExcursionData = async (data: Partial<IExcursion>): void => {
+    const updateExcursionData = async (data: Partial<IExcursion>): Promise<void> => {
         const newData: IExcursion = {...excursion, ...data};
         const stepData = excursionSteps[currentStep || 0];
 
-        console.log('updated', newData, stepData)
+        console.log('updated', newData, stepData);
         setExcursion(newData);
     };
 
@@ -240,6 +215,7 @@ const ExcursionStepper: React.FC = () => {
             icon: <UserIcon className="max-w-[20px]"/>,
             type: 'title',
             component: <ExcursionGeneralInfo
+                setIsValid={(valid) => updateStepValidity(0, valid)}
                 excursionData={excursion}
                 updateExcursion={updateExcursionData}
             />,
@@ -248,13 +224,16 @@ const ExcursionStepper: React.FC = () => {
             properties: ['organizations'],
             label: 'Organizaciones',
             icon: <UserIcon className="max-w-[20px]"/>,
-            component: <OrganizationsDestinationsStep excursionData={excursion} updateExcursion={updateExcursionData}/>,
+            component: <OrganizationsDestinationsStep
+                setIsValid={(valid) => updateStepValidity(1, valid)}
+                excursionData={excursion} updateExcursion={updateExcursionData}/>,
         },
         {
             properties: ['destinations'],
             label: 'Destinos',
             icon: <UserIcon className="max-w-[20px]"/>,
             component: <OrganizationsDestinationsStep
+                setIsValid={(valid) => updateStepValidity(2, valid)}
                 type="destinations"
                 excursionData={excursion}
                 updateExcursion={updateExcursionData}/>,
@@ -264,97 +243,117 @@ const ExcursionStepper: React.FC = () => {
             label: 'Imagenes',
             type: 'images',
             icon: <UserIcon className="max-w-[20px]"/>,
-            component: <MediaHandlerStep excursionData={excursion} updateExcursion={updateExcursionData}/>,
+            component: <MediaHandlerStep
+                setIsValid={(valid) => updateStepValidity(3, valid)}
+                excursionData={excursion} updateExcursion={updateExcursionData}/>,
         },
         {
             properties: ['activities'],
             label: 'Actividades',
             type: 'activities',
             icon: <UserIcon className="max-w-[20px]"/>,
-            component: <ActivitiesHandlerStep excursionData={excursion} updateExcursion={updateExcursionData}/>,
+            component: <ActivitiesHandlerStep
+                setIsValid={(valid) => updateStepValidity(4, valid)}
+                excursionData={excursion} updateExcursion={updateExcursionData}/>,
         },
-        {
-            properties: ['foods'],
-            label: 'Comidas',
-            icon: <UserIcon className="max-w-[20px]"/>,
-            component: <FoodsHandlerStep excursionData={excursion} updateExcursion={updateExcursionData}/>,
-        },
+        // {
+        //     properties: ['foods'],
+        //     label: 'Comidas',
+        //     icon: <UserIcon className="max-w-[20px]"/>,
+        //     component: <FoodsHandlerStep excursionData={excursion} updateExcursion={updateExcursionData}/>,
+        // },
         {
             properties: ['transport'],
             label: 'Transporte',
             icon: <UserIcon className="max-w-[20px]"/>,
-            component: <TransportHandlerStep excursionData={excursion} updateExcursion={updateExcursionData}/>,
+            component: <TransportHandlerStep
+                setIsValid={(valid) => updateStepValidity(5, valid)}
+                excursionData={excursion} updateExcursion={updateExcursionData}/>,
         },
-        {
-            properties: ['checkpoints'],
-            label: 'checkpoints',
-            icon: <UserIcon className="max-w-[20px]"/>,
-            component: <CheckpointHandlerStep excursionData={excursion} updateExcursion={updateExcursionData}/>,
-        },
+        // {
+        //     properties: ['checkpoints'],
+        //     label: 'checkpoints',
+        //     icon: <UserIcon className="max-w-[20px]"/>,
+        //     component: <CheckpointHandlerStep excursionData={excursion} updateExcursion={updateExcursionData}/>,
+        // },
         {
             properties: ['finance'],
             label: 'Finanzas',
             icon: <UserIcon className="max-w-[20px]"/>,
-            component: <FinancesHandlerStep excursionData={excursion} updateExcursion={updateExcursionData}/>,
+            component: <FinancesHandlerStep
+                setIsValid={(valid) => updateStepValidity(6, valid)}
+                excursionData={excursion} updateExcursion={updateExcursionData}/>,
         },
         {
             properties: ['projections'],
             label: 'Proyecciones',
             icon: <UserIcon className="max-w-[20px]"/>,
-            component: <ProjectHandlerStep excursionData={excursion} updateExcursion={updateExcursionData}/>,
+            component: <ProjectHandlerStep excursionData={excursion} updateExcursion={updateExcursionData}
+                                           setIsValid={(valid) => updateStepValidity(7, valid)} />,
         },
         {
             properties: [],
             label: 'Compartir',
             icon: <UserIcon className="max-w-[20px]"/>,
-            component: <div></div>,
+            component: <div>
+            </div>
         },
     ];
+
+    const [isValidSteps, setIsValidSteps] = useState<boolean[]>(Array(excursionSteps.length).fill(false));
+
+    const updateStepValidity = (stepIndex: number, isValid: boolean) => {
+        setIsValidSteps((prev) => {
+            const newValidity = [...prev];
+            newValidity[stepIndex] = isValid;
+            return newValidity;
+        });
+    };
 
     const onStepClick = (index: number, step: IStep<IExcursion>) => {
         setCurrentStep(index);
     }
 
-    useEffect(() => {
-        console.log('excursion =>', excursion);
-        const isTitleValid = !!excursion.title;
-        const isDescriptionValid = !!excursion.description;
-        const isStartDateValid = !!excursion.startDate;
-        const isEndDateValid = !!excursion.endDate;
-        const areDestinationsValid = excursion.destinations && excursion.destinations.length > 0;
-        const isFlyerValid = !!excursion.flyer;
-        const isTransportValid = !!excursion.transport;
-        const isFinanceValid = !!excursion.finance;
-        console.log('Flyer Valid:', isFlyerValid);
-
-        if (
-            isTitleValid &&
-            isDescriptionValid &&
-            isStartDateValid &&
-            isEndDateValid &&
-            areDestinationsValid &&
-            isFlyerValid &&
-            isTransportValid &&
-            isFinanceValid
-        ) {
-            console.log('completed');
-            if (excursion.status !== 'completed') {
-                setExcursion({...excursion, status: ExcursionStatusEnum.COMPLETED});
-            }
-        } else {
-            console.log('draft');
-            if (excursion.status !== 'draft') {
-                setExcursion({...excursion, status: ExcursionStatusEnum.DRAFT});
-            }
-        }
-
-    }, [excursion]);
+    // useEffect(() => {
+    //     console.log('excursion =>', excursion);
+    //     const isTitleValid = !!excursion.title;
+    //     const isDescriptionValid = !!excursion.description;
+    //     const isStartDateValid = !!excursion.startDate;
+    //     const isEndDateValid = !!excursion.endDate;
+    //     const areDestinationsValid = excursion.destinations && excursion.destinations.length > 0;
+    //     const isFlyerValid = !!excursion.flyer;
+    //     const isTransportValid = !!excursion.transport;
+    //     const isFinanceValid = !!excursion.finance;
+    //     console.log('Flyer Valid:', isFlyerValid);
+    //     if (
+    //         isTitleValid &&
+    //         isDescriptionValid &&
+    //         isStartDateValid &&
+    //         isEndDateValid &&
+    //         areDestinationsValid &&
+    //         isFlyerValid &&
+    //         isTransportValid &&
+    //         isFinanceValid
+    //     ) {
+    //         console.log('completed');
+    //         if (excursion.status !== 'completed') {
+    //             setExcursion({...excursion, status: ExcursionStatusEnum.COMPLETED});
+    //         }
+    //     } else {
+    //         console.log('draft');
+    //         if (excursion.status !== 'draft') {
+    //             setExcursion({...excursion, status: ExcursionStatusEnum.DRAFT});
+    //         }
+    //     }
+    // }, [excursion]);
 
 
     useEffect(() => {
         console.log('excursionData =>', excursionData)
         if (excursionData) setExcursion({...excursionData});
     }, [excursionData]);
+
+    console.log('validacion', isValidSteps[currentStep])
 
     return (
         <Card>
@@ -364,6 +363,7 @@ const ExcursionStepper: React.FC = () => {
                 </Typography>
             </CardHeader>
             <CardBody>
+                {AlertDialog()}
                 <AppStepper<IExcursion>
                     steps={excursionSteps}
                     activeStep={currentStep || 0}
@@ -376,10 +376,11 @@ const ExcursionStepper: React.FC = () => {
                     <Button
                         size="lg"
                         color="blue"
+                        disabled={!isValidSteps[currentStep]}
                         onClick={handleNext}
-                        // disabled={currentStep === 7 || !isFormValid}
+                        data-avoid-disabled-on-app-loading
                     >
-                        {currentStep === excursionSteps.length ? 'Finish' : 'Next'}
+                        {currentStep === excursionSteps.length ? 'Finish' : 'Next'} klk
                     </Button>
                 </div>
                 {/*{validationErrors.length > 0 && (*/}

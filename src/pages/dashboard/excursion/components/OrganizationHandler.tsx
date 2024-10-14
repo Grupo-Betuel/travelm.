@@ -1,4 +1,4 @@
-import React, {useMemo, useState} from "react";
+import React, {useEffect, useMemo, useState} from "react";
 import {
     Button,
 } from "@material-tailwind/react";
@@ -7,12 +7,14 @@ import {IOrganization, OrganizationTypesEnum} from "../../../../models/organizat
 import SearchableSelect from "../../../../components/SearchableSelect";
 import {OrganizationCard} from "./OrganizationCard";
 import {useOrganizationHandler} from "../../../../hooks/useOrganizationHandler";
+import {useForm} from "react-hook-form";
 
 export interface IOrganizationSelectorProps {
     onSelect: (selected: IOrganization[]) => void;
     selected?: IOrganization[];
     isMultiple?: boolean;
     organizationType?: OrganizationTypesEnum;
+    setIsValid?: (isValid: boolean) => void;
 }
 
 const OrganizationHandler: React.FC<IOrganizationSelectorProps> = (
@@ -21,6 +23,7 @@ const OrganizationHandler: React.FC<IOrganizationSelectorProps> = (
         isMultiple,
         selected,
         organizationType,
+        setIsValid,
     }) => {
 
     const {
@@ -40,13 +43,23 @@ const OrganizationHandler: React.FC<IOrganizationSelectorProps> = (
         onSelect(selectedValues);
     }
 
+    useEffect(() => {
+        if (setIsValid) {
+            setIsValid(!!selected?.length);
+        }
+    }, [selected]);
+    const { control } = useForm({ mode: 'all' })
+
     return (
         <div className="space-y-4">
             <div className="flex items-center gap-3 w-100">
                 <SearchableSelect<IOrganization>
+                    control={control}
+                    name="organization"
+                    rules={{ required: 'Organization is required' }}
                     onSelect={handleOnSelectOrganization}
                     options={organizations || []}
-                    label="Select Organiazation"
+                    label="Select Organization"
                     multiple={isMultiple}
                     displayProperty={"name"}
                     selectedValues={selected}

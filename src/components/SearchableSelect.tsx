@@ -13,12 +13,14 @@ interface SearchableSelectProps<T> {
     control?: Control<any>;
     options: (IOption | T)[];
     displayProperty?: keyof T;
+    valueProperty?: keyof T;
     label: string;
     disabled?: boolean;
     multiple?: boolean;
     rules?: any;
     className?: string;
-    onSelect?: (selectedValues: T[] | string[], selectedItem: T | string | null) => void;
+    onSelect?: (selectedValues: any[] | any, selectedItem: any | null) => void;
+    selectedValues?: any[];
 }
 
 function SearchableSelect<T>({
@@ -28,10 +30,12 @@ function SearchableSelect<T>({
                                  label,
                                  multiple = false,
                                  displayProperty,
+                                 valueProperty,
                                  className,
                                  rules,
                                  disabled,
                                  onSelect,
+                                 selectedValues,
                              }: SearchableSelectProps<T>) {
     const [searchTerm, setSearchTerm] = useState<string>('');
     const [filteredOptions, setFilteredOptions] = useState<(IOption | T)[]>(options);
@@ -39,7 +43,9 @@ function SearchableSelect<T>({
     const refDiv = useRef<HTMLDivElement>(null);
 
     // For internal state management when control is not provided
-    const [internalValue, setInternalValue] = useState<any>(multiple ? [] : null);
+    const [internalValue, setInternalValue] = useState<any>(
+        multiple ? (selectedValues || []) : selectedValues ? selectedValues[0] : null
+    );
 
     // Determine if react-hook-form is being used
     const isControlled = control && name;
@@ -55,10 +61,7 @@ function SearchableSelect<T>({
 
     if (isControlled) {
         // Setup for react-hook-form
-        const {
-            field,
-            fieldState,
-        } = useController({
+        const { field, fieldState } = useController({
             name: name!,
             control: control!,
             rules,
@@ -94,28 +97,31 @@ function SearchableSelect<T>({
             return optionLabel.toLowerCase().includes(searchTerm.toLowerCase());
         });
         setFilteredOptions(filtered);
-    }, [searchTerm, options]);
+    }, [searchTerm, options, displayProperty]);
 
     const handleOptionClick = (option: T | IOption) => {
+        const optionValue = valueProperty ? (option as T)[valueProperty as keyof T] : option;
         let newValue;
 
         if (multiple) {
-            const optionValue = JSON.stringify(option);
-            const currentValues = Array.isArray(value)
-                ? value.map((v: any) => JSON.stringify(v))
-                : [];
+            const currentValues = Array.isArray(value) ? value : [];
             const isSelected = currentValues.includes(optionValue);
             if (isSelected) {
-                newValue = value.filter((v: any) => JSON.stringify(v) !== optionValue);
+                newValue = currentValues.filter((v: any) => v !== optionValue);
             } else {
-                newValue = [...(value || []), option];
+                newValue = [...currentValues, optionValue];
             }
         } else {
-            newValue = option;
+            newValue = optionValue;
             setIsFocused(false);
         }
 
         onChange(newValue);
+
+        if (onSelect) {
+            const selectedItem = multiple ? null : optionValue;
+            onSelect(newValue, selectedItem);
+        }
 
         if (isControlled) {
             // Call onBlur to trigger validation
@@ -134,7 +140,11 @@ function SearchableSelect<T>({
 
     const handleClear = () => {
         setSearchTerm('');
-        onChange(multiple ? [] : null);
+        const newValue = multiple ? [] : null;
+        onChange(newValue);
+        if (onSelect) {
+            onSelect(newValue, null);
+        }
         setIsFocused(false);
         if (isControlled) {
             onBlur();
@@ -145,20 +155,32 @@ function SearchableSelect<T>({
         if (multiple && Array.isArray(value)) {
             return value
                 .map((val: any) => {
-                    const option = val;
+                    const option = options.find((opt) =>
+                        valueProperty
+                            ? (opt as T)[valueProperty as keyof T] === val
+                            : opt === val
+                    );
                     return (
-                        (option as T)?.[displayProperty as keyof T] || (option as IOption)?.label || ''
+                        (option as T)?.[displayProperty as keyof T] ||
+                        (option as IOption)?.label ||
+                        ''
                     );
                 })
-                .join(', ') as string;
+                .join(', ');
         } else if (!multiple && value) {
-            const option = value;
+            const option = options.find((opt) =>
+                valueProperty
+                    ? (opt as T)[valueProperty as keyof T] === value
+                    : opt === value
+            );
             return (
-                ((option as T)?.[displayProperty as keyof T] || (option as IOption)?.label || '') as string
+                ((option as T)?.[displayProperty as keyof T] ||
+                    (option as IOption)?.label ||
+                    '') as string
             );
         }
         return '';
-    }, [value, multiple, displayProperty]);
+    }, [value, multiple, displayProperty, options]);
 
     const showError = isControlled && error && (isTouched || isSubmitted);
 
@@ -187,11 +209,10 @@ function SearchableSelect<T>({
             {isFocused && (
                 <List className="max-h-60 overflow-auto mt-1 border absolute w-full rounded bg-white z-50">
                     {filteredOptions.map((option, index) => {
-                        const optionValue = JSON.stringify(option);
+                        const optionValue = valueProperty ? (option as T)[valueProperty as keyof T] : option;
                         const isSelected = multiple
-                            ? Array.isArray(value) &&
-                            value.some((v: any) => JSON.stringify(v) === optionValue)
-                            : JSON.stringify(value) === optionValue;
+                            ? Array.isArray(value) && value.includes(optionValue)
+                            : value === optionValue;
                         return (
                             <a key={`selectable-options-${index}`} onClick={() => handleOptionClick(option)}>
                                 <ListItem
@@ -199,8 +220,8 @@ function SearchableSelect<T>({
                                     className={`cursor-pointer ${isSelected ? 'bg-gray-300' : ''}`}
                                 >
                                     {displayProperty
-                                        ? (option as any)[displayProperty]
-                                        : (option as IOption).label}
+                                        ? (option as T)[displayProperty as keyof T]
+                                        : (option as any).label}
                                 </ListItem>
                             </a>
                         );

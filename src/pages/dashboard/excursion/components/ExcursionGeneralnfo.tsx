@@ -1,79 +1,80 @@
-import React from "react";
-import {
-    Input,
-    Popover,
-    PopoverHandler,
-    PopoverContent, Textarea, Button,
-} from "@material-tailwind/react";
-// import { format } from "date-fns";
-// import { DayPicker } from "react-day-picker";
-// import { ChevronRightIcon, ChevronLeftIcon } from "@heroicons/react/24/outline";
-import {IExcursion} from "../../../../models/excursionModel";
+import React, {useEffect} from "react";
+import {IExcursion} from "@/models/excursionModel";
 import DatePicker from "../../../../components/DatePicker";
-import MapPicker from "../../../../components/MapPicker";
-import {useForm} from "react-hook-form";
+import {SubmitHandler, useForm, useWatch} from "react-hook-form";
+import FormControl from "@/components/FormControl";
+import {Simulate} from "react-dom/test-utils";
 
 interface GeneralInfoProps {
     excursionData: IExcursion;
     updateExcursion: (excursion: Partial<IExcursion>) => void;
+    setIsValid: (isValid: boolean) => void;
 }
 
-const ExcursionGeneralInfo: React.FC<GeneralInfoProps> = ({excursionData, updateExcursion}) => {
-    const handleInputChange = (event: any): void => {
-        console.log(event);
-        if (event.target.name === 'startDate' && !excursionData.endDate) {
-            updateExcursion({
-                [event.target.name]: event.target.value,
-                endDate: event.target.value
-            });
-        } else {
-            updateExcursion({[event.target.name]: event.target.value});
-        }
-    };
+const defaultValues = {
+    title: "",
+    description: "",
+    startDate: null,
+    endDate: null,
+}
 
+const ExcursionGeneralInfo: React.FC<GeneralInfoProps> = ({excursionData, setIsValid, updateExcursion}) => {
     const {
         control,
-        handleSubmit,
-    } = useForm<any>({ mode: 'onBlur' });
+        formState: {errors, isValid },
+        reset,
+    } = useForm<any>({mode: 'all', defaultValues: excursionData});
 
+    const newExcusion: IExcursion = useWatch({control});
+    useEffect(() => {
+        updateExcursion({...excursionData, ...newExcusion});
+    }, [newExcusion]);
+
+    useEffect(() => {
+        if (excursionData._id) {
+            reset(excursionData)
+        }
+    }, [excursionData._id]);
+
+    useEffect(() => {
+        setIsValid(isValid);
+    }, [isValid]);
 
     return (
 
-        <form onSubmit={handleSubmit(handleInputChange)} className="flex flex-col gap-4 mb-6">
-            <Input
-                label="Title"
+        <form className="flex flex-col gap-4 mb-6">
+            <FormControl
                 name="title"
-                value={excursionData.title || ''}
-                onChange={handleInputChange}
+                control={control}
+                label="Nombre Excusion"
+                rules={{required: 'El título de excursion es requerido'}}
+                className="w-full"
             />
-            <Textarea
-                label="Description"
+            <FormControl
                 name="description"
-                value={excursionData.description || ''}
-                onChange={handleInputChange}
+                control={control}
+                label="Descripción"
+                type="textarea"
+                className="w-full"
+                rules={{
+                    minLength: {
+                        value: 3,
+                        message: 'La descripción debe tener al menos 3 caracteres',
+                    },
+                }}
             />
             <DatePicker
                 label="Dia de comienzo"
                 control={control}
                 name="startDate"
                 rules={{required: 'Fecha de finalizacion es requerida'}}
-                // onChange={date => handleInputChange({target: {name: 'startDate', value: date}})}
-                // date={excursionData.startDate}
             />
             <DatePicker
                 control={control}
                 name="endDate"
                 rules={{required: 'Fecha de finalizacion es requerida'}}
                 label="Dia de Finalizacion"
-                // onChange={date => handleInputChange({target: {name: 'endDate', value: date}})}
-                // date={excursionData.endDate || excursionData.startDate}
             />
-            <Button
-                color="blue"
-                type="submit"
-            >
-                Guardar
-            </Button>
         </form>
     );
 };

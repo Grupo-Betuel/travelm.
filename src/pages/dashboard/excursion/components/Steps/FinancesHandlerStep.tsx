@@ -9,9 +9,10 @@ import {Typography} from "@material-tailwind/react";
 interface FinancesStepProps {
     excursionData: IExcursion;
     updateExcursion: (excursion: Partial<IExcursion>) => void;
+    setIsValid: (isValid: boolean) => void;
 }
 
-const FinancesHandlerStep: React.FC<FinancesStepProps> = ({excursionData, updateExcursion}) => {
+const FinancesHandlerStep: React.FC<FinancesStepProps> = ({excursionData, updateExcursion, setIsValid}) => {
     const onUpdateFinances = (finance: IFinance) => {
         updateExcursion({finance});
     }
@@ -42,6 +43,15 @@ const FinancesHandlerStep: React.FC<FinancesStepProps> = ({excursionData, update
     useEffect(() => {
         updateExcursion({finance: {...excursionData.finance, cost: total}});
     }, [total, excursionData.finance?.cost])
+
+    useEffect(() => {
+        if (excursionData.finance?.price && excursionData.finance.price > 0) {
+            console.log("es valido")
+            setIsValid(true);
+        } else {
+            setIsValid(false);
+        }
+    }, [excursionData.finance?.price]);
 
     console.log('total', total, excursionData.finance);
     return (

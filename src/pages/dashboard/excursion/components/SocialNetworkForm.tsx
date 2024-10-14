@@ -6,15 +6,15 @@ import {
     Select,
     Option,
 } from "@material-tailwind/react";
-import { ISocialNetwork } from "@/models/ISocialNetwork";
+import { SocialNetworkModels } from "@/models/SocialNetworkModels";
 import {BASIC_CONSTANTS} from "@/constants/basic.constants";
 
 interface SocialNetworkFormProps {
-    socialNetworks: ISocialNetwork[];
-    updateSocialNetworks: (socialNetworks: ISocialNetwork[]) => void;
+    socialNetworks: SocialNetworkModels[];
+    updateSocialNetworks: (socialNetworks: SocialNetworkModels[]) => void;
 }
 
-const emptySocialNetwork: ISocialNetwork = {
+const emptySocialNetwork: SocialNetworkModels = {
     type: "instagram",
     username: "",
     url: "",
@@ -25,7 +25,7 @@ const SocialNetworkForm: React.FC<SocialNetworkFormProps> = ({
                                                                  updateSocialNetworks,
                                                              }) => {
     const [socialNetworkForm, setSocialNetworkForm] =
-        useState<ISocialNetwork>(emptySocialNetwork);
+        useState<SocialNetworkModels>(emptySocialNetwork);
     const [editSocialNetworkIndex, setEditSocialNetworkIndex] =
         useState<number | null>(null);
 

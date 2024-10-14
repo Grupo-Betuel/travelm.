@@ -293,7 +293,7 @@ const MediaHandler = (
     const toggleSearchMediaModal = (mediaType?: MediaTypeEnum | ExtraMediaTypesEnum) => () => {
         const newValue = !searchMediaModal;
         if (newValue) {
-            let media = images;
+            let media: (IMediaFile | IMedia)[] = images;
             switch (mediaType) {
                 case 'image':
                     media = images;

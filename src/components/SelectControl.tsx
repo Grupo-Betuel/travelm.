@@ -17,15 +17,16 @@ interface SelectControlProps {
     onChange?: (value: any) => void;
 }
 
-const SelectControl: React.FC<SelectControlProps> = ({
-                                                         name,
-                                                         control,
-                                                         label,
-                                                         options,
-                                                         rules,
-                                                         className,
-                                                         onChange,
-                                                     }) => {
+const SelectControl: React.FC<SelectControlProps> = (
+    {
+        name,
+        control,
+        label,
+        options,
+        rules,
+        className,
+        onChange,
+    }) => {
     const {isSubmitted} = useFormState({control});
 
     const {watch} = useForm();
