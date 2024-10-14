@@ -12,7 +12,7 @@ import {BaseModel} from "./interfaces/BaseModel";
 import {IBedroom} from "./bedroomModel";
 import {IExpense} from "@/models/ExpensesModel";
 import {IService} from "@/models/serviceModel";
-import {IExcursionConfiguration} from "@/models/IConfiguration";
+import {IExcursionConfiguration} from "@/models/ExcursionConfigurationModels";
 
 export type ExcursionDetailActions = 'remove-client' | 'add-client' | 'update-client' | 'update' | 'update-service' | 'update-expense' | 'delete-expense';
 export type ExcursionDetailActionsDataTypes = IClient | Partial<IExcursion> | Partial<IClient>[] | Partial<IService>;

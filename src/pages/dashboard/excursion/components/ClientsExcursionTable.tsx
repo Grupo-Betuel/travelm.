@@ -56,6 +56,7 @@ export interface IClientTableProps {
     onUpdateClient: (client: Partial<IClient> | Partial<IClient>[], extra?: IUpdateClientExtra) => void;
     onUpdateService: (service: Partial<IService> | Partial<IService>[], extra?: IUpdateClientExtra) => void;
     updateExcursion: (excursion: Partial<IExcursion>, extra?: IUpdateClientExtra) => any;
+    onClientSelected?: (clients: IClient[]) => void;
     excursion: IExcursion;
     bedrooms?: IBedroom[];
 }
@@ -88,6 +89,7 @@ export const ClientsExcursionTable = (
         onUpdateClient,
         onUpdateService,
         updateExcursion,
+        onClientSelected,
     }: IClientTableProps) => {
     const [selectedClient, setSelectedClient] = useState<IClient | null>(null);
     const [isModalOpen, setModalOpen] = useState(false);
@@ -441,8 +443,9 @@ export const ClientsExcursionTable = (
 
     const [selectedClients, setSelectedClients] = useState<IClient[]>([]);
 
-    const onSelectClient = (sclients: IClient[]) => {
-        setSelectedClients(sclients);
+    const onSelectClient = (sClients: IClient[]) => {
+        setSelectedClients(sClients);
+        onClientSelected && onClientSelected(sClients);
     }
 
     const onChangeClientsBedrooms = (options: IOption[]) => {

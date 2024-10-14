@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { Input, List, ListItem } from '@material-tailwind/react';
-import {CgClose} from "react-icons/cg";
+import { CgClose } from "react-icons/cg";
 
 export interface IOption<T = any> {
     label: string;
@@ -10,11 +10,12 @@ export interface IOption<T = any> {
 interface SearchableSelectProps<T> {
     options: (IOption | T)[];
     displayProperty?: keyof T;
+    valueProperty?: keyof T;
     label: string;
     disabled?: boolean;
     multiple?: boolean;
-    onSelect?: ((selectedValues: string[], selectedItem: string) => void) | ((selectedValues: T[], selectedItem: T) => void);
-    selectedValues?: string[] | T[];
+    onSelect?: ((selectedValues: any[], selectedItem: any) => void);
+    selectedValues?: any[];
     className?: string;
 }
 
@@ -26,6 +27,7 @@ function SearchableSelect<T>({
                                  onSelect,
                                  selectedValues,
                                  displayProperty,
+                                 valueProperty,
                                  className,
                              }: SearchableSelectProps<T>) {
     const [searchTerm, setSearchTerm] = useState<string>('');
@@ -40,32 +42,46 @@ function SearchableSelect<T>({
             return value.toLowerCase().includes(searchTerm.toLowerCase());
         });
         setFilteredOptions(filtered);
-    }, [searchTerm, options]);
+    }, [searchTerm, options, displayProperty]);
 
     useEffect(() => {
-        const selected = selectedValues?.map(value => JSON.stringify(value)) || [];
+        if(!selectedValues) return;
+        const selected = selectedValues?.map(value => {
+            if (valueProperty) {
+                return JSON.stringify(options.find(option =>
+                    (option as T)[valueProperty as keyof T] === value
+                ));
+            }
+            return JSON.stringify(value);
+        }) || [];
         setSelectedOptions(selected);
-    }, [selectedValues]);
+    }, [selectedValues, options, valueProperty]);
 
-    const toggleOption = (value: string | any) => {
-        value = JSON.stringify(value);
+    const toggleOption = (option: IOption | T) => {
+        const value = JSON.stringify(option);
         const included = selectedOptions.includes(value);
-        const newSelectedOptions = multiple
+        let newSelectedOptions = multiple
             ? included
                 ? selectedOptions.filter(item => item !== value)
                 : [...selectedOptions, value]
             : included ? [] : [value];
 
-        setSelectedOptions(newSelectedOptions);
+        newSelectedOptions = newSelectedOptions.filter(item => item !== undefined);
 
+        setSelectedOptions([...newSelectedOptions]);
         if (onSelect) {
-            const list = newSelectedOptions.map(option => JSON.parse(option));
-            const item = included ? null : JSON.parse(value);
-            onSelect(list, item);
+            let selectedItems;
+            if (valueProperty) {
+                selectedItems = newSelectedOptions.map(opt => JSON.parse(opt)?.[valueProperty as keyof T]).filter(item => item !== undefined);
+            } else {
+                selectedItems = newSelectedOptions.map(opt => JSON.parse(opt));
+            }
+            const selectedItem = included ? null : (valueProperty ? (option as T)[valueProperty as keyof T] : option);
+            onSelect(selectedItems, selectedItem);
         }
 
         if (!multiple) {
-            setIsFocused(false); // Automatically close the dropdown for single select
+            setIsFocused(false);
         }
     };
 
@@ -79,7 +95,7 @@ function SearchableSelect<T>({
         setSearchTerm('');
         setSelectedOptions([]);
         if (onSelect) {
-            onSelect([], '' as any);
+            onSelect([], null);
         }
         setIsFocused(false);
     };
@@ -87,14 +103,14 @@ function SearchableSelect<T>({
     const displayValue: string = useMemo(() => {
         if (multiple) {
             return selectedOptions.map(value => {
-                const option = options.find(option => JSON.stringify(option) === value);
+                const option = options.find(opt => JSON.stringify(opt) === value);
                 return (option as T)?.[displayProperty as keyof T] || (option as IOption)?.label || '';
             }).join(', ') as string;
         } else {
             const option = selectedOptions[0] ? JSON.parse(selectedOptions[0]) : null;
             return ((option as T)?.[displayProperty as keyof T] || (option as IOption)?.label || '') as string;
         }
-    }, [selectedOptions, options, multiple, displayProperty]);
+    }, [selectedOptions, options, multiple, displayProperty, valueProperty]);
 
     return (
         <div ref={ref} onBlur={handleBlur} className={`${className || ''} relative w-full`}>
@@ -107,12 +123,12 @@ function SearchableSelect<T>({
                 onChange={(e) => setSearchTerm(e.target.value)}
                 onFocus={() => {
                     setIsFocused(true);
-                    setSearchTerm(''); // Clear search term on focus to show all options
+                    setSearchTerm('');
                 }}
                 icon={
-                    (searchTerm || displayValue)   ? (
+                    (searchTerm || displayValue) ? (
                         <CgClose className="h-5 w-5 cursor-pointer" onClick={handleClear}/>
-                    ): null
+                    ) : null
                 }
                 placeholder={!isFocused && multiple ? displayValue : ''}
             />
@@ -125,9 +141,9 @@ function SearchableSelect<T>({
                         >
                             <ListItem
                                 disabled={disabled}
-                                className={`cursor-pointer ${selectedOptions.includes(JSON.stringify(option)) ? 'bg-gray-300' : ''}`}
+                                className={`cursor-pointer ${selectedOptions.includes(JSON.stringify(option)) ? 'bg-blue-300' : ''}`}
                             >
-                                {displayProperty ? (option as any)[displayProperty] : (option as IOption).label}
+                                {displayProperty ? (option as T)[displayProperty as keyof T] : (option as any).label}
                             </ListItem>
                         </a>
                     ))}

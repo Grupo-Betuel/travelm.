@@ -1,4 +1,4 @@
-import {ISocialNetwork} from "./ISocialNetwork";
+import {SocialNetworkModels} from "./SocialNetworkModels";
 import {IMedia} from "./mediaModel";
 import {IContact} from "./contactModel";
 import {IReview} from "./reviewsModel";
@@ -22,7 +22,7 @@ export interface IOrganization extends BaseModel {
     name: string;
     description: string;
     logo: IMedia;
-    socialNetworks: ISocialNetwork[];
+    socialNetworks: SocialNetworkModels[];
     medias: IMedia[];
     contact: IContact;
     reviews: IReview[];

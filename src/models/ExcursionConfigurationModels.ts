@@ -8,6 +8,7 @@ export enum ExcursionConfigTypeEnum {
     RECEIPT = 'receipt',
     RULE = 'rules',
     ADVICE = 'advices',
+    CUSTOM = 'custom',
 }
 
 export interface ITravelList {
@@ -24,14 +25,14 @@ export interface IExcursionConfigAction {
     title: string;
 };
 
-export interface IExcursionConfigMessage {
+export interface IExcursionMessage {
     type: ExcursionConfigTypeEnum;
     text: string;
-    medias: IMedia[];
+    medias?: IMedia[];
 }
 
 export interface IExcursionConfiguration {
-    messages: IExcursionConfigMessage[],
+    messages: IExcursionMessage[],
     actions: IExcursionConfigAction[],
     rules: ITravelList;
     advices: ITravelList;

@@ -26,7 +26,7 @@ import {ICustomComponentDialog, IPathDataParam} from "@/models/common";
 import {getCrudService} from "@/api/services/CRUD.service";
 import UserForm from "../../users/components/UserForm";
 import IUser, {UserRoleTypes, UserTypes} from "../../../../models/interfaces/userModel";
-import {ISocialNetwork} from "@/models/ISocialNetwork";
+import {SocialNetworkModels} from "@/models/SocialNetworkModels";
 import ContactForm from "@/pages/dashboard/excursion/components/ContactForm";
 
 export interface OrganizationHandlerProps {
@@ -110,7 +110,7 @@ export const OrganizationForm: React.FC<OrganizationHandlerProps> = (
         }
     };
 
-    const handleSocialNetworksChange = (socialNetworks: ISocialNetwork[]) => {
+    const handleSocialNetworksChange = (socialNetworks: SocialNetworkModels[]) => {
         setOrganization((prevFormData) => ({
             ...prevFormData,
             socialNetworks,

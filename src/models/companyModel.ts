@@ -1,4 +1,4 @@
-import {ISocialNetwork} from "./ISocialNetwork";
+import {SocialNetworkModels} from "./SocialNetworkModels";
 
 export type CompanyTypes = 'store' | 'agency' | 'other';
 export class CompanyModel {
@@ -26,7 +26,7 @@ export class CompanyModel {
 
     logo: string = '';
 
-    facebook: ISocialNetwork = {} as ISocialNetwork;
+    facebook: SocialNetworkModels = {} as SocialNetworkModels;
 
-    instagram: ISocialNetwork = {} as ISocialNetwork;
+    instagram: SocialNetworkModels = {} as SocialNetworkModels;
 }

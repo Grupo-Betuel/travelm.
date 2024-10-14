@@ -23,7 +23,7 @@ import {IClient} from "../models/clientModel";
 import IUser from "../models/interfaces/userModel";
 import {ITransportResource} from "../models/transportResourcesModel";
 import {IExpense} from "@/models/ExpensesModel";
-import {ISocialNetwork} from "@/models/ISocialNetwork";
+import {SocialNetworkModels} from "@/models/SocialNetworkModels";
 
 export const EntityApiStores: EntityStores = {
     contacts: createEntityApiSlice<IContact & BaseModel>('contacts'),
@@ -46,7 +46,7 @@ export const EntityApiStores: EntityStores = {
     travelClients: createEntityApiSlice<IClient>('travelClients'),
     travelUsers: createEntityApiSlice<IUser & BaseModel>('travelUsers'),
     transportResources: createEntityApiSlice<ITransportResource & BaseModel>('transportResources'),
-    socialNetworks: createEntityApiSlice<ISocialNetwork & BaseModel>('socialNetworks'),
+    socialNetworks: createEntityApiSlice<SocialNetworkModels & BaseModel>('socialNetworks'),
 }
 
 const storeReducer: any = {};

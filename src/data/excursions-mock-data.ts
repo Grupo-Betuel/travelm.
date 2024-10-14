@@ -8,7 +8,7 @@ import {ILocation} from "@/models/ordersModels";
 import {IActivity} from "@/models/activitiesModel";
 import {IReview} from "@/models/reviewsModel";
 import {IComment} from "@/models/commentModel";
-import {ISocialNetwork} from "@/models/ISocialNetwork";
+import {SocialNetworkModels} from "@/models/SocialNetworkModels";
 import {IOrganization} from "@/models/organizationModel";
 import {IBus} from "@/models/busesModel";
 import {ICheckpoint} from "@/models/checkpointModel";
@@ -114,7 +114,7 @@ const mockUser: IUser = {
     password: "password",
 };
 
-const mockSocialNetwork: ISocialNetwork = {
+const mockSocialNetwork: SocialNetworkModels = {
     type: 'instagram',
     url: 'https://instagram.com/exampleuser',
     username: 'exampleuser',

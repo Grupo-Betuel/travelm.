@@ -1,5 +1,5 @@
 import {IService} from "./serviceModel";
-import {ISocialNetwork} from "./ISocialNetwork";
+import {SocialNetworkModels} from "./SocialNetworkModels";
 import {BaseModel} from "./interfaces/BaseModel";
 
 export interface IClient extends BaseModel {
@@ -10,6 +10,6 @@ export interface IClient extends BaseModel {
     email: string;
     services: IService[];
     currentService?: IService;
-    socialNetworks: ISocialNetwork[];
+    socialNetworks: SocialNetworkModels[];
     relatedCompanies?: string,
 }
