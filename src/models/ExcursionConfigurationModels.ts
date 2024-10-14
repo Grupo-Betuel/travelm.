@@ -1,4 +1,5 @@
 import {IMedia} from "@/models/mediaModel";
+import {IOption} from "@/components/SearchableSelect";
 
 export enum ExcursionConfigTypeEnum {
     PROMOTION = 'promotion',
@@ -37,3 +38,25 @@ export interface IExcursionConfiguration {
     rules: ITravelList;
     advices: ITravelList;
 }
+
+export const excursionConfigTypeLabels: { [N in ExcursionConfigTypeEnum]: string } = {
+    promotion: 'Promoción',
+    'request-payment': 'Solicitud de pago',
+    motivation: 'Motivación',
+    ticket: 'Boleto',
+    receipt: 'Recibo',
+    rules: 'Reglas',
+    advices: 'Consejos',
+    custom: 'Personalizado'
+}
+
+export const excursionConfigTypeList: IOption<ExcursionConfigTypeEnum>[] = [
+    { value: ExcursionConfigTypeEnum.PROMOTION, label: excursionConfigTypeLabels.promotion },
+    { value: ExcursionConfigTypeEnum.REQUEST_PAYMENT, label: excursionConfigTypeLabels["request-payment"] },
+    { value: ExcursionConfigTypeEnum.MOTIVATION, label: excursionConfigTypeLabels.motivation },
+    { value: ExcursionConfigTypeEnum.TICKET, label: excursionConfigTypeLabels.ticket },
+    { value: ExcursionConfigTypeEnum.RECEIPT, label: excursionConfigTypeLabels.receipt },
+    { value: ExcursionConfigTypeEnum.RULE, label: excursionConfigTypeLabels.rules },
+    { value: ExcursionConfigTypeEnum.ADVICE, label: excursionConfigTypeLabels.advices },
+    { value: ExcursionConfigTypeEnum.CUSTOM, label: excursionConfigTypeLabels.custom }
+]
