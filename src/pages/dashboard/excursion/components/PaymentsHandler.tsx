@@ -28,8 +28,15 @@ import FormControl from "@/components/FormControl";
 import {InfoCardItem} from "@/components/InfoCardItem";
 import {BiDollar, BiEdit, BiSave, BiTrash} from "react-icons/bi";
 import {FaRegSave} from "react-icons/fa";
+import {useAuth} from "@/context/authContext";
+import {BlobProviderParams, PDFDownloadLink} from "@react-pdf/renderer";
+import PaymentPDF from "@/components/pdf/PaymentsPdfTemplate";
+import {IClient} from "@/models/clientModel";
+import {IExcursion} from "@/models/excursionModel";
 
 interface PaymentHandlerProps {
+    client?: IClient;
+    excursion?: IExcursion;
     enableAddPayment?: boolean;
     payments: IPayment[];
     onChangePayment: (payments: IPayment[]) => any;
@@ -38,13 +45,15 @@ interface PaymentHandlerProps {
 
 export const emptyPayment: IPayment = {type: 'cash', date: new Date(), amount: 0, comment: '', media: undefined};
 
-
 const PaymentHandler: React.FC<PaymentHandlerProps> = (
     {
+        client,
+        excursion,
         payments,
         onDeletePayment,
         onChangePayment,
     }) => {
+    const {user} = useAuth();
     const [selectedPayment, setSelectedPayment] = useState<IPayment | null>(null);
 
     const onConfirmAction = (type?: CommonConfirmActions, data?: CommonConfirmActionsDataTypes<IPayment>) => {
@@ -109,6 +118,15 @@ const PaymentHandler: React.FC<PaymentHandlerProps> = (
         onDeletePayment(p);
     }
 
+    const handlePrintPayment = () => {
+        console.log(payments);
+        console.log(client);
+        console.log(user);
+        console.log(excursion);
+    };
+
+    // @ts-ignore
+    // @ts-ignore
     return (
         <div className="flex flex-col gap-3">
             <form onSubmit={handleSubmit(addOrUpdatePayment)}>
@@ -174,8 +192,29 @@ const PaymentHandler: React.FC<PaymentHandlerProps> = (
                         <FaRegSave className="text-md"/>
                         {getValues('_id') ? "Guardar Cambios" : "Agregar"}
                     </Button>
+                    {/* Botón para imprimir payment en consola */}
+                    <Button
+                        variant="text" className="text-sm flex items-center gap-3" onClick={handlePrintPayment}>
+                        <BiEdit className="text-md"/>
+                        Imprimir Payment
+                    </Button>
                 </div>
             </form>
+            <div className="text-right">
+                <PDFDownloadLink
+                    document={<PaymentPDF title={excursion?.title} client={client} payments={payments} user={user}/>}
+                    fileName={`pago_Prueba.pdf`}
+                    style={{
+                        textDecoration: 'none',
+                        padding: '10px',
+                        color: '#fff',
+                        backgroundColor: '#007bff',
+                        borderRadius: '5px',
+                    }}
+                >
+                    Guardar PDF
+                </PDFDownloadLink>
+            </div>
             <div className="flex items-end overflow-x-auto gap-4 pt-10 pb-2">
                 {payments.map((payment, index) => (
                     <InfoCardItem
