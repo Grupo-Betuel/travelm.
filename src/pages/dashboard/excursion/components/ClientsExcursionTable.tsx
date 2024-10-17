@@ -759,6 +759,8 @@ export const ClientsExcursionTable = (
                         <DialogBody className="overflow-y-scroll max-h-[80dvh]">
                             {selectedService ? (
                                 <PaymentHandler
+                                    client={selectedClient}
+                                    excursion={excursion}
                                     enableAddPayment={selectedService.status !== 'paid'}
                                     payments={selectedService.payments}
                                     onDeletePayment={handleDeletePayment}
